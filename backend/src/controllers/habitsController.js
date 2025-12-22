@@ -6,7 +6,7 @@ export const getHabits = async (req, res) => {
     throw new AppError('User is not authorized.', 401);
   }
 
-  const habits = await HabitModel.find({ user: req.user._id });
+  const habits = await HabitModel.find({ userId: req.user._id });
 
   res.status(200).json({
     success: true,
