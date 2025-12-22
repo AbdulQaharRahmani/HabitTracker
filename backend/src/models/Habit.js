@@ -13,7 +13,7 @@ const HabitSchema = new mongoose.Schema(
       type: String,
       enum: [
         'daily',
-        'everyotherday',
+        'every-other-day',
         'weekly',
         'biweekly',
         'weekdays',
