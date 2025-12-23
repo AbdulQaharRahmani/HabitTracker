@@ -1,9 +1,19 @@
 import express from 'express';
 import { asyncHandler } from '../../utils/asyncHandler.js';
-import { createHabit } from '../controllers/habitsController.js';
+import {
+  createHabit,
+  deleteHabit,
+  getHabits,
+  updateHabit,
+} from '../controllers/habitsController.js';
 
 const router = express.Router();
 
 router.post('/', asyncHandler(createHabit));
+
+router
+  .route('/:id')
+  .patch(asyncHandler(updateHabit))
+  .delete(asyncHandler(deleteHabit));
 
 export default router;

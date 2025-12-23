@@ -27,7 +27,7 @@ const HabitSchema = new mongoose.Schema(
   }
 );
 
-HabitSchema.methods.isOwner = async function (userId) {
+HabitSchema.methods.isOwner = function (userId) {
   return String(this.userId) === String(userId);
 };
 
