@@ -42,10 +42,12 @@ export const loginUser = async (req, res) => {
         {expiresIn: process.env.JWT_EXPIRES_IN}
     )
     res.status(200).json({
-        success: true,
-        message:'Login Successfully',
+        success:true,
+        message:"Login Successfully",
+        data:{
         token,
-        id: user._id,
-        email: user.email
+        id:user._id,
+        email:user.emali
+        }
     });
 };
