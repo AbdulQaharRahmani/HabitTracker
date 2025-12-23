@@ -10,6 +10,7 @@ import {
 const router = express.Router();
 
 router.post('/', asyncHandler(createHabit));
+router.get('/', asyncHandler(getHabits));
 
 router
   .route('/:id')
