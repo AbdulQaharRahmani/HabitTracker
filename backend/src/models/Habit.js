@@ -27,6 +27,7 @@ const HabitSchema = new mongoose.Schema(
   }
 );
 
+// Check if the habit belongs to the logged-in user
 HabitSchema.methods.isOwner = function (userId) {
   return String(this.userId) === String(userId);
 };
