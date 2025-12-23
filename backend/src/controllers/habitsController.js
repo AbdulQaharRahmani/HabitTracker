@@ -27,14 +27,14 @@ export const createHabit = async (req, res) => {
   res.status(201).json(habit);
 };
 
-export const updateHabit = async (req, res, next) => {
-  if (!req.user) return next(new AppError('User is not authorized.', 401));
+export const updateHabit = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized.', 401);
 
   const habit = await HabitModel.findById(req.params.id);
-  if (!habit) return next(notFound('Habit'));
+  if (!habit) throw notFound('Habit');
 
   if (!habit.isOwner(req.user._id))
-    return next(new AppError('You are not allowed to update this habit', 403));
+    throw new AppError('You are not allowed to update this habit', 403);
 
   const { title, description, frequency } = req.body;
 
@@ -50,14 +50,14 @@ export const updateHabit = async (req, res, next) => {
   });
 };
 
-export const deleteHabit = async (req, res, next) => {
-  if (!req.user) return next(new AppError('User is not authorized.', 401));
+export const deleteHabit = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized.', 401);
 
   const habit = await HabitModel.findById(req.params.id);
-  if (!habit) return next(notFound('Habit'));
+  if (!habit) throw notFound('Habit');
 
   if (!habit.isOwner(req.user._id))
-    return next(new AppError('You are not allowed to delete this habit', 403));
+    throw new AppError('You are not allowed to delete this habit', 403);
 
   await habit.deleteOne();
 
