@@ -1,13 +1,14 @@
 import { AppError } from '../../utils/error.js';
 import { UserModel } from '../models/User.js';
+import jwt  from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 export const registerUser = async (req, res) => {
     const {email, password} = req.body;
 
-    const emailExisted = await UserModel.findOne({email});
+    const emailExisted = await UserModel.exists({email});
     if(emailExisted){
-        throw new AppError('E-Mail exists already, please pick a different one.', 400);
+        throw new AppError('Email exists already', 400);
     }
 
     const hashPassword = await bcrypt.hash(password, 12);
@@ -15,9 +16,9 @@ export const registerUser = async (req, res) => {
         email,
         password: hashPassword
     })
-    res.status(201).json({
+    res.status(200).json({
         success: true,
-        data: users
+        message: 'User registered successfully'
     });
 };
 
@@ -26,15 +27,25 @@ export const loginUser = async (req, res) => {
 
     const user = await UserModel.findOne({email});
     if(!user){
-        throw new AppError('User not existed!', 400);
+        throw new AppError('User not existed!', 404);
     }
     
     const pswMatch = await bcrypt.compare(password, user.password);
     if(!pswMatch){
         throw new AppError('Password has to match',400);
     }
-    res.status(201).json({
+
+    const token = await jwt.sign(
+        {userId: user._id,
+        email: user.email},
+        process.env.JWT_SECRET,
+        {expiresIn: process.env.JWT_EXPIRES_IN}
+    )
+    res.status(200).json({
         success: true,
-        data: user
+        message:'Login Successfully',
+        token,
+        id: user._id,
+        email: user.email
     });
 };
