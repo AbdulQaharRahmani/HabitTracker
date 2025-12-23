@@ -24,7 +24,10 @@ export const createHabit = async (req, res) => {
     frequency,
   });
 
-  res.status(201).json(habit);
+  res.status(201).json({
+    success: true,
+    data: habit,
+  });
 };
 
 export const updateHabit = async (req, res) => {
