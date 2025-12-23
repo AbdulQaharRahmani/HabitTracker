@@ -13,7 +13,7 @@ router.post('/', asyncHandler(createHabit));
 
 router
   .route('/:id')
-  .patch(asyncHandler(updateHabit))
+  .put(asyncHandler(updateHabit))
   .delete(asyncHandler(deleteHabit));
 
 export default router;
