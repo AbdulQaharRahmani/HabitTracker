@@ -46,7 +46,7 @@ export const completeHabit = async (req, res) => {
   if (!habit) throw notFound('Habit');
 
   // Validate habit ownership
-  if (!(await habit.isOwner(req.user._id)))
+  if (!habit.isOwner(req.user._id))
     throw new AppError('Not allowed to modify this habit', 403);
 
   // Validate if habit is completed for the same day
@@ -73,7 +73,7 @@ export const uncompleteHabit = async (req, res) => {
   if (!habit) throw notFound('Habit');
 
   // Validate habit ownership
-  if (!(await habit.isOwner(req.user._id)))
+  if (!habit.isOwner(req.user._id))
     throw new AppError('Not allowed to modify this habit', 403);
 
   const [startOfToday, endOfToday] = DateHelper.getStartAndEndOfToday();
