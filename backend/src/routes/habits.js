@@ -4,11 +4,17 @@ import {
   createHabit,
   getHabits,
   reorderHabits,
+  completeHabit,
+  createHabit,
+  getHabits,
+  uncompleteHabit,
 } from '../controllers/habitsController.js';
 
 const router = express.Router();
 
 router.post('/', asyncHandler(createHabit));
+router.post('/:id/complete', asyncHandler(completeHabit));
+router.delete('/:id/complete', asyncHandler(uncompleteHabit));
 router.get('/', asyncHandler(getHabits));
 router.put('/reorder', asyncHandler(reorderHabits));
 export default router;
