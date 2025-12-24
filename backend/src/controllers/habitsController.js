@@ -19,10 +19,6 @@ export const createHabit = async (req, res) => {
 
   const { title, description, frequency } = req.body;
 
-  // Not efficient way:
-  // const isExistHabit = await HabitModel.findOne({req.user._id, title})
-  // if (isExistHabit) throw new AppError('Habit already exists!', 400);
-
   const habit = await HabitModel.create({
     userId: req.user._id,
     title,
