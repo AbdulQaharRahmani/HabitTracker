@@ -1,6 +1,7 @@
 import { AppError, notFound } from '../utils/error.js';
 import { HabitModel } from '../models/Habit.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
+import { DateHelper } from '../../utils/date.js';
 
 export const getHabits = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
