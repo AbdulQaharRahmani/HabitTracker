@@ -27,7 +27,7 @@ router.get('/', auth, asyncHandler(getHabits));
 
 router
   .route('/:id')
-  .put(asyncHandler(updateHabit))
-  .delete(asyncHandler(deleteHabit));
+  .put(auth, asyncHandler(updateHabit))
+  .delete(auth, asyncHandler(deleteHabit));
 
 export default router;
