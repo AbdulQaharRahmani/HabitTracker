@@ -1,0 +1,53 @@
+{
+  "users": [
+    {
+      "_id": "64f1a1c9a1f4b5d123456789",
+      "name": "Hamid",
+      "email": "hamid@example.com",
+      "password": "hashed_password_here"
+    },
+    {
+      "_id": "64f1a1c9a1f4b5d123456780",
+      "name": "Ali",
+      "email": "ali@example.com",
+      "password": "hashed_password_here"
+    }
+  ],
+  "habits": [
+    {
+      "_id": "1001",
+      "userId": "64f1a1c9a1f4b5d123456789",
+      "title": "Drink Water",
+      "frequency": "daily",
+      "createdAt": "2025-12-01T08:00:00.000Z"
+    },
+    {
+      "_id": "1002",
+      "userId": "64f1a1c9a1f4b5d123456789",
+      "title": "Go to Gym",
+      "frequency": "weekdays",
+      "createdAt": "2025-12-03T08:00:00.000Z"
+    },
+    {
+      "_id": "1003",
+      "userId": "64f1a1c9a1f4b5d123456789",
+      "title": "Read Book",
+      "frequency": "weekly",
+      "createdAt": "2025-12-05T08:00:00.000Z"
+    }
+  ],
+  "habitCompletions": [
+    {
+      "_id": "2001",
+      "userId": "64f1a1c9a1f4b5d123456789",
+      "habitId": "1001",
+      "date": "2025-12-24T10:00:00.000Z"
+    },
+    {
+      "_id": "2002",
+      "userId": "64f1a1c9a1f4b5d123456789",
+      "habitId": "1002",
+      "date": "2025-12-24T12:00:00.000Z"
+    }
+  ]
+}

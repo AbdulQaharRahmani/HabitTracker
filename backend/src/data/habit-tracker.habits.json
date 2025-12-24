@@ -1,0 +1,162 @@
+[
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Drink Water",
+    "frequency": "daily",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Go to Gym",
+    "frequency": "weekdays",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Read Book",
+    "frequency": "weekly",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Meditation",
+    "frequency": "daily",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Walk Dog",
+    "frequency": "daily",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Cook Meal",
+    "frequency": "weekends",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Call Family",
+    "frequency": "weekly",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Learn Coding",
+    "frequency": "every-other-day",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Clean Room",
+    "frequency": "weekdays",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Journal Writing",
+    "frequency": "daily",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Yoga",
+    "frequency": "weekdays",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Study Languages",
+    "frequency": "biweekly",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Stretching",
+    "frequency": "daily",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Plan Week",
+    "frequency": "weekly",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Drink Tea",
+    "frequency": "daily",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Gardening",
+    "frequency": "weekends",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Practice Instrument",
+    "frequency": "every-other-day",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Review Notes",
+    "frequency": "weekdays",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Clean Kitchen",
+    "frequency": "weekly",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  },
+  {
+    "userId": {
+      "$oid": "64f1a1c9a1f4b5d123456788"
+    },
+    "title": "Watch Tutorial",
+    "frequency": "daily",
+    "createdAt": "2025-12-01T08:00:00.000Z"
+  }
+]
