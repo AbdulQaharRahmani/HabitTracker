@@ -5,8 +5,6 @@ import {
   getHabits,
   reorderHabits,
   completeHabit,
-  createHabit,
-  getHabits,
   uncompleteHabit,
 } from '../controllers/habitsController.js';
 
