@@ -1,0 +1,110 @@
+:root {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  background: linear-gradient(to top, #ffffff 0%, #aee5ff 100%);
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    place-items: center;
+    box-sizing: border-box;
+    min-width: 320px;
+    min-height: 100vh;
+}
+
+.my-container{
+    margin: 1rem 4rem;
+    margin-bottom : 0;
+    padding: 2rem;
+    text-align: center;
+}
+
+.default-text-color{
+    color: #09a2e9;
+}
+
+.info-container > a {
+    color: #09a2e97b;
+    transition: all 200ms ease-in;
+    text-decoration: none;
+}
+
+.info-container > a:hover{
+    color: #38befc;
+}
+
+.profile-pic{
+    border: solid 4px #fff;
+    border-radius: 50%;
+    padding: 3rem;
+}
+
+.sidebar-container-row{
+    margin: 0.1rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+    justify-items: center;
+    border: solid 1px #fff;
+    border-radius: 12px;
+    background-color: none;
+    transition: all 200ms ease-in-out;
+    box-shadow: 1px 1px 2px #aee5ff;
+}
+
+.icon{
+    display: block;
+    margin: 0 auto;
+}
+
+.sidebar-container-row:hover{
+    background-color: #86d9ff19;
+    border-color: #38befc;
+    box-shadow: 
+    0 0 15px #e4f6fe, 
+    0 0 30px #cbf2fe, 
+    0 0 45px #f9fdff,
+    inset 0 0 20px rgba(255,255,255,0.6);
+}
+
+.selected{
+    background-color: #ffffff;
+    box-shadow: 
+    0 0 15px #9ddefc, 
+    0 0 30px #cbf2fe, 
+    0 0 45px #f9fdff,
+    inset 0 0 20px rgba(255,255,255,0.6);
+    border-radius: 12px;
+}
+
+.sidebar-container{
+    padding: 0 2rem;
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+}
+
+.sidebar-wrapper {
+    margin-bottom: 0.5rem;
+    position: relative;
+    width: fit-content;
+}
+
+.sidebar-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to top, #5ec4f4 0%, #ffffff 100%);
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
