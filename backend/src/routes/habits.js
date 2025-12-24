@@ -1,22 +1,29 @@
 import express from 'express';
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   createHabit,
   deleteHabit,
   getHabits,
   updateHabit,
   completeHabit,
-  createHabit,
-  getHabits,
   uncompleteHabit,
 } from '../controllers/habitsController.js';
 
 const router = express.Router();
 
-router.post('/', asyncHandler(createHabit));
+import mongoose from 'mongoose';
+
+const auth = (req, res, next) => {
+  req.user = {
+    _id: new mongoose.Types.ObjectId('694c1e9da83cd8cfd3ae6d9b'),
+  };
+  next();
+};
+
+router.post('/', auth, asyncHandler(createHabit));
 router.post('/:id/complete', asyncHandler(completeHabit));
 router.delete('/:id/complete', asyncHandler(uncompleteHabit));
-router.get('/', asyncHandler(getHabits));
+router.get('/', auth, asyncHandler(getHabits));
 
 router
   .route('/:id')

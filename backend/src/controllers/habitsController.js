@@ -1,5 +1,4 @@
-import { DateHelper } from '../../utils/date.js';
-import { AppError, notFound } from '../../utils/error.js';
+import { AppError, notFound } from '../utils/error.js';
 import { HabitModel } from '../models/Habit.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
 
@@ -18,6 +17,10 @@ export const createHabit = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
 
   const { title, description, frequency } = req.body;
+
+  // Not efficient way:
+  // const isExistHabit = await HabitModel.findOne({req.user._id, title})
+  // if (isExistHabit) throw new AppError('Habit already exists!', 400);
 
   const habit = await HabitModel.create({
     userId: req.user._id,
@@ -69,6 +72,8 @@ export const deleteHabit = async (req, res) => {
   res.status(200).json({
     success: true,
     message: 'habit deleted successfully',
+  });
+};
 //Mark habit as completed.
 //Route: Post => api/habits/:id/complete
 export const completeHabit = async (req, res) => {

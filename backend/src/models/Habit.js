@@ -32,4 +32,7 @@ HabitSchema.methods.isOwner = function (userId) {
   return String(this.userId) === String(userId);
 };
 
+// User can not create two habit with same title
+HabitSchema.index({ userId: 1, title: 1 }, { unique: true });
+
 export const HabitModel = mongoose.model('Habit', HabitSchema);
