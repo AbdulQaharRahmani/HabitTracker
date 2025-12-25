@@ -6,8 +6,8 @@
 
 :root {
     font-family: 'Tinos', serif;
-    line-height: 1.5;
-    font-weight: 400;
+    /* line-height: 1.5; */
+    /* font-weight: 400; */
     
     /* Primary colors */
     --color-primary: #6366F1;
@@ -35,7 +35,7 @@
 
     --color-bg: #f3f4f6;
     --color-text-black: #1F2937;
-    --color-text-gray: #B9BCC4;
+    --color-text-gray: #7e8189;
     --color-text-light-gray: #E2E4E8;
 }
 
@@ -48,5 +48,20 @@ body {
     min-height: 100vh; 
     font-family: 'Tinos', serif;
     background-color: var(--color-bg);
-    color: var(--color-text);
+}
+
+.sidebar-bg{
+    background-color: #fff;
+}
+
+.text-black{
+    color: var(--color-text-black)
+}
+
+.text-gray{
+    color: var(--color-text-gray);
+}
+
+.bg-white{
+    background-color: #ffffff;
 }
