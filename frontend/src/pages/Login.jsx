@@ -44,7 +44,7 @@ export default function Login() {
                     <div className="p-5 rounded-2xl mb-4 rotate-3 animate-bounce " style={{ backgroundColor: '#7B68EE' }}>
                         <FaUser className="text-white text-4xl " />
                     </div>
-                    <h1 className="text-3xl font-black tracking-tight text-gray-800 uppercase">
+                    <h1 className="text-3xl font-black text-gray-800 uppercase">
                         Login
                     </h1>
                 </div>
@@ -54,7 +54,7 @@ export default function Login() {
                         
                         {/* Email Input */}
                         <div className="relative ">
-                            <MdEmail className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl transition-colors group-focus-within:text-[#00D4AA]" style={{ color: '#7B68EE' }} />
+                            <MdEmail className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl" style={{ color: '#7B68EE' }} />
                             <input
                                 type="text"
                                 placeholder="Your Email"
@@ -66,7 +66,7 @@ export default function Login() {
 
                         {/* Password Input */}
                         <div className="relative ">
-                            <MdLock className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl group-focus-within:text-[#00D4AA]" style={{ color: '#7B68EE' }} />
+                            <MdLock className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl" style={{ color: '#7B68EE' }} />
                             <input
                                 type={passwordType}
                                 placeholder="Your Password"
