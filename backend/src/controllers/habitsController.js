@@ -6,16 +6,46 @@ import { DateHelper } from '../utils/date.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
 
 export const getHabits = async (req, res) => {
-  if (!req.user) {
-    throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw new AppError('Unauthorized', 401);
+
+  const dateString = req.query.date;
+
+  const habits = await HabitModel.find({
+    userId: req.user._id,
+  });
+
+  if (!dateString) {
+    return res.status(200).json({
+      success: true,
+      data: habits,
+    });
   }
 
-  const habits = await HabitModel.find({ userId: req.user._id });
+  const date = dayjs(dateString, 'YYYY-MM-DD', true);
+  if (!date.isValid()) throw new AppError('Invalid date', 400);
 
-  res.status(200).json({
-    success: true,
-    data: habits,
+  const startOfDay = date.startOf('day').toDate();
+  const endOfDay = date.endOf('day').toDate();
+
+  const completedHabits = await HabitCompletionModel.find({
+    userId: req.user._id,
+    date: { $gte: startOfDay, $lte: endOfDay },
   });
+
+  const completedHabitsIds = new Set(
+    completedHabits.map((c) => c.habitId.toString())
+  );
+
+  const results = habits
+    .filter((h) => isHabitForSelectedDay(h, date))
+    .map((h) => ({
+      _id: h._id,
+      title: h.title,
+      frequency: h.frequency,
+      completed: completedHabitsIds.has(h._id.toString()),
+    }));
+
+  res.status(200).json({ success: true, data: results });
 };
 
 export const createHabit = async (req, res) => {
@@ -35,44 +65,6 @@ export const createHabit = async (req, res) => {
   res.status(201).json({
     success: true,
     data: habit,
-  });
-};
-
-export const getHabitsForSelectedDays = async (req, res) => {
-  const dateString = req.query.date || dayjs().format('YYYY-MM-DD');
-  const date = dayjs(dateString, 'YYYY-MM-DD', true);
-
-  if (!date.isValid()) throw new AppError('Invalid date', 400);
-
-  const startOfDay = date.startOf('day').toDate();
-  const endOfDay = date.endOfDay('day').toDate();
-
-  // Fetch all habits
-  const habits = await HabitModel.find({ userId: req.user._id });
-
-  // Fetch all completedHabits for this date in one query
-  const completedHabits = await HabitCompletionModel.find({
-    userId: req.user._id,
-    date: { $gte: startOfDay, $lte: endOfDay },
-  });
-
-  // Create a set of completed habit IDs for O(1) lookup
-  const completedHabitsIds = new Set(
-    completedHabits.map((c) => c.habitId.toString())
-  );
-
-  const results = habits
-    .filter((habit) => isHabitForSelectedDay(habit, date))
-    .map((habit) => ({
-      _id: habit._id,
-      title: habit.title,
-      frequency: habit.frequency,
-      completed: completedHabitsIds.has(habit._id.toString()),
-    }));
-
-  res.status(200).json({
-    success: true,
-    data: results,
   });
 };
 

@@ -1,53 +1,50 @@
-{
-  "users": [
-    {
-      "_id": "64f1a1c9a1f4b5d123456789",
-      "name": "Hamid",
-      "email": "hamid@example.com",
-      "password": "hashed_password_here"
-    },
-    {
-      "_id": "64f1a1c9a1f4b5d123456780",
-      "name": "Ali",
-      "email": "ali@example.com",
-      "password": "hashed_password_here"
-    }
-  ],
-  "habits": [
-    {
-      "_id": "1001",
-      "userId": "64f1a1c9a1f4b5d123456789",
-      "title": "Drink Water",
-      "frequency": "daily",
-      "createdAt": "2025-12-01T08:00:00.000Z"
-    },
-    {
-      "_id": "1002",
-      "userId": "64f1a1c9a1f4b5d123456789",
-      "title": "Go to Gym",
-      "frequency": "weekdays",
-      "createdAt": "2025-12-03T08:00:00.000Z"
-    },
-    {
-      "_id": "1003",
-      "userId": "64f1a1c9a1f4b5d123456789",
-      "title": "Read Book",
-      "frequency": "weekly",
-      "createdAt": "2025-12-05T08:00:00.000Z"
-    }
-  ],
-  "habitCompletions": [
-    {
-      "_id": "2001",
-      "userId": "64f1a1c9a1f4b5d123456789",
-      "habitId": "1001",
-      "date": "2025-12-24T10:00:00.000Z"
-    },
-    {
-      "_id": "2002",
-      "userId": "64f1a1c9a1f4b5d123456789",
-      "habitId": "1002",
-      "date": "2025-12-24T12:00:00.000Z"
-    }
-  ]
-}
+[
+  {
+    "userId": { "$oid": "694d177e9c791573bbaf5824" },
+    "title": "Study Data Structure",
+    "description": "Improve my logic",
+    "frequency": "daily",
+    "createdAt": { "$date": "2025-12-10T09:00:00.000Z" },
+    "updatedAt": { "$date": "2025-12-10T09:00:00.000Z" }
+  },
+  {
+    "userId": { "$oid": "694d177e9c791573bbaf5824" },
+    "title": "Go to Gym",
+    "description": "Workout and stay fit",
+    "frequency": "everyOtherDay",
+    "createdAt": { "$date": "2025-12-11T09:00:00.000Z" },
+    "updatedAt": { "$date": "2025-12-11T09:00:00.000Z" }
+  },
+  {
+    "userId": { "$oid": "694d177e9c791573bbaf5824" },
+    "title": "Read Book",
+    "description": "Read 20 pages",
+    "frequency": "weekly",
+    "createdAt": { "$date": "2025-12-05T09:00:00.000Z" },
+    "updatedAt": { "$date": "2025-12-05T09:00:00.000Z" }
+  },
+  {
+    "userId": { "$oid": "694d177e9c791573bbaf5824" },
+    "title": "Weekly Review",
+    "description": "Review weekly progress",
+    "frequency": "biweekly",
+    "createdAt": { "$date": "2025-12-01T09:00:00.000Z" },
+    "updatedAt": { "$date": "2025-12-01T09:00:00.000Z" }
+  },
+  {
+    "userId": { "$oid": "694d177e9c791573bbaf5824" },
+    "title": "Study on Weekdays",
+    "description": "Only weekdays habit",
+    "frequency": "weekdays",
+    "createdAt": { "$date": "2025-12-02T09:00:00.000Z" },
+    "updatedAt": { "$date": "2025-12-02T09:00:00.000Z" }
+  },
+  {
+    "userId": { "$oid": "694d177e9c791573bbaf5824" },
+    "title": "Family Time",
+    "description": "Spend time with family",
+    "frequency": "weekends",
+    "createdAt": { "$date": "2025-12-03T09:00:00.000Z" },
+    "updatedAt": { "$date": "2025-12-03T09:00:00.000Z" }
+  }
+]
