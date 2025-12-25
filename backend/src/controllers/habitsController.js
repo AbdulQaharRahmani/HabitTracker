@@ -1,8 +1,9 @@
-import { AppError } from '../utils/error.js';
-import { HabitModel } from '../models/Habit.js';
 import dayjs from 'dayjs';
-import { HabitCompletion } from '../models/HabitCompletion.js';
+import { AppError, notFound } from '../utils/error.js';
+import { HabitModel } from '../models/Habit.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
+import { DateHelper } from '../utils/date.js';
+import { HabitCompletionModel } from '../models/HabitCompletion.js';
 
 export const getHabits = async (req, res) => {
   if (!req.user) {
@@ -37,75 +38,6 @@ export const createHabit = async (req, res) => {
   });
 };
 
-// export const getHabitsForSelectedDays = async (req, res) => {
-//   // if (!req.user) throw new AppError('User is not authorized.', 401);
-
-//   // const dateString = req.query.date || dayjs().format('YYYY-MM-DD');
-//   const dateString = dayjs().format('YYYY-MM-DD');
-//   const date = dayjs(dateString, 'YYYY-MM-DD', true);
-//   console.log(dateString, date);
-
-//   if (!date.isValid()) throw new AppError('Invalid date', 400);
-
-//   const startOfDay = date.startOf('day').toDate();
-//   const endOfDay = date.endOf('day').toDate();
-
-//   const habits = await HabitModel.find({ userId: req.user._id });
-
-//   const result = [];
-
-//   for (let habit of habits) {
-//     const day = date.day();
-//     let isForToday = false;
-
-//     switch (habit.frequency) {
-//       case 'daily':
-//         isForToday = true;
-//         break;
-//       case 'weekdays':
-//         if (day >= 1 && day <= 5) isForToday = true;
-//         break;
-//       case 'weekends':
-//         if (day === 0 || day === 6) isForToday = true;
-//         break;
-//       case 'every-other-day':
-//         const daysSinceStart = dayjs(date).diff(dayjs(habit.createdAt), 'day');
-//         if (daysSinceStart % 2 === 0) isForToday = true;
-//         break;
-//       case 'weekly':
-//         if (day === dayjs(habit.createdAt).day()) isForToday = true;
-//         break;
-//       case 'biweekly':
-//         const weeksSinceStart = Math.floor(
-//           dayjs(date).diff(dayjs(habit.createdAt), 'day') / 7
-//         );
-//         if (day === dayjs(habit.createdAt).day() && weeksSinceStart % 2 === 0)
-//           isForToday = true;
-//         break;
-//     }
-
-//     if (!isForToday) continue;
-
-//     // Check if habit is completed today (exists returns ObjectId or null)
-//     const completed = await HabitCompletion.exists({
-//       habitId: habit._id,
-//       date: { $gte: startOfDay, $lte: endOfDay },
-//     });
-
-//     result.push({
-//       _id: habit._id,
-//       title: habit.title,
-//       frequency: habit.frequency,
-//       completed: !!completed, // !! convert ObjectId/null to true/false
-//     });
-//   }
-
-//   res.status(200).json({
-//     success: true,
-//     data: result,
-//   });
-// };
-
 export const getHabitsForSelectedDays = async (req, res) => {
   const dateString = req.query.date || dayjs().format('YYYY-MM-DD');
   const date = dayjs(dateString, 'YYYY-MM-DD', true);
@@ -119,7 +51,7 @@ export const getHabitsForSelectedDays = async (req, res) => {
   const habits = await HabitModel.find({ userId: req.user._id });
 
   // Fetch all completedHabits for this date in one query
-  const completedHabits = await HabitCompletion.find({
+  const completedHabits = await HabitCompletionModel.find({
     userId: req.user._id,
     date: { $gte: startOfDay, $lte: endOfDay },
   });
@@ -141,5 +73,60 @@ export const getHabitsForSelectedDays = async (req, res) => {
   res.status(200).json({
     success: true,
     data: results,
+  });
+};
+
+//Mark habit as completed.
+//Route: Post => api/habits/:id/complete
+export const completeHabit = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized', 401);
+
+  const habit = await HabitModel.findById(req.params.id);
+
+  if (!habit) throw notFound('Habit');
+
+  // Validate habit ownership
+  if (!habit.isOwner(req.user._id))
+    throw new AppError('Not allowed to modify this habit', 403);
+
+  // Validate if habit is completed for the same day
+  if (await HabitCompletionModel.isAlreadyCompleted(req.params.id))
+    throw new AppError('Habit is already completed', 400);
+
+  const habitCompletion = await HabitCompletionModel.create({
+    habitId: habit._id,
+    userId: req.user._id,
+  });
+
+  res.status(201).json({
+    success: true,
+    data: habitCompletion,
+  });
+};
+
+// Unmark habit completion if exist, otherwise throw error
+export const uncompleteHabit = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized', 401);
+
+  const habit = await HabitModel.findById(req.params.id);
+
+  if (!habit) throw notFound('Habit');
+
+  // Validate habit ownership
+  if (!habit.isOwner(req.user._id))
+    throw new AppError('Not allowed to modify this habit', 403);
+
+  const [startOfToday, endOfToday] = DateHelper.getStartAndEndOfToday();
+
+  const habitCompletion = await HabitCompletionModel.findOneAndDelete({
+    habitId: habit._id,
+    date: { $gte: startOfToday, $lte: endOfToday },
+  });
+
+  if (!habitCompletion) throw notFound('HabitCompletion');
+
+  res.status(200).json({
+    success: true,
+    data: habitCompletion,
   });
 };
