@@ -11,12 +11,8 @@ import {
   HiOutlineFire, 
   HiOutlineClipboardList 
 } from 'react-icons/hi';
+
 import { NavLink } from 'react-router-dom';
-
-const Sidebar = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-
   const dashboardItems = [
     { id: 'today', name: 'Today', icon: <FaCalendarDay />, path: '/' },
     { id: 'habits', name: 'Habits', icon: <HiOutlineFire />, path: '/habits' },
@@ -27,6 +23,11 @@ const Sidebar = ({ children }) => {
   const preferencesItems = [
     { id: 'settings', name: 'Settings', icon: <FaCog />, path: '/settings' },
   ];
+
+const Sidebar = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
 
   const toggleMobileSidebar = () => {
     setIsMobileOpen(!isMobileOpen);
@@ -229,8 +230,8 @@ const Sidebar = ({ children }) => {
      <main className={`
         flex-1
         transition-all duration-300
-        ${isOpen ? 'md:ml-0' : 'md:ml-0'}
-        ${isMobileOpen ? 'ml-0' : 'ml-0'}
+        ${isOpen ? 'md:ml-2' : 'md:ml-1'}
+        ${isMobileOpen ? 'ml-64' : 'ml-0'}
         p-4 md:p-6
         min-h-screen
          dark:from-gray-900 dark:to-gray-800
