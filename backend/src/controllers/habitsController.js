@@ -5,6 +5,7 @@ import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 import { DateHelper } from '../utils/date.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
 
+// Get all user habits
 export const getHabits = async (req, res) => {
   if (!req.user) {
     throw new AppError('User is not authorized.', 401);
@@ -18,44 +19,44 @@ export const getHabits = async (req, res) => {
   });
 };
 
-export const getHabitsByDate = async (req, res) => {
-  //------------ Get date
+// Get all user habits for selected date
+export const getHabitByDate = async (req, res) => {
+  // 1) Get date from query
   const dateString = req.query.date;
-
   const selectedDate = dateString
     ? dayjs(dateString, 'YYYY-MM-DD', true)
     : dayjs();
 
-  if (dateString && !selectedDate.isValid()) {
+  if (dateString && !selectedDate.isValid())
     throw new AppError('Invalid date format', 400);
-  }
 
   const startOfDay = selectedDate.startOf('day').toDate();
   const endOfDay = selectedDate.endOf('day').toDate();
 
-  //------------- Fetch habits
+  // 2) Fetch habits
   const habits = await HabitModel.find({ userId: req.user._id });
 
-  // Fetch habit completions for the selected day
-  const completions = await HabitCompletionModel.find({
+  const completionHabits = await HabitCompletionModel.find({
     userId: req.user._id,
     date: { $gte: startOfDay, $lte: endOfDay },
   });
 
-  // Store completed habit IDs in Set for fast lookup
-  const completedHabitIds = new Set(
-    completions.map((c) => c.habitId.toString())
+  // 3) store completions habits ids into a set for faster lookup
+  const habitCompletionIds = new Set(
+    completionHabits.map((c) => c._id.toString())
   );
 
-  //-------- Filter habits by frequency and add completion status
+  // 4) filter by frequency and create new results
   const results = habits
-    .filter((habit) => isHabitForSelectedDay(habit, selectedDate))
+    .filter((habit) => {
+      isHabitForSelectedDay(habit, selectedDate);
+    })
     .map((habit) => ({
       _id: habit._id,
       title: habit.title,
       description: habit.description,
       frequency: habit.frequency,
-      completed: completedHabitIds.has(habit._id.toString()),
+      completed: habitCompletionIds.has(habit._id.toString()),
     }));
 
   res.status(200).json({
@@ -64,6 +65,7 @@ export const getHabitsByDate = async (req, res) => {
   });
 };
 
+// Create user habit
 export const createHabit = async (req, res) => {
   if (!req.user) {
     throw new AppError('User is not authorized.', 401);

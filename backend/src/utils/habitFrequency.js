@@ -2,9 +2,13 @@ import dayjs from 'dayjs';
 
 export const isHabitForSelectedDay = (habit, selectedDate) => {
   if (!habit || !selectedDate) return false;
+
   const selected = selectedDate.startOf('day');
   const habitStart = dayjs(habit.createdAt).startOf('day');
-  const selectedDay = selected.day(); //exp: 0 = Sunday
+
+  if (selected.isBefore(habitStart, 'day')) return false;
+
+  const selectedDay = selected.day(); //exp: 0 = Sunday, 1 = monday
 
   switch (habit.frequency) {
     case 'daily':
