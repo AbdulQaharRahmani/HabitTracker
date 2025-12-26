@@ -5,6 +5,7 @@ import {
   deleteHabit,
   getHabits,
   updateHabit,
+  reorderHabits,
   completeHabit,
   uncompleteHabit,
 } from '../controllers/habitsController.js';
@@ -21,4 +22,5 @@ router
   .put(asyncHandler(updateHabit))
   .delete(asyncHandler(deleteHabit));
 
+router.put('/reorder', asyncHandler(reorderHabits));
 export default router;
