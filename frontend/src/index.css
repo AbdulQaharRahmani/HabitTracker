@@ -2,14 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Tinos&display=swap');
-
 :root {
     font-family: 'Tinos', serif;
-    /* line-height: 1.5; */
-    /* font-weight: 400; */
-    
-    /* Primary colors */
+
     --color-primary: #6366F1;
     --color-primary-hover: #EEF4FF; 
 
