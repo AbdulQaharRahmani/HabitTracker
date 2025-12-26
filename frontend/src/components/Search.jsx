@@ -14,7 +14,7 @@ export default function Search() {
         <input
           type="text"
           placeholder="Search habits..."
-          className="flex-1 px-4 py-2 outline-none"
+          className="flex-1 px-4 py-2 outline-none text-gray"
         />
       </form>
     </div>
