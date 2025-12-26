@@ -46,7 +46,7 @@ export default function HabitCard({ title, description, category, time, duration
   const bgColor = colors[color];
 
   return (
-    <div className="mx-auto my-4 p-4 rounded-xl bg-white shadow-sm flex items-start gap-4">
+    <div className="mx-auto my-4 p-4 rounded-xl bg-white  shadow-sm flex items-start gap-4">
       <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
 
       <div>
