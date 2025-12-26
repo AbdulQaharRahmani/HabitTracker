@@ -4,7 +4,7 @@
 
 :root {
     font-family: 'Tinos', serif;
-    /* Primary colors */
+
     --color-primary: #6366F1;
     --color-primary-hover: #EEF4FF; 
 
@@ -59,69 +59,4 @@ body {
 
 .bg-white{
     background-color: #ffffff;
-    transition: all 200ms ease-in;
-}
-
-.bg-white:hover{
-    background-color: #fdfdfd9f;
-}
-
-.bg-primary{
-    background-color: var(--color-primary);
-}
-
-.bg-primary-hover{
-    background-color: var(--color-primary-hover);
-}
-
-.text-white {
-    color: #ffffff;   
-}
-
-.text-red{
-    color: var(--color-red);
-}
-
-.text-red-hover{
-    color: var(--color-red-hover);
-}
-
-.text-primary{
-    color: var(--color-primary);
-}
-
-.text-primary-hover{
-    color: var(--color-primary-hover);
-}
-
-.text-orange{
-    color: var(--color-orange);
-}
-
-.text-orange-hover{
-    color: var(--color-orange-hover);
-}
-
-.bg-orange-hover{
-    background-color: var(--color-orange-hover);
-}
-
-.text-light-green{
-    color: var(--color-light-green);
-}
-
-.text-light-green-hover{
-    color: var(--color-light-green-hover);
-}
-
-.bg-light-green-hover{
-    background-color: var(--color-light-green-hover);
-}
-
-.text-purple{
-    color: var(--color-purple);
-}
-
-.text-purple-hover{
-    color: var(--color-purple-hover);
 }
