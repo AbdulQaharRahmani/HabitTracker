@@ -2,6 +2,7 @@ import Header from './components/Header.jsx';
 import DarkMode from './components/DarkMode.jsx';
 import Search from './components/Search.jsx';
 import HabitCard from './components/HabitCard.jsx';
+import AddHabit from './components/AddHabit.jsx';
 
 function App() {
   return (
@@ -22,9 +23,10 @@ function App() {
         </div>
         <hr className="my-4 ml-12 mr-4 border-gray-200" />
 
-        {/* Search */}
-        <div className="ml-12 my-6">
+        {/* Search , View, AddHabit*/}
+        <div className="ml-12 my-6 grid grid-cols-2 ">
           <Search />
+          <AddHabit />
         </div>
 
         {/* Habit list of Cards*/}
