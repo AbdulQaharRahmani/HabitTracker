@@ -6,46 +6,62 @@ import { DateHelper } from '../utils/date.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
 
 export const getHabits = async (req, res) => {
-  if (!req.user) throw new AppError('Unauthorized', 401);
-
-  const dateString = req.query.date;
-
-  const habits = await HabitModel.find({
-    userId: req.user._id,
-  });
-
-  if (!dateString) {
-    return res.status(200).json({
-      success: true,
-      data: habits,
-    });
+  if (!req.user) {
+    throw new AppError('User is not authorized.', 401);
   }
 
-  const date = dayjs(dateString, 'YYYY-MM-DD', true);
-  if (!date.isValid()) throw new AppError('Invalid date', 400);
+  const habits = await HabitModel.find({ userId: req.user._id });
 
-  const startOfDay = date.startOf('day').toDate();
-  const endOfDay = date.endOf('day').toDate();
+  res.status(200).json({
+    success: true,
+    data: habits,
+  });
+};
 
-  const completedHabits = await HabitCompletionModel.find({
+export const getHabitsByDate = async (req, res) => {
+  //------------ Get date
+  const dateString = req.query.date;
+
+  const selectedDate = dateString
+    ? dayjs(dateString, 'YYYY-MM-DD', true)
+    : dayjs();
+
+  if (dateString && !selectedDate.isValid()) {
+    throw new AppError('Invalid date format', 400);
+  }
+
+  const startOfDay = selectedDate.startOf('day').toDate();
+  const endOfDay = selectedDate.endOf('day').toDate();
+
+  //------------- Fetch habits
+  const habits = await HabitModel.find({ userId: req.user._id });
+
+  // Fetch habit completions for the selected day
+  const completions = await HabitCompletionModel.find({
     userId: req.user._id,
     date: { $gte: startOfDay, $lte: endOfDay },
   });
 
-  const completedHabitsIds = new Set(
-    completedHabits.map((c) => c.habitId.toString())
+  // Store completed habit IDs in Set for fast lookup
+  const completedHabitIds = new Set(
+    completions.map((c) => c.habitId.toString())
   );
 
+  //-------- Filter habits by frequency and add completion status
   const results = habits
-    .filter((h) => isHabitForSelectedDay(h, date))
-    .map((h) => ({
-      _id: h._id,
-      title: h.title,
-      frequency: h.frequency,
-      completed: completedHabitsIds.has(h._id.toString()),
+    .filter((habit) => isHabitForSelectedDay(habit, selectedDate))
+    .map((habit) => ({
+      _id: habit._id,
+      title: habit.title,
+      description: habit.description,
+      frequency: habit.frequency,
+      completed: completedHabitIds.has(habit._id.toString()),
     }));
 
-  res.status(200).json({ success: true, data: results });
+  res.status(200).json({
+    success: true,
+    data: results,
+  });
 };
 
 export const createHabit = async (req, res) => {

@@ -1,8 +1,10 @@
 import dayjs from 'dayjs';
 
 export const isHabitForSelectedDay = (habit, selectedDate) => {
-  const selectedDay = selectedDate.day(); // 0 = Sunday
-  const habitStart = dayjs(habit.createdAt);
+  if (!habit || !selectedDate) return false;
+  const selected = selectedDate.startOf('day');
+  const habitStart = dayjs(habit.createdAt).startOf('day');
+  const selectedDay = selected.day(); //exp: 0 = Sunday
 
   switch (habit.frequency) {
     case 'daily':
@@ -18,19 +20,13 @@ export const isHabitForSelectedDay = (habit, selectedDate) => {
       return selectedDay === habitStart.day();
 
     case 'every-other-day': {
-      const daysSinceStart = selectedDate.diff(habitStart, 'day');
-      return daysSinceStart >= 0 && daysSinceStart % 2 === 0;
+      const daysSinceStart = selected.diff(habitStart, 'day');
+      return daysSinceStart % 2 === 0;
     }
 
     case 'biweekly': {
-      const weeksSinceStart = Math.floor(
-        selectedDate.diff(habitStart, 'day') / 7
-      );
-      return (
-        weeksSinceStart >= 0 &&
-        selectedDay === habitStart.day() &&
-        weeksSinceStart % 2 === 0
-      );
+      const weeksSinceStart = Math.floor(selected.diff(habitStart, 'day') / 7);
+      return selectedDay === habitStart.day() && weeksSinceStart % 2 === 0;
     }
 
     default:
