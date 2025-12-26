@@ -64,7 +64,8 @@ export const deleteHabit = async (req, res) => {
   if (!habit.isOwner(req.user._id))
     throw new AppError('You are not allowed to delete this habit', 403);
 
-  await habit.deleteOne();
+  habit.isDeleted = true;
+  await habit.save();
 
   res.status(200).json({
     success: true,

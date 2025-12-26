@@ -21,11 +21,21 @@ const HabitSchema = new mongoose.Schema(
       ],
       required: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Add { isDeleted: false } to find, findOne, FindById queries
+HabitModel.pre(/^find/, function (next) {
+  this.where({ isDeleted: false });
+  next();
+});
 
 // Return true if user is owner of Habit, otherwise false
 HabitSchema.methods.isOwner = function (userId) {
