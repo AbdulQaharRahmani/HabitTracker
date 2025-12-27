@@ -11,7 +11,7 @@ export const authenticationToken = asyncHandler(async (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1];
-  const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
   if (!decoded.id) {
     throw new AppError('Unauthorized: Invalid token payload', 401);
   }
