@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import cors from 'cors';
 import habitsRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js'
@@ -38,3 +38,4 @@ app.use(errorHandler);
 //#endregion
 
 export default app;
+
