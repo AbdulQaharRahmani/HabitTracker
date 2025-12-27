@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "habittracker",
   "version": "1.0.0",
   "description": "",
@@ -43,3 +43,4 @@
     "vitest": "^4.0.16"
   }
 }
+
