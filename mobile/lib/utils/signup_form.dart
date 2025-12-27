@@ -146,18 +146,27 @@ class _SignupFormState extends State<SignupForm> {
 
               //======== Sign up button ========
               SignUpButtons(
-                onTap: () async {
-                  final success = await controller.signUp(context);
+                onTap: () {
+                  final success = controller.signUp();
                   if (success) {
-                    await Future.delayed(const Duration(milliseconds: 300));
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (_) => const HomeScreen()),
                           (route) => false,
                     );
+                  } else {
+                    if (!controller.isAgreeTerms) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please accept terms and conditions'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
                 },
               ),
+
               const SizedBox(height: 20),
 
               //======= divider ========
