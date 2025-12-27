@@ -29,7 +29,8 @@
     --color-gray-second: #6B7280;
 
     --color-bg: #f3f4f6;
-    --color-text-black: #1F2937;
+    --color-text-black: #1F2937; 
+    /* text-gray-800 */
     --color-text-gray: #7e8189;
     --color-text-light-gray: #E2E4E8;
 }
