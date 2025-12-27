@@ -20,7 +20,7 @@ export const getHabits = async (req, res) => {
 };
 
 // Get all user habits for selected date
-export const getHabitByDate = async (req, res) => {
+export const getHabitsByDate = async (req, res) => {
   // 1) Get date from query
   const dateString = req.query.date;
   const selectedDate = dateString
