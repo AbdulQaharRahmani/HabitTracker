@@ -46,7 +46,7 @@ export const loginUser = async (req, res) => {
     data: {
       token,
       id: user._id,
-      email: user.emali,
+      email: user.email,
     },
   });
 };
