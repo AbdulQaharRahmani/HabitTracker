@@ -61,8 +61,8 @@ const seed = async () => {
 };
 
 try {
-  seed();
+  await seed();
 } catch (error) {
   console.log(error.message);
-  process.exit();
+  process.exit(1);
 }
