@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/screans/add_habit.dart';
 import 'app/app_theme.dart';
 import 'features/add_habit_model.dart';
+import 'package:habit_tracker/screans/sign_up_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,21 +16,11 @@ class MyApp extends StatelessWidget {
   // Use a designSize that matches your UI design (example: iPhone 12/13 size).
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(390, 844),
-      minTextAdapt: true,
-      builder: (context, child) {
-        return MaterialApp(
-          title: 'Habit Tracker',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          home: const Home(),
-        );
-      },
+    return MaterialApp(
+         home:SignUpPage(),
+      debugShowCheckedModeBanner: false,
     );
-  }
-}
-
+  }}
 class Home extends StatefulWidget {
   const Home({super.key});
 
