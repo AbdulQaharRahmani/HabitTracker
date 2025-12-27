@@ -1,5 +1,5 @@
 import { AppError, notFound } from '../utils/error.js';
-import { HabitCompletionModel, HabitModel } from '../models/HabitCompletion.js';
+import { Habit, HabitCompletionModel } from '../models/HabitCompletion.js';
 import { DateHelper } from '../utils/date.js';
 
 export const getHabits = async (req, res) => {
