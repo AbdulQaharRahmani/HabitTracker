@@ -12,11 +12,13 @@ export const registerUser = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 12);
-  const users = await UserModel.create({
+
+  const user = await UserModel.create({
     email,
     password: hashPassword,
   });
-  res.status(200).json({
+
+  res.status(201).json({
     success: true,
     message: 'User registered successfully',
   });
@@ -32,14 +34,15 @@ export const loginUser = async (req, res) => {
 
   const pswMatch = await bcrypt.compare(password, user.password);
   if (!pswMatch) {
-    throw new AppError('Password has to match', 400);
+    throw new AppError('Password is not correct', 400);
   }
 
-  const token = await jwt.sign(
+  const token = jwt.sign(
     { id: user._id, email: user.email },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN }
   );
+
   res.status(200).json({
     success: true,
     message: 'Login Successfully',
