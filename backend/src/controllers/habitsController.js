@@ -49,7 +49,7 @@ export const getHabitsByDate = async (req, res) => {
   // 4) filter by frequency and create new results
   const results = habits
     .filter((habit) => {
-      isHabitForSelectedDay(habit, selectedDate);
+      return isHabitForSelectedDay(habit, selectedDate);
     })
     .map((habit) => ({
       _id: habit._id,
@@ -58,6 +58,9 @@ export const getHabitsByDate = async (req, res) => {
       frequency: habit.frequency,
       completed: habitCompletionIds.has(habit._id.toString()),
     }));
+
+  if (results.length === 0)
+    throw new AppError('No habits found for the selected date', 400);
 
   res.status(200).json({
     success: true,
