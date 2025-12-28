@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@tailwind utilities;
+
+
+.profile-container {
+  width: 100px;
+  height: 100px;
+  background-size: cover;
+  background-position: top;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #fff;
+}
