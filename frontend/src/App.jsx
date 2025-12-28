@@ -7,11 +7,16 @@ import AddHabit from './components/AddHabit.jsx';
 
 function App() {
   const [habits, setHabits] = useState([]);
-  
+  const [searchTerm, setSearchTerm] = useState('');
+
   const handleAddHabit = (newHabit) => {
     setHabits((prevHabits) => [...prevHabits, newHabit]);
   };
   
+  const filteredHabits = habits.filter(habit =>
+    habit.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="grid grid-cols-[240px_1fr] min-h-screen">
       
@@ -32,15 +37,20 @@ function App() {
 
         {/* Search , View, AddHabit*/}
         <div className="ml-12 my-6 grid grid-cols-2 items-center">
-          <Search />
+          <Search 
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
           <AddHabit onAddHabit={handleAddHabit} />
         </div>
 
         {/* Habit list */}
         <div className="ml-12 mt-6 space-y-4">
-          {habits.map((habit) => (
-            <HabitCard key={habit.id} {...habit} />
-          ))}
+          {
+            filteredHabits.map(habit => (
+              <HabitCard key={habit.id} {...habit} />
+            ))
+          }
         </div>
 
       </div>
