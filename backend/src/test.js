@@ -1,4 +1,4 @@
-const promise = new Promise(function(resolve, reject){
+const promise = new Promise(function (resolve) {
   resolve('I am resolved');
 });
 
