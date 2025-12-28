@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { DateHelper } from '../../utils/date.js';
+import { DateHelper } from '../utils/date.js';
 
 const HabitCompletionSchema = new mongoose.Schema(
   {
