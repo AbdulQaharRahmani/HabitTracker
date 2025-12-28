@@ -4,10 +4,12 @@ import DarkMode from './components/DarkMode.jsx';
 import Search from './components/Search.jsx';
 import HabitCard from './components/HabitCard.jsx';
 import AddHabit from './components/AddHabit.jsx';
+import View from './components/View.jsx'
 
 function App() {
   const [habits, setHabits] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('grid');
 
   const handleAddHabit = (newHabit) => {
     setHabits((prevHabits) => [...prevHabits, newHabit]);
@@ -36,23 +38,31 @@ function App() {
         <hr className="my-4 ml-12 mr-4 border-gray-200" />
 
         {/* Search , View, AddHabit*/}
-        <div className="ml-12 my-6 grid grid-cols-2 items-center">
+        <div className="ml-12 my-6 flex items-center justify-between">
           <Search 
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
-          <AddHabit onAddHabit={handleAddHabit} />
+          <div className="flex items-center gap-4 mr-4">
+            <View viewMode={viewMode} setViewMode={setViewMode} />
+            <AddHabit onAddHabit={handleAddHabit} />
+          </div>
         </div>
 
         {/* Habit list */}
-        <div className="ml-12 mt-6 space-y-4">
+        <div
+          className={
+            viewMode === 'grid'
+              ? 'grid grid-cols-3 gap-6 justify-items-start' 
+              : 'ml-12 my-6 space-y-4'
+          }
+        >
           {
-            filteredHabits.map(habit => (
+            filteredHabits.map((habit) => (
               <HabitCard key={habit.id} {...habit} />
             ))
           }
         </div>
-
       </div>
     </div>
   );
