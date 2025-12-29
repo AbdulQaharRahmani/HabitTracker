@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "habittracker",
   "version": "1.0.0",
   "description": "",
@@ -10,7 +10,8 @@
   "scripts": {
     "start": "node ./src/server.js",
     "dev": "nodemon ./src/server.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
@@ -34,10 +35,16 @@
     "mongoose": "^9.0.2"
   },
   "devDependencies": {
-    "eslint": "^9.39.2",
+    "@eslint/eslintrc": "^2.0.0",
+    "@eslint/js": "^9.39.2",
+    "eslint": "^8.44.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
     "nodemon": "^3.1.11",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "supertest": "^7.1.4",
+    "vitest": "^4.0.16"
   }
 }
+
