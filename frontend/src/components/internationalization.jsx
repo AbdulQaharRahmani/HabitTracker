@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 function LanguageSwitcher() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     document.documentElement.lang = i18n.language;
@@ -15,11 +15,13 @@ function LanguageSwitcher() {
 
   return (
     <div>
-      <h1>{t("welcome")}</h1>
-
-      <select value={i18n.language} onChange={handleChange}>
-        <option value="en">English</option>
-        <option value="fa">فارسی</option>
+      <select
+        value={i18n.language}
+        onChange={handleChange}
+        className="fixed top-0 right-0 z-50 py-[2px]"
+      >
+        <option value="en">🌐English</option>
+        <option value="fa">فارسی🌐</option>
       </select>
     </div>
   );
