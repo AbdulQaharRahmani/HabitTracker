@@ -1,6 +1,7 @@
-import express from 'express';
+﻿import express from 'express';
 import cors from 'cors';
 import habitsRoutes from './routes/habits.js';
+import authRoutes from './routes/auth.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -18,8 +19,8 @@ app.get('/api/health', (req, res) => {
   res.send('Habit tracker API is running');
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/habits', habitsRoutes);
-
 //#endregion
 
 //#region Not found (404) middleware

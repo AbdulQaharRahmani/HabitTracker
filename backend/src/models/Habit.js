@@ -21,11 +21,36 @@ const HabitSchema = new mongoose.Schema(
       ],
       required: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    order: {
+      type: Number,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// find docs wih { isDeleted: false } in this queries: (find, findOne, findById)
+HabitModel.pre(/^find/, function (next) {
+  this.where({ isDeleted: false });
+  next();
+});
+
+HabitSchema.index({ userId: 1, order: 1 });
+
+//Return the query object that can be awaited
+HabitSchema.statics.findByUserAndSortByOrder = function (userId) {
+  return this.find({ userId }).sort({ order: 1 });
+};
+
+// Return the query object that can be awaited
+HabitSchema.statics.getHabitCountByUserId = function (userId) {
+  return this.countDocuments({ userId });
+};
 
 // Return true if user is owner of Habit, otherwise false
 HabitSchema.methods.isOwner = function (userId) {

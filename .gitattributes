@@ -1,0 +1,8 @@
+# Enforce LF (Unix-style) line endings for all text files
+* text=auto eol=lf
+
+# Binary files (keep as-is)
+*.png binary
+*.jpg binary
+*.gif binary
+*.zip binary
