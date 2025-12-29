@@ -22,20 +22,23 @@ export default function Habits () {
   return (
     <div className="">
       {/* Main */}
-      <div className="px-6">
+      <div className="px-6 md:px-2">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:ml-0 md:items-center md:justify-between">
           <Header />
           <DarkMode />
         </div>
-        <hr className="my-4 ml-12 mr-4 border-gray-200" />
+        <hr className="my-4 mx-2 md:ml-6 lg:ml-12 md:mr-4 border-gray-200" />
         {/* Search , View, AddHabit*/}
-        <div className="ml-12 my-6 flex items-center justify-between">
-          <Search 
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
-          <div className="flex items-center gap-4 mr-4">
+        <div className="my-6 flex flex-col gap-4 md:ml-6 md:justify-start lg:ml-12 lg:flex-row lg:items-center lg:justify-between">
+          <div className="w-full md:max-w-md lg:w-1/2">
+            <Search 
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
+          </div>
+
+          <div className="flex w-full flex-wrap justify-start items-center gap-3 md:gap-2 md:w-auto lg:w-1/2 lg:justify-end">
             <View viewMode={viewMode} setViewMode={setViewMode} />
             <AddHabit onAddHabit={handleAddHabit} />
           </div>
@@ -44,8 +47,8 @@ export default function Habits () {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-3 gap-6 justify-items-start' 
-              : 'ml-12 my-6 space-y-4'
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:grid-cols-2 md:ml-12 gap-6 justify-items-start' 
+              : 'my-6 space-y-4 md:ml-12'
           }
         >
           {
