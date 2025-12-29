@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 import { loginUser, registerUser } from '../controllers/authController.js';
 import { loginValidate, registerValidate } from '../middleware/validateUser.js';
 
