@@ -44,6 +44,41 @@ const seed = async () => {
       userId: user._id,
       order: 3,
     },
+    {
+      title: 'Play Basketball',
+      description: 'Fun',
+      frequency: 'biweekly',
+      userId: user._id,
+      order: 4,
+    },
+    {
+      title: 'AI',
+      description: 'Learn about AI',
+      frequency: 'daily',
+      userId: user._id,
+      order: 5,
+    },
+    {
+      title: 'MongoDB',
+      description: 'Learn about MongoDb',
+      frequency: 'weekly',
+      userId: user._id,
+      order: 6,
+    },
+    {
+      title: 'Nodejs',
+      description: 'Learn about nodejs',
+      frequency: 'daily',
+      userId: user._id,
+      order: 7,
+    },
+    {
+      title: 'React',
+      description: 'Learn about React',
+      frequency: 'daily',
+      userId: user._id,
+      order: 8,
+    },
   ];
 
   const result = await HabitModel.insertMany(habits);
