@@ -1,26 +1,33 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
-import Contact from './pages/Contact';
 
+import { BrowserRouter as Router, Route, Routes, Outlet } from "react-router-dom";
+import './index.css'
+import Habits from "./pages/Habits";
+import Tasks from "./pages/Tasks";
+import Statistics from "./pages/Statistics";
+import Settings from "./pages/Settings";
+import Sidebar from "./components/Sidebar";
+import Today from "./pages/Today";
+import Login from './pages/Login';
 function App() {
   return (
     <Router>
-      <Header />
-      <div style={{ minHeight: '80vh', padding: '20px' }}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route element={
+              <Sidebar>
+                <Outlet />
+              </Sidebar>
+          }>
+            <Route path="/" element={<Today />} />
+            <Route path="/habits" element={<Habits />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/statistics" element={<Statistics />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+          <Route path="*" element={<>not found</>} />
         </Routes>
-      </div>
-      <Footer />
     </Router>
   );
 }
 
 export default App;
-
