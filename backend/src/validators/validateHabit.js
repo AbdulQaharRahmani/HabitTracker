@@ -48,7 +48,7 @@ export const updateHabitValidator = [
     .isString()
     .withMessage('Description must be a string')
     .isLength({ max: 255 })
-    .withMessage('Descriptionmax length is 255 characters'),
+    .withMessage('Description max length is 255 characters'),
 
   body('frequency')
     .optional()
