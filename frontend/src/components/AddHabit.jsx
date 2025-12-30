@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaPlus } from 'react-icons/fa';
 
-export default function AddHabit ( {onAddHabit} ) {
+export default function AddHabit () {
     const [showForm, setShowForm] = useState(false)
 
     const [title, setTitle] = useState('');
@@ -13,7 +13,7 @@ export default function AddHabit ( {onAddHabit} ) {
 
     return (
         <div className="">
-            <button className="bg-indigo-500 hover:bg-indigo-600  rounded-md px-4 py-2 text-white flex flex-center shadow-md text-md transition ease-in-out duration-200" 
+            <button className="bg-indigo-500 hover:bg-indigo-600  rounded-md px-4 py-2 text-white flex items-center justify-center shadow-md text-md transition ease-in-out duration-200" 
                     type="button" 
                     onClick={() => {setShowForm(true)}}
             >
@@ -42,25 +42,8 @@ export default function AddHabit ( {onAddHabit} ) {
                             <div className="flex-1 bg-white w-full overflow-y-auto px-6 pb-6 rounded-xl">
                                 <form className="w-full h-full flex flex-col gap-4 mt-4"
                                     onSubmit={(e) => {
-                                    e.preventDefault();
-
-                                    const newHabit = {
-                                        id: Date.now(),
-                                        title,
-                                        description,
-                                        category,
-                                        time: frequency === 'CustomDays' ? customDays : frequency,
-                                        duration: `${duration}m`,
-                                    };
-
-                                    onAddHabit(newHabit);
-                                    setShowForm(false);
-
-                                    setTitle('');
-                                    setDescription('');
-                                    setCategory('');
-                                    setFrequency('');
-                                    setDuration('');
+                                        e.preventDefault();
+                                        setShowForm(false)
                                     }}
                                 >
                                     <span className="grid grid-rows-1">
@@ -70,15 +53,27 @@ export default function AddHabit ( {onAddHabit} ) {
                                         >
                                             Title
                                         </label>
-                                        <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="text-gray p-2 rounded-md shadow-sm bg-gray-50  border border-gray-200" placeholder="Enter habit title..."/>
+                                        <input 
+                                            type="text" 
+                                            id="title" 
+                                            value={title} onChange={(e) => setTitle(e.target.value)} 
+                                            className="text-gray p-2 rounded-md shadow-sm bg-gray-50  border border-gray-200" 
+                                            placeholder="Enter habit title..."/>
                                     </span>
 
                                     <span className="grid grid-rows-1">
                                         <label 
-                                            htmlFor="description" className="text-gray-600">Description</label>
+                                            htmlFor="description" 
+                                            className="text-gray-600"
+                                        >
+                                            Description
+                                        </label>
                                         <textarea
                                             className="w-[100%] h-24 p-2 rounded-md shadow-sm text-gray bg-gray-50  border border-gray-200"
-                                            placeholder="Description..." value={description} onChange={(e) => setDescription(e.target.value)}/>
+                                            placeholder="Description..."
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
+                                        />
                                     </span>
 
                                     <span className="grid grid-row-1">
