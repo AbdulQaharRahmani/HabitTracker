@@ -13,6 +13,75 @@ if (process.env.NODE_ENV !== 'development') {
   process.exit();
 }
 
+const secondsInOneDay = 86400000;
+
+const createHabitCompletionData = (habits) => {
+  const habitCompletions = [];
+
+  for (let habit of habits) {
+    switch (habit.frequency) {
+      case 'daily': {
+        let currentDate = new Date(habit.createdAt);
+        for (let i = 1; i <= 5; i++) {
+          currentDate = new Date(currentDate.getTime() + i * secondsInOneDay);
+          habitCompletions.push({
+            habitId: habit._id,
+            userId: habit.userId,
+            date: currentDate,
+            createdAt: currentDate,
+            updatedAt: currentDate,
+          });
+        }
+        break;
+      }
+      case 'weekly': {
+        let currentDate = new Date(habit.createdAt);
+        for (let i = 1; i <= 4; i++) {
+          currentDate = new Date(currentDate.getTime() + 7 * secondsInOneDay);
+          habitCompletions.push({
+            habitId: habit._id,
+            userId: habit.userId,
+            date: currentDate,
+            createdAt: currentDate,
+            updatedAt: currentDate,
+          });
+        }
+        break;
+      }
+      case 'biweekly': {
+        let currentDate = new Date(habit.createdAt);
+        for (let i = 1; i <= 3; i++) {
+          currentDate = new Date(currentDate.getTime() + 14 * secondsInOneDay);
+          habitCompletions.push({
+            habitId: habit._id,
+            userId: habit.userId,
+            date: currentDate,
+            createdAt: currentDate,
+            updatedAt: currentDate,
+          });
+        }
+        break;
+      }
+      case 'every-other-day': {
+        let currentDate = new Date(habit.createdAt);
+        for (let i = 1; i <= 5; i++) {
+          currentDate = new Date(currentDate.getTime() + 2 * secondsInOneDay);
+          habitCompletions.push({
+            habitId: habit._id,
+            userId: habit.userId,
+            date: currentDate,
+            createdAt: currentDate,
+            updatedAt: currentDate,
+          });
+        }
+        break;
+      }
+    }
+  }
+
+  return habitCompletions;
+};
+
 const seed = async () => {
   await mongoose.connection.dropDatabase();
   console.log('Database cleared');
@@ -22,6 +91,10 @@ const seed = async () => {
     password: 'test123',
   });
 
+  const startDate = new Date();
+
+  startDate.setMonth(startDate.getMonth() - 2);
+
   const habits = [
     {
       title: 'Study DSA',
@@ -29,6 +102,8 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 1,
+      createdAt: new Date(startDate),
+      updatedAt: new Date(startDate),
     },
     {
       title: 'Play Football',
@@ -36,6 +111,8 @@ const seed = async () => {
       frequency: 'weekly',
       userId: user._id,
       order: 2,
+      createdAt: new Date(startDate),
+      updatedAt: new Date(startDate),
     },
     {
       title: 'Study Book of Proof',
@@ -43,6 +120,8 @@ const seed = async () => {
       frequency: 'every-other-day',
       userId: user._id,
       order: 3,
+      createdAt: new Date(startDate),
+      updatedAt: new Date(startDate),
     },
     {
       title: 'Play Basketball',
@@ -50,6 +129,8 @@ const seed = async () => {
       frequency: 'biweekly',
       userId: user._id,
       order: 4,
+      createdAt: new Date(startDate),
+      updatedAt: new Date(startDate),
     },
     {
       title: 'AI',
@@ -57,6 +138,8 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 5,
+      createdAt: new Date(startDate),
+      updatedAt: new Date(startDate),
     },
     {
       title: 'MongoDB',
@@ -64,6 +147,8 @@ const seed = async () => {
       frequency: 'weekly',
       userId: user._id,
       order: 6,
+      createdAt: new Date(startDate),
+      updatedAt: new Date(startDate),
     },
     {
       title: 'Nodejs',
@@ -71,6 +156,8 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 7,
+      createdAt: new Date(startDate),
+      updatedAt: new Date(startDate),
     },
     {
       title: 'React',
@@ -78,16 +165,86 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 8,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+    },
+    {
+      title: 'Exercise',
+      description: 'Morning workout',
+      frequency: 'daily',
+      userId: user._id,
+      order: 9,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+    },
+    {
+      title: 'Read a book',
+      description: 'Read at least 20 pages',
+      frequency: 'every-other-day',
+      userId: user._id,
+      order: 10,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+    },
+    {
+      title: 'Meditation',
+      description: '10 minutes',
+      frequency: 'daily',
+      userId: user._id,
+      order: 11,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+    },
+    {
+      title: 'Clean home',
+      description: 'Keep home clean',
+      frequency: 'weekly',
+      userId: user._id,
+      order: 12,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+    },
+    {
+      title: 'Grocery shopping',
+      description: 'Buy weekly groceries',
+      frequency: 'weekly',
+      userId: user._id,
+      order: 13,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+    },
+    {
+      title: 'Call family',
+      description: 'Have fun',
+      frequency: 'biweekly',
+      userId: user._id,
+      order: 14,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+    },
+    {
+      title: 'Journal',
+      description: 'Write daily stories',
+      frequency: 'daily',
+      userId: user._id,
+      order: 15,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+    },
+    {
+      title: 'Learn Spanish',
+      description: 'Language practice',
+      frequency: 'every-other-day',
+      userId: user._id,
+      order: 16,
+      createdAt: new Date(startDate.getTime() + secondsInOneDay),
+      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
     },
   ];
 
   const result = await HabitModel.insertMany(habits);
 
-  let habitCompletions = [];
-
-  for (let habit of result) {
-    habitCompletions.push({ habitId: habit._id, userId: habit.userId });
-  }
+  const habitCompletions = createHabitCompletionData(result);
 
   await HabitCompletionModel.insertMany(habitCompletions);
 
