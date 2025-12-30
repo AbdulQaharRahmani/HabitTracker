@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'development') {
   process.exit();
 }
 
-const secondsInOneDay = 86400000;
+const SECONDS_IN_ONE_DAY = 86400000;
 
 const createHabitCompletionData = (habits) => {
   const habitCompletions = [];
@@ -23,7 +23,9 @@ const createHabitCompletionData = (habits) => {
       case 'daily': {
         let currentDate = new Date(habit.createdAt);
         for (let i = 1; i <= 5; i++) {
-          currentDate = new Date(currentDate.getTime() + i * secondsInOneDay);
+          currentDate = new Date(
+            currentDate.getTime() + i * SECONDS_IN_ONE_DAY
+          );
           habitCompletions.push({
             habitId: habit._id,
             userId: habit.userId,
@@ -37,7 +39,9 @@ const createHabitCompletionData = (habits) => {
       case 'weekly': {
         let currentDate = new Date(habit.createdAt);
         for (let i = 1; i <= 4; i++) {
-          currentDate = new Date(currentDate.getTime() + 7 * secondsInOneDay);
+          currentDate = new Date(
+            currentDate.getTime() + 7 * SECONDS_IN_ONE_DAY
+          );
           habitCompletions.push({
             habitId: habit._id,
             userId: habit.userId,
@@ -51,7 +55,9 @@ const createHabitCompletionData = (habits) => {
       case 'biweekly': {
         let currentDate = new Date(habit.createdAt);
         for (let i = 1; i <= 3; i++) {
-          currentDate = new Date(currentDate.getTime() + 14 * secondsInOneDay);
+          currentDate = new Date(
+            currentDate.getTime() + 14 * SECONDS_IN_ONE_DAY
+          );
           habitCompletions.push({
             habitId: habit._id,
             userId: habit.userId,
@@ -65,7 +71,9 @@ const createHabitCompletionData = (habits) => {
       case 'every-other-day': {
         let currentDate = new Date(habit.createdAt);
         for (let i = 1; i <= 5; i++) {
-          currentDate = new Date(currentDate.getTime() + 2 * secondsInOneDay);
+          currentDate = new Date(
+            currentDate.getTime() + 2 * SECONDS_IN_ONE_DAY
+          );
           habitCompletions.push({
             habitId: habit._id,
             userId: habit.userId,
@@ -165,8 +173,8 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 8,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
     {
       title: 'Exercise',
@@ -174,8 +182,8 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 9,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
     {
       title: 'Read a book',
@@ -183,8 +191,8 @@ const seed = async () => {
       frequency: 'every-other-day',
       userId: user._id,
       order: 10,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
     {
       title: 'Meditation',
@@ -192,8 +200,8 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 11,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
     {
       title: 'Clean home',
@@ -201,8 +209,8 @@ const seed = async () => {
       frequency: 'weekly',
       userId: user._id,
       order: 12,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
     {
       title: 'Grocery shopping',
@@ -210,8 +218,8 @@ const seed = async () => {
       frequency: 'weekly',
       userId: user._id,
       order: 13,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
     {
       title: 'Call family',
@@ -219,8 +227,8 @@ const seed = async () => {
       frequency: 'biweekly',
       userId: user._id,
       order: 14,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
     {
       title: 'Journal',
@@ -228,8 +236,8 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 15,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
     {
       title: 'Learn Spanish',
@@ -237,8 +245,8 @@ const seed = async () => {
       frequency: 'every-other-day',
       userId: user._id,
       order: 16,
-      createdAt: new Date(startDate.getTime() + secondsInOneDay),
-      updatedAt: new Date(startDate.getTime() + secondsInOneDay),
+      createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
   ];
 
