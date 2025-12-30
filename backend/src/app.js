@@ -3,7 +3,7 @@ import cors from 'cors';
 import habitsRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js';
 import { errorHandler } from './middleware/errorHandler.js';
-import authMiddleware from './middleware/authMiddleware.js';
+import { authMiddleware } from './middleware/authMiddleware.js';
 
 const app = express();
 

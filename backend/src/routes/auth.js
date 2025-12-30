@@ -4,7 +4,7 @@ import { loginUser, registerUser } from '../controllers/authController.js';
 import {
   loginValidate,
   registerValidate,
-} from '../validations/validateUser.js';
+} from '../validators/validateUser.js';
 import { validate } from '../middleware/validate.js';
 
 const router = express.Router();
