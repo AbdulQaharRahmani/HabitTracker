@@ -2,7 +2,7 @@
 import cors from 'cors';
 import habitsRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js';
-import taskRout from './routes/task.js';
+import taskRoutes from './routes/task.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -22,7 +22,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/habits', habitsRoutes);
-app.use('/api/tasks', taskRout);
+app.use('/api/tasks', taskRoutes);
 //#endregion
 
 //#region Not found (404) middleware
