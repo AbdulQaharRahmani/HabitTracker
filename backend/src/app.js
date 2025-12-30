@@ -3,6 +3,7 @@ import cors from 'cors';
 import habitsRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import path from 'path';
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(cors({ origin: '*' }));
 //#endregion
 
 //#region Route Middlewares
+
+app.use('/uploads', express.static(path.join(process.cwd), 'src/uploads'));
 
 app.get('/api/health', (req, res) => {
   res.send('Habit tracker API is running');
