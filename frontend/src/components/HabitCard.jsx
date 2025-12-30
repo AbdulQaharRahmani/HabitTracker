@@ -11,21 +11,21 @@ export default function HabitCard({ title, description, category, time, duration
       <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
 
       <div>
-        <h3 className="text-xl font-semibold text-black">{title}</h3>
-        <p className="text-sm text-gray-400 mt-1">{description}</p>
+        <h3 className="text-xl font-semibold text-black">{title ? title : "No Title"}</h3>
+        <p className="text-sm text-gray-400 mt-1">{description ? description : "No Description"}</p>
 
         <div className="flex items-center gap-4 mt-3">
           <span
             className="px-2 py-1 text-xs font-semibold uppercase rounded-md"
             style={{ backgroundColor: bgColor, color }}
           >
-            {category}
+            {category ? category : "No Category"}
           </span>
 
           <span className="flex items-center text-sm text-gray-400">
-            {time}
+            {time ? time : "No Specific Time"}
             <FaCircle className="mx-2 text-[5px]" />
-            {duration}
+            {duration ? duration : "No Specific Duration"}
           </span>
         </div>
       </div>
