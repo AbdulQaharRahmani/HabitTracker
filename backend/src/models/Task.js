@@ -38,4 +38,6 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
+taskSchema.index({ title: 1, userId: 1 }, { unique: true });
+
 export const TaskModel = mongoose.model('TaskModel', taskSchema);
