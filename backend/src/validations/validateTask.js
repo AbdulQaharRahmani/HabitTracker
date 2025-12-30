@@ -6,7 +6,7 @@ export const createTaskValidator = [
     .withMessage('Title is required')
     .isString()
     .withMessage('Title should be a string')
-    .isLength({ min: 3, max: 30 })
+    .isLength({ min: 1, max: 30 })
     .withMessage(
       'The title length should be greater than 3 and less than 30 letter'
     )
