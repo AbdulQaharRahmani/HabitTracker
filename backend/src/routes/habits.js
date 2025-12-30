@@ -10,45 +10,19 @@ import {
   completeHabit,
   uncompleteHabit,
 } from '../controllers/habitsController.js';
-import {
-  createHabitValidator ,
-  getHabitsByDateValidator ,
-  habitIdValidator ,
-  updateHabitValidator ,
-} from '../validators/validateHabit.js';
-import { validate } from '../middleware/validate.js';
 
 const router = express.Router();
 
-router.post('/', createHabitValidator, validate, asyncHandler(createHabit));
+router.post('/', asyncHandler(createHabit));
 router.get('/', asyncHandler(getHabits));
-router.get(
-  '/date',
-  getHabitsByDateValidator,
-  validate,
-  asyncHandler(getHabitsByDate)
-);
-router.post(
-  '/:id/complete',
-  habitIdValidator,
-  validate,
-  asyncHandler(completeHabit)
-);
-router.delete(
-  '/:id/complete',
-  habitIdValidator,
-  validate,
-  asyncHandler(uncompleteHabit)
-);
+router.get('/date', asyncHandler(getHabitsByDate));
+router.post('/:id/complete', asyncHandler(completeHabit));
+router.delete('/:id/complete', asyncHandler(uncompleteHabit));
+
 router
   .route('/:id')
-  .put(
-    habitIdValidator,
-    updateHabitValidator,
-    validate,
-    asyncHandler(updateHabit)
-  )
-  .delete(habitIdValidator, validate, asyncHandler(deleteHabit));
+  .put(asyncHandler(updateHabit))
+  .delete(asyncHandler(deleteHabit));
 
 router.put('/reorder', asyncHandler(reorderHabits));
 
