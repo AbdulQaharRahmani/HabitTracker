@@ -233,7 +233,8 @@ const Sidebar = ({ children }) => {
         ${isOpen ? 'md:ml-2' : 'md:ml-1'}
         ${isMobileOpen ? 'ml-64' : 'ml-0'}
         p-4 md:p-6
-        min-h-screen
+        overflow-y-auto
+        h-screen
          dark:from-gray-900 dark:to-gray-800
       `}>
         <div className="mt-16 md:mt-0">
