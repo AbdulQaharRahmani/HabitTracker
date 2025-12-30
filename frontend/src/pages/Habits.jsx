@@ -7,22 +7,13 @@ import AddHabit from '../components/AddHabit.jsx';
 import View from '../components/View.jsx'
 
 export default function Habits () {
-  const [habits, setHabits] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid');
-
-  const handleAddHabit = (newHabit) => {
-    setHabits((prevHabits) => [...prevHabits, newHabit]);
-  };
-  
-  const filteredHabits = habits.filter(habit =>
-    habit.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="">
       {/* Main */}
-      <div className="px-6 md:px-2">
+      <div className="md:px-2 lg:px-4">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:ml-0 md:items-center md:justify-between">
           <Header />
@@ -40,7 +31,7 @@ export default function Habits () {
 
           <div className="flex w-full flex-wrap justify-start items-center gap-3 md:gap-2 md:w-auto lg:w-1/2 lg:justify-end">
             <View viewMode={viewMode} setViewMode={setViewMode} />
-            <AddHabit onAddHabit={handleAddHabit} />
+            <AddHabit />
           </div>
         </div>
         {/* Habit list */}
@@ -51,11 +42,27 @@ export default function Habits () {
               : 'my-6 space-y-4 md:ml-12'
           }
         >
-          {
-            filteredHabits.map((habit) => (
-              <HabitCard key={habit.id} {...habit} />
-            ))
-          }
+          <HabitCard
+            title="Drink Water"
+            description="Drink at least 8 cups of water"
+            category="Health"
+            time="Morning"
+            duration="5 min"
+          />
+          <HabitCard
+            title="Exercise"
+            description="30 minutes of workout"
+            category="Fitness"
+            time="Evening"
+            duration="30 min"
+          />
+          <HabitCard
+            title="Read"
+            description="Read 20 pages of a book"
+            category="Education"
+            time="Night"
+            duration="20 min"
+          />
         </div>
       </div>
     </div>
