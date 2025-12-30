@@ -5,6 +5,7 @@ const taskSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
     description: {
       type: String,
@@ -40,4 +41,4 @@ const taskSchema = new mongoose.Schema(
 
 taskSchema.index({ title: 1, userId: 1 }, { unique: true });
 
-export const TaskModel = mongoose.model('TaskModel', taskSchema);
+export const TaskModel = mongoose.model('Task', taskSchema);
