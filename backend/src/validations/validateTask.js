@@ -16,7 +16,7 @@ export const createTaskValidator = [
     .optional()
     .isString()
     .withMessage('Description should be string')
-    .isLength({ min: 10, max: 200 })
+    .isLength({ min: 1, max: 200 })
     .withMessage('Description can be up to 200 characters')
     .trim(),
 
