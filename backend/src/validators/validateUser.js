@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 
-export const registerValidate = [
+export const registerValidator = [
   body('email')
     .notEmpty()
     .withMessage('Email is required')
@@ -18,7 +18,7 @@ export const registerValidate = [
     .trim(),
 ];
 
-export const loginValidate = [
+export const loginValidator = [
   body('email')
     .notEmpty()
     .withMessage('Email is required')

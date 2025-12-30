@@ -16,8 +16,8 @@ export const createHabitValidator = [
     .withMessage('Title is required')
     .isString()
     .withMessage('Title must be a string')
-    .isLength({ min: 3, max: 25 })
-    .withMessage('Title must be between 3 and 25 characters'),
+    .isLength({ min: 1, max: 25 })
+    .withMessage('Title must be between 1 and 25 characters'),
 
   body('description')
     .optional()
