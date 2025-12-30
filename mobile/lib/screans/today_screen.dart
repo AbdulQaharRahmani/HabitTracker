@@ -6,11 +6,6 @@ import '../utils/today_progressBar/header_section.dart';
 import '../utils/today_progressBar/task.dart';
 import '../utils/today_progressBar/task_item.dart';
 import '../utils/today_progressBar/top_bar.dart';
-void main(){
-  runApp(MaterialApp(
-    home: TodayScreen(),
-  ));
-}
 class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key});
 
