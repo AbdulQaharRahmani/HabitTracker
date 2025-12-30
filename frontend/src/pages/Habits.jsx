@@ -27,7 +27,7 @@ export default function Habits () {
             />
           </div>
 
-          <div className="flex w-full flex-wrap justify-start items-center gap-3 md:gap-2 md:w-auto lg:w-1/2 lg:justify-end">
+          <div className="flex w-full flex-wrap justify-center items-center gap-4 md:gap-2 md:justify-center lg:justify-end lg:mr-3">
             <View viewMode={viewMode} setViewMode={setViewMode} />
             <AddHabit />
           </div>
@@ -36,8 +36,8 @@ export default function Habits () {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:grid-cols-2 md:ml-12 gap-6 justify-items-start' 
-              : 'my-6 space-y-4 md:ml-12'
+              ? 'grid grid-cols-1 lg:grid-cols-3 lg:ml-0 sm:grid-cols-2  md:grid-cols-1 md:ml-12 gap-6 justify-items-start' 
+              : 'my-6 space-y-4 ml-10'
           }
         >
           <HabitCard
