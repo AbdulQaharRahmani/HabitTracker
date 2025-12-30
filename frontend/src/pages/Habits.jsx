@@ -11,9 +11,7 @@ export default function Habits () {
   const [viewMode, setViewMode] = useState('grid');
 
   return (
-    <div className="">
-      {/* Main */}
-      <div className="md:px-2 lg:px-4">
+    <div className="md:px-2 lg:px-4">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:ml-0 md:items-center md:justify-between">
           <Header />
@@ -63,8 +61,14 @@ export default function Habits () {
             time="Night"
             duration="20 min"
           />
+          <HabitCard
+            title=""
+            description=""
+            category=""
+            time=""
+            duration=""
+          />
         </div>
       </div>
-    </div>
   );
 };
