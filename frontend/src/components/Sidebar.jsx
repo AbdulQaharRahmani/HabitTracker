@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import useSidebarStore from '../store/useSidebarStore';
 import { 
   FaCalendarDay, 
   FaChartLine, 
@@ -25,17 +25,15 @@ import { NavLink } from 'react-router-dom';
   ];
 
 const Sidebar = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const {
+  isOpen,
+  isMobileOpen,
+  toggleSidebar,
+  toggleMobileSidebar,
+  closeMobileSidebar,
+} = useSidebarStore();
 
 
-  const toggleMobileSidebar = () => {
-    setIsMobileOpen(!isMobileOpen);
-  };
-
-  const closeMobileSidebar = () => {
-    setIsMobileOpen(false);
-  };
 
   return (
     <div className="flex min-h-screen">
