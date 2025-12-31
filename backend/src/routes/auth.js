@@ -1,4 +1,6 @@
 import express from 'express';
+import { upload } from '../middleware/upload.js';
+import { authenticationToken } from '../middleware/authMiddleware.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   getProfilePicture,
@@ -12,7 +14,12 @@ const router = express.Router();
 
 router.post('/register', registerValidate, asyncHandler(registerUser));
 router.post('/login', loginValidate, asyncHandler(loginUser));
-router.post('/profile-picture', asyncHandler(uploadProfilePicture));
-router.get('/profile-picture', asyncHandler(getProfilePicture));
+router.post(
+  '/profile-picture',
+  authenticationToken,
+  upload.single('profilePicture'),
+  asyncHandler(uploadProfilePicture)
+);
+router.get('/:id/profile-picture', asyncHandler(getProfilePicture));
 
 export default router;

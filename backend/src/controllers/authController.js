@@ -68,7 +68,11 @@ export const uploadProfilePicture = async (req, res) => {
 
   // Delete previous profile picture if exists
   if (user.profilePicture) {
-    const oldPath = path.join(process.cwd, user.profilePicture);
+    const oldPath = path.join(
+      process.cwd(),
+      'src/uploads/profile',
+      path.basename(user.profilePicture)
+    );
     if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
   }
 
@@ -94,5 +98,11 @@ export const getProfilePicture = async (req, res) => {
       message: 'User does not have profile picture',
     });
 
-  res.sendFile(path.join(process.cwd(), user.profilePicture));
+  res.sendFile(
+    path.join(
+      process.cwd(),
+      '/src/uploads/profile',
+      path.basename(user.profilePicture)
+    )
+  );
 };
