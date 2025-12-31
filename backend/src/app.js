@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.js';
 import categoryRoutes from './routes/categories.js';
 import taskRoutes from './routes/task.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { authMiddleware } from './middleware/authMiddleware.js';
 
 const app = express();
 
@@ -16,15 +17,21 @@ app.use(cors({ origin: '*' }));
 //#endregion
 
 //#region Route Middlewares
-
 app.get('/api/health', (req, res) => {
   res.send('Habit tracker API is running');
 });
 
+// Public routes
+
 app.use('/api/auth', authRoutes);
+
+// Protect routes
+app.use(authMiddleware);
+
 app.use('/api/categories', categoryRoutes);
 app.use('/api/habits', habitRoutes);
 app.use('/api/tasks', taskRoutes);
+
 //#endregion
 
 //#region Not found (404) middleware
