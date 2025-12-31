@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/screans/home_screen.dart';
 import 'package:habit_tracker/utils/form_label.dart';
 import 'package:habit_tracker/utils/sign_up_button.dart';
 import 'package:habit_tracker/utils/signup_controller.dart';
 import 'package:habit_tracker/utils/square_tiles.dart';
 
+import '../screans/home_screan.dart';
 import 'custom_text_field.dart';
 
 class SignupForm extends StatefulWidget {
