@@ -75,13 +75,14 @@ export const uploadProfilePicture = async (req, res) => {
     );
     if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
   }
+  // console.log(process.cwd()); => D:\HabitTracker\backend
 
   user.profilePicture = `/uploads/profile/${req.file.filename}`;
   await user.save();
 
   res.status(201).json({
     success: true,
-    message: 'User profile picture updated',
+    message: 'Your profile picture uploaded',
   });
 };
 
