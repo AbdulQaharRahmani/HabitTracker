@@ -1,5 +1,6 @@
-import { FaList } from 'react-icons/fa';
 import { IoGrid } from 'react-icons/io5';
+import { FaThList } from "react-icons/fa";
+
 
 export default function View({ viewMode, setViewMode }) {
   return (
@@ -29,7 +30,7 @@ export default function View({ viewMode, setViewMode }) {
               : 'text-gray-400 hover:text-gray-600'
           }`}
         >
-          <FaList size={18} />
+          <FaThList size={18} />
         </button>
       </div>
     </div>
