@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/screans/sign_up_page.dart';
-import 'package:habit_tracker/screans/today_screen.dart';
 
 void main() {
 
@@ -12,7 +11,7 @@ void main() {
       builder: (context, child) {
         return const MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: TodayScreen(),
+          home: SignUpPage(),
         );
       },
     ),
