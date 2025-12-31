@@ -33,6 +33,7 @@
     /* text-gray-800 */
     --color-text-gray: #7e8189;
     --color-text-light-gray: #E2E4E8;
+    background-color: #F9FAFB;
 }
 
 body {
@@ -43,7 +44,7 @@ body {
     min-width: 320px;   
     min-height: 100vh; 
     font-family: 'Tinos', serif;
-    background-color: var(--color-bg);
+    background-color: #F9FAFB;
 }
 
 .sidebar-bg{
