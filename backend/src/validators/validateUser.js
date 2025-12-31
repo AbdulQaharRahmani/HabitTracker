@@ -1,7 +1,6 @@
-import { body, validationResult } from 'express-validator';
-import { AppError } from '../utils/error.js';
+import { body } from 'express-validator';
 
-export const registerValidate = [
+export const registerValidator = [
   body('email')
     .notEmpty()
     .withMessage('Email is required')
@@ -17,29 +16,13 @@ export const registerValidate = [
     .isAlphanumeric()
     .withMessage('Password must contain only letters and numbers')
     .trim(),
-
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new AppError(errors.array()[0].msg, 400);
-    }
-    next();
-  },
 ];
 
-export const loginValidate = [
+export const loginValidator = [
   body('email')
     .notEmpty()
     .withMessage('Email is required')
     .isEmail()
     .withMessage('Please enter a valid email'),
   body('password').notEmpty().withMessage('Password is required').trim(),
-
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      throw new AppError(errors.array()[0].msg, 400);
-    }
-    next();
-  },
 ];
