@@ -1,5 +1,6 @@
-import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import useSidebarStore from "../store/useSidebarStore";
+
 import {
   FaCalendarDay,
   FaChartLine,
@@ -38,17 +39,9 @@ const preferencesItems = [
 ];
 
 const Sidebar = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { t } = useTranslation();
-
-  const toggleMobileSidebar = () => {
-    setIsMobileOpen(!isMobileOpen);
-  };
-
-  const closeMobileSidebar = () => {
-    setIsMobileOpen(false);
-  };
+  const { isOpen, isMobileOpen, toggleMobileSidebar, closeMobileSidebar } =
+    useSidebarStore();
 
   return (
     <div className="flex min-h-screen">
