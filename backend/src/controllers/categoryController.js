@@ -27,7 +27,7 @@ export const updateCategory = async (req, res) => {
       userId: req.user._id,
     },
     { name, icon, backgroundColor },
-    { new: true }
+    { new: true, runValidators: true }
   );
 
   if (!category) throw notFound('Category');
