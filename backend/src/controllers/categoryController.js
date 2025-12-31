@@ -1,4 +1,4 @@
-import { CategoryModel } from '../models/CategoryModel.js';
+import { CategoryModel } from '../models/Category.js';
 import { AppError, notFound } from '../utils/error.js';
 
 export const createCategory = async (req, res) => {
