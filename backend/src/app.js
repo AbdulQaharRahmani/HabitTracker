@@ -4,6 +4,7 @@ import habitRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js';
 import taskRoutes from './routes/task.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { authMiddleware } from './middleware/authMiddleware.js';
 
 const app = express();
 
@@ -15,12 +16,14 @@ app.use(cors({ origin: '*' }));
 //#endregion
 
 //#region Route Middlewares
-
 app.get('/api/health', (req, res) => {
   res.send('Habit tracker API is running');
 });
 
 app.use('/api/auth', authRoutes);
+//Protect routes below
+app.use(authMiddleware);
+app.use('/api/habits', habitsRoutes);
 app.use('/api/habits', habitRoutes);
 app.use('/api/tasks', taskRoutes);
 //#endregion
