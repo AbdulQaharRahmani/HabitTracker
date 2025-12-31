@@ -5,13 +5,17 @@ import {
   updateCategory,
   deleteCategory,
 } from '../controllers/categoryController.js';
+import { categoryValidator } from '../validators/categoryValidators.js';
+import { validate } from '../middleware/validate.js';
+import { IdValidator } from '../validators/IdValidator.js';
 
 const router = express.Router();
 
-router.post('/', asyncHandler(createCategory));
+router.post('/', categoryValidator, validate, asyncHandler(createCategory));
+
 router
   .route('/:id')
-  .put(asyncHandler(updateCategory))
-  .delete(asyncHandler(deleteCategory));
+  .put(IdValidator, categoryValidator, validate, asyncHandler(updateCategory))
+  .delete(IdValidator, validate, asyncHandler(deleteCategory));
 
 export default router;
