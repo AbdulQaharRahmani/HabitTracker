@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { AppError } from '../../utils/error.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { AppError } from '../utils/error.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 import { UserModel } from '../models/User.js';
 
-export const authenticationToken = asyncHandler(async (req, res, next) => {
+export const authMiddleware = asyncHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer')) {
