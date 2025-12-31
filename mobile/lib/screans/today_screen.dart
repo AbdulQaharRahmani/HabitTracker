@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app/app_theme.dart';
 import '../utils/today_progressBar/categories.dart';
 import '../utils/today_progressBar/date_selector.dart';
 import '../utils/today_progressBar/daily_grid.dart';
@@ -6,6 +7,7 @@ import '../utils/today_progressBar/header_section.dart';
 import '../utils/today_progressBar/task.dart';
 import '../utils/today_progressBar/task_item.dart';
 import '../utils/today_progressBar/top_bar.dart';
+
 class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key});
 
@@ -17,7 +19,9 @@ class _TodayScreenState extends State<TodayScreen> {
   DateTime selectedDate = DateTime.now();
 
   List<DateTime> get weekDates {
-    final start = selectedDate.subtract(Duration(days: selectedDate.weekday - 1));
+    final start = selectedDate.subtract(
+      Duration(days: selectedDate.weekday - 1),
+    );
     return List.generate(7, (i) => start.add(Duration(days: i)));
   }
 
@@ -36,17 +40,42 @@ class _TodayScreenState extends State<TodayScreen> {
 
   // ------------------- Sample Tasks -------------------
   final List<TaskItem> morningTasks = [
-    TaskItem(title: 'Drink Water', time: '7:00 AM', category: 'HEALTH', done: true),
-    TaskItem(title: 'Meditation', time: '8:00 AM', category: 'MINDFULNESS', done: false),
+    TaskItem(
+      title: 'Drink Water',
+      time: '7:00 AM',
+      category: 'Health',
+      done: true,
+    ),
+    TaskItem(
+      title: 'Meditation',
+      time: '8:00 AM',
+      category: 'Health',
+      done: false,
+    ),
   ];
 
   final List<TaskItem> workTasks = [
-    TaskItem(title: 'Finish Report', time: '10:30 AM', category: 'PRODUCTIVITY', done: false),
-    TaskItem(title: 'Email Follow-up', time: '2:00 PM', category: 'WORK', done: false),
+    TaskItem(
+      title: 'Finish Report',
+      time: '10:30 AM',
+      category: 'Work',
+      done: false,
+    ),
+    TaskItem(
+      title: 'Email Follow-up',
+      time: '2:00 PM',
+      category: 'Work',
+      done: false,
+    ),
   ];
 
   final List<TaskItem> eveningTasks = [
-    TaskItem(title: 'Read 20 pages', time: '9:00 PM', category: 'LEARNING', done: false),
+    TaskItem(
+      title: 'Read 20 pages',
+      time: '9:00 PM',
+      category: 'Study',
+      done: false,
+    ),
   ];
 
   late Map<String, List<TaskItem>> dailySections;
@@ -64,18 +93,23 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   Widget build(BuildContext context) {
     // Calculate completed and total tasks
-    int totalTasks = dailySections.values.fold(0, (sum, list) => sum + list.length);
+    int totalTasks = dailySections.values.fold(
+      0,
+      (sum, list) => sum + list.length,
+    );
     int completedTasks = dailySections.values.fold(
       0,
-          (sum, list) => sum + list.where((t) => t.done).length,
+      (sum, list) => sum + list.where((t) => t.done).length,
     );
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppTheme.primary,
+
         onPressed: () {
           //  add new habit/task.
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: AppTheme.textWhite),
       ),
       body: SafeArea(
         child: Padding(
@@ -92,8 +126,9 @@ class _TodayScreenState extends State<TodayScreen> {
                   setState(() => selectedDate = date);
                 },
               ),
-              const SizedBox(height: 12),
-              categories(),
+              // const SizedBox(height: 12),
+              // if we need categories we can add
+              // categories(),
               const SizedBox(height: 16),
               dailyGoalCard(
                 completed: completedTasks,
@@ -110,22 +145,24 @@ class _TodayScreenState extends State<TodayScreen> {
                     // Assign icons based on section
                     switch (entry.key) {
                       case 'MORNING ROUTINE':
-                        sectionIcon = const Icon(Icons.sunny);
+                        sectionIcon =  Icon(Icons.sunny,color: AppTheme.warning,);
                         break;
                       case 'WORK & FOCUS':
-                        sectionIcon = const Icon(Icons.work);
+                        sectionIcon =  Icon(Icons.work,color: AppTheme.primary);
                         break;
                       case 'EVENING WIND DOWN':
-                        sectionIcon = const Icon(Icons.nightlight_round);
+                        sectionIcon =  Icon(Icons.nightlight_round,color: AppTheme.warning);
                         break;
                       default:
-                        sectionIcon = const Icon(Icons.task);
+                        sectionIcon =  Icon(Icons.task,color: AppTheme.success);
                     }
-
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SectionHeader(title: entry.key, icon: sectionIcon.icon!),
+                        SectionHeader(
+                          title: entry.key,
+                          icon: sectionIcon,
+                        ),
                         const SizedBox(height: 8),
                         ...entry.value.map((task) {
                           return TaskCard(

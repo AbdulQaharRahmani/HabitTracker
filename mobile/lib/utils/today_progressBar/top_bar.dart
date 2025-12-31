@@ -46,7 +46,7 @@ class TopBar extends StatelessWidget {
           ],
         ),
         const Spacer(),
-        _iconButton(Icons.tune),
+        _iconButton(Icons.person),
         const SizedBox(width: 8),
         _iconButton(Icons.calendar_today, onTap: onPickDate),
       ],

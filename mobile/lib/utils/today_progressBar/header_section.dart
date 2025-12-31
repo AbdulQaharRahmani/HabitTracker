@@ -4,7 +4,7 @@ import '../../app/app_theme.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
-  final IconData icon;
+  final Icon icon;
 
   const SectionHeader({super.key, required this.title, required this.icon});
 
@@ -12,7 +12,7 @@ class SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppTheme.primary),
+        icon,
         const SizedBox(width: 8),
         Text(
           title,
@@ -21,8 +21,6 @@ class SectionHeader extends StatelessWidget {
             color: AppTheme.textPrimary,
           ),
         ),
-        const Spacer(),
-        // Show section progress / summary  from backend
       ],
     );
   }
