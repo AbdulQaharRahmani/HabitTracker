@@ -35,7 +35,7 @@ function LanguageSwitcher() {
           value="fa"
           className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
         >
-          فارسی🌐
+          🌐Farsi
         </option>
       </select>
     </div>
