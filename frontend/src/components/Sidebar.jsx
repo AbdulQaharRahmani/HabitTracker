@@ -1,15 +1,15 @@
 import useSidebarStore from '../store/useSidebarStore';
-import { 
-  FaCalendarDay, 
-  FaChartLine, 
-  FaCog, 
-  FaBars, 
+import {
+  FaCalendarDay,
+  FaChartLine,
+  FaCog,
+  FaBars,
   FaTimes,
   FaUser,
 } from 'react-icons/fa';
-import { 
-  HiOutlineFire, 
-  HiOutlineClipboardList 
+import {
+  HiOutlineFire,
+  HiOutlineClipboardList
 } from 'react-icons/hi';
 
 import { NavLink } from 'react-router-dom';
@@ -52,7 +52,7 @@ const Sidebar = ({ children }) => {
       <aside
         className={`
           fixed md:relative
-          h-screen
+          h-main-screen
           bg-white
           text-gray-800
           transition-all duration-300 ease-in-out
@@ -97,8 +97,8 @@ const Sidebar = ({ children }) => {
                       onClick={closeMobileSidebar}
                       className={({ isActive }) => `
                         w-full flex items-center rounded-lg p-3 transition-all duration-200
-                        ${isActive 
-                          ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
+                        ${isActive
+                          ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
                           : 'text-gray-600 hover:bg-gray-100 hover:translate-x-1'
                         }
                         ${!isOpen ? 'justify-center' : 'justify-start'}
@@ -139,8 +139,8 @@ const Sidebar = ({ children }) => {
                       onClick={closeMobileSidebar}
                       className={({ isActive }) => `
                         w-full flex items-center justify-center rounded-lg p-3 transition-all duration-200
-                        ${isActive 
-                          ? 'bg-indigo-50 text-indigo-600' 
+                        ${isActive
+                          ? 'bg-indigo-50 text-indigo-600'
                           : 'text-gray-500 hover:bg-gray-100'
                         }
                       `}
@@ -167,8 +167,8 @@ const Sidebar = ({ children }) => {
                       onClick={closeMobileSidebar}
                       className={({ isActive }) => `
                         w-full flex items-center rounded-lg p-3 transition-all duration-200
-                        ${isActive 
-                          ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
+                        ${isActive
+                          ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
                           : 'text-gray-600 hover:bg-gray-100 hover:translate-x-1'
                         }
                         ${!isOpen ? 'justify-center' : 'justify-start'}
@@ -208,8 +208,8 @@ const Sidebar = ({ children }) => {
                       onClick={closeMobileSidebar}
                       className={({ isActive }) => `
                         w-full flex items-center justify-center rounded-lg p-3 transition-all duration-200
-                        ${isActive 
-                          ? 'bg-indigo-50 text-indigo-600' 
+                        ${isActive
+                          ? 'bg-indigo-50 text-indigo-600'
                           : 'text-gray-500 hover:bg-gray-100'
                         }
                       `}
@@ -230,7 +230,7 @@ const Sidebar = ({ children }) => {
         transition-all duration-300
         ${isOpen ? 'md:ml-2' : 'md:ml-1'}
         ${isMobileOpen ? 'ml-64' : 'ml-0'}
-        p-4 md:p-6
+
         min-h-screen
          dark:from-gray-900 dark:to-gray-800
       `}>
