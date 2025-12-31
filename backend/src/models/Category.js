@@ -13,8 +13,8 @@ const CategorySchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    icon: { type: String, default: '' },
-    backgroundColor: { type: String, default: '' },
+    icon: { type: String, default: '', trim: true },
+    backgroundColor: { type: String, default: '', trim: true },
   },
   { timestamps: true }
 );
