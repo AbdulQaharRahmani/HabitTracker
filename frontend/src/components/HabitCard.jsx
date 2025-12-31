@@ -1,13 +1,17 @@
 import { FaCheckCircle, FaCircle } from 'react-icons/fa';
 import HabitCardIcon from './HabitCardIcon';
 
-export default function HabitCard({ title, description, category, time, duration }) {
+export default function HabitCard({ title, description, category, time, duration, viewMode }) {
   const color = '#6366F1';
   const bgColor = '#EEF4FF';
   const Icon = FaCheckCircle;  
 
   return (
-    <div className="mx-auto my-4 p-4 rounded-xl bg-white shadow-sm flex items-start gap-4">
+    <div className={`
+        mx-auto my-4 p-4 rounded-xl bg-white shadow-sm flex items-start gap-4 min-h-[150px]
+        ${viewMode === 'grid' ? 'w-full max-w-xs' : 'w-full'}
+      `}
+    >
       <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
 
       <div>
@@ -23,9 +27,9 @@ export default function HabitCard({ title, description, category, time, duration
           </span>
 
           <span className="flex items-center text-sm text-gray-400">
-            {time ? time : "No Specific Time"}
+            {time ? time : "No Time"}
             <FaCircle className="mx-2 text-[5px]" />
-            {duration ? duration : "No Specific Duration"}
+            {duration ? duration : "No Duration"}
           </span>
         </div>
       </div>
