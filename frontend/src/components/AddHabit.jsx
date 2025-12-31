@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaPlus } from 'react-icons/fa';
+import { GrAdd } from "react-icons/gr";
 
 export default function AddHabit () {
     const [showForm, setShowForm] = useState(false)
@@ -17,8 +17,8 @@ export default function AddHabit () {
                     type="button" 
                     onClick={() => {setShowForm(true)}}
             >
-                <span className="mx-2 mt-1 font-light">
-                    <FaPlus size={13} />
+                <span className="mx-2  font-normal">
+                    <GrAdd size={14}/>
                 </span>
                 <span className="">
                     New Habit
