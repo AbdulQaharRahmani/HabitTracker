@@ -2,7 +2,9 @@ import React from 'react'
 
 function Statistics() {
   return (
-    <div>Statistics</div>
+    <div>
+<DayilyConsistency/>
+    </div>
   )
 }
 

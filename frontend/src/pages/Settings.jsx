@@ -4,7 +4,7 @@ import DayilyConsistency from '../components/DailyConsistency'
 function Settings() {
   return (
     <div>
-      <DayilyConsistency/>
+      Settings
     </div>
   )
 }

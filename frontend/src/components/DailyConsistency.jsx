@@ -15,7 +15,7 @@ const DayilyConsistency = () => {
     return colors[level] || colors[0];
   };
   return (
-    <div className="w-full scroll-auto max-w-full p-4 md:p-8 bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 font-sans">
+    <div className="w-full scroll-auto max-w-4xl p-4 md:p-8 bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 font-sans">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
         <h2 className="text-xl md:text-2xl font-bold text-slate-800">Daily Consistency</h2>
         <div className="flex items-center gap-3 text-xs md:text-sm font-medium text-slate-500">
