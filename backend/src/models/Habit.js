@@ -35,9 +35,8 @@ const HabitSchema = new mongoose.Schema(
 );
 
 // find docs wih { isDeleted: false } in this queries: (find, findOne, findById)
-HabitModel.pre(/^find/, function (next) {
+HabitSchema.pre(/^find/, function () {
   this.where({ isDeleted: false });
-  next();
 });
 
 HabitSchema.index({ userId: 1, order: 1 });
