@@ -21,6 +21,12 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
     throw new AppError('Unauthorized: User not found', 401);
   }
 
+  const issueAt = decoded.iat * 1000; // convert iat from seconds to milliseconds
+  const changedPasswordAt = user.changedPasswordAt?.getTime(); // get the changedPasswordAt in milliseconds
+
+  if (user.changedPasswordAt && issueAt < changedPasswordAt)
+    throw new AppError('Password has been changed.Please log in again.');
+
   req.user = {
     _id: user._id,
     email: user.email,
