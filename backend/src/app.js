@@ -16,7 +16,7 @@ app.use(cors({ origin: '*' }));
 
 //#region Route Middlewares
 
-app.use('/uploads', express.static(path.join(process.cwd), 'src/uploads'));
+app.use('/uploads', express.static(path.join(process.cwd(), 'src/uploads')));
 
 app.get('/api/health', (req, res) => {
   res.send('Habit tracker API is running');
