@@ -5,7 +5,7 @@ import authRoutes from './routes/auth.js';
 import taskRoutes from './routes/task.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
-
+import userRoutes from './routes/user.js';
 const app = express();
 
 //#region Normal Midlleware
@@ -25,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use(authMiddleware);
 app.use('/api/habits', habitRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
 //#endregion
 
 //#region Not found (404) middleware
