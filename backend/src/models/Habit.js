@@ -50,7 +50,7 @@ HabitSchema.index({ userId: 1, title: 1 }, { unique: true });
 //Return the query object that can be awaited
 HabitSchema.statics.findByUserAndSortByOrder = function (userId) {
   return this.find({ userId })
-    .populate('categoryId', 'name')
+    .populate('categoryId', 'name icon backgroundColor')
     .sort({ order: 1 })
     .lean();
 };
