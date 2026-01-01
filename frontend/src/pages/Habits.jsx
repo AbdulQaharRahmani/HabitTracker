@@ -13,21 +13,21 @@ export default function Habits () {
   return (
     <div className="md:px-2 lg:px-4 bg-gray-50"> 
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:ml-0 md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:ml-0 md:items-between md:justify-between sm:flex-row sm:ml-0 sm:items-between sm:justify-between">
         <Header />
         <DarkMode />
       </div>
       <hr className="my-4 mx-2 md:ml-6 md:mr-4 border-gray-200" />
       {/* Search , View, AddHabit*/}
-      <div className="my-6 flex flex-col gap-4 md:ml-6 md:justify-start lg:flex-row lg:items-center lg:justify-between">
-        <div className="w-full md:max-w-md lg:w-1/2">
+      <div className="my-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:ml-6">
+        <div className="w-full lg:w-1/2">
           <Search 
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
         </div>
 
-        <div className="flex  flex-wrap justify-center items-center gap-4 md:gap-2 md:justify-center lg:justify-end lg:mr-3">
+        <div className="flex flex-row justify-between items-center w-full lg:w-auto lg:flex-row lg:justify-end gap-3 md:flex-col sm:flex-col">
           <View viewMode={viewMode} setViewMode={setViewMode} />
           <AddHabit />
         </div>
