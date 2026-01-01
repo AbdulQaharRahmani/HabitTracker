@@ -8,25 +8,25 @@ export default function HabitCard({ title, description, category, time, duration
 
   return (
     <div className={`
-        mx-auto my-4 p-4 rounded-xl bg-white shadow-sm flex items-start gap-4 min-h-[150px]
+        mx-auto p-4 rounded-xl bg-white shadow-sm flex items-start gap-4 min-h-[125px]
         ${viewMode === 'grid' ? 'w-full max-w-xs' : 'w-full'}
       `}
     >
       <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
 
       <div>
-        <h3 className="text-xl font-semibold text-black">{title ? title : "No Title"}</h3>
-        <p className="text-sm text-gray-400 mt-1">{description ? description : "No Description"}</p>
+        <h3 className="text-xl font-semibold text-gray-500">{title ? title : "No Title"}</h3>
+        <p className="text-sm text-gray-400">{description ? description : "No Description"}</p>
 
-        <div className="flex items-center gap-4 mt-3">
+        <div className="flex items-center gap-4 mt-2">
           <span
-            className="px-2 py-1 text-xs font-semibold uppercase rounded-md"
+            className="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md"
             style={{ backgroundColor: bgColor, color }}
           >
             {category ? category : "No Category"}
           </span>
 
-          <span className="flex items-center text-sm text-gray-400">
+          <span className="flex items-center text-[12px] text-gray-400">
             {time ? time : "No Time"}
             <FaCircle className="mx-2 text-[5px]" />
             {duration ? duration : "No Duration"}
