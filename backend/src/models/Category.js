@@ -21,4 +21,8 @@ const CategorySchema = new mongoose.Schema(
 
 CategorySchema.index({ userId: 1, name: 1 }, { unique: true });
 
+CategorySchema.statics.isCategoryExist = function (categoryId) {
+  return this.exists({ _id: categoryId });
+};
+
 export const CategoryModel = mongoose.model('Category', CategorySchema);
