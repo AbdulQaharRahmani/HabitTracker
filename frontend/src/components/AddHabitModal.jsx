@@ -1,6 +1,6 @@
 import { FaTimes } from "react-icons/fa";
 import { Dropdown } from "./Dropdown";
-import { useState } from "react";
+import useAddHabitStore from "../store/useAddHabitStore";
 import axios from "axios";
 
 const frequencyItems = [
@@ -25,29 +25,21 @@ const categoryItems = [
 ];
 
 export default function AddHabitModal() {
-    const [isModalOpen, setModalOPen] = useState(true);
-    const [habitData, setHabitData] = useState({
-        title: "",
-        description: "",
-        frequency: "Choose Frequency",
-        category: "Choose Category",
-    });
-    const getHabitData = (e, item) => {
-        const value = e.target.value;
-        setHabitData((prevData) => ({
-            ...prevData,
-            [item]: value,
-        }));
-    };
+    const {
+        isModalOpen,
+        setModalOpen,
+        habitData,
+        setHabitData
+    } = useAddHabitStore()
     const handleHabitDataSubmission = async (e) => {
         e.preventDefault();
-        if (habitData.title === "") {
+        if (!habitData.title) {
             alert("Title is required!");
             return;
         }
         if (
-            habitData.frequency === "Choose Frequency" ||
-            habitData.category === "Choose Category"
+            !habitData.frequency ||
+            !habitData.category
         ) {
             alert("Category and Frequency are required");
             return;
@@ -70,10 +62,10 @@ export default function AddHabitModal() {
             setHabitData({
                 title: "",
                 description: "",
-                frequency: "Choose Frequency",
-                category: "Choose Category",
+                frequency: null,
+                category: null,
             });
-            setModalOPen(false);
+            setModalOpen(false);
         } catch (error) {
             console.log("Could Not Save the new habit", error);
         }
@@ -86,7 +78,7 @@ export default function AddHabitModal() {
                     <div className="flex justify-between p-2">
                         <h2 className="font-bold">Add New Habit</h2>
                         <FaTimes
-                            onClick={() => setModalOPen(false)}
+                            onClick={() => setModalOpen(false)}
                             className="cursor-pointer"
                         />
                     </div>
@@ -105,7 +97,7 @@ export default function AddHabitModal() {
                             className="border-2 border-gray-100 p-2 rounded-md bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#7B68EE]/20 focus:border-[#7B68EE] outline-none transition-all placeholder:text-sm"
                             placeholder="Enter habit title"
                             value={habitData.title}
-                            onChange={(e) => getHabitData(e, "title")}
+                            onChange={(e) => setHabitData("title", e.target.value)}
                         />
                         <label htmlFor="description">Description</label>
                         <textarea
@@ -114,15 +106,16 @@ export default function AddHabitModal() {
                             placeholder="Enter habit description"
                             className="border-2 border-gray-100 p-2 rounded-md bg-gray-50 h-[150px] resize-none focus:bg-white focus:ring-2 focus:ring-[#7B68EE]/20 focus:border-[#7B68EE] outline-none transition-all placeholder:text-sm"
                             value={habitData.description}
-                            onChange={(e) => getHabitData(e, "description")}
+                            onChange={(e) => setHabitData("description", e.target.value)}
                         />
                         <label htmlFor="frequency">
                             Frequency <span className="text-red-600">*</span>
                         </label>
                         <Dropdown
                             items={frequencyItems}
+                            placeholder={"Choose Frequency"}
                             value={habitData.frequency}
-                            getValue={(e) => getHabitData(e, "frequency")}
+                            getValue={(e) => setHabitData("frequency", e.target.value)}
                         />
 
                         <label htmlFor="frequency">
@@ -130,8 +123,9 @@ export default function AddHabitModal() {
                         </label>
                         <Dropdown
                             items={categoryItems}
+                            placeholder={"Choose Category"}
                             value={habitData.category}
-                            getValue={(e) => getHabitData(e, "category")}
+                            getValue={(e) => setHabitData("category", e.target.value)}
                         />
 
                         <div className="pt-6 flex flex-col gap-3">
@@ -144,7 +138,7 @@ export default function AddHabitModal() {
                             </button>
                             <button
                                 className="w-full py-3.5 text-gray-500 font-semibold rounded-xl border-2 border-gray-100 hover:bg-gray-50 transition-all active:scale-[0.98]"
-                                onClick={() => setModalOPen(false)}
+                                onClick={() => setModalOpen(false)}
                                 type="button"
                             >
                                 Cancel
