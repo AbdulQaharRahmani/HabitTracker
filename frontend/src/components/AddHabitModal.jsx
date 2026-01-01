@@ -1,8 +1,7 @@
 import { FaTimes } from "react-icons/fa";
 import { Dropdown } from "./Dropdown";
 import useAddHabitStore from "../store/useAddHabitStore";
-import axios from "axios";
-
+import api from "../../services/api";
 const frequencyItems = [
     { id: "f1", name: "Daily", value: "daily" },
     { id: "f2", name: "Every Other Day", value: "everyOtherDay" },
@@ -33,6 +32,11 @@ export default function AddHabitModal() {
     } = useAddHabitStore()
     const handleHabitDataSubmission = async (e) => {
         e.preventDefault();
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Your session has expired. Please login to add a habit.");
+            return;
+        }
         if (!habitData.title) {
             alert("Title is required!");
             return;
@@ -45,20 +49,7 @@ export default function AddHabitModal() {
             return;
         }
         try {
-            const baseURL = "http://localhost:3000/api/habits";
-            let token = localStorage.getItem("token");
-            if (!token) {
-                alert("Your session has expired, please login!");
-                return;
-            }
-            const response = await axios({
-                method: "post",
-                url: baseURL,
-                data: habitData,
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            await api.post("/habits", habitData)
             setHabitData({
                 title: "",
                 description: "",
