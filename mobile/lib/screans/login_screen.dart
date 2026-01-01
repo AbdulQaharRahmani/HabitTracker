@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/header_card_login.dart';
 import '../utils/login_card.dart';
+import '../utils/login_utils/controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,35 +12,32 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  late final LoginController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = LoginController();
+    controller.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    controller.disposeAll();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       body: SingleChildScrollView(
-        padding:  EdgeInsets.symmetric(horizontal: 12.h, vertical:100.h),
+        padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 100.h),
         child: Column(
           children: [
             const HeaderCard(),
-            LoginCard(
-              emailController: emailController,
-              passwordController: passwordController,
-              onLoginSuccess: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Login success! Token saved.')),
-                );
-              },
-            ),
+            LoginCard(controller: controller),
           ],
         ),
       ),
