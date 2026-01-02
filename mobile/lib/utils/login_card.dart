@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:habit_tracker/screans/home_screen.dart';
+import 'package:habit_tracker/screans/taskPage/tasks_screen.dart';
 import '../app/app_theme.dart';
 class LoginCard extends StatelessWidget {
 
@@ -120,7 +122,9 @@ class LoginCard extends StatelessWidget {
               width: double.infinity,
               height: 48.h,
               child: ElevatedButton(
-                onPressed: (){},
+                onPressed: (){
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>TasksScreen()));
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primary,
 
