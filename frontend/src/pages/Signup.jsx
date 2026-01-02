@@ -1,0 +1,193 @@
+import { useState } from "react";
+import { Link ,useNavigate} from "react-router-dom";
+
+import { MdPowerSettingsNew } from "react-icons/md";
+import { CiUser } from "react-icons/ci";
+import { AiOutlineMail } from "react-icons/ai";
+import { SlLock } from "react-icons/sl";
+import { FaEye, FaRegEyeSlash, FaApple } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+
+function SignUp () {
+  const navigate=useNavigate();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [showPass, setShowPass] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  const [errors,setErrors]=useState({});
+
+  const signupUserHandler=(e)=>{
+    e.preventDefault();
+
+    formValidation();
+
+    resetHandler();
+    navigate('/');
+  }
+
+  const formValidation=()=>{
+    let tempErrors={};
+    if(!fullName){
+         tempErrors.fullName='full Name is required';
+    }
+    if(!email){
+         tempErrors.email='email is required';
+    }
+    if(!password){
+         tempErrors.password='password is required';
+    }
+
+    setErrors(tempErrors);
+  }
+
+  const resetHandler=()=>{
+    setFullName("");
+    setEmail("");
+    setPassword("");
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center w-full h-screen overflow-hidden bg-zinc-100 p-2 sm:p-3">
+
+      <div className="flex flex-col items-center justify-center text-center mb-4">
+        <div className="mb-2 rounded-2xl bg-indigo-100 p-3">
+          <MdPowerSettingsNew className="text-xl text-indigo-600" />
+        </div>
+        <h1 className="text-xl font-bold">Create Account</h1>
+        <p className="text-xs text-gray-500 max-w-xs">
+          Start your journey to better habits today.
+        </p>
+      </div>
+
+      <form className="flex flex-col w-full max-w-[350px] gap-0 rounded-2xl border bg-white px-6 py-4 shadow-lg">
+
+      <div className="w-full">
+      <label htmlFor="full-name" className="text-xs font-medium text-gray-900">
+        Full Name
+      </label>
+
+      <div
+        className={`mt-1 flex w-full items-center rounded-xl border bg-zinc-100/50 px-2 focus-within:border-indigo-500 ${
+          errors.fullName ? 'border-red-500' : 'border-gray-200'
+        }`}
+      >
+        <CiUser className="text-gray-800" size={15} />
+        <input
+          id="full-name"
+          type="text"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="John Doe"
+          className="w-full bg-transparent px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
+        />
+      </div>
+
+    <span
+    className={`block min-h-[10px] ml-2 text-[10px] font-medium transition-opacity duration-200 ${
+      errors.fullName ? 'text-red-500 opacity-100' : 'opacity-0'
+    }`}
+  >
+    {errors.fullName || ' '}
+  </span>
+
+</div>
+        <div className="w-full">
+          <label htmlFor="email" className="text-xs font-medium text-gray-900 mt-2">
+            Email Address
+          </label>
+          <div className={ `flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 mt-1 focus-within:border-indigo-500 ${errors.email ? 'border-red-500': 'border-gray-200'}`}>
+            <AiOutlineMail className="text-gray-800" size={15}/>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="hello@example.com"
+              className="w-full bg-zinc-100/50 px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
+            />
+          </div>
+          <span
+            className={`block min-h-[10px] ml-2 text-[10px] font-medium transition-opacity duration-200 ${
+              errors.email ? 'text-red-500 opacity-100' : 'opacity-0'
+            }`}
+          >
+            {errors.email || ' '}
+          </span>
+
+        </div>
+
+        <div className="w-full">
+          <label htmlFor="password" className="text-xs font-medium text-gray-900 mt-2">
+            Password
+          </label>
+          <div className={ `flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 mt-1 focus-within:border-indigo-500 ${errors.password ? 'border-red-500': 'border-gray-200'}`}>
+            <SlLock className={`${errors.password ? 'border-red-500': 'text-gray-800' }`} size={15} />
+            <input
+              id="password"
+              type={showPass ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full bg-zinc-100/50 px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
+            />
+            <button type="button" onClick={() => setShowPass(!showPass)}>
+              {showPass ? <FaEye className="text-gray-500" size={13} /> : <FaRegEyeSlash className="text-gray-500" size={13}/>}
+            </button>
+          </div>
+          <span
+          className={`block min-h-[10px] ml-2 text-[10px] font-medium transition-opacity duration-200 ${
+            errors.password ? 'text-red-500 opacity-100' : 'opacity-0'
+          }`}
+        >
+          {errors.password || ' '}
+        </span>
+        </div>
+
+        <div className="flex items-center gap-2 w-full mt-2">
+          <input
+            type="radio"
+            id="terms"
+            name="terms"
+            checked={checked}
+            onClick={() => setChecked(!checked)}
+            className="cursor-pointer accent-indigo-500"
+          />
+          <label htmlFor="terms" className="text-xs text-gray-500 font-medium">
+            I agree to the <span className="text-indigo-500">Terms of Service</span> and <span className="text-indigo-500">Privacy Policy</span>
+          </label>
+        </div>
+
+        <button className="w-full mt-2 rounded-xl bg-indigo-500 py-2 text-xs text-white font-medium hover:bg-indigo-700" onClick={signupUserHandler}>
+          Sign Up
+        </button>
+
+        <div className="flex items-center gap-2 w-full mt-2 text-xs">
+          <div className="h-px flex-1 bg-gray-200"></div>
+          <span className="text-gray-500 whitespace-nowrap">Or continue with</span>
+          <div className="h-px flex-1 bg-gray-200"></div>
+        </div>
+
+        <div className="flex w-full gap-2 mt-2">
+          <button className="flex-1 flex items-center justify-center gap-1 rounded-xl border py-2 text-xs font-semibold hover:bg-indigo-500 hover:text-white">
+            <FcGoogle size={15} /> Google
+          </button>
+          <button className="flex-1 flex items-center justify-center gap-1 rounded-xl border py-2 text-xs font-semibold hover:bg-indigo-500 hover:text-white">
+            <FaApple size={15}/> Apple
+          </button>
+        </div>
+      </form>
+
+      <div className="flex gap-1 items-center justify-center mt-3 text-xs">
+        <p className="text-xs text-gray-500 font-medium">Already have an account?</p>
+        <Link to="/login" className="text-indigo-700 font-medium hover:underline">
+          Log in
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+export default SignUp;
