@@ -2,6 +2,7 @@
 import cors from 'cors';
 import habitsRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js';
+import userRoutes from './routes/user.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import path from 'path';
 
@@ -23,6 +24,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/habits', habitsRoutes);
 //#endregion
 

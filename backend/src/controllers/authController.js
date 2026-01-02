@@ -1,9 +1,7 @@
-import { AppError, notFound } from '../utils/error.js';
+import { AppError } from '../utils/error.js';
 import { UserModel } from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import fs from 'fs';
-import path from 'path';
 
 export const registerUser = async (req, res) => {
   const { email, password } = req.body;
@@ -54,56 +52,4 @@ export const loginUser = async (req, res) => {
       email: user.email,
     },
   });
-};
-
-// @desc    Upload or update user's profile picture
-// @route   POST /api/users/profile-picture
-// @access  Private
-export const uploadProfilePicture = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
-  if (!req.file) throw new AppError('Please upload a profile image', 400);
-
-  const user = await UserModel.findById(req.user._id);
-  if (!user) throw notFound('User');
-
-  // Delete previous profile picture if exists
-  if (user.profilePicture) {
-    const oldPath = path.join(
-      process.cwd(),
-      'src/uploads/profile',
-      path.basename(user.profilePicture)
-    );
-    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-  }
-  // console.log(process.cwd()); => D:\HabitTracker\backend
-
-  user.profilePicture = `/uploads/profile/${req.file.filename}`;
-  await user.save();
-
-  res.status(201).json({
-    success: true,
-    message: 'Your profile picture uploaded',
-  });
-};
-
-// @desc    Get user's profile picture
-// @route   GET /api/users/:id/profile-picture
-// @access  Public
-export const getProfilePicture = async (req, res) => {
-  const user = await UserModel.findById(req.params.id);
-  if (!user) throw notFound('User');
-
-  if (!user.profilePicture)
-    return res.status(200).json({
-      success: true,
-      message: 'User does not have profile picture',
-    });
-
-  res.sendFile(
-    path.join(
-      process.cwd(),
-      '/src/uploads/profile',
-      path.basename(user.profilePicture)
-    )
-  );
 };
