@@ -20,7 +20,7 @@ export const createTask = async (req, res) => {
   });
 };
 
-export const updateTasks = async (req, res) => {
+export const updateTask = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized', 401);
 
   const task = await TaskModel.findById(req.params.id);
@@ -32,15 +32,15 @@ export const updateTasks = async (req, res) => {
 
   const { title, description, status, priority, dueDate } = req.body;
 
-  if(title !== undefined) task.title = title
-  if(description !== undefined) task.description = description
-  if(status !== undefined) task.status = status
-  if(priority !== undefined) task.priority = priority
-  if(dueDate !== undefined) task.dueDate = dueDate
+  if (title !== undefined) task.title = title;
+  if (description !== undefined) task.description = description;
+  if (status !== undefined) task.status = status;
+  if (priority !== undefined) task.priority = priority;
+  if (dueDate !== undefined) task.dueDate = dueDate;
 
-  await task.save()
+  await task.save();
   res.status(200).json({
     success: true,
-    data: task
-  })
+    data: task,
+  });
 };
