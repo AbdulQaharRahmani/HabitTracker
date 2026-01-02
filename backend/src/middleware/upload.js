@@ -1,6 +1,11 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 import { AppError } from '../utils/error.js';
+
+// if '/uploads/profile' not exist create it first
+const uploadDir = path.join(process.cwd(), 'src/uploads/profile');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 // Define the storage path and create new name for image
 const storage = multer.diskStorage({
