@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/utils/tasks_page_component/tasks_card.dart';
-
 import '../../utils/tasks_page_component/habit.dart';
 
 class TasksScreen extends StatefulWidget {
@@ -22,7 +20,6 @@ class _TasksScreenState extends State<TasksScreen> {
       backgroundColor: Color(0xFFEFF2F6),
       appBar: AppBar(
         backgroundColor: Color(0xFFEFF2F6),
-        // actionsPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 9),
         title: Row(
           children: [
             Padding(
@@ -58,7 +55,7 @@ class _TasksScreenState extends State<TasksScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            // Text for uer name
+            // ====== Text for uer name ======
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -99,15 +96,14 @@ class _TasksScreenState extends State<TasksScreen> {
           ),
         ],
       ),
-      //  The body of screen
 
-
+      // ====== The body of screen ======
       body: SingleChildScrollView(
         padding: EdgeInsets.only(top: 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //  Row for all tasks
+            //  ====== Row for all tasks ======
             Container(
               padding: EdgeInsets.symmetric(horizontal: 30),
               child: Row(
@@ -153,7 +149,6 @@ class _TasksScreenState extends State<TasksScreen> {
 
             //  ======= search box  =======
             Container(
-              // color: Colors.red,
               height: 44,
               margin: EdgeInsets.symmetric(horizontal: 30),
               child: SearchBar(
@@ -163,7 +158,7 @@ class _TasksScreenState extends State<TasksScreen> {
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                leading: Icon(Icons.search,color: Colors.grey,),
+                leading: Icon(Icons.search, color: Colors.grey),
                 padding: WidgetStatePropertyAll(
                   EdgeInsets.only(left: 15, right: 0),
                 ),
@@ -175,7 +170,7 @@ class _TasksScreenState extends State<TasksScreen> {
               ),
             ),
 
-            // Row for to do and active
+            // ====== Row for to do and active ======
             const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.max,
@@ -185,7 +180,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   padding: const EdgeInsets.only(left: 25),
                   child: Text(
                     'To Do',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize:25),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
                   ),
                 ),
                 Padding(
@@ -204,7 +199,6 @@ class _TasksScreenState extends State<TasksScreen> {
                       style: TextStyle(
                         color: Colors.blue.shade800,
                         fontWeight: FontWeight.bold,
-                        // backgroundColor: Colors.blue.shade100
                       ),
                     ),
                   ),
@@ -212,15 +206,10 @@ class _TasksScreenState extends State<TasksScreen> {
               ],
             ),
 
-
-            //  list to show habits card
-            const SizedBox(
-              height:10,
-            ),
-            //  Tasks card
-
+            // ====== list to show habits card ======
+            const SizedBox(height: 10),
+            // ====== Tasks card ======
             TasksCard(),
-
           ],
         ),
       ),

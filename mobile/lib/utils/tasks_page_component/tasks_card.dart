@@ -25,8 +25,7 @@ class _TasksCardState extends State<TasksCard> {
       category: 'Health',
       isCompleted: false,
       iconColor: Colors.purple,
-      taskIcon: Icons.self_improvement
-      ,
+      taskIcon: Icons.self_improvement,
       timeInMin: 30,
     ),
     Habit(
@@ -35,7 +34,7 @@ class _TasksCardState extends State<TasksCard> {
       category: 'Health',
       isCompleted: false,
       iconColor: Colors.red,
-      taskIcon:Icons.fitness_center,
+      taskIcon: Icons.fitness_center,
       timeInMin: 30,
     ),
     Habit(
@@ -44,7 +43,7 @@ class _TasksCardState extends State<TasksCard> {
       category: 'Health',
       isCompleted: false,
       iconColor: Colors.red,
-      taskIcon:Icons.fitness_center,
+      taskIcon: Icons.fitness_center,
       timeInMin: 30,
     ),
   ];
@@ -54,66 +53,64 @@ class _TasksCardState extends State<TasksCard> {
     final activeHabits = _habits.where((h) => !h.isCompleted).toList();
     final completedHabits = _habits.where((h) => h.isCompleted).toList();
 
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           // ====== active tasks ======
           ListView.builder(
-              itemCount: activeHabits.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return _buildHabitCard(activeHabits[index],index);
-              }),
-
-          // const SizedBox(
-          //   height:5,
-          // ),
+            itemCount: activeHabits.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return _buildHabitCard(activeHabits[index], index);
+            },
+          ),
 
           //  ====== complete Tasks  ======
           if (completedHabits.isNotEmpty)
-            Column(crossAxisAlignment: CrossAxisAlignment.start,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text("Completed Tasks", style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,),),),
-                const SizedBox(
-                  height:5,
+                  child: Text(
+                    "Completed Tasks",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 5),
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: completedHabits.length,
                   itemBuilder: (context, index) {
-                    return  _buildHabitCard(completedHabits[index], index, isCompleted: true);
+                    return _buildHabitCard(
+                      completedHabits[index],
+                      index,
+                      isCompleted: true,
+                    );
                   },
                 ),
               ],
             ),
-
-
         ],
-
       ),
-
     );
   }
 
-  Widget _buildHabitCard(Habit habit, int index ,{bool isCompleted = false}) {
+  Widget _buildHabitCard(Habit habit, int index, {bool isCompleted = false}) {
     return Card(
       color: isCompleted ? Colors.grey.shade200 : Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(25)
+        borderRadius: BorderRadiusGeometry.circular(25),
       ),
       margin: const EdgeInsets.fromLTRB(21, 0, 21, 10),
-      // margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -124,17 +121,18 @@ class _TasksCardState extends State<TasksCard> {
               margin: EdgeInsets.only(top: 9),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color:habit.isCompleted ?Colors.grey.withAlpha(25): habit.iconColor.withAlpha(38),
+                color: habit.isCompleted
+                    ? Colors.grey.withAlpha(25)
+                    : habit.iconColor.withAlpha(38),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 habit.taskIcon,
-                color: habit.isCompleted ?Colors.grey: habit.iconColor,
+                color: habit.isCompleted ? Colors.grey : habit.iconColor,
               ),
             ),
 
             const SizedBox(width: 12),
-
             // =======  Content of task card =======
             Expanded(
               child: Column(
@@ -149,16 +147,22 @@ class _TasksCardState extends State<TasksCard> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            decoration:
-                            habit.isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
-                            color: habit.isCompleted ? Colors.grey : Colors.black,
+                            decoration: habit.isCompleted
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                            color: habit.isCompleted
+                                ? Colors.grey
+                                : Colors.black,
                           ),
                         ),
                       ),
                       IconButton(
                         padding: EdgeInsets.only(left: 35),
                         icon: const Icon(
-                          Icons.delete, size: 23, color: Colors.grey,),
+                          Icons.delete,
+                          size: 23,
+                          color: Colors.grey,
+                        ),
                         onPressed: () {
                           setState(() {
                             _habits.removeAt(index);
@@ -169,13 +173,16 @@ class _TasksCardState extends State<TasksCard> {
                       Transform.scale(
                         scale: 1.38,
                         child: Checkbox(
-                          activeColor: habit.isCompleted ?Colors.grey : Colors.blue,
+                          activeColor: habit.isCompleted
+                              ? Colors.grey
+                              : Colors.blue,
                           checkColor: Colors.white,
                           side: BorderSide(
-                              color: Colors.grey.shade400, width: 2
+                            color: Colors.grey.shade400,
+                            width: 2,
                           ),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadiusGeometry.circular(5)
+                            borderRadius: BorderRadiusGeometry.circular(5),
                           ),
                           value: habit.isCompleted,
                           onChanged: (value) {
@@ -185,25 +192,17 @@ class _TasksCardState extends State<TasksCard> {
                           },
                         ),
                       ),
-
                     ],
                   ),
-
-                  // const SizedBox(height:0),
-
                   // =======  Description =======
                   Text(
                     habit.description,
-                    style: const TextStyle(
-                      color: Colors.grey,
-
-                    ),
+                    style: const TextStyle(color: Colors.grey),
                   ),
 
                   const SizedBox(height: 6),
 
                   // =======  Category Badge =======
-
                   Row(
                     children: [
                       Container(
@@ -212,27 +211,32 @@ class _TasksCardState extends State<TasksCard> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: habit.isCompleted? Colors.grey.withAlpha(40): habit.iconColor.withAlpha(40),
+                          color: habit.isCompleted
+                              ? Colors.grey.withAlpha(40)
+                              : habit.iconColor.withAlpha(40),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           habit.category.toUpperCase(),
                           style: TextStyle(
-                            color:habit.isCompleted?Colors.grey: habit.iconColor,
+                            color: habit.isCompleted
+                                ? Colors.grey
+                                : habit.iconColor,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 10),
                       // =======  Time of tasks =======
                       if (!habit.isCompleted) ...[
-                        Icon(Icons.access_time_outlined, color: Colors.grey, size: 15),
-                        SizedBox(width: 4),
-                        Text(
-                          '1h',
-                          style: TextStyle(color: Colors.grey),
+                        Icon(
+                          Icons.access_time_outlined,
+                          color: Colors.grey,
+                          size: 15,
                         ),
+                        SizedBox(width: 4),
+                        Text('1h', style: TextStyle(color: Colors.grey)),
                       ],
                     ],
                   ),
