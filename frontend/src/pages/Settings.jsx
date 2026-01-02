@@ -97,9 +97,10 @@ const Settings = () => {
                   <h3 className="font-semibold">Streak Alerts</h3>
                   <p className="text-sm text-slate-500">Get notified when your streak is at risk.</p>
                 </div>
-                <div className="w-12 h-6 bg-indigo-600 rounded-full relative cursor-pointer">
-                  <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
-                </div>
+                <label className="inline-flex items-center me-5 cursor-pointer">
+                  <input type="checkbox" value="" class="sr-only peer" checked/>
+                  <div className="relative w-9 h-5 bg-neutral-quaternary rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
+                </label>
               </div>
 
               <div className="flex items-center justify-between">
@@ -107,9 +108,10 @@ const Settings = () => {
                   <h3 className="font-semibold">Weekly Summary Email</h3>
                   <p className="text-sm text-slate-500">Receive a weekly report of your progress.</p>
                 </div>
-                <div className="w-12 h-6 bg-slate-200 rounded-full relative cursor-pointer">
-                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
-                </div>
+               <label className="inline-flex items-center me-5 cursor-pointer">
+                  <input type="checkbox" value="" class="sr-only peer" checked/>
+                  <div className="relative w-9 h-5 bg-neutral-quaternary rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
+                </label>
               </div>
             </div>
           </section>
