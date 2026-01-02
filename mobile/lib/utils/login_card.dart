@@ -201,7 +201,7 @@ class LoginCard extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>SignUpScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>SignUpPage()));
                     },
                     child: Text('Sign up', style: TextStyle(fontSize: 12.sp)),
                   ),

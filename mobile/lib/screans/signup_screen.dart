@@ -3,14 +3,14 @@ import 'package:habit_tracker/screans/login_screen.dart';
 import 'package:habit_tracker/utils/signup_form.dart';
 import '../utils/signup_controller.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpPageState extends State<SignUpPage> {
   final controller = SignUpController();
   bool isPasswordHidden = true;
 
