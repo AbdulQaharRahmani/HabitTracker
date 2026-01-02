@@ -4,7 +4,7 @@ import useAddHabitStore from "../store/useAddHabitStore";
 import api from "../../services/api";
 const frequencyItems = [
     { id: "f1", name: "Daily", value: "daily" },
-    { id: "f2", name: "Every Other Day", value: "everyOtherDay" },
+    { id: "f2", name: "Every Other Day", value: "every-other-day" },
     { id: "f3", name: "Weekly", value: "weekly" },
     { id: "f4", name: "Biweekly", value: "biweekly" },
     { id: "f5", name: "Weekdays", value: "weekdays" },

@@ -7,8 +7,8 @@ export function Dropdown({ items, value, getValue, placeholder }) {
     const handleDropdownVisibility = () => {
         setDropdownOpen(!isDropdownOpen)
     }
-    const handleSelect = (itemName) => {
-        getValue({ target: { value: itemName } })
+    const handleSelect = (itemValue) => {
+        getValue({ target: { value: itemValue } })
         setDropdownOpen(false)
     }
     return (
@@ -19,7 +19,7 @@ export function Dropdown({ items, value, getValue, placeholder }) {
                     placeholder={placeholder}
                     readOnly
                     value={value}
-                    className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white p-4 pr-12 text-sm font-medium text-gray-700 shadow-sm transition-all caret-transparent focus:border-[#7B68EE] focus:ring-4 focus:ring-[#7B68EE]/15 outline-none"
+                    className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white p-4 pr-12 text-sm font-medium text-gray-700 shadow-sm transition-all caret-transparent focus:border-[#7B68EE] focus:ring-4 focus:ring-[#7B68EE]/15 outline-none capitalize"
                     onChange={getValue}
                     onClick={handleDropdownVisibility}
                 />
@@ -36,7 +36,7 @@ export function Dropdown({ items, value, getValue, placeholder }) {
                                 key={item.id}
                                 data-value={item.value}
                                 className="group flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-sm text-gray-600 transition-all hover:bg-[#7B68EE]/10 hover:text-[#7B68EE]"
-                                onClick={() => handleSelect(item.name)}
+                                onClick={() => handleSelect(item.value)}
                             >
                                 <span className="font-medium">{item.name}</span>
 
