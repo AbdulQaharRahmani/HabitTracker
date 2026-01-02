@@ -42,11 +42,11 @@ export const getProfilePicture = async (req, res) => {
       message: 'User does not have profile picture',
     });
 
-  res.sendFile(
-    path.join(
-      process.cwd(),
-      '/src/uploads/profile',
-      path.basename(user.profilePicture)
-    )
-  );
+  const fullUrl = `${req.protocol}://${req.get('host')}${user.profilePicture}`;
+  // console.log(req.protocol, req.get('host')); ==> http, localhost:3000
+
+  res.status(200).json({
+    success: true,
+    data: fullUrl,
+  });
 };
