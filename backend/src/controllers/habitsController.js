@@ -75,7 +75,10 @@ export const createHabit = async (req, res) => {
 
   const { title, description, frequency, categoryId } = req.body;
 
-  const isCategoryExist = await CategoryModel.isCategoryExist(categoryId);
+  const isCategoryExist = await CategoryModel.isCategoryExist(
+    categoryId,
+    req.user._id
+  );
 
   if (!isCategoryExist) throw notFound('Category');
 
@@ -107,7 +110,10 @@ export const updateHabit = async (req, res) => {
 
   const { title, description, frequency, categoryId } = req.body;
 
-  const isCategoryExist = await CategoryModel.isCategoryExist(categoryId);
+  const isCategoryExist = await CategoryModel.isCategoryExist(
+    categoryId,
+    req.user._id
+  );
 
   if (!isCategoryExist) throw notFound('Category');
 
