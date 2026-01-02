@@ -1,7 +1,6 @@
-import fs from 'fs';
-import path from 'path';
 import { AppError, notFound } from '../utils/error.js';
 import { UserModel } from '../models/User.js';
+import { deleteFile } from '../utils/deleteFile.js';
 
 //  Upload or update user's profile picture
 export const uploadProfilePicture = async (req, res) => {
@@ -13,14 +12,8 @@ export const uploadProfilePicture = async (req, res) => {
 
   // Delete previous profile picture if exists
   if (user.profilePicture) {
-    const oldPath = path.join(
-      process.cwd(),
-      'src/uploads/profile',
-      path.basename(user.profilePicture)
-    );
-    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    deleteFile(user.profilePicture);
   }
-  // console.log(process.cwd()); => D:\HabitTracker\backend
 
   user.profilePicture = `/uploads/profile/${req.file.filename}`;
   await user.save();
