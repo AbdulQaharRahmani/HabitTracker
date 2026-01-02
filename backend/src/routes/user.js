@@ -4,7 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   getProfilePicture,
   uploadProfilePicture,
-} from '../controllers/authController.js';
+} from '../controllers/usersController.js';
 
 const router = express.Router();
 
