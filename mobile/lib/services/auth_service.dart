@@ -25,10 +25,6 @@ class AuthService {
         "password": password,
       }),
     );
-
-    print("HTTP Status: ${response.statusCode}");
-    print("HTTP Body: ${response.body}");
-
     return jsonDecode(response.body);
   }
   }
