@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 
 export const createTaskValidator = [
   body('title')
@@ -26,6 +26,32 @@ export const createTaskValidator = [
     .withMessage('Priority must be low, medium, or high'),
 
   body('dueDate')
+    .optional()
+    .isISO8601()
+    .withMessage('DueDate must be a valid date')
+    .toDate(),
+];
+
+export const filterTasksValidator = [
+  query('searchTerm')
+    .optional()
+    .isString()
+    .withMessage('Search Term should be a string')
+    .trim(),
+
+  query('status')
+    .optional()
+    .isString()
+    .withMessage('Status should be string')
+    .trim(),
+
+  query('priority')
+    .optional()
+    .isString()
+    .withMessage('Priority should be string')
+    .trim(),
+
+  query('dueDate')
     .optional()
     .isISO8601()
     .withMessage('DueDate must be a valid date')
