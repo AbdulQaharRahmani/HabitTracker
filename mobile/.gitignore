@@ -48,5 +48,6 @@ app.*.map.json
 *.lock
 *.tmp
  pubspec.lock
-
-
+ .idea/
+ build/
+ local.properties
