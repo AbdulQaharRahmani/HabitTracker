@@ -3,7 +3,6 @@ import { UserModel } from '../models/User.js';
 import { deleteFile } from '../utils/deleteFile.js';
 import { AppError, notFound } from '../utils/error.js';
 
-
 //  Upload or update user's profile picture
 export const uploadProfilePicture = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
@@ -44,7 +43,7 @@ export const getProfilePicture = async (req, res) => {
     success: true,
     data: fullUrl,
   });
-
+};
 
 export const changePassword = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
