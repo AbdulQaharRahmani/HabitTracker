@@ -56,10 +56,4 @@ export const filterTasksValidator = [
     .isISO8601()
     .withMessage('DueDate must be a valid date')
     .toDate(),
-
-  query('deletedAt')
-    .optional()
-    .isISO8601()
-    .withMessage('DeletedAt must be a valid date')
-    .toDate(),
 ];
