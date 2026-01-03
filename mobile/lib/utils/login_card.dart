@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/screans/home_screen.dart';
-import 'package:habit_tracker/screans/taskPage/tasks_screen.dart';
+import 'package:habit_tracker/screans/home_screan.dart';
+import 'package:habit_tracker/screans/signup_screen.dart';
 import '../app/app_theme.dart';
 class LoginCard extends StatelessWidget {
 
@@ -123,7 +123,10 @@ class LoginCard extends StatelessWidget {
               height: 48.h,
               child: ElevatedButton(
                 onPressed: (){
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>TasksScreen()));
+
+                  // ====== Static page route
+                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=> HomeScreen()));
+
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primary,
@@ -197,7 +200,9 @@ class LoginCard extends StatelessWidget {
                     style: TextStyle(fontSize: 12.sp),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>SignUpPage()));
+                    },
                     child: Text('Sign up', style: TextStyle(fontSize: 12.sp)),
                   ),
                 ],
