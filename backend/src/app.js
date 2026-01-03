@@ -6,7 +6,7 @@ import categoryRoutes from './routes/categories.js';
 import taskRoutes from './routes/task.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
-
+import userRoutes from './routes/user.js';
 const app = express();
 
 //#region Normal Midlleware
@@ -31,6 +31,7 @@ app.use(authMiddleware);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/habits', habitRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
 
 //#endregion
 
