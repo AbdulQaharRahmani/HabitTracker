@@ -1,7 +1,7 @@
 import { create } from "zustand"
 
 const useAddHabitStore = create((set) => ({
-    isModalOpen: true,
+    isModalOpen: false,
     habitData: {
         title: "",
         description: "",
