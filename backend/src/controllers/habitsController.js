@@ -75,12 +75,12 @@ export const createHabit = async (req, res) => {
 
   const { title, description, frequency, categoryId } = req.body;
 
-  const isCategoryExist = await CategoryModel.isCategoryExist(
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
     categoryId,
     req.user._id
   );
 
-  if (!isCategoryExist) throw notFound('Category');
+  if (!doesCategoryExist) throw notFound('Category');
 
   let habitCount = await HabitModel.getHabitCountByUserId(req.user._id);
 
@@ -110,12 +110,12 @@ export const updateHabit = async (req, res) => {
 
   const { title, description, frequency, categoryId } = req.body;
 
-  const isCategoryExist = await CategoryModel.isCategoryExist(
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
     categoryId,
     req.user._id
   );
 
-  if (!isCategoryExist) throw notFound('Category');
+  if (!doesCategoryExist) throw notFound('Category');
 
   if (title !== undefined) habit.title = title;
   if (description !== undefined) habit.description = description;
