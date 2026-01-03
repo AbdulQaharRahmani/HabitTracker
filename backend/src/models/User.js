@@ -14,6 +14,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  changedPasswordAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 export const UserModel = mongoose.model('User', UserSchema);

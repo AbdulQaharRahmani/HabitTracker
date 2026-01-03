@@ -8,7 +8,7 @@ import taskRoutes from './routes/task.js';
 import categoryRoutes from './routes/categories.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
-
+import userRoutes from './routes/user.js';
 const app = express();
 
 //#region Normal Midlleware
