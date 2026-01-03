@@ -22,9 +22,15 @@ export const createTask = async (req, res) => {
 
 // Get task lists with pagination
 export const getTaskLists = async (req, res) => {
-  if (req.user) throw new AppError('User unAuthorized', 400);
+  if (!req.user) throw new AppError('User unAuthorized', 400);
 
-  const tasks = await TaskModel.find({ userId: req.user._id });
+  const limit = Number(req.query.limit) || 2;
+  const page = Number(req.query.page) || 1;
+  const skip = (page - 1) * limit;
+
+  const tasks = await TaskModel.find({ userId: req.user._id })
+    .skip(skip)
+    .limit(limit);
 
   res.status(200).json({
     success: true,
