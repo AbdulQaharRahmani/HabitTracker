@@ -26,7 +26,7 @@ export default function Login() {
         } catch (error) {
             console.log(`Could not login ${error}`);
             const message = error.response?.data?.message || error.response?.data?.error || "Unknown Error";
-            console.log("Server says: " + JSON.stringify(message));
+            alert(JSON.stringify(message))
         } finally {
             setLoading(false);
         }
