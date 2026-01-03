@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../app/app_theme.dart';
-import '../features/add_habit_model.dart';
+import '../../app/app_theme.dart';
+import '../../features/add_habit_model.dart';
 
 class AddHabitDialog {
   static Future<void> show(
