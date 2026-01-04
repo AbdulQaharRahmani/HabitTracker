@@ -28,7 +28,6 @@ class _SignupFormState extends State<SignupForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               /// Full name
               FormLabel(text: 'Full Name'),
               CustomTextField(
@@ -38,7 +37,6 @@ class _SignupFormState extends State<SignupForm> {
                 keyboardType: TextInputType.name,
                 obsecureText: false,
               ),
-
 
               SizedBox(height: 10.h),
 
@@ -73,36 +71,70 @@ class _SignupFormState extends State<SignupForm> {
                 ),
               ),
 
-
-              SizedBox(height: 20.h),
-
-              /// Sign up button
-              SizedBox(
-                width: double.infinity,
-                height: 48.h,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final ok = await controller.signUp();
-                    if (!mounted) return;
-                    if (ok) {
-                     Navigator.pushNamed(context,AppRoutes.home);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.r),
+              SizedBox(height: 14.h),
+              /// agree terms
+               Row(
+                  children: [
+                    Checkbox(
+                      value: controller.isAgreeTerms,
+                      onChanged: (value) {
+                        setState(() {
+                          controller.isAgreeTerms = value!;
+                        });
+                      },
                     ),
-                  ),
-                  child: Text(
-                    'Create Account',
-                    style: TextStyle(color: AppTheme.textWhite),
-                  ),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          children: [
+                            const TextSpan(text: "I agree to the "),
+                            TextSpan(
+                              text: "Terms of Service",
+                              style: const TextStyle(color: AppTheme.primary),
+                            ),
+                            const TextSpan(text: " and "),
+                            TextSpan(
+                              text: "Privacy Policy",
+                              style: const TextStyle(color: AppTheme.primary),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+              SizedBox(height: 14.h),
+              /// Sign up button
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return SizedBox(
+                    width: constraints.maxWidth,
+                    height: 48.h,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final ok = await controller.signUp();
+                        if (!mounted) return;
+                        if (ok) {
+                          Navigator.pushNamed(context, AppRoutes.home);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                      ),
+                      child: const Text(
+                        'Create Account',
+                        style: TextStyle(color: AppTheme.textWhite),
+                      ),
+                    ),
+                  );
+                },
               ),
 
               SizedBox(height: 22.h),
-
               /// Divider
               Row(
                 children: [
@@ -128,4 +160,3 @@ class _SignupFormState extends State<SignupForm> {
     );
   }
 }
-

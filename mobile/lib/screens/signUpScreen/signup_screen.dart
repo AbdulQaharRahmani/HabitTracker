@@ -27,12 +27,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 80.h),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 10.h),
+              SizedBox(height: 20.h),
               // App Logo
               Container(
                 width: 60.w,
@@ -109,7 +109,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       );
                     },
                     child: Text(
-                      'Login In',
+                      'Log In',
                       style: TextStyle(
                         color: AppTheme.primary,
                         fontWeight: FontWeight.bold,
@@ -122,7 +122,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 }
