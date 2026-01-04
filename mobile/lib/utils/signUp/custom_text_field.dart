@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../app/app_theme.dart';
 
 class CustomTextField extends StatefulWidget {
@@ -40,52 +41,52 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TextFormField(
-        controller: widget.controller,
-        obscureText: _obsecure,
-        keyboardType: widget.keyboardType,
-        enabled: widget.enabled ?? true,
-        validator: widget.validator ??
-                (value) {
-              if (widget.isRequired &&
-                  (value == null || value.trim().isEmpty)) {
-                return 'This field is required';
-              }
-              return null;
-            },
-        style: const TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          hintText: widget.hintText,
-          prefixIcon: Icon(widget.icon, size: 20),
-          suffixIcon: widget.obsecureText
-              ? IconButton(
-            icon: Icon(
-              _obsecure ? Icons.visibility_off : Icons.visibility,
-              size: 20,
-            ),
-            onPressed: () {
-              setState(() => _obsecure = !_obsecure);
-            },
-          )
-              : null,
-          filled: true,
-          fillColor: AppTheme.inputBackground,
-          contentPadding:
-          const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+    return TextFormField(
+      controller: widget.controller,
+      obscureText: _obsecure,
+      keyboardType: widget.keyboardType,
+      enabled: widget.enabled ?? true,
+      validator: widget.validator ??
+              (value) {
+            if (widget.isRequired &&
+                (value == null || value.trim().isEmpty)) {
+              return 'This field is required';
+            }
+            return null;
+          },
+      style: TextStyle(fontSize: 14.sp),
+      decoration: InputDecoration(
+        hintText: widget.hintText,
+        hintStyle: TextStyle(fontSize: 14.sp),
+        prefixIcon: Icon(widget.icon, size: 20.sp),
+        suffixIcon: widget.obsecureText
+            ? IconButton(
+          icon: Icon(
+            _obsecure ? Icons.visibility_off : Icons.visibility,
+            size: 20.sp,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
-          ),
+          onPressed: () {
+            setState(() => _obsecure = !_obsecure);
+          },
+        )
+            : widget.suffixIcon,
+        filled: true,
+        fillColor: AppTheme.inputBackground,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 14.h,
+          horizontal: 16.w, // 🔑 مهم: هماهنگ با Button
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
         ),
       ),
     );
