@@ -25,6 +25,11 @@ export const createTaskValidator = [
     .isIn(['low', 'medium', 'high'])
     .withMessage('Priority must be low, medium, or high'),
 
+  body('status')
+    .optional()
+    .isIn(['active', 'done'])
+    .withMessage('Status must be active or done'),
+
   body('dueDate')
     .optional()
     .isISO8601()
@@ -55,6 +60,11 @@ export const updateTaskValidator = [
     .optional()
     .isIn(['low', 'medium', 'high'])
     .withMessage('Priority must be low, medium, or high'),
+
+  body('status')
+    .optional()
+    .isIn(['active', 'done'])
+    .withMessage('Status must be active or done'),
 
   body('dueDate')
     .optional()

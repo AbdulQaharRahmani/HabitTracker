@@ -39,6 +39,7 @@ export const updateTask = async (req, res) => {
   if (dueDate !== undefined) task.dueDate = dueDate;
 
   await task.save();
+
   res.status(200).json({
     success: true,
     data: task,
