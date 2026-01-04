@@ -33,11 +33,20 @@ const taskSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// find docs wih { isDeleted: false } in this queries: (find, findOne, findById)
+taskSchema.pre(/^find/, function () {
+  this.where({ isDeleted: false });
+});
 
 taskSchema.index({ title: 1, userId: 1 }, { unique: true });
 
