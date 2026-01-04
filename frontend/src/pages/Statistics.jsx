@@ -1,8 +1,11 @@
 import React from 'react'
+import DayilyConsistency from '../components/DailyConsistency'
 
 function Statistics() {
   return (
-    <div>Statistics</div>
+    <div>
+       <DayilyConsistency/>
+    </div>
   )
 }
 
