@@ -9,7 +9,7 @@ export const changePassword = async (req, res) => {
 
   const user = await UserModel.findById(req.user._id);
 
-  if (!user) throw new notFound('User');
+  if (!user) throw notFound('User');
 
   const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
 
