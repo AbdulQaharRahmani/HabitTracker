@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/app_theme.dart';
+
 class SignUpButtons extends StatelessWidget {
   final Function()? onTap;
   const SignUpButtons({super.key, required this.onTap});
@@ -12,14 +14,14 @@ class SignUpButtons extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 10),
         margin: EdgeInsets.symmetric(horizontal: 25),
         decoration: BoxDecoration(
-          color: Colors.blue,
+          color:  AppTheme.primary,
           borderRadius: BorderRadius.circular(15),
         ),
         child: const Center(
           child: Text(
             'Sign Up',
             style: TextStyle(
-              color: Colors.white,
+              color: AppTheme.textWhite,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
