@@ -31,7 +31,7 @@ export const deleteTask = async (req, res) => {
     throw new AppError('You are not allowed to remove this task', 403);
 
   //Check task already deleted
-  if (task.isSoftDeleted()) throw new AppError('Task already deleted', 400);
+  if (task.isDeleted) throw new AppError('Task already deleted', 400);
 
   task.deletedAt = new Date();
   task.isDeleted = true;

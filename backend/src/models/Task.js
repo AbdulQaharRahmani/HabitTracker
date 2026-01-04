@@ -45,7 +45,4 @@ const taskSchema = new mongoose.Schema(
 
 taskSchema.index({ title: 1, userId: 1 }, { unique: true });
 
-taskSchema.methods.isSoftDeleted = function () {
-  return this.isDeleted;
-};
 export const TaskModel = mongoose.model('Task', taskSchema);
