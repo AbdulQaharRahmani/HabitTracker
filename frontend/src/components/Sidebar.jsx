@@ -52,7 +52,7 @@ const Sidebar = ({ children }) => {
       <aside
         className={`
           fixed md:relative
-          h-main-screen
+          h-min-screen
           bg-white
           text-gray-800
           transition-all duration-300 ease-in-out
@@ -230,7 +230,6 @@ const Sidebar = ({ children }) => {
         transition-all duration-300
         ${isOpen ? 'md:ml-2' : 'md:ml-1'}
         ${isMobileOpen ? 'ml-64' : 'ml-0'}
-
         min-h-screen
          dark:from-gray-900 dark:to-gray-800
       `}>
