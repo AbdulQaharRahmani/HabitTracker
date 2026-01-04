@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/screens/homeScreen/home_screan.dart';
+import 'package:habit_tracker/screens/homeScreen/home_screen.dart';
 import 'package:habit_tracker/screens/profileScreen/profile_screen.dart';
 import '../screens/signUpScreen/signup_screen.dart';
 import '../screens/loginScreen/login_screen.dart';
