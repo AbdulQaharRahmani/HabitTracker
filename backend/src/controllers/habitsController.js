@@ -14,7 +14,6 @@ export const getHabits = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    result: habits.length,
     data: habits,
   });
 };
@@ -36,10 +35,7 @@ export const getHabitsByDate = async (req, res) => {
   const endOfDay = selectedDate.endOf('day').toDate();
 
   // 2) Fetch habits
-  const habits = await HabitModel.find({ userId: req.user._id }).populate(
-    'categoryId',
-    'name backgroundColor icon'
-  );
+  const habits = await HabitModel.find({ userId: req.user._id });
 
   const completionHabits = await HabitCompletionModel.find({
     userId: req.user._id,
@@ -48,7 +44,7 @@ export const getHabitsByDate = async (req, res) => {
 
   // 3) store completions habits ids into a set for faster lookup
   const habitCompletionIds = new Set(
-    completionHabits.map((c) => c.habitId.toString())
+    completionHabits.map((c) => c._id.toString())
   );
 
   // 4) filter by frequency and create new results
@@ -61,7 +57,6 @@ export const getHabitsByDate = async (req, res) => {
       title: habit.title,
       description: habit.description,
       frequency: habit.frequency,
-      category: habit.categoryId,
       completed: habitCompletionIds.has(habit._id.toString()),
     }));
 
@@ -70,7 +65,6 @@ export const getHabitsByDate = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    result: results.length,
     data: results,
   });
 };
