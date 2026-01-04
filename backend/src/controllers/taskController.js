@@ -33,8 +33,8 @@ export const deleteTask = async (req, res) => {
   //Check task already deleted
   if (task.isSoftDeleted()) throw new AppError('Task already deleted', 400);
 
-  task.isDeleted = true;
   task.deletedAt = new Date();
+  task.isDeleted = true;
 
   await task.save();
 
