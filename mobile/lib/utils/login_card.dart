@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/screans/home_screan.dart';
-import 'package:habit_tracker/screans/signup_screen.dart';
 import '../app/app_theme.dart';
 class LoginCard extends StatelessWidget {
 
@@ -122,12 +120,7 @@ class LoginCard extends StatelessWidget {
               width: double.infinity,
               height: 48.h,
               child: ElevatedButton(
-                onPressed: (){
-
-                  // ====== Static page route
-                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=> HomeScreen()));
-
-                },
+                onPressed: (){},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primary,
 
@@ -200,9 +193,7 @@ class LoginCard extends StatelessWidget {
                     style: TextStyle(fontSize: 12.sp),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>SignUpPage()));
-                    },
+                    onPressed: () {},
                     child: Text('Sign up', style: TextStyle(fontSize: 12.sp)),
                   ),
                 ],

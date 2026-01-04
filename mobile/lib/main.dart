@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screans/login_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/screans/signup_screen.dart';
+import 'package:habit_tracker/screans/sign_up_page.dart';
+import 'package:habit_tracker/screans/home_screan.dart';
 
 void main() {
-  runApp(const MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // Initialize ScreenUtil for responsive sizing.
-  // Use a designSize that matches your UI design (example: iPhone 12/13 size).
-  @override
-  Widget build(BuildContext context) {
-    return ScreenUtilInit(
+  runApp(
+       ScreenUtilInit(
         designSize: const Size(375, 812),
         minTextAdapt: true,
-        splitScreenMode: true,
         builder: (context, child) {
-          return MaterialApp(
-            home: SignUpPage(),
+          return const MaterialApp(
             debugShowCheckedModeBanner: false,
+            home: LoginScreen(),
           );
-        }
+        },
+      ),
+  );
+}
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+         home:SignUpPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
-}
