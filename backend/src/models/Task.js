@@ -43,11 +43,9 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-// find docs wih { isDeleted: false } in this queries: (find, findOne, findById)
-taskSchema.pre(/^find/, function () {
-  this.where({ isDeleted: false });
-});
-
 taskSchema.index({ title: 1, userId: 1 }, { unique: true });
 
+taskSchema.methods.isSoftDeleted = function () {
+  return this.isDeleted;
+};
 export const TaskModel = mongoose.model('Task', taskSchema);
