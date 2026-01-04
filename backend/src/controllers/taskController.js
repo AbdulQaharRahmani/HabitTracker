@@ -28,7 +28,7 @@ export const getTasks = async (req, res) => {
   const page = Number(req.query.page) || 1;
   const skip = (page - 1) * limit;
 
-  const tasks = await TaskModel.find({ userId: req.user._id })
+  const tasks = await TaskModel.find({ userId: req.user._id, deletedAt: null })
     .skip(skip)
     .limit(limit);
 
