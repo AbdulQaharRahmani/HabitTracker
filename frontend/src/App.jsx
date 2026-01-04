@@ -7,16 +7,19 @@ import Settings from "./pages/Settings";
 import Sidebar from "./components/Sidebar";
 import Today from "./pages/Today";
 import Login from './pages/Login';
+import Signup from "./pages/Signup";
 function App() {
   return (
     <Router>
         <Routes>
+          <Route path="/signup" element={<Signup/>}/>
           <Route path="/login" element={<Login />} />
           <Route element={
               <Sidebar>
                 <Outlet />
               </Sidebar>
           }>
+
             <Route path="/" element={<Today />} />
             <Route path="/habits" element={<Habits />} />
             <Route path="/tasks" element={<Tasks />} />
