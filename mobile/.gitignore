@@ -71,3 +71,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/.idea/
+/*.i
+*.lock
+*.tmp
+ pubspec.lock
+ .idea/
+ build/
+ local.properties
