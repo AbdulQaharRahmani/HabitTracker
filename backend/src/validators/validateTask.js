@@ -27,8 +27,8 @@ export const createTaskValidator = [
 
   body('status')
     .optional()
-    .isIn(['active', 'done'])
-    .withMessage('Status must be active or done'),
+    .isIn(['todo', 'done'])
+    .withMessage('Status must be todo or done'),
 
   body('dueDate')
     .optional()
@@ -63,8 +63,8 @@ export const updateTaskValidator = [
 
   body('status')
     .optional()
-    .isIn(['active', 'done'])
-    .withMessage('Status must be active or done'),
+    .isIn(['todo', 'done'])
+    .withMessage('Status must be todo or done'),
 
   body('dueDate')
     .optional()
