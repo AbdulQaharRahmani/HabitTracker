@@ -1,4 +1,4 @@
-import { HabitModel } from '../models/Habit';
+import { HabitModel } from '../models/Habit.js';
 import { HabitCompletionModel } from '../models/habitCompletion.js';
 import dayjs from 'dayjs';
 
