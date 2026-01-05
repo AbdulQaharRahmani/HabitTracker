@@ -260,9 +260,7 @@ const Sidebar = ({ children }) => {
         transition-all duration-300
         ${isOpen ? "md:ml-2" : "md:ml-1"}
         ${isMobileOpen ? "ml-64" : "ml-0"}
-        p-4 md:p-6
-        overflow-y-auto
-        h-screen
+        h-min-screen
          dark:from-gray-900 dark:to-gray-800
       `}
       >

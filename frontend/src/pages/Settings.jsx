@@ -14,11 +14,11 @@ const Settings = () => {
             <div className="flex flex-col md:flex-row gap-8">
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-orange-100 border-4 border-white shadow-md">
-                   <img
-                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
+               <img
+                  src="https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg"
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
                 </div>
                 <button className="px-4 py-2 border shadow-sm border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors">
                   CHANGE PHOTO
