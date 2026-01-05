@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screans/login_screen.dart';
 import 'package:habit_tracker/utils/signup_form.dart';
 import '../utils/signup_controller.dart';
 
@@ -66,12 +67,10 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(width: 4),
                   GestureDetector(
                     onTap: () {
-                      //Add Login Page route here
-                      // Navigator.push(context,MaterialPageRoute(builder:(context) => const LoginPage(),));
-                      print('Sign in button pressed');
+                      Navigator.push(context,MaterialPageRoute(builder:(context) => const LoginScreen(),));
                     },
                     child: Text(
-                      'Sign In',
+                      'Login In',
                       style: TextStyle(
                         color: Colors.blue,
                         fontWeight: FontWeight.bold,

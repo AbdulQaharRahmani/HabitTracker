@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/screans/sign_up_page.dart';
-import 'package:habit_tracker/screans/home_screan.dart';
+import 'package:habit_tracker/screans/signup_screen.dart';
 
 void main() {
   runApp(const MyApp());

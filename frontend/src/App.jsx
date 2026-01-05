@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Route, Routes, Outlet } from "react-router-dom";
 import './index.css'
 import Habits from "./pages/Habits";

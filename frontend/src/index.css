@@ -1,3 +1,64 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    font-family: 'Tinos', serif;
+
+    --color-primary: #6366F1;
+    --color-primary-hover: #EEF4FF; 
+
+    /* Secondary colors */
+    --color-light-green: #66C78A;
+    --color-light-green-hover: #F6FEF9;
+    
+    --color-dark-green: #0D9488;
+    --color-dark-green-hover: #EDFDF6;
+
+    --color-purple: #9333EA;
+    --color-purple-hover: #FBF4FF;
+
+    --color-orange: #D97706;
+    --color-orange-hover: #FFF7EC;
+
+    --color-red: #E53D62;
+    --color-red-hover: #FEF1F4;
+
+    /* Gray colors */
+    --color-gray-first: #9fa6b1;
+    --color-gray-second: #6B7280;
+
+    --color-bg: #f3f4f6;
+    --color-text-black: #1F2937; 
+    /* text-gray-800 */
+    --color-text-gray: #7e8189;
+    --color-text-light-gray: #E2E4E8;
+    background-color: #F9FAFB;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: block;
+    box-sizing: border-box;
+    min-width: 320px;   
+    min-height: 100vh; 
+    font-family: 'Tinos', serif;
+    background-color: #F9FAFB;
+}
+
+.sidebar-bg{
+    background-color: #fff;
+}
+
+.text-black{
+    color: var(--color-text-black)
+}
+
+.text-gray{
+    color: var(--color-text-gray);
+}
+
+.bg-white{
+    background-color: #ffffff;
+}

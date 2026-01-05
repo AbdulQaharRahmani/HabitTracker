@@ -1,6 +1,10 @@
 import express from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { createTask, updateTask } from '../controllers/taskController.js';
+import {
+  createTask,
+  toggleTaskStatus,
+  updateTask,
+} from '../controllers/taskController.js';
 import {
   createTaskValidator,
   updateTaskValidator,
@@ -15,4 +19,10 @@ router
   .route('/:id')
   .put(IdValidator, updateTaskValidator, validate, asyncHandler(updateTask));
 
+router.patch(
+  '/:id/status',
+  IdValidator,
+  validate,
+  asyncHandler(toggleTaskStatus)
+);
 export default router;

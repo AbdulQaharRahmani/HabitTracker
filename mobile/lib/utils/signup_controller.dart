@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
+
 class SignUpController {
   final formKey = GlobalKey<FormState>();
 
@@ -8,6 +10,9 @@ class SignUpController {
   final passwordController = TextEditingController();
 
   bool isAgreeTerms = false;
+
+
+  final AuthService _authService = AuthService();
 
   // ===== Validators =====
   String? nameValidator(String? value) {
@@ -38,15 +43,27 @@ class SignUpController {
   }
 
   // ===== Sign Up Logic =====
-  bool signUp() {
+  Future<bool> signUp() async {
+    print("SignUp started");
     if (formKey.currentState?.validate() != true) {
+      print("Form validation failed");
       return false;
     }
     if (!isAgreeTerms) {
+      print("Terms not agreed");
       return false;
     }
-    return true;
+
+    final result = await _authService.registerUser(
+      name: usernameController.text,
+      email: emailController.text,
+      password: passwordController.text,
+    );
+
+    print("Server response: $result");
+    return result["success"] == true;
   }
+
 
   void _showSuccessMessage(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
