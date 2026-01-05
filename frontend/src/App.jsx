@@ -12,12 +12,15 @@ import Settings from "./pages/Settings";
 import Sidebar from "./components/Sidebar";
 import Today from "./pages/Today";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import LanguageSwitcher from "./components/internationalization";
+
 function App() {
   return (
     <Router>
       <LanguageSwitcher />
       <Routes>
+        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route
           element={
