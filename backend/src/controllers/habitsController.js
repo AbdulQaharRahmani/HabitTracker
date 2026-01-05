@@ -63,6 +63,8 @@ export const getHabitsByDate = async (req, res) => {
       frequency: habit.frequency,
       category: habit.categoryId,
       completed: habitCompletionIds.has(habit._id.toString()),
+      createdAt: habit.createdAt,
+      updatedAt: habit.updatedAt,
     }));
 
   if (results.length === 0)
