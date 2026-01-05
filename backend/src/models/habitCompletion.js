@@ -33,6 +33,7 @@ HabitCompletionSchema.statics.isAlreadyCompleted = async function (habitId) {
   return isCompleted !== null;
 };
 
+// If the model created once, don't create it again
 export const HabitCompletionModel =
   mongoose.models.HabitCompletion ||
   mongoose.model('HabitCompletion', HabitCompletionSchema);
