@@ -1,51 +1,44 @@
-import { HabitModel } from '../models/Habit.js';
+import { HabitModel } from '../models/Habit';
 import { HabitCompletionModel } from '../models/habitCompletion.js';
 import dayjs from 'dayjs';
 
 export const getHabitsDashboard = async (req, res) => {
-  const userId = req.user._id;
-
-  // 1) Total habits
+  // 1) Total Habits
   const totalHabits = await HabitModel.countDocuments({
-    userId,
+    userId: req.user._id,
     isDeleted: false,
   });
 
-  // 2) current streak (e.g. 2)
-  let streak = 0;
+  // 2) Current Streak
+  let currentStreak = 0;
   let currentDay = dayjs();
 
   while (true) {
     const startOfDay = dayjs(currentDay).startOf('day').toDate();
     const endOfDay = dayjs(currentDay).endOf('day').toDate();
 
-    const exists = await HabitCompletionModel.exists({
-      userId,
+    const exist = await HabitCompletionModel.exists({
+      userId: req.user._id,
       date: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    if (exists) {
-      streak++;
-      currentDay = dayjs(currentDay).subtract(1, 'day'); //means => currentDay -= 1
+    if (exist) {
+      currentStreak++;
+      currentDay = dayjs(currentDay).subtract(1, 'day').toDate();
     } else break;
   }
 
-  // console.log(currentDay); // 2026-01-04T14:28:10.255Z
-  // console.log(startOfDay); // 2026-01-03T19:30:00.000Z
-  // console.log(endOfDay); // 2026-01-04T19:29:59.999Z
-
-  // 3) Completion rate
-
-  const startOfWeek = dayjs().startOf('week').toDate();
-  const endOfWeek = dayjs().endOf('week').toDate();
+  // 3) Completion Rate
+  const startOfWeek = dayjs(currentDay).startOf('week').toDate();
+  const endOfWeek = dayjs(currentDay).endOf('week').toDate();
 
   const habitsCompleted = await HabitCompletionModel.find({
-    userId,
+    userId: req.user._id,
     date: { $gte: startOfWeek, $lte: endOfWeek },
-  }).lean();
+  });
 
   const habitsCompletedIds = new Set(
-    habitsCompleted.map((doc) => doc.habitId.toString())
+    habitsCompleted.map((hab) => hab._id.toString())
   );
 
   const completionRate = totalHabits
@@ -56,7 +49,7 @@ export const getHabitsDashboard = async (req, res) => {
     success: true,
     data: {
       totalHabits,
-      streak,
+      currentStreak,
       completionRate,
     },
   });
