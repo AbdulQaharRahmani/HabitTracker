@@ -33,7 +33,6 @@ HabitCompletionSchema.statics.isAlreadyCompleted = async function (habitId) {
   return isCompleted !== null;
 };
 
-export const HabitCompletionModel = mongoose.model(
-  'HabitCompletion',
-  HabitCompletionSchema
-);
+export const HabitCompletionModel =
+  mongoose.models.HabitCompletion ||
+  mongoose.model('HabitCompletion', HabitCompletionSchema);

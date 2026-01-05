@@ -17,6 +17,7 @@ import {
   updateHabitValidator,
 } from '../validators/validateHabit.js';
 import { validate } from '../middleware/validate.js';
+import { getHabitsDashboard } from '../controllers/habitDashboardController.js';
 
 const router = express.Router();
 
@@ -51,5 +52,7 @@ router
   .delete(habitIdValidator, validate, asyncHandler(deleteHabit));
 
 router.put('/reorder', asyncHandler(reorderHabits));
+
+router.get('/dashboard', asyncHandler(getHabitsDashboard));
 
 export default router;
