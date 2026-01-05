@@ -35,7 +35,10 @@ export const getHabitsByDate = async (req, res) => {
   const endOfDay = selectedDate.endOf('day').toDate();
 
   // 2) Fetch habits
-  const habits = await HabitModel.find({ userId: req.user._id });
+  const habits = await HabitModel.find({
+    userId: req.user._id,
+    isDeleted: false,
+  });
 
   const completionHabits = await HabitCompletionModel.find({
     userId: req.user._id,
@@ -139,6 +142,8 @@ export const deleteHabit = async (req, res) => {
 
   if (!habit.isOwner(req.user._id))
     throw new AppError('You are not allowed to delete this habit', 403);
+
+  if (habit.isDeleted) throw new AppError('Habit is already deleted', 400);
 
   habit.isDeleted = true;
   await habit.save();
