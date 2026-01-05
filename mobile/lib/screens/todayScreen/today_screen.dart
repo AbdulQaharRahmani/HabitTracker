@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import '../app/app_theme.dart';
-import '../utils/today_progressBar/categories.dart';
-import '../utils/today_progressBar/date_selector.dart';
-import '../utils/today_progressBar/daily_grid.dart';
-import '../utils/today_progressBar/header_section.dart';
-import '../utils/today_progressBar/task.dart';
-import '../utils/today_progressBar/task_item.dart';
-import '../utils/today_progressBar/top_bar.dart';
+import '../../app/app_theme.dart';
+import '../../utils/today_progressBar/date_selector.dart';
+import '../../utils/today_progressBar/daily_grid.dart';
+import '../../utils/today_progressBar/header_section.dart';
+import '../../utils/today_progressBar/task.dart';
+import '../../utils/today_progressBar/task_item.dart';
+import '../../utils/today_progressBar/top_bar.dart';
 
 class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key});
@@ -19,10 +18,10 @@ class _TodayScreenState extends State<TodayScreen> {
   DateTime selectedDate = DateTime.now();
 
   List<DateTime> get weekDates {
-    final start = selectedDate.subtract(
-      Duration(days: selectedDate.weekday - 1),
+    return List.generate(
+      7,
+          (i) => selectedDate.add(Duration(days: i - 3)),
     );
-    return List.generate(7, (i) => start.add(Duration(days: i)));
   }
 
   Future<void> pickDate() async {
@@ -103,14 +102,7 @@ class _TodayScreenState extends State<TodayScreen> {
     );
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppTheme.primary,
-
-        onPressed: () {
-          //  add new habit/task.
-        },
-        child: const Icon(Icons.add, color: AppTheme.textWhite),
-      ),
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
