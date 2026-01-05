@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "habittracker",
   "version": "1.0.0",
   "description": "",
@@ -32,7 +32,8 @@
     "express": "^5.2.1",
     "express-validator": "^7.3.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.0.2"
+    "mongoose": "^9.0.2",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^2.0.0",
