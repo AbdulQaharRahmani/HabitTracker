@@ -5,6 +5,7 @@ import Search from '../components/Search.jsx';
 import HabitCard from '../components/HabitCard.jsx';
 import AddHabit from '../components/AddHabit.jsx';
 import View from '../components/View.jsx'
+import HabitList from '../components/HabitList.jsx';
 
 export default function Habits () {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,140 +32,13 @@ export default function Habits () {
       </div>
       {/* Habit list */}
       <div
-        className={
-          viewMode === "grid"
-            ? "grid grid-cols-1 lg:grid-cols-3 lg:ml-6 sm:grid-cols-2 md:grid-cols-1 md:ml-[2.25rem] gap-6 justify-items-start"
-            : "my-6 space-y-4 ml-[1.35rem]"
-        }
+        // className={
+        //   viewMode === "grid"
+        //     ? "grid grid-cols-1 lg:grid-cols-3 lg:ml-6 sm:grid-cols-2 md:grid-cols-1 md:ml-[2.25rem] gap-6 justify-items-start"
+        //     : "my-6 space-y-4 ml-[1.35rem]"
+        // }
       >
-        <HabitCard
-          viewMode={viewMode}
-          title="Study DSA"
-          description="Improve my logic"
-          category="Learning"
-          frequency="daily"
-          duration="5 min"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Play Football"
-          description="Improve my skills"
-          category="Sport"
-          frequency="weekly"
-          duration="30 min"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Study Book of Proof"
-          description="Improve my logic"
-          category="Education"
-          frequency="every-other-day"
-          duration="20 min"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="AI"
-          description="Learn anout AI"
-          category="Learning"
-          frequency="daily"
-          duration="10 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="MongoDB"
-          description="Learn anout MongoDB"
-          category="Learning"
-          frequency="weekly"
-          duration=""
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Play Basketball"
-          description="Fun"
-          category="Health"
-          frequency="biweekly"
-          duration=""
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Node.js"
-          description="Learn about Node.js"
-          category="Learning"
-          frequency="daily"
-          duration="20 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="React"
-          description="Learn about React"
-          category="Learning"
-          frequency="daily"
-          duration="20 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Exercise"
-          description="Morning workout"
-          category="Health"
-          frequency="daily"
-          duration="20 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Reading a book"
-          description="Read at least 20 pages"
-          category="Health"
-          frequency="every-other-day"
-          duration="20 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Meditation"
-          description="10 minutes"
-          category="Health"
-          frequency="daily"
-          duration="20 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Clean home"
-          description="keep home clean"
-          category=""
-          frequency="weekly"
-          duration="20 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Grocery shopping"
-          description="Buy weekly groceries"
-          category=""
-          frequency="weekly"
-          duration="10 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Call family"
-          description="Have fun"
-          category=""
-          frequency="biweekly"
-          duration="10 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Journal"
-          description="Write daily stories"
-          category=""
-          frequency="daily"
-          duration="10 m"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Learn Spanish"
-          description="language practice"
-          category=""
-          frequency="every-other-day"
-          duration="10 m"
-        />
+        <HabitList viewMode={viewMode}></HabitList>
       </div>
     </div>
   );
