@@ -36,10 +36,10 @@ export const getHabitsByDate = async (req, res) => {
   const endOfDay = selectedDate.endOf('day').toDate();
 
   // 2) Fetch habits
-  const habits = await HabitModel.find({ userId: req.user._id }).populate(
-    'categoryId',
-    'name backgroundColor icon'
-  );
+  const habits = await HabitModel.find({
+    userId: req.user._id,
+    createdAt: { $lte: endOfDay },
+  }).populate('categoryId', 'name backgroundColor icon');
 
   const completionHabits = await HabitCompletionModel.find({
     userId: req.user._id,
