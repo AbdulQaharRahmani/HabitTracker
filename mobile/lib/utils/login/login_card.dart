@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../app/app_theme.dart';
-import '../screens/home_screen.dart';
-import 'login_utils/controller.dart';
-
 import 'package:habit_tracker/features/routes.dart';
 import '../../app/app_theme.dart';
-class LoginCard extends StatelessWidget {
+import '../login_utils/controller.dart';
 
 class LoginCard extends StatefulWidget {
   final LoginController controller;
@@ -30,7 +26,7 @@ class _LoginCardState extends State<LoginCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Email label
+              /// Email label
               Text(
                 'Email Address',
                 style: TextStyle(
@@ -40,7 +36,8 @@ class _LoginCardState extends State<LoginCard> {
                 ),
               ),
               SizedBox(height: 6.h),
-              // Email field
+
+              /// Email field
               TextFormField(
                 controller: controller.emailController,
                 validator: controller.emailValidator,
@@ -58,7 +55,8 @@ class _LoginCardState extends State<LoginCard> {
                 ),
               ),
               SizedBox(height: 10.h),
-              // Password label
+
+              /// Password label
               Row(
                 children: [
                   Text(
@@ -79,7 +77,8 @@ class _LoginCardState extends State<LoginCard> {
                   ),
                 ],
               ),
-              // Password field
+
+              /// Password field
               TextFormField(
                 controller: controller.passwordController,
                 validator: controller.passwordValidator,
@@ -98,41 +97,14 @@ class _LoginCardState extends State<LoginCard> {
                 ),
               ),
               SizedBox(height: 20.h),
-              // Login button
+
+              /// Login button
               SizedBox(
                 width: double.infinity,
-                height: 52,
+                height: 48.h,
                 child: ElevatedButton(
-                  onPressed: controller.isLoading
-                      ? null
-                      : () async {
-                    final success = await controller.login();
-                    if (!mounted) return;
-
-                    if (success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Login successful'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const HomeScreen()),
-                            (route) => false,
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            controller.errorMessage ?? 'Login failed',
-                          ),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.home);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
@@ -140,46 +112,13 @@ class _LoginCardState extends State<LoginCard> {
                       borderRadius: BorderRadius.circular(14.r),
                     ),
                   ),
-                  child: controller.isLoading
-                      ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : Text(
+                  child: Text(
                     'Log In',
-                    style: TextStyle(
-                      color: AppTheme.textWhite,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-            ),
-
-            SizedBox(height: 20.h),
-
-            /// Login button
-            SizedBox(
-              width: double.infinity,
-              height: 48.h,
-              child: ElevatedButton(
-                onPressed: (){
-
-                  // ====== Static page route
-                  Navigator.pushNamed(context,AppRoutes.home);
-
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
+                    style: TextStyle(color: AppTheme.textWhite),
                   ),
                 ),
-                child:Text('Log In',style:TextStyle(color: AppTheme.textWhite) ,),
               ),
-            ),
+
               SizedBox(height: 22.h),
 
               /// Divider
@@ -189,7 +128,7 @@ class _LoginCardState extends State<LoginCard> {
                     child: Divider(thickness: 0.6, color: Colors.black26),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
                     child: Text(
                       'Or continue with',
                       style: TextStyle(
@@ -198,8 +137,12 @@ class _LoginCardState extends State<LoginCard> {
                       ),
                     ),
                   ),
-                ),
+                  Expanded(
+                    child: Divider(thickness: 0.6, color: Colors.black26),
+                  ),
+                ],
               ),
+
               SizedBox(height: 14.h),
               SizedBox(
                 width: double.infinity,
@@ -225,6 +168,7 @@ class _LoginCardState extends State<LoginCard> {
                 ),
               ),
               SizedBox(height: 14.h),
+              /// Signup row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -234,9 +178,12 @@ class _LoginCardState extends State<LoginCard> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context,AppRoutes.signup);
+                      Navigator.pushNamed(context, AppRoutes.signup);
                     },
-                    child: Text('Sign up', style: TextStyle(fontSize: 12.sp)),
+                    child: Text(
+                      'Sign up',
+                      style: TextStyle(fontSize: 12.sp),
+                    ),
                   ),
                 ],
               ),
