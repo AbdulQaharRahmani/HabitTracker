@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/header_card_login.dart';
-import '../utils/login_card.dart';
+import 'package:habit_tracker/app/app_theme.dart';
+import '../../utils/login/header_card_login.dart';
+import '../../utils/login/login_card.dart';
+import '../../utils/login_utils/controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,20 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
     return Scaffold(
+      backgroundColor: AppTheme.background,
       body: SingleChildScrollView(
         padding:  EdgeInsets.symmetric(horizontal: 12.h, vertical:100.h),
         child: Column(
           children: [
             const HeaderCard(),
-            LoginCard(
-              emailController: emailController,
-              passwordController: passwordController,
-              onLoginSuccess: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Login success! Token saved.')),
-                );
-              },
-            ),
+            LoginCard(controller: LoginController())
           ],
         ),
       ),
