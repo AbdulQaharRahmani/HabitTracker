@@ -22,9 +22,6 @@ class AuthService {
       }),
     );
 
-    print("HTTP STATUS: ${response.statusCode}");
-    print("HTTP BODY: ${response.body}");
-
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
