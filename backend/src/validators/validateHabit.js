@@ -32,6 +32,11 @@ export const createHabitValidator = [
     .withMessage('Frequency is required')
     .isIn(frequency)
     .withMessage(`Frequency must be one of the allowed values : ${frequency}`),
+  body('categoryId')
+    .notEmpty()
+    .withMessage('Category is required')
+    .isMongoId()
+    .withMessage('CategoryId is invalid'),
 ];
 
 // Update Habit
@@ -54,6 +59,11 @@ export const updateHabitValidator = [
     .optional()
     .isIn(frequency)
     .withMessage(`Frequency must be one of the allowed values ${frequency}`),
+  body('categoryId')
+    .notEmpty()
+    .withMessage('Category is required')
+    .isMongoId()
+    .withMessage('CategoryId is invalid'),
 ];
 
 // Get habits by date
