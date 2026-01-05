@@ -1,4 +1,5 @@
 import { CategoryModel } from '../models/Category.js';
+import { HabitModel } from '../models/Habit.js';
 import { AppError, notFound } from '../utils/error.js';
 
 export const createCategory = async (req, res) => {
@@ -37,6 +38,12 @@ export const updateCategory = async (req, res) => {
 
 export const deleteCategory = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
+
+  const isCategoryInUsed = await HabitModel.exists({
+    categoryId: req.params.id,
+  });
+
+  if (isCategoryInUsed) throw new AppError('Category is in-used', 400);
 
   const category = await CategoryModel.findOneAndDelete({
     _id: req.params.id,
