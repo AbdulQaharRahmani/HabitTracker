@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import HabitCard from "./HabitCard";
-import { FaLess } from "react-icons/fa";
 
 export default function HabitList ({viewMode}) {
     const [habits, setHabits] = useState([])
