@@ -4,6 +4,7 @@ import { HabitModel } from '../models/Habit.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 import { DateHelper } from '../utils/date.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
+import { CategoryModel } from '../models/Category.js';
 
 // Get all user habits
 export const getHabits = async (req, res) => {
@@ -19,6 +20,8 @@ export const getHabits = async (req, res) => {
 
 // Get all user habits for selected date
 export const getHabitsByDate = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized.', 401);
+
   // 1) Get date from query
   const dateString = req.query.date;
   const selectedDate = dateString
@@ -70,7 +73,15 @@ export const getHabitsByDate = async (req, res) => {
 export const createHabit = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
 
-  const { title, description, frequency } = req.body;
+  const { title, description, frequency, categoryId } = req.body;
+
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
+    categoryId,
+    req.user._id
+  );
+
+  if (!doesCategoryExist) throw notFound('Category');
+
   let habitCount = await HabitModel.getHabitCountByUserId(req.user._id);
 
   const habit = await HabitModel.create({
@@ -79,6 +90,7 @@ export const createHabit = async (req, res) => {
     description,
     frequency,
     order: habitCount + 1,
+    categoryId,
   });
 
   res.status(201).json({
@@ -96,11 +108,20 @@ export const updateHabit = async (req, res) => {
   if (!habit.isOwner(req.user._id))
     throw new AppError('You are not allowed to update this habit', 403);
 
-  const { title, description, frequency } = req.body;
+  const { title, description, frequency, categoryId } = req.body;
+
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
+    categoryId,
+    req.user._id
+  );
+
+  if (!doesCategoryExist) throw notFound('Category');
 
   if (title !== undefined) habit.title = title;
   if (description !== undefined) habit.description = description;
   if (frequency !== undefined) habit.frequency = frequency;
+
+  habit.categoryId = categoryId;
 
   await habit.save();
 

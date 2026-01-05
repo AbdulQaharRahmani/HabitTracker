@@ -40,9 +40,14 @@ const preferencesItems = [
 
 const Sidebar = ({ children }) => {
   const { t } = useTranslation();
-  const { isOpen, isMobileOpen, toggleMobileSidebar, closeMobileSidebar } =
-    useSidebarStore();
 
+  const {
+    isOpen,
+    isMobileOpen,
+    toggleSidebar,
+    toggleMobileSidebar,
+    closeMobileSidebar,
+  } = useSidebarStore();
   return (
     <div className="flex min-h-screen">
       <button
@@ -60,7 +65,7 @@ const Sidebar = ({ children }) => {
       <aside
         className={`
           fixed md:relative
-          h-screen
+          h-min-screen
           bg-white
           text-gray-800
           transition-all duration-300 ease-in-out
@@ -256,7 +261,8 @@ const Sidebar = ({ children }) => {
         ${isOpen ? "md:ml-2" : "md:ml-1"}
         ${isMobileOpen ? "ml-64" : "ml-0"}
         p-4 md:p-6
-        min-h-screen
+        overflow-y-auto
+        h-screen
          dark:from-gray-900 dark:to-gray-800
       `}
       >
