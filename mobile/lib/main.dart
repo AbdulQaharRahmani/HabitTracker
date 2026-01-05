@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/screans/signup_screen.dart';
+import 'features/routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
         splitScreenMode: true,
         builder: (context, child) {
           return MaterialApp(
-            home: SignUpPage(),
+            initialRoute: AppRoutes.splash,
+            routes: AppRoutes.routes,
             debugShowCheckedModeBanner: false,
           );
         }
