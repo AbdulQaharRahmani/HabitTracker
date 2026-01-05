@@ -42,6 +42,7 @@ export const deleteTask = async (req, res) => {
     success: true,
     message: 'Task deleted successfully',
   });
+};
 export const toggleTaskStatus = async (req, res) => {
   if (!req.user) throw new AppError('User is not authenticated', 401);
 
