@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/screans/sign_up_page.dart';
 import 'package:habit_tracker/screans/home_screan.dart';
-import 'package:habit_tracker/screans/taskPage/add_task_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
         splitScreenMode: true,
         builder: (context, child) {
           return MaterialApp(
-            home: NewTaskPage(),
+            home: SignUpPage(),
             debugShowCheckedModeBanner: false,
           );
         }
