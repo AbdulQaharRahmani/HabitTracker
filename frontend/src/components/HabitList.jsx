@@ -10,7 +10,7 @@ export default function HabitList ({viewMode}) {
         fetch("http://localhost:3000/api/habits")
         .then(response => {
             if (!response.ok) {
-                throw Error("Error: Failde to take habits try again later!")
+                throw Error("Failde to fetch!")
             }
             if (response.ok) {
                 return response.json();
@@ -35,14 +35,14 @@ export default function HabitList ({viewMode}) {
 
     if (loading) {
         return (
-            <p className="text-gray-300 text-md">Loading Habits</p>
+            <p className="text-gray-300 text-md text-center">Loading Habits ...</p>
         )
     }
 
     if (error) {
         return (
-            <p className="text-rose-500 text-md">{error}</p>
-        )
+          <p className="text-rose-500 text-md text-center">Error: {error}</p>
+        );
     }
 
     if (!error && !loading) {
