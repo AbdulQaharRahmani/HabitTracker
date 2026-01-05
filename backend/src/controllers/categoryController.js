@@ -68,7 +68,6 @@ export const getCategories = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    results: categories.length,
     data: categories,
   });
 };
