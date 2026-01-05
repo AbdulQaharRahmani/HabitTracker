@@ -9,9 +9,6 @@ const frequencyItems = [
     { id: "f4", name: "Biweekly", value: "biweekly" },
     { id: "f5", name: "Weekdays", value: "weekdays" },
     { id: "f6", name: "Weekends", value: "weekends" },
-    { id: "f7", name: "Monthly", value: "monthly" },
-    { id: "f8", name: "Quarterly", value: "quarterly" },
-    { id: "f9", name: "Yearly", value: "yearly" },
 ];
 const categoryItems = [
     { id: "c1", name: "Health & Fitness", value: "health" },
