@@ -15,7 +15,7 @@ Widget dailyGoalCard({
   return Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color:AppTheme.textWhite,
       borderRadius: BorderRadius.circular(20),
       boxShadow: [
         BoxShadow(
