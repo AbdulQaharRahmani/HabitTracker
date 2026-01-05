@@ -67,9 +67,6 @@ export const getHabitsByDate = async (req, res) => {
       updatedAt: habit.updatedAt,
     }));
 
-  if (results.length === 0)
-    throw new AppError('No habits found for the selected date', 400);
-
   res.status(200).json({
     success: true,
     result: results.length,
