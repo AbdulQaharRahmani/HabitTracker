@@ -128,10 +128,10 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   Widget _buildTextField(
-    TextEditingController controller,
-    String hint,
-    int maxLines,
-  ) {
+      TextEditingController controller,
+      String hint,
+      int maxLines,
+      ) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
