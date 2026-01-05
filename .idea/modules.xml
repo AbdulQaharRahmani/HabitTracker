@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/HabitTracker.iml" filepath="$PROJECT_DIR$/.idea/HabitTracker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/habit_tracker.iml" filepath="$PROJECT_DIR$/.idea/habit_tracker.iml" />
     </modules>
   </component>
 </project>
