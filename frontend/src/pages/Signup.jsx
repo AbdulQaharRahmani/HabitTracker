@@ -22,25 +22,40 @@ function SignUp () {
   const signupUserHandler=(e)=>{
     e.preventDefault();
 
-    formValidation();
-
-    resetHandler();
-    navigate('/');
+    if(formValidation()){
+      resetHandler();
+      navigate('/');
+    }
   }
 
   const formValidation=()=>{
     let tempErrors={};
-    if(!fullName){
-         tempErrors.fullName='full Name is required';
-    }
-    if(!email){
-         tempErrors.email='email is required';
-    }
-    if(!password){
-         tempErrors.password='password is required';
-    }
+    let isValid=true;
+
+    if(!fullName.trim()){
+         tempErrors.fullName='Full Name is required';
+         isValid=false;
+        }
+        if(!email.trim()){
+          tempErrors.email='Email is required';
+          isValid=false;
+        }else if(!/\S+@\S+\.\S+/.test(email)){
+          tempErrors.email='Email is invalid';
+          isValid=false;
+        }
+
+        if(!password.trim()){
+          tempErrors.password='Password is required';
+          isValid=false;
+        }else if(password.length < 6){
+           tempErrors.password = 'Password must be at least 6 characters';
+           isValid = false;
+        }
 
     setErrors(tempErrors);
+
+    return isValid;
+
   }
 
   const resetHandler=()=>{
@@ -70,16 +85,21 @@ function SignUp () {
       </label>
 
       <div
-        className={`mt-1 flex w-full items-center rounded-xl border bg-zinc-100/50 px-2 focus-within:border-indigo-500 ${
+        className={`mt-1 flex w-full items-center rounded-xl border bg-zinc-100/50 px-2 focus-within:border-indigo-500  transition ${
           errors.fullName ? 'border-red-500' : 'border-gray-200'
         }`}
       >
-        <CiUser className="text-gray-800" size={15} />
+        <CiUser className={`${errors.fullName ? 'text-red-500': 'text-gray-800' }`} size={15} />
         <input
           id="full-name"
           type="text"
           value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          onChange={
+            (e) => {
+              setFullName(e.target.value);
+              setErrors(prev=>({...prev,fullName:''}));
+            }
+          }
           placeholder="John Doe"
           className="w-full bg-transparent px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
         />
@@ -98,15 +118,20 @@ function SignUp () {
           <label htmlFor="email" className="text-xs font-medium text-gray-900 mt-2">
             Email Address
           </label>
-          <div className={ `flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 mt-1 focus-within:border-indigo-500 ${errors.email ? 'border-red-500': 'border-gray-200'}`}>
-            <AiOutlineMail className="text-gray-800" size={15}/>
+          <div className={ `flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 mt-1 focus-within:border-indigo-500  ${errors.email ? 'border-red-500': 'border-gray-200'}`}>
+            <AiOutlineMail className={`${errors.email ? 'text-red-500': 'text-gray-800' }`} size={15}/>
             <input
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErrors(prev=>({...prev, email:""}));
+
+              }
+              }
               placeholder="hello@example.com"
-              className="w-full bg-zinc-100/50 px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              className="w-full bg-transparent px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
             />
           </div>
           <span
@@ -124,14 +149,18 @@ function SignUp () {
             Password
           </label>
           <div className={ `flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 mt-1 focus-within:border-indigo-500 ${errors.password ? 'border-red-500': 'border-gray-200'}`}>
-            <SlLock className={`${errors.password ? 'border-red-500': 'text-gray-800' }`} size={15} />
+            <SlLock className={`${errors.password ? 'text-red-500': 'text-gray-800' }`} size={15} />
             <input
               id="password"
               type={showPass ? "text" : "password"}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setErrors(prev=>({...prev,password:""}));
+                }
+              }
               placeholder="••••••••"
-              className="w-full bg-zinc-100/50 px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              className="w-full bg-transparent px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
             />
             <button type="button" onClick={() => setShowPass(!showPass)}>
               {showPass ? <FaEye className="text-gray-500" size={13} /> : <FaRegEyeSlash className="text-gray-500" size={13}/>}
@@ -146,19 +175,27 @@ function SignUp () {
         </span>
         </div>
 
-        <div className="flex items-center gap-2 w-full mt-2">
-          <input
-            type="radio"
-            id="terms"
-            name="terms"
-            checked={checked}
-            onClick={() => setChecked(!checked)}
-            className="cursor-pointer accent-indigo-500"
-          />
-          <label htmlFor="terms" className="text-xs text-gray-500 font-medium">
-            I agree to the <span className="text-indigo-500">Terms of Service</span> and <span className="text-indigo-500">Privacy Policy</span>
-          </label>
-        </div>
+      <div className="flex items-center gap-2 w-full mt-2">
+  <label className="flex items-center cursor-pointer">
+    <div className="relative">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => setChecked(e.target.checked)}
+        className="sr-only"
+      />
+
+      <div className={`w-3.5 h-3.5 border-[1.5px] ${checked ? 'border-indigo-700' : 'border-gray-400'} rounded-full flex items-center justify-center transition-all`}>
+        {checked && <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full transition-all"></span>}
+      </div>
+    </div>
+    <span className="ml-2 text-xs text-gray-500 font-medium hover:text-indigo-500">
+      I agree to the <span className="text-indigo-500">Terms of Service</span> and <span className="text-indigo-500">Privacy Policy</span>
+    </span>
+  </label>
+</div>
+
+
 
         <button className="w-full mt-2 rounded-xl bg-indigo-500 py-2 text-xs text-white font-medium hover:bg-indigo-700" onClick={signupUserHandler}>
           Sign Up
