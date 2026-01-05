@@ -69,7 +69,6 @@ export const getHabitsByDate = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    result: results.length,
     data: results,
   });
 };
