@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/screans/home_screan.dart';
-import 'package:habit_tracker/screans/signup_screen.dart';
-import '../app/app_theme.dart';
+import 'package:habit_tracker/features/routes.dart';
+import '../../app/app_theme.dart';
 class LoginCard extends StatelessWidget {
 
   final TextEditingController emailController;
@@ -125,7 +124,7 @@ class LoginCard extends StatelessWidget {
                 onPressed: (){
 
                   // ====== Static page route
-                  Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=> HomeScreen()));
+                  Navigator.pushNamed(context,AppRoutes.home);
 
                 },
                 style: ElevatedButton.styleFrom(
@@ -201,7 +200,7 @@ class LoginCard extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>SignUpPage()));
+                      Navigator.pushNamed(context,AppRoutes.signup);
                     },
                     child: Text('Sign up', style: TextStyle(fontSize: 12.sp)),
                   ),
