@@ -16,7 +16,7 @@ export default function Login() {
     const navigate = useNavigate();
     const handleLogin = async (e) => {
         e.preventDefault();
-        if (!email || !password) return alert("Please fill all fields!");
+        if (!email.trim() || !password.trim()) return alert("Please fill all fields!");
         setLoading(true);
         try {
             const response = await api.post("/auth/login", { email, password })
@@ -61,6 +61,7 @@ export default function Login() {
                             />
                             <input
                                 type="email"
+                                required
                                 placeholder="Your Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -75,6 +76,7 @@ export default function Login() {
                             />
                             <input
                                 type={passwordType}
+                                required
                                 placeholder="Your Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
