@@ -68,9 +68,7 @@ function SignUp () {
     <div className="flex flex-col items-center justify-center w-full h-screen overflow-hidden bg-zinc-100 p-2 sm:p-3">
 
       <div className="flex flex-col items-center justify-center text-center mb-4">
-        <div className="mb-2 rounded-2xl bg-indigo-100 p-3">
-          <MdPowerSettingsNew className="text-xl text-indigo-600" />
-        </div>
+
         <h1 className="text-xl font-bold">Create Account</h1>
         <p className="text-xs text-gray-500 max-w-xs">
           Start your journey to better habits today.
