@@ -20,7 +20,10 @@ export default function Login() {
         setLoading(true);
         try {
             const response = await api.post("/auth/login", { email, password })
-            localStorage.setItem("token", response.data.data.token)
+            let token = response.data.data.token
+            if(token){
+                localStorage.setItem("token", token)
+            }
             alert("Welcome again!")
             navigate("/")
         } catch (error) {
