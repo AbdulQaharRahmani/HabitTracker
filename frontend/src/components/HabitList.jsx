@@ -7,41 +7,40 @@ export default function HabitList ({viewMode}) {
     const [error, setError] = useState(null)
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/habits")
-        .then(response => {
-            if (!response.ok) {
-                throw Error("Failde to fetch!")
-            }
-            if (response.ok) {
-                return response.json();
-            }
+      // hardcoded token got this by postman
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NWE5YWE0MGY2MWEwNTk0NzNlMzIyNSIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3Njc3MDQ3NDYsImV4cCI6MTc2NzcwODM0Nn0.of_vX04Sh277O8-YvNJD2UIU6IWaksZ7PUw1UqxZEAg" // <-- replace with your token
+
+      fetch("http://localhost:3000/api/habits", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch habits");
+          return res.json();
         })
-        .then(data => {
-            if (data) {
-                setHabits(data);
-                setLoading(false);
-            }
-            else {
-                setHabits("No habits found")
-                setLoading(false)
-            }
-            
+        .then((data) => {
+          setHabits(Array.isArray(data) ? data : data.data);
+          setLoading(false);
         })
-        .catch(error => {
-            setError(error.message)
-            setLoading(false)
-        })
-    }, [])
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }, []);
+
 
     if (loading) {
         return (
-            <p className="text-gray-300 text-md text-center">Loading Habits ...</p>
-        )
+          <p className="text-gray-300 text-lg text-semibold my-4 text-center">
+            Loading Habits ...
+          </p>
+        );
     }
 
     if (error) {
         return (
-          <p className="text-rose-500 text-md text-center">Error: {error}</p>
+          <p className="text-rose-400 text-lg text-semibold text-center my-4">Error: {error}</p>
         );
     }
 
@@ -56,7 +55,7 @@ export default function HabitList ({viewMode}) {
             >
                 {habits.map((habit) => (
                     <HabitCard
-                        // key={habit.id}
+                        key={habit._id}
                         viewMode={viewMode}
                         title={habit.title}
                         description={habit.description}
