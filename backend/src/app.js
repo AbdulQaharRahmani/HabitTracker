@@ -30,12 +30,12 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 
 // Protect routes
-app.use(authMiddleware);
+// app.use(authMiddleware);
 
-app.use('/api/categories', categoryRoutes);
-app.use('/api/habits', habitRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/categories', authMiddleware, categoryRoutes);
+app.use('/api/habits', authMiddleware, habitRoutes);
+app.use('/api/tasks', authMiddleware, taskRoutes);
+app.use('/api/users', authMiddleware, userRoutes);
 
 //#endregion
 
