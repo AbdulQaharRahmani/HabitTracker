@@ -2,7 +2,6 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa";
 import { MdEmail, MdLock } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import api from "../../services/api";
 
 const sampleUser = {
     userEmail: "shukriasul5@gmail.com",
@@ -24,22 +23,16 @@ export default function Login() {
         if (!email || !password) return alert("Please fill all fields!");
         setLoading(true);
         try {
-            const response = await api.post('auth/login', { email, password })
-            localStorage.setItem('token', response.data.data.token)
-            console.log(response);
-
-            const res = await api.get('/habits')
-            console.log(res);
-            // await new Promise((resolve) => setTimeout(resolve, 2000));
-            // if (
-            //     sampleUser.userEmail === email &&
-            //     sampleUser.userPassword === password
-            // ) {
-            //     alert("Success! 🎉");
-            //     navigate("/");
-            // } else {
-            //     alert("Invalid email or password!");
-            // }
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            if (
+                sampleUser.userEmail === email &&
+                sampleUser.userPassword === password
+            ) {
+                alert("Success! 🎉");
+                navigate("/");
+            } else {
+                alert("Invalid email or password!");
+            }
         } catch (error) {
             console.log(`Could not login ${error}`);
         } finally {
