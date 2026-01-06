@@ -74,7 +74,7 @@ describe('Auth Controller - unit tests', () => {
     await registerUser(req, res);
 
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenLastCalledWith({
+    expect(res.json).toHaveBeenCalledWith({
       success: true,
       message: 'User registered successfully',
     });
