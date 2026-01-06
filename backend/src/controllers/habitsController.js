@@ -14,6 +14,7 @@ export const getHabits = async (req, res) => {
 
   res.status(200).json({
     success: true,
+    result: habits.length,
     data: habits,
   });
 };
@@ -38,7 +39,8 @@ export const getHabitsByDate = async (req, res) => {
   const habits = await HabitModel.find({
     userId: req.user._id,
     isDeleted: false,
-  });
+    createdAt: { $lte: endOfDay },
+  }).populate('categoryId', 'name backgroundColor icon');
 
   const completionHabits = await HabitCompletionModel.find({
     userId: req.user._id,
@@ -47,7 +49,7 @@ export const getHabitsByDate = async (req, res) => {
 
   // 3) store completions habits ids into a set for faster lookup
   const habitCompletionIds = new Set(
-    completionHabits.map((c) => c._id.toString())
+    completionHabits.map((c) => c.habitId.toString())
   );
 
   // 4) filter by frequency and create new results
@@ -60,11 +62,11 @@ export const getHabitsByDate = async (req, res) => {
       title: habit.title,
       description: habit.description,
       frequency: habit.frequency,
+      category: habit.categoryId,
       completed: habitCompletionIds.has(habit._id.toString()),
+      createdAt: habit.createdAt,
+      updatedAt: habit.updatedAt,
     }));
-
-  if (results.length === 0)
-    throw new AppError('No habits found for the selected date', 400);
 
   res.status(200).json({
     success: true,
