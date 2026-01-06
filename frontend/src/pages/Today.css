@@ -28,6 +28,7 @@
   padding: 10px; /* Reduce overall calendar padding */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: none;
+  margin-top: 10px;
 }
 
 /* 4. Adjust day cell spacing and size (Key changes for overall size reduction) */
