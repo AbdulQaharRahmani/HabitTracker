@@ -22,7 +22,7 @@ export const createTask = async (req, res) => {
 
 export const deleteTask = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized', 401);
- 
+
   const task = await TaskModel.findById(req.params.id);
   if (!task) throw notFound('Task');
 
