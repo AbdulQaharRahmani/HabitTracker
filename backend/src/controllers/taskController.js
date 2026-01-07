@@ -1,4 +1,5 @@
 import { TaskModel } from '../models/Task.js';
+import { DateHelper } from '../utils/date.js';
 import { AppError, notFound } from '../utils/error.js';
 
 export const createTask = async (req, res) => {
@@ -20,29 +21,36 @@ export const createTask = async (req, res) => {
   });
 };
 
-export const deleteTask = async (req, res) => {
+export const filterTasks = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized', 401);
 
-  const task = await TaskModel.findById(req.params.id);
-  if (!task) throw notFound('Task');
+  const { searchTerm, status, priority, dueDate } = req.query;
 
-  //Ensure the task belongs to the authenticated user
-  if (String(req.user._id) !== String(task.userId))
-    throw new AppError('You are not allowed to remove this task', 403);
+  let query = { userId: req.user._id };
 
-  //Check task already deleted
-  if (task.isDeleted) throw new AppError('Task already deleted', 400);
+  if (searchTerm)
+    query.$or = [
+      { title: { $regex: searchTerm, $options: 'i' } },
+      { description: { $regex: searchTerm, $options: 'i' } },
+    ];
 
-  task.deletedAt = new Date();
-  task.isDeleted = true;
+  if (status) query.status = status;
 
-  await task.save();
+  if (priority) query.priority = priority;
 
-  res.status(200).json({
-    success: true,
-    message: 'Task deleted successfully',
-  });
+  if (dueDate) {
+    const date = new Date(dueDate);
+    query.dueDate = {
+      $gte: DateHelper.getStartOfDate(date),
+      $lte: DateHelper.getEndOfDate(date),
+    };
+  }
+
+  const tasks = await TaskModel.find({ ...query }).lean();
+
+  res.status(200).json({ success: true, data: tasks });
 };
+
 export const toggleTaskStatus = async (req, res) => {
   if (!req.user) throw new AppError('User is not authenticated', 401);
 
@@ -61,4 +69,29 @@ export const toggleTaskStatus = async (req, res) => {
   await task.save();
 
   res.status(200).json({ success: true, data: task });
+};
+
+export const updateTask = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized', 401);
+
+  const task = await TaskModel.findById(req.params.id);
+  if (!task) throw notFound('Task');
+
+  //Ensure the task belongs to the authenticated user
+  if (String(req.user._id) !== String(task.userId))
+    throw new AppError('You are not allowed to update this task', 403);
+
+  const { title, description, status, priority, dueDate } = req.body;
+
+  if (title !== undefined) task.title = title;
+  if (description !== undefined) task.description = description;
+  if (status !== undefined) task.status = status;
+  if (priority !== undefined) task.priority = priority;
+  if (dueDate !== undefined) task.dueDate = dueDate;
+
+  await task.save();
+  res.status(200).json({
+    success: true,
+    data: task,
+  });
 };
