@@ -12,6 +12,7 @@ import {
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 
 import { NavLink } from "react-router-dom";
+
 const dashboardItems = [
   { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
   { id: "habits", name: "Habits", icon: <HiOutlineFire />, path: "/habits" },
@@ -48,6 +49,7 @@ const Sidebar = ({ children }) => {
     toggleMobileSidebar,
     closeMobileSidebar,
   } = useSidebarStore();
+
   return (
     <div className="flex min-h-screen">
       <button
@@ -64,8 +66,8 @@ const Sidebar = ({ children }) => {
       )}
       <aside
         className={`
-          fixed md:relative
-          h-min-screen
+          fixed top-0 left-0 md:relative
+          h-screen
           bg-white
           text-gray-800
           transition-all duration-300 ease-in-out
@@ -75,6 +77,7 @@ const Sidebar = ({ children }) => {
           ${isOpen ? "w-64" : "w-20"}
           flex flex-col
           shadow-xl border-r border-gray-200
+          overflow-y-auto // Add scroll to sidebar if content overflows
         `}
       >
         <div className="p-6 border-b border-gray-200">
@@ -260,11 +263,12 @@ const Sidebar = ({ children }) => {
         transition-all duration-300
         ${isOpen ? "md:ml-2" : "md:ml-1"}
         ${isMobileOpen ? "ml-64" : "ml-0"}
-        h-min-screen
-         dark:from-gray-900 dark:to-gray-800
+        overflow-y-auto // Allow main content to scroll
+        h-screen // Keep full height but allow scrolling
+        dark:from-gray-900 dark:to-gray-800
       `}
       >
-        <div className="mt-16 md:mt-0">{children}</div>
+        <div className="p-4 md:p-6">{children}</div>
       </main>
     </div>
   );
