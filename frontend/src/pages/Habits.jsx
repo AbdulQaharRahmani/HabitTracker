@@ -2,13 +2,14 @@ import { useState } from 'react'
 import Header from '../components/Header.jsx';
 import DarkMode from '../components/DarkMode.jsx';
 import Search from '../components/Search.jsx';
-import HabitCard from '../components/HabitCard.jsx';
 import AddHabit from '../components/AddHabit.jsx';
 import View from '../components/View.jsx'
+import HabitList from '../components/HabitList.jsx';
 
 export default function Habits () {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
+  const [token, setToken] = useState(localStorage.getItem("token" || null))
 
   return (
     <div className="md:px-2 lg:px-4 bg-gray-50"> 
@@ -33,45 +34,8 @@ export default function Habits () {
         </div>
       </div>
       {/* Habit list */}
-      <div
-        className={
-          viewMode === 'grid'
-            ? 'grid grid-cols-1 lg:grid-cols-3 lg:ml-6 sm:grid-cols-2  md:grid-cols-1 md:ml-[2.25rem] gap-6 justify-items-start' 
-            : 'my-6 space-y-4 ml-[1.35rem]'
-        }
-      >
-        <HabitCard
-          viewMode={viewMode}
-          title="Drink Water"
-          description="Drink at least 8 cups of water"
-          category="Health"
-          time="Morning"
-          duration="5 min"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Exercise"
-          description="30 minutes of workout"
-          category="Fitness"
-          time="Evening"
-          duration="30 min"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title="Read"
-          description="Read 20 pages of a book"
-          category="Education"
-          time="Night"
-          duration="20 min"
-        />
-        <HabitCard
-          viewMode={viewMode}
-          title=""
-          description=""
-          category=""
-          time=""
-          duration=""
-        />
+      <div>
+        <HabitList viewMode={viewMode}></HabitList>
       </div>
     </div>
   );
