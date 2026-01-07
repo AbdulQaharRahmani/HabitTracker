@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import { UserModel } from '../models/User.js';
 import { HabitModel } from '../models/Habit.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
+import { CategoryModel } from '../models/Category.js';
+import bcrypt from 'bcryptjs';
 dotenv.config();
 
 await connectDB();
@@ -94,10 +96,20 @@ const seed = async () => {
   await mongoose.connection.dropDatabase();
   console.log('Database cleared');
 
+  const hashedPassword = await bcrypt.hash('test123', 12);
+
   const user = await UserModel.create({
     email: 'test@gmail.com',
-    password: 'test123',
+    password: hashedPassword,
   });
+
+  // Create Category Data
+  const categories = await CategoryModel.insertMany([
+    { name: 'Other', userId: user._id },
+    { name: 'Health', userId: user._id },
+    { name: 'Study', userId: user._id },
+    { name: 'Work', userId: user._id },
+  ]);
 
   const startDate = new Date();
 
@@ -110,6 +122,7 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 1,
+      categoryId: categories[2]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
     },
@@ -119,6 +132,7 @@ const seed = async () => {
       frequency: 'weekly',
       userId: user._id,
       order: 2,
+      categoryId: categories[1]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
     },
@@ -128,6 +142,7 @@ const seed = async () => {
       frequency: 'every-other-day',
       userId: user._id,
       order: 3,
+      categoryId: categories[2]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
     },
@@ -137,6 +152,7 @@ const seed = async () => {
       frequency: 'biweekly',
       userId: user._id,
       order: 4,
+      categoryId: categories[1]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
     },
@@ -146,6 +162,7 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 5,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
     },
@@ -155,15 +172,17 @@ const seed = async () => {
       frequency: 'weekly',
       userId: user._id,
       order: 6,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
     },
     {
       title: 'Nodejs',
-      description: 'Learn about nodejs',
+      description: 'Learn about Nodejs',
       frequency: 'daily',
       userId: user._id,
       order: 7,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
     },
@@ -173,6 +192,7 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 8,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -182,6 +202,7 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 9,
+      categoryId: categories[1]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -191,6 +212,7 @@ const seed = async () => {
       frequency: 'every-other-day',
       userId: user._id,
       order: 10,
+      categoryId: categories[2]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -200,6 +222,7 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 11,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -209,6 +232,7 @@ const seed = async () => {
       frequency: 'weekly',
       userId: user._id,
       order: 12,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -218,6 +242,7 @@ const seed = async () => {
       frequency: 'weekly',
       userId: user._id,
       order: 13,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -227,6 +252,7 @@ const seed = async () => {
       frequency: 'biweekly',
       userId: user._id,
       order: 14,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -236,6 +262,7 @@ const seed = async () => {
       frequency: 'daily',
       userId: user._id,
       order: 15,
+      categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -245,6 +272,7 @@ const seed = async () => {
       frequency: 'every-other-day',
       userId: user._id,
       order: 16,
+      categoryId: categories[2]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
