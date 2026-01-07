@@ -11,7 +11,6 @@ export default function HabitList({ viewMode }) {
     const fetchHabits = async () => {
       try {
         const response = await api.get("/habits");
-        // 👆 token is AUTOMATICALLY attached here
         const data = response.data;
         setHabits(Array.isArray(data) ? data : data.data);
       } catch (err) {
