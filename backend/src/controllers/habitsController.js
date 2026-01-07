@@ -107,32 +107,44 @@ export const createHabit = async (req, res) => {
 export const updateHabit = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
 
-  const habit = await HabitModel.findById(req.params.id);
-  if (!habit) throw notFound('Habit');
+  if (Object.keys(req.body).length === 0)
+    throw new AppError('No fields provided for update', 400);
 
-  if (!habit.isOwner(req.user._id))
-    throw new AppError('You are not allowed to update this habit', 403);
+  const allowedFieldsToUpdate = {
+    title: true,
+    description: true,
+    frequency: true,
+    categoryId: true,
+  };
 
-  const { title, description, frequency, categoryId } = req.body;
+  const updateQuery = {};
 
-  const doesCategoryExist = await CategoryModel.doesCategoryExist(
-    categoryId,
-    req.user._id
+  for (let key of Object.keys(req.body)) {
+    if (key in allowedFieldsToUpdate) updateQuery[key] = req.body[key];
+  }
+
+  if (updateQuery?.categoryId) {
+    const doesCategoryExist = await CategoryModel.doesCategoryExist(
+      req.body.categoryId,
+      req.user._id
+    );
+    if (!doesCategoryExist) throw notFound('Category');
+  }
+
+  const updatedHabit = await HabitModel.findOneAndUpdate(
+    {
+      _id: req.params.id,
+      userId: req.user._id,
+    },
+    { $set: updateQuery },
+    { new: true, runValidators: true }
   );
 
-  if (!doesCategoryExist) throw notFound('Category');
-
-  if (title !== undefined) habit.title = title;
-  if (description !== undefined) habit.description = description;
-  if (frequency !== undefined) habit.frequency = frequency;
-
-  habit.categoryId = categoryId;
-
-  await habit.save();
+  if (!updatedHabit) throw notFound('Habit');
 
   res.status(200).json({
     success: true,
-    data: habit,
+    data: updatedHabit,
   });
 };
 
