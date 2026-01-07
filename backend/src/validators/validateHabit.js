@@ -60,8 +60,8 @@ export const updateHabitValidator = [
     .isIn(frequency)
     .withMessage(`Frequency must be one of the allowed values ${frequency}`),
   body('categoryId')
-    .notEmpty()
-    .withMessage('Category is required')
+    .optional()
+    .trim()
     .isMongoId()
     .withMessage('CategoryId is invalid'),
 ];
