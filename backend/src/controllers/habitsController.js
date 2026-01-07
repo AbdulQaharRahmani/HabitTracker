@@ -38,6 +38,7 @@ export const getHabitsByDate = async (req, res) => {
   // 2) Fetch habits
   const habits = await HabitModel.find({
     userId: req.user._id,
+    isDeleted: false,
     createdAt: { $lte: endOfDay },
   }).populate('categoryId', 'name backgroundColor icon');
 
@@ -143,6 +144,8 @@ export const deleteHabit = async (req, res) => {
 
   if (!habit.isOwner(req.user._id))
     throw new AppError('You are not allowed to delete this habit', 403);
+
+  if (habit.isDeleted) throw new AppError('Habit is already deleted', 400);
 
   habit.isDeleted = true;
   await habit.save();
