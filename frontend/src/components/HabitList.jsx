@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import HabitCard from "./HabitCard";
+import api from "../../services/api";
 
 export default function HabitList({ viewMode }) {
   const [habits, setHabits] = useState([]);
@@ -7,27 +8,24 @@ export default function HabitList({ viewMode }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // hardcoded token got this by postman
-    const token =
-      ""; // replace with your token
-
-    fetch("http://localhost:3000/api/habits", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch habits");
-        return res.json();
-      })
-      .then((data) => {
+    const fetchHabits = async () => {
+      try {
+        const response = await api.get("/habits");
+        // 👆 token is AUTOMATICALLY attached here
+        const data = response.data;
         setHabits(Array.isArray(data) ? data : data.data);
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Failed to fetch habits"
+        );
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchHabits();
   }, []);
 
   if (loading) {
