@@ -28,21 +28,31 @@ export const getHabitsDashboard = async (req, res) => {
     } else break;
   }
 
-  // 3) Completion Rate
+  // 3) Completion Rate with aggregation for better
   const startOfWeek = dayjs(currentDay).startOf('week').toDate();
   const endOfWeek = dayjs(currentDay).endOf('week').toDate();
 
-  const habitsCompleted = await HabitCompletionModel.find({
-    userId: req.user._id,
-    date: { $gte: startOfWeek, $lte: endOfWeek },
-  });
+  const habitsCompleted = await HabitCompletionModel.aggregate([
+    {
+      $match: {
+        // Select only this user's completions for the current week
+        userId: req.user._id,
+        date: { $gte: startOfWeek, $lte: endOfWeek },
+      },
+    },
+    {
+      $group: {
+        _id: '$habitId', // Group by each habit → one group per habit
+        totalDone: { $sum: 1 }, // Count how many times this habit was completed in the week
+      },
+    },
+  ]);
 
-  const habitsCompletedIds = new Set(
-    habitsCompleted.map((hab) => hab._id.toString())
-  );
+  const completedHabits = habitsCompleted[0].totalDone || 0;
+  console.log(habitsCompleted[0]); // [ { _id: new ObjectId('695d3d61ba36511e5173f767'), totalDone: 1 } ]
 
   const completionRate = totalHabits
-    ? Math.floor((habitsCompletedIds.size / totalHabits) * 100)
+    ? Math.floor((completedHabits / totalHabits) * 100)
     : 0;
 
   res.status(200).json({
@@ -54,3 +64,23 @@ export const getHabitsDashboard = async (req, res) => {
     },
   });
 };
+
+// ---------------------------------
+
+// 3) Completion Rate without aggregation:
+
+// const startOfWeek = dayjs(currentDay).startOf('week').toDate();
+// const endOfWeek = dayjs(currentDay).endOf('week').toDate();
+
+// const habitsCompleted = await HabitCompletionModel.find({
+//   userId: req.user._id,
+//   date: { $gte: startOfWeek, $lte: endOfWeek },
+// });
+
+// const habitsCompletedIds = new Set(
+//   habitsCompleted.map((hab) => hab._id.toString())
+// );
+
+// const completionRate = totalHabits
+//    ? Math.floor((habitsCompletedIds.size / totalHabits) * 100)
+//   : 0;
