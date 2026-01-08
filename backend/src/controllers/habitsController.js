@@ -4,6 +4,7 @@ import { HabitModel } from '../models/Habit.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 import { DateHelper } from '../utils/date.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
+import { CategoryModel } from '../models/Category.js';
 
 // Get all user habits
 export const getHabits = async (req, res) => {
@@ -13,12 +14,15 @@ export const getHabits = async (req, res) => {
 
   res.status(200).json({
     success: true,
+    result: habits.length,
     data: habits,
   });
 };
 
 // Get all user habits for selected date
 export const getHabitsByDate = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized.', 401);
+
   // 1) Get date from query
   const dateString = req.query.date;
   const selectedDate = dateString
@@ -32,7 +36,11 @@ export const getHabitsByDate = async (req, res) => {
   const endOfDay = selectedDate.endOf('day').toDate();
 
   // 2) Fetch habits
-  const habits = await HabitModel.find({ userId: req.user._id });
+  const habits = await HabitModel.find({
+    userId: req.user._id,
+    isDeleted: false,
+    createdAt: { $lte: endOfDay },
+  }).populate('categoryId', 'name backgroundColor icon');
 
   const completionHabits = await HabitCompletionModel.find({
     userId: req.user._id,
@@ -41,7 +49,7 @@ export const getHabitsByDate = async (req, res) => {
 
   // 3) store completions habits ids into a set for faster lookup
   const habitCompletionIds = new Set(
-    completionHabits.map((c) => c._id.toString())
+    completionHabits.map((c) => c.habitId.toString())
   );
 
   // 4) filter by frequency and create new results
@@ -54,11 +62,11 @@ export const getHabitsByDate = async (req, res) => {
       title: habit.title,
       description: habit.description,
       frequency: habit.frequency,
+      category: habit.categoryId,
       completed: habitCompletionIds.has(habit._id.toString()),
+      createdAt: habit.createdAt,
+      updatedAt: habit.updatedAt,
     }));
-
-  if (results.length === 0)
-    throw new AppError('No habits found for the selected date', 400);
 
   res.status(200).json({
     success: true,
@@ -70,7 +78,15 @@ export const getHabitsByDate = async (req, res) => {
 export const createHabit = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
 
-  const { title, description, frequency } = req.body;
+  const { title, description, frequency, categoryId } = req.body;
+
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
+    categoryId,
+    req.user._id
+  );
+
+  if (!doesCategoryExist) throw notFound('Category');
+
   let habitCount = await HabitModel.getHabitCountByUserId(req.user._id);
 
   const habit = await HabitModel.create({
@@ -79,6 +95,7 @@ export const createHabit = async (req, res) => {
     description,
     frequency,
     order: habitCount + 1,
+    categoryId,
   });
 
   res.status(201).json({
@@ -96,11 +113,20 @@ export const updateHabit = async (req, res) => {
   if (!habit.isOwner(req.user._id))
     throw new AppError('You are not allowed to update this habit', 403);
 
-  const { title, description, frequency } = req.body;
+  const { title, description, frequency, categoryId } = req.body;
+
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
+    categoryId,
+    req.user._id
+  );
+
+  if (!doesCategoryExist) throw notFound('Category');
 
   if (title !== undefined) habit.title = title;
   if (description !== undefined) habit.description = description;
   if (frequency !== undefined) habit.frequency = frequency;
+
+  habit.categoryId = categoryId;
 
   await habit.save();
 
@@ -118,6 +144,8 @@ export const deleteHabit = async (req, res) => {
 
   if (!habit.isOwner(req.user._id))
     throw new AppError('You are not allowed to delete this habit', 403);
+
+  if (habit.isDeleted) throw new AppError('Habit is already deleted', 400);
 
   habit.isDeleted = true;
   await habit.save();

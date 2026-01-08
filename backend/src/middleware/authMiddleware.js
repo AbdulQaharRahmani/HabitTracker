@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { AppError } from '../../utils/error.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { AppError } from '../utils/error.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 import { UserModel } from '../models/User.js';
 
-export const authenticationToken = asyncHandler(async (req, res, next) => {
+export const authMiddleware = asyncHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer')) {
@@ -20,6 +20,12 @@ export const authenticationToken = asyncHandler(async (req, res, next) => {
   if (!user) {
     throw new AppError('Unauthorized: User not found', 401);
   }
+
+  const issueAt = decoded.iat * 1000; // convert iat from seconds to milliseconds
+  const changedPasswordAt = user.changedPasswordAt?.getTime(); // get the changedPasswordAt in milliseconds
+
+  if (user.changedPasswordAt && issueAt < changedPasswordAt)
+    throw new AppError('Password has been changed.Please log in again.');
 
   req.user = {
     _id: user._id,

@@ -46,6 +46,7 @@ class AppTheme {
   static const Color error = Color(0xFFEF4444);
 
   static const Color pendingIcon = Color(0xFFF97316);
+  static const Color streakBadge = Color(0x80EFD8C2);
 
   /* -------------------------------------------------------------------------- */
   /*                                Category Chips                               */

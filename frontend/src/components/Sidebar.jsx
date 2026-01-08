@@ -1,40 +1,53 @@
-import useSidebarStore from '../store/useSidebarStore';
-import { 
-  FaCalendarDay, 
-  FaChartLine, 
-  FaCog, 
-  FaBars, 
+import { useTranslation } from "react-i18next";
+import useSidebarStore from "../store/useSidebarStore";
+
+import {
+  FaCalendarDay,
+  FaChartLine,
+  FaCog,
+  FaBars,
   FaTimes,
   FaUser,
-} from 'react-icons/fa';
-import { 
-  HiOutlineFire, 
-  HiOutlineClipboardList 
-} from 'react-icons/hi';
+} from "react-icons/fa";
+import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 
-import { NavLink } from 'react-router-dom';
-  const dashboardItems = [
-    { id: 'today', name: 'Today', icon: <FaCalendarDay />, path: '/' },
-    { id: 'habits', name: 'Habits', icon: <HiOutlineFire />, path: '/habits' },
-    { id: 'tasks', name: 'Tasks', icon: <HiOutlineClipboardList />, path: '/tasks' },
-    { id: 'statistics', name: 'Statistics', icon: <FaChartLine />, path: '/statistics' },
-  ];
+import { NavLink } from "react-router-dom";
+const dashboardItems = [
+  { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
+  { id: "habits", name: "Habits", icon: <HiOutlineFire />, path: "/habits" },
+  {
+    id: "tasks",
+    name: "Tasks",
+    icon: <HiOutlineClipboardList />,
+    path: "/tasks",
+  },
+  {
+    id: "statistics",
+    name: "Statistics",
+    icon: <FaChartLine />,
+    path: "/statistics",
+  },
+];
 
-  const preferencesItems = [
-    { id: 'settings', name: 'Settings', icon: <FaCog />, path: '/settings' },
-  ];
+const preferencesItems = [
+  {
+    id: "settings",
+    name: "Settings",
+    icon: <FaCog />,
+    path: "/settings",
+  },
+];
 
 const Sidebar = ({ children }) => {
+  const { t } = useTranslation();
+
   const {
-  isOpen,
-  isMobileOpen,
-  toggleSidebar,
-  toggleMobileSidebar,
-  closeMobileSidebar,
-} = useSidebarStore();
-
-
-
+    isOpen,
+    isMobileOpen,
+    toggleSidebar,
+    toggleMobileSidebar,
+    closeMobileSidebar,
+  } = useSidebarStore();
   return (
     <div className="flex min-h-screen">
       <button
@@ -52,20 +65,26 @@ const Sidebar = ({ children }) => {
       <aside
         className={`
           fixed md:relative
-          h-screen
+          h-min-screen
           bg-white
           text-gray-800
           transition-all duration-300 ease-in-out
           z-40
-          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
-          ${isOpen ? 'w-64' : 'w-20'}
+          ${isOpen ? "w-64" : "w-20"}
           flex flex-col
           shadow-xl border-r border-gray-200
         `}
       >
         <div className="p-6 border-b border-gray-200">
-          <div className={`flex ${isOpen ? 'flex-col text-center space-y-1' : 'flex-col items-center'}`}>
+          <div
+            className={`flex ${
+              isOpen
+                ? "flex-col text-center space-y-1"
+                : "flex-col items-center"
+            }`}
+          >
             <div className="relative flex justify-center">
               <div className="w-[60px] h-[60px] rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
                 <FaUser size={24} className="text-white" />
@@ -73,9 +92,11 @@ const Sidebar = ({ children }) => {
             </div>
             {isOpen && (
               <div className="w-full">
-                <h3 className="font-semibold text-gray-800 text-lg mt-2">Ehsanullah</h3>
+                <h3 className="font-semibold text-gray-800 text-lg mt-2">
+                  Ehsanullah
+                </h3>
                 <button className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors duration-200 mt-1">
-                  View Profile
+                  {t("View Profile")}
                 </button>
               </div>
             )}
@@ -86,35 +107,40 @@ const Sidebar = ({ children }) => {
           {isOpen && (
             <div className="mb-6">
               <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
-                DASHBOARD
+                {t("DASHBOARD")}
               </h4>
               <ul className="space-y-1">
                 {dashboardItems.map((item) => (
                   <li key={item.id}>
                     <NavLink
                       to={item.path}
-                      end={item.path === '/'}
+                      end={item.path === "/"}
                       onClick={closeMobileSidebar}
                       className={({ isActive }) => `
                         w-full flex items-center rounded-lg p-3 transition-all duration-200
-                        ${isActive 
-                          ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
-                          : 'text-gray-600 hover:bg-gray-100 hover:translate-x-1'
+                        ${
+                          isActive
+                            ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
+                            : "text-gray-600 hover:bg-gray-100 hover:translate-x-1"
                         }
-                        ${!isOpen ? 'justify-center' : 'justify-start'}
+                        ${!isOpen ? "justify-center" : "justify-start"}
                       `}
                     >
                       {({ isActive }) => (
                         <>
-                          <span className={`
-                            ${!isOpen ? 'text-xl' : 'text-lg'}
-                            ${isActive ? 'text-indigo-600' : 'text-gray-500'}
-                          `}>
+                          <span
+                            className={`
+                            ${!isOpen ? "text-xl" : "text-lg"}
+                            ${isActive ? "text-indigo-600" : "text-gray-500"}
+                          `}
+                          >
                             {item.icon}
                           </span>
                           {isOpen && (
                             <>
-                              <span className="ml-4 font-medium">{item.name}</span>
+                              <span className="ml-4 font-medium">
+                                {t(item.name)}
+                              </span>
                               {isActive && (
                                 <div className="ml-auto w-2 h-2 bg-indigo-600 rounded-full"></div>
                               )}
@@ -135,19 +161,18 @@ const Sidebar = ({ children }) => {
                   <li key={item.id}>
                     <NavLink
                       to={item.path}
-                      end={item.path === '/'}
+                      end={item.path === "/"}
                       onClick={closeMobileSidebar}
                       className={({ isActive }) => `
                         w-full flex items-center justify-center rounded-lg p-3 transition-all duration-200
-                        ${isActive 
-                          ? 'bg-indigo-50 text-indigo-600' 
-                          : 'text-gray-500 hover:bg-gray-100'
+                        ${
+                          isActive
+                            ? "bg-indigo-50 text-indigo-600"
+                            : "text-gray-500 hover:bg-gray-100"
                         }
                       `}
                     >
-                      <span className="text-xl">
-                        {item.icon}
-                      </span>
+                      <span className="text-xl">{item.icon}</span>
                     </NavLink>
                   </li>
                 ))}
@@ -157,7 +182,7 @@ const Sidebar = ({ children }) => {
           {isOpen && (
             <div>
               <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
-                PREFERENCES
+                {t("Preferences")}
               </h4>
               <ul className="space-y-1">
                 {preferencesItems.map((item) => (
@@ -167,24 +192,29 @@ const Sidebar = ({ children }) => {
                       onClick={closeMobileSidebar}
                       className={({ isActive }) => `
                         w-full flex items-center rounded-lg p-3 transition-all duration-200
-                        ${isActive 
-                          ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
-                          : 'text-gray-600 hover:bg-gray-100 hover:translate-x-1'
+                        ${
+                          isActive
+                            ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
+                            : "text-gray-600 hover:bg-gray-100 hover:translate-x-1"
                         }
-                        ${!isOpen ? 'justify-center' : 'justify-start'}
+                        ${!isOpen ? "justify-center" : "justify-start"}
                       `}
                     >
                       {({ isActive }) => (
                         <>
-                          <span className={`
-                            ${!isOpen ? 'text-xl' : 'text-lg'}
-                            ${isActive ? 'text-indigo-600' : 'text-gray-500'}
-                          `}>
+                          <span
+                            className={`
+                            ${!isOpen ? "text-xl" : "text-lg"}
+                            ${isActive ? "text-indigo-600" : "text-gray-500"}
+                          `}
+                          >
                             {item.icon}
                           </span>
                           {isOpen && (
                             <>
-                              <span className="ml-4 font-medium">{item.name}</span>
+                              <span className="ml-4 font-medium">
+                                {t(item.name)}
+                              </span>
                               {isActive && (
                                 <div className="ml-auto w-2 h-2 bg-indigo-600 rounded-full"></div>
                               )}
@@ -208,15 +238,14 @@ const Sidebar = ({ children }) => {
                       onClick={closeMobileSidebar}
                       className={({ isActive }) => `
                         w-full flex items-center justify-center rounded-lg p-3 transition-all duration-200
-                        ${isActive 
-                          ? 'bg-indigo-50 text-indigo-600' 
-                          : 'text-gray-500 hover:bg-gray-100'
+                        ${
+                          isActive
+                            ? "bg-indigo-50 text-indigo-600"
+                            : "text-gray-500 hover:bg-gray-100"
                         }
                       `}
                     >
-                      <span className="text-xl">
-                        {item.icon}
-                      </span>
+                      <span className="text-xl">{item.icon}</span>
                     </NavLink>
                   </li>
                 ))}
@@ -225,21 +254,22 @@ const Sidebar = ({ children }) => {
           )}
         </nav>
       </aside>
-     <main className={`
+      <main
+        className={`
         flex-1
         transition-all duration-300
-        ${isOpen ? 'md:ml-2' : 'md:ml-1'}
-        ${isMobileOpen ? 'ml-64' : 'ml-0'}
+        ${isOpen ? "md:ml-2" : "md:ml-1"}
+        ${isMobileOpen ? "ml-64" : "ml-0"}
         p-4 md:p-6
-        min-h-screen
+        overflow-y-auto
+        h-screen
          dark:from-gray-900 dark:to-gray-800
-      `}>
-        <div className="mt-16 md:mt-0">
-          {children}
-        </div>
+      `}
+      >
+        <div className="mt-16 md:mt-0">{children}</div>
       </main>
     </div>
   );
-}
+};
 
 export default Sidebar;
