@@ -12,7 +12,7 @@ export default function HabitList({ viewMode }) {
       try {
         const response = await api.get("/habits");
         const data = response.data;
-        setHabits(Array.isArray(data) ? data : data.data);
+        setHabits(Array.isArray(data) ? data : data.data || []);
       } catch (err) {
         setError(
           err.response?.data?.message ||
@@ -52,7 +52,11 @@ export default function HabitList({ viewMode }) {
             : "my-6 space-y-4 ml-[1.35rem]"
         }
       >
-        {habits.map((habit) => (
+      {habits.length === 0 ? 
+        (
+          <p className="text-gray-500 text-lg">You have no habits yet. Add your first habit.</p>
+        ) : (
+          habits.map((habit) => (
           <HabitCard
             key={habit._id}
             viewMode={viewMode}
@@ -62,7 +66,9 @@ export default function HabitList({ viewMode }) {
             frequency={habit.frequency}
             duration={habit.duration}
           />
-        ))}
+      ))
+        )
+      }
       </div>
     );
   }
