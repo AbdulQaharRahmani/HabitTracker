@@ -9,7 +9,6 @@ import HabitList from '../components/HabitList.jsx';
 export default function Habits () {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
-  const [token, setToken] = useState(localStorage.getItem("token" || null))
 
   return (
     <div className="md:px-2 lg:px-4 bg-gray-50"> 
