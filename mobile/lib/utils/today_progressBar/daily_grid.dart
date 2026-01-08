@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/utils/today_progressBar/status_bar.dart';
 import 'package:habit_tracker/utils/today_progressBar/streak_badge.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../app/app_theme.dart';
 Widget dailyGoalCard({
-  //  replace these with a model loaded from backend
   required int completed,
   required int total,
   required double progress,
@@ -13,7 +11,7 @@ Widget dailyGoalCard({
   final percentText = '${(progress * 100).round()}%';
 
   return Container(
-    padding: const EdgeInsets.all(16),
+    padding:  EdgeInsets.all(16.sp),
     decoration: BoxDecoration(
       color:AppTheme.textWhite,
       borderRadius: BorderRadius.circular(20),
@@ -34,10 +32,10 @@ Widget dailyGoalCard({
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                 Text(
                   'Daily Goal',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -49,12 +47,11 @@ Widget dailyGoalCard({
               ],
             ),
             const Spacer(),
-            //  streakDays should come from backend
             streakBadgeWithValue(streakDays),
           ],
         ),
 
-        const SizedBox(height: 16),
+         SizedBox(height: 16.h),
 
         // Progress Row
         Row(
@@ -78,7 +75,7 @@ Widget dailyGoalCard({
           ],
         ),
 
-        const SizedBox(height: 8),
+         SizedBox(height: 8.h),
 
         /// Progress Bar
         ClipRRect(
@@ -91,30 +88,7 @@ Widget dailyGoalCard({
           ),
         ),
 
-        const SizedBox(height: 16),
-
-        /// Bottom Stats
-        Row(
-          children: [
-            Expanded(
-              child: StatusCard(
-                color: AppTheme.success,
-                count: '$completed',
-                title: 'Done',
-                subtitle: 'Keep it up!',
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: StatusCard(
-                color: AppTheme.warning,
-                count: '${total - completed}',
-                title: 'Pending',
-                subtitle: 'Almost there',
-              ),
-            ),
-          ],
-        ),
+         SizedBox(height: 16.h),
       ],
     ),
   );
