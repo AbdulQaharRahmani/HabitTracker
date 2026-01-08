@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/features/routes.dart';
 import 'package:intl/intl.dart';
 
@@ -31,16 +32,19 @@ class TopBar extends StatelessWidget {
           children: [
             Text(
               "Today's Progress",
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppTheme.textPrimary,
-                fontSize: 20,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4.h),
             Text(
               subtitle,
-              style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
+              style: TextStyle(
+                color: AppTheme.textMuted,
+                fontSize: 12.sp,
+              ),
             ),
           ],
         ),
@@ -56,7 +60,7 @@ class TopBar extends StatelessWidget {
             );
           },
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8.w),
         _iconButton(Icons.calendar_today, onTap: onPickDate),
       ],
     );
@@ -66,8 +70,13 @@ class TopBar extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: CircleAvatar(
+        radius: 20.r,
         backgroundColor: AppTheme.background,
-        child: Icon(icon, color: AppTheme.pendingIcon),
+        child: Icon(
+          icon,
+          size: 20.sp,
+          color: AppTheme.pendingIcon,
+        ),
       ),
     );
   }

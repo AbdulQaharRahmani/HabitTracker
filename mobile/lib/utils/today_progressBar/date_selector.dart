@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 class DateSelector extends StatelessWidget {
   final List<DateTime> weekDates;
   final DateTime selectedDate;
@@ -16,11 +17,11 @@ class DateSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 80,
+      height: 80.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: weekDates.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) =>  SizedBox(width: 8.w),
         itemBuilder: (context, index) {
           final date = weekDates[index];
           final isSelected = DateUtils.isSameDay(date, selectedDate);
@@ -28,10 +29,10 @@ class DateSelector extends StatelessWidget {
           return GestureDetector(
             onTap: () => onDateSelected(date),
             child: Container(
-              width: 64,
+              width: 64.w,
               decoration: BoxDecoration(
                 color: isSelected ? AppTheme.primary : AppTheme.surface,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -43,11 +44,11 @@ class DateSelector extends StatelessWidget {
                       fontWeight: isSelected ? FontWeight.bold : null,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                   SizedBox(height: 4.h),
                   Text(
                     '${date.day}',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 18.w,
                       fontWeight: FontWeight.bold,
                       color: isSelected ? AppTheme.textWhite : AppTheme.textPrimary,
                     ),
