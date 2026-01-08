@@ -11,15 +11,30 @@ function Tasks () {
           title={"Tasks"}
           subtitle={"Manage your daily goals and todos."}
         ></Header>
-        <span className='mt-10 mr-8'>
+        <span className="mt-10 mr-8">
           <AddTask></AddTask>
         </span>
       </div>
-      <div className=''>
-        <TaskCard 
+      <div className='grid gap-4'>
+        <TaskCard
           title={"Complete project proposal"}
           deadline={"Yesterday"}
-          category={"HEALTH"}  
+          category={"Work"}
+        />
+        <TaskCard
+          title={"Buy groceries for the week"}
+          deadline={"Today"}
+          category={"Personal"}
+        />
+        <TaskCard
+          title={"Schedule dentist appoinment"}
+          deadline={"Tomorrow"}
+          category={"Health"}
+        />
+        <TaskCard
+          title={"Call Mom"}
+          deadline={"No date"}
+          category={"Family"}
         />
       </div>
     </div>
