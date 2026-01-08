@@ -142,6 +142,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 children: [
                   Expanded(
                     child: StatCard(
+                      color: AppTheme.primary.withOpacity(0.4),
                       icon: Iconsax.task,
                       title: 'Habits',
                       value: '12',
@@ -150,6 +151,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   SizedBox(width: 12.w),
                   Expanded(
                     child: StatCard(
+                      color: AppTheme.warning.withOpacity(0.4),
                       icon: Iconsax.flash_1,
                       title: 'Streak',
                       value: '5',
@@ -158,6 +160,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   SizedBox(width: 12.w),
                   Expanded(
                     child: StatCard(
+                      color: AppTheme.success.withOpacity(0.4),
                       icon: Iconsax.percentage_circle,
                       title: 'Rate',
                       value: '87%',
@@ -168,15 +171,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
               SizedBox(height: 24.h),
               // completion section
-              _SectionTitle(title: 'Completion Trend'),
               SizedBox(height: 12.h),
 
               CompletionChart(),
 
               SizedBox(height: 24.h),
 
-              // Heatmap section
-              _SectionTitle(title: 'Consistency'),
+           // heat map
 
               SizedBox(height: 12.h),
 
