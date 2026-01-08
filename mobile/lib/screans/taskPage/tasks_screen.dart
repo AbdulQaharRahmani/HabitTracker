@@ -35,7 +35,7 @@ class _TasksScreenState extends State<TasksScreen> {
                     ),
                     child: CircleAvatar(
                       radius: avatarRadius,
-                      backgroundImage: AssetImage('assets/images.png'),
+                      backgroundImage: AssetImage('assets/images/image.png'),
                     ),
                   ),
                   Positioned(
