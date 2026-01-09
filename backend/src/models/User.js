@@ -6,6 +6,17 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // googleId unique if present, otherwise multiple users can have no googleId
+    default: null,
+  },
+  username: {
+    type: String,
+    require: true,
+    trim: true,
+  },
   password: {
     type: String,
     required: true,
