@@ -11,7 +11,7 @@ export default function Habits () {
   const [viewMode, setViewMode] = useState('list');
 
   return (
-    <div className="md:px-2 lg:px-4 bg-gray-50"> 
+    <div className="md:px-2 lg:px-4 bg-gray-50">
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:ml-0 md:items-between md:justify-between sm:flex-row sm:ml-0 sm:items-between sm:justify-between">
         <Header />
@@ -21,7 +21,7 @@ export default function Habits () {
       {/* Search , View, AddHabit*/}
       <div className="my-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:ml-6">
         <div className="w-full lg:w-1/2">
-          <Search 
+          <Search
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
@@ -32,11 +32,10 @@ export default function Habits () {
           <AddHabit />
         </div>
       </div>
-      {/* Habit list */}
       <div
         className={
           viewMode === 'grid'
-            ? 'grid grid-cols-1 lg:grid-cols-3 lg:m-0 sm:grid-cols-2  md:grid-cols-1 md:ml-12 gap-6 justify-items-start' 
+            ? 'grid grid-cols-1 lg:grid-cols-3 lg:m-0 sm:grid-cols-2  md:grid-cols-1 md:ml-12 gap-6 justify-items-start'
             : 'my-6 space-y-4 ml-5'
         }
       >
