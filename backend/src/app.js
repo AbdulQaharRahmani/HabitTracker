@@ -1,4 +1,5 @@
-﻿import express from 'express';
+﻿import 'dotenv/config';
+import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import habitRoutes from './routes/habits.js';
@@ -8,6 +9,7 @@ import taskRoutes from './routes/task.js';
 import categoryRoutes from './routes/categories.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
+
 const app = express();
 
 //#region Normal Midlleware
