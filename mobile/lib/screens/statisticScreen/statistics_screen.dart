@@ -171,8 +171,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
               SizedBox(height: 24.h),
               // completion section
-              SizedBox(height: 12.h),
-
+              
               CompletionChart(),
 
               SizedBox(height: 24.h),
