@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { HiChevronDown, HiCheck } from "react-icons/hi";
 
-export function Dropdown({ items, value, getValue, placeholder }) {
+export default function Dropdown({ items, value, getValue, placeholder }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false)
 
     const handleDropdownVisibility = () => {
         setDropdownOpen(!isDropdownOpen)
     }
     const handleSelect = (itemValue) => {
-        getValue({ target: { value: itemValue } })
+        getValue(itemValue)
         setDropdownOpen(false)
     }
+    const selectedItem = items.find((item)=> item.value === value)
+    const displayValue = selectedItem ? selectedItem.name : ""
     return (
         <div className="w-full relative">
             <div className="relative w-full">
@@ -18,7 +20,7 @@ export function Dropdown({ items, value, getValue, placeholder }) {
                     type="text"
                     placeholder={placeholder}
                     readOnly
-                    value={value}
+                    value={displayValue}
                     className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white p-4 pr-12 text-sm font-medium text-gray-700 shadow-sm transition-all caret-transparent focus:border-[#7B68EE] focus:ring-4 focus:ring-[#7B68EE]/15 outline-none capitalize"
                     onChange={getValue}
                     onClick={handleDropdownVisibility}
