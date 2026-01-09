@@ -59,6 +59,7 @@ export default function HabitList({ viewMode }) {
           habits.map((habit) => (
           <HabitCard
             key={habit._id}
+            id={habit._id}
             viewMode={viewMode}
             title={habit.title}
             description={habit.description}

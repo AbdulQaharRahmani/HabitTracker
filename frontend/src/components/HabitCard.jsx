@@ -1,7 +1,7 @@
 import { FaCheckCircle, FaCircle } from 'react-icons/fa';
 import HabitCardIcon from './HabitCardIcon';
 
-export default function HabitCard({ title, description, category, frequency, duration, viewMode }) {
+export default function HabitCard({ title, description, category, frequency, duration, viewMode, id }) {
   const color = '#6366F1';
   const bgColor = '#EEF4FF';
   const Icon = FaCheckCircle;  
