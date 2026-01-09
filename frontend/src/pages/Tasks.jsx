@@ -5,7 +5,7 @@ import TaskCard from '../components/TaskCard';
 
 function Tasks () {
   return (
-    <div className="md:px-2 lg:ml-4 bg-gray-50 grid grid-cols gap-4">
+    <div className="md:px-2 bg-gray-50 grid grid-cols gap-4">
       <div className="flex flex-rows justify-between my-2">
         <Header
           title={"Tasks"}
