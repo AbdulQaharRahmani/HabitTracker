@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  final String baseUrl = "http://10.100.100.34:3000";
+  final String baseUrl = "http://10.100.100.41:3000";
 
   Future<Map<String, dynamic>> registerUser({
     required String name,

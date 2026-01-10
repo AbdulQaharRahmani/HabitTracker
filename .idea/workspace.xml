@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1f3da058-9203-446b-a536-84e9b43c0197" name="Changes" comment="The login connected with the render backend and work correctly">
+      <change afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.dart_tool/package_graph.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.dart_tool/version" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/HabitTracker.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/deviceManager.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/controllers/categoryController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/controllers/taskController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/controllers/userController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/middleware/upload.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/middleware/validate.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/models/Category.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/routes/categories.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/routes/task.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/routes/user.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/seeders/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/utils/deleteFile.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/validators/validateCategory.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/validators/validateHabit.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/validators/validateId.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/validators/validateTask.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/services/api.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/assets/calendar-today.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/assets/habit-pic.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/assets/profile-pic5.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/assets/settings-pic.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/assets/statics-pic.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/assets/tasks-pic.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/AddHabit.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/AddHabitModal.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/DailyConsistency.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/DarkMode.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Dropdown.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/HabitCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/HabitCardIcon.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Header.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Search.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/View.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/internationalization.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/CustomDatePicker.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Today.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/store/useAddHabitStore.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/utils/i18n.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/utils/locals/en.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/utils/locals/fa.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/features/add_habit_model.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/features/routes.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/habitScreen/add_habit.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/habitScreen/habits_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/homeScreen/home_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/profileScreen/profile_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/settingScreen/setting_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/signUpScreen/signup_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/taskScreen/add_task_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/todayScreen/today_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/services/auth_service.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/login/login_card.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/login_utils/auth_service.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/login_utils/controller.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_card.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_header.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_icons.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_items.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_profile_card.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_section.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/custom_text_field.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/form_label.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/signup_form.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/social_buttons.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/square_tiles.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/categories.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/daily_grid.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/daily_section_list.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/date_selector.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/header_section.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/status_bar.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/streak_badge.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/task.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/task_item.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/top_bar.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/controllers/habitsController.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/habitsController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/middleware/authMiddleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/middleware/authMiddleware.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/middleware/validateUser.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/validators/validateUser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/models/Habit.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/models/Habit.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/models/HabitCompletion.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/models/Task.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/models/Task.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/models/User.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/models/User.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/models/habitCompletion.js" beforeDir="false" afterPath="$PROJECT_DIR$/HabitCompletion.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/habits.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/habits.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/utils/date.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/utils/date.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/react.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Sidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Sidebar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/main.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Habits.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Habits.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Settings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Settings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Statistics.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Statistics.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Today.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Today.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/app/app_theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/app/app_theme.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/features/habit/model.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/home_screan.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/screens/loginScreen/login_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/settingPage/setting_screen.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/signup_screen.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/statisticPage/statistics_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/screens/statisticScreen/statistics_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/taskPage/tasks_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/screens/taskScreen/tasks_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/todayPage/today_screen.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/custom_text_field.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/form_label.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/header_card_login.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/login/header_card_login.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/helper.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/login_card.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/sign_up_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/sign_up_button.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/signup_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/signup_controller.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/signup_form.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/square_tiles.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/pubspec.yaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CMakeLists.txt" />
+        <option value="Dart File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Farhadakbary&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/AbdulQaharRahmani/HabitTracker.git&quot;,
+    &quot;accountId&quot;: &quot;03c3b512-2231-4d19-8eb6-2d822cfad7ac&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="37CRohFsIlU3Zi4JmLzPByxkSOL" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Flutter.add_habit.dart.executor": "Run",
+    "Flutter.main.dart.executor": "Run",
+    "Flutter.today_screen.dart.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "com.google.services.firebase.aqiPopupShown": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "#106 on Merging implement__habit__list__feature-#16",
+    "ignore.virus.scanning.warn.message": "true",
+    "io.flutter.reload.alreadyRun": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/habit_tracker/HabitTracker/mobile/assets",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
+    "show.migrate.to.gradle.popup": "false"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\habit_tracker\HabitTracker\mobile\assets" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\habit_tracker\HabitTracker\mobile\lib\screens\signUpScreen" />
+      <recent name="D:\habit_tracker\HabitTracker\mobile\lib\screens\homeScreen" />
+      <recent name="D:\habit_tracker\HabitTracker\mobile\lib\utils\signUp" />
+      <recent name="D:\habit_tracker\HabitTracker\mobile\lib\utils\login" />
+      <recent name="D:\habit_tracker\HabitTracker\mobile\lib\screens\loginScreen" />
+    </key>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1f3da058-9203-446b-a536-84e9b43c0197" name="Changes" comment="" />
+      <created>1766405242977</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1766405242977</updated>
+    </task>
+    <task id="LOCAL-00001" summary="#22     Farhad Akbari                        Login page designed">
+      <option name="closed" value="true" />
+      <created>1766492443727</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1766492443727</updated>
+    </task>
+    <task id="LOCAL-00002" summary="login page fully designed">
+      <option name="closed" value="true" />
+      <created>1766833797698</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1766833797698</updated>
+    </task>
+    <task id="LOCAL-00003" summary="#15 Add_Habit_Feature_Implementation ui designed">
+      <option name="closed" value="true" />
+      <created>1766837610321</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1766837610321</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Conflicts Resolved">
+      <option name="closed" value="true" />
+      <created>1766856061835</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1766856061835</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Conflicts Resolved">
+      <option name="closed" value="true" />
+      <created>1766857311633</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1766857311633</updated>
+    </task>
+    <task id="LOCAL-00006" summary="#20 implement_date_selection_on_today_page designed">
+      <option name="closed" value="true" />
+      <created>1767122001718</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1767122001720</updated>
+    </task>
+    <task id="LOCAL-00007" summary="the design">
+      <option name="closed" value="true" />
+      <created>1767122154278</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1767122154278</updated>
+    </task>
+    <task id="LOCAL-00008" summary="a bug fixed from today progress screen">
+      <option name="closed" value="true" />
+      <created>1767122305236</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1767122305236</updated>
+    </task>
+    <task id="LOCAL-00009" summary="The comment resolved.">
+      <option name="closed" value="true" />
+      <created>1767179328975</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1767179328976</updated>
+    </task>
+    <task id="LOCAL-00010" summary="conflicts resolved.">
+      <option name="closed" value="true" />
+      <created>1767179734117</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1767179734117</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Connect login with backend #108 FAI">
+      <option name="closed" value="true" />
+      <created>1767182727297</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1767182727297</updated>
+    </task>
+    <task id="LOCAL-00012" summary="comment done.">
+      <option name="closed" value="true" />
+      <created>1767201489402</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1767201489402</updated>
+    </task>
+    <task id="LOCAL-00013" summary="main.dart updated.">
+      <option name="closed" value="true" />
+      <created>1767201546923</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1767201546923</updated>
+    </task>
+    <task id="LOCAL-00014" summary="conflicts resolved">
+      <option name="closed" value="true" />
+      <created>1767201896959</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1767201896959</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Implement profile screen and redesign the structure of the project">
+      <option name="closed" value="true" />
+      <created>1767464512696</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1767464512696</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Implement profile screen">
+      <option name="closed" value="true" />
+      <created>1767468459153</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1767468459153</updated>
+    </task>
+    <task id="LOCAL-00017" summary="The fart files name corrected.">
+      <option name="closed" value="true" />
+      <created>1767502513314</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1767502513315</updated>
+    </task>
+    <task id="LOCAL-00018" summary="The dart files name corrected.">
+      <option name="closed" value="true" />
+      <created>1767502604878</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1767502604878</updated>
+    </task>
+    <task id="LOCAL-00019" summary="The sign up and login screen designed completely and also the other screens fixed.">
+      <option name="closed" value="true" />
+      <created>1767508294789</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1767508294789</updated>
+    </task>
+    <task id="LOCAL-00020" summary="conflicts resolved">
+      <option name="closed" value="true" />
+      <created>1767605811615</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1767605811615</updated>
+    </task>
+    <task id="LOCAL-00021" summary="conflicts resolved">
+      <option name="closed" value="true" />
+      <created>1767607436079</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1767607436079</updated>
+    </task>
+    <task id="LOCAL-00022" summary="comments of the PR resolved">
+      <option name="closed" value="true" />
+      <created>1767609282807</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1767609282807</updated>
+    </task>
+    <task id="LOCAL-00023" summary="implement-statistics-screen-FAI#124">
+      <option name="closed" value="true" />
+      <created>1767781780220</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1767781780220</updated>
+    </task>
+    <task id="LOCAL-00024" summary="some bugs resolved">
+      <option name="closed" value="true" />
+      <created>1767781895327</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1767781895328</updated>
+    </task>
+    <task id="LOCAL-00025" summary="resolved conflicts">
+      <option name="closed" value="true" />
+      <created>1767782000666</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1767782000666</updated>
+    </task>
+    <task id="LOCAL-00026" summary="resolved conflicts">
+      <option name="closed" value="true" />
+      <created>1767782336218</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1767782336218</updated>
+    </task>
+    <task id="LOCAL-00027" summary="resolved conflicts">
+      <option name="closed" value="true" />
+      <created>1767784658928</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1767784658928</updated>
+    </task>
+    <task id="LOCAL-00028" summary="The login connected with the render backend and work correctly">
+      <option name="closed" value="true" />
+      <created>1767803417764</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1767803417764</updated>
+    </task>
+    <task id="LOCAL-00029" summary="The login connected with the render backend and work correctly">
+      <option name="closed" value="true" />
+      <created>1767845696550</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1767845696550</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="70ea1eea-61cf-44cd-a2da-a15f99c4ba4a" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="70ea1eea-61cf-44cd-a2da-a15f99c4ba4a">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:D:/habit_tracker/HabitTracker/mobile/lib/services" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="connect_login_with_backend_FAI_#108" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="#22     Farhad Akbari                        Login page designed" />
+    <MESSAGE value="login page fully designed" />
+    <MESSAGE value="#15 Add_Habit_Feature_Implementation ui designed" />
+    <MESSAGE value="Conflicts Resolved" />
+    <MESSAGE value="#20 implement_date_selection_on_today_page designed" />
+    <MESSAGE value="the design" />
+    <MESSAGE value="a bug fixed from today progress screen" />
+    <MESSAGE value="The comment resolved." />
+    <MESSAGE value="conflicts resolved." />
+    <MESSAGE value="Connect login with backend #108 FAI" />
+    <MESSAGE value="comment done." />
+    <MESSAGE value="main.dart updated." />
+    <MESSAGE value="Implement profile screen and redesign the structure of the project" />
+    <MESSAGE value="Implement profile screen" />
+    <MESSAGE value="The fart files name corrected." />
+    <MESSAGE value="The dart files name corrected." />
+    <MESSAGE value="The sign up and login screen designed completely and also the other screens fixed." />
+    <MESSAGE value="conflicts resolved" />
+    <MESSAGE value="comments of the PR resolved" />
+    <MESSAGE value="implement-statistics-screen-FAI#124" />
+    <MESSAGE value="some bugs resolved" />
+    <MESSAGE value="resolved conflicts" />
+    <MESSAGE value="The login connected with the render backend and work correctly" />
+    <option name="LAST_COMMIT_MESSAGE" value="The login connected with the render backend and work correctly" />
+  </component>
+</project>

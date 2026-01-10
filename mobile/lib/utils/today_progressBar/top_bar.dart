@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/features/routes.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/app_theme.dart';
+import '../../screens/profileScreen/profile_screen.dart';
 
 class TopBar extends StatelessWidget {
   final VoidCallback onPickDate;
@@ -38,15 +40,22 @@ class TopBar extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: const TextStyle(
-                color: AppTheme.textMuted,
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
             ),
           ],
         ),
         const Spacer(),
-        _iconButton(Icons.person),
+        _iconButton(
+          Icons.person,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfileScreen(),
+              ),
+            );
+          },
+        ),
         const SizedBox(width: 8),
         _iconButton(Icons.calendar_today, onTap: onPickDate),
       ],

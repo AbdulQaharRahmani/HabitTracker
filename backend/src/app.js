@@ -1,12 +1,13 @@
 ﻿import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import habitRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js';
-import categoryRoutes from './routes/categories.js';
+import userRoutes from './routes/user.js';
 import taskRoutes from './routes/task.js';
+import categoryRoutes from './routes/categories.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
-import userRoutes from './routes/user.js';
 const app = express();
 
 //#region Normal Midlleware
@@ -17,6 +18,9 @@ app.use(cors({ origin: '*' }));
 //#endregion
 
 //#region Route Middlewares
+
+app.use('/uploads', express.static(path.join(process.cwd(), 'src/uploads')));
+
 app.get('/api/health', (req, res) => {
   res.send('Habit tracker API is running');
 });
@@ -26,12 +30,11 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 
 // Protect routes
-app.use(authMiddleware);
 
-app.use('/api/categories', categoryRoutes);
-app.use('/api/habits', habitRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/categories', authMiddleware, categoryRoutes);
+app.use('/api/habits', authMiddleware, habitRoutes);
+app.use('/api/tasks', authMiddleware, taskRoutes);
+app.use('/api/users', authMiddleware, userRoutes);
 
 //#endregion
 

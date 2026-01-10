@@ -39,17 +39,12 @@ const HabitSchema = new mongoose.Schema(
   }
 );
 
-// find docs wih { isDeleted: false } in this queries: (find, findOne, findById)
-HabitSchema.pre(/^find/, function () {
-  this.where({ isDeleted: false });
-});
-
-HabitSchema.index({ userId: 1, order: 1 });
+HabitSchema.index({ userId: 1, isDeleted: 1, order: 1 });
 HabitSchema.index({ userId: 1, title: 1 }, { unique: true });
 
 //Return the query object that can be awaited
 HabitSchema.statics.findByUserAndSortByOrder = function (userId) {
-  return this.find({ userId })
+  return this.find({ userId, isDeleted: false })
     .populate('categoryId', 'name icon backgroundColor')
     .sort({ order: 1 })
     .lean();

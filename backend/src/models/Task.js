@@ -12,8 +12,8 @@ const taskSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['active', 'done'],
-      default: 'active',
+      enum: ['todo', 'done'],
+      default: 'todo',
     },
     priority: {
       type: String,
@@ -32,6 +32,10 @@ const taskSchema = new mongoose.Schema(
     deletedAt: {
       type: Date,
       default: null,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
