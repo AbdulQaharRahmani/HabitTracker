@@ -97,22 +97,34 @@ export const toggleTaskStatus = async (req, res) => {
 export const updateTask = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized', 401);
 
-  const task = await TaskModel.findById(req.params.id);
+  if (Object.keys(req.body).length === 0)
+    throw new AppError('No fields provided for update', 400);
+
+  const allowedFieldsToUpdate = {
+    title: true,
+    description: true,
+    status: true,
+    priority: true,
+    dueDate: true,
+  };
+
+  const updateQuery = {};
+
+  for (let key of Object.keys(req.body)) {
+    if (key in allowedFieldsToUpdate) updateQuery[key] = req.body[key];
+  }
+
+  const task = await TaskModel.findOneAndUpdate(
+    { _id: req.params.id, userId: req.user._id },
+    { $set: updateQuery },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
   if (!task) throw notFound('Task');
 
-  //Ensure the task belongs to the authenticated user
-  if (String(req.user._id) !== String(task.userId))
-    throw new AppError('You are not allowed to update this task', 403);
-
-  const { title, description, status, priority, dueDate } = req.body;
-
-  if (title !== undefined) task.title = title;
-  if (description !== undefined) task.description = description;
-  if (status !== undefined) task.status = status;
-  if (priority !== undefined) task.priority = priority;
-  if (dueDate !== undefined) task.dueDate = dueDate;
-
-  await task.save();
   res.status(200).json({
     success: true,
     data: task,
