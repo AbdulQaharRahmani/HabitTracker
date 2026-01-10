@@ -4,16 +4,17 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 export const registerUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
 
   const emailExisted = await UserModel.exists({ email });
   if (emailExisted) {
-    throw new AppError('Email exists already', 400);
+    throw new AppError('Email already exists', 400);
   }
 
   const hashPassword = await bcrypt.hash(password, 12);
 
-  const user = await UserModel.create({
+  await UserModel.create({
+    username,
     email,
     password: hashPassword,
   });
@@ -50,6 +51,7 @@ export const loginUser = async (req, res) => {
       token,
       id: user._id,
       email: user.email,
+      username: user.username,
     },
   });
 };

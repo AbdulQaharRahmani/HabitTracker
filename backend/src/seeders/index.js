@@ -99,6 +99,7 @@ const seed = async () => {
   const hashedPassword = await bcrypt.hash('test123', 12);
 
   const user = await UserModel.create({
+    username: 'Test',
     email: 'test@gmail.com',
     password: hashedPassword,
   });
