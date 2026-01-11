@@ -32,10 +32,10 @@ export const useTaskCardStore = create((set) => ({
     },
   ],
 
-    toggleTaskDone: (id) =>
+    completeTask: (id) =>
         set((state) => ({
             tasks: state.tasks.map((task) =>
-                task.id === id ? { ...task, done: !task.done } : task
+                task.id === id ? { ...task, done: true } : task
             ),
         })
     ),
@@ -44,7 +44,5 @@ export const useTaskCardStore = create((set) => ({
         set((state) => ({
             tasks: state.tasks.filter((task) => task.id !== id)
         }),
-    )
-
-
+    ),
 }));
