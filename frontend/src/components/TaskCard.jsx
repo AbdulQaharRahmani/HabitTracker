@@ -3,13 +3,13 @@ import { MdDeleteOutline } from "react-icons/md";
 import { useTaskCardStore } from "../store/useTaskCardStore";
 
 export default function TaskCard ({title, deadline, category, done, id}) {
-  const toggleTaskDone = useTaskCardStore((state) => state.toggleTaskDone);
+  const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
 
   return (
     <div className="flex bg-white rounded-xl shadow-sm mx-8">
       <div className="flex items-center justify-between border-r border-gray-300 mx-4 px-4 pr-8 text-center">
-        <button onClick={() => toggleTaskDone(id)}>
+        <button onClick={() => completeTask(id)}>
           {done ? (
             <FaCheckCircle size={20} className="text-green-400" />
           ) : (
@@ -39,18 +39,13 @@ export default function TaskCard ({title, deadline, category, done, id}) {
                 <span className="">{deadline}</span>
               </p>
             </span>
-            <span className="py-2 text-[0.8rem] text-gray-300">
-              {category}
-            </span>
+            <span className="py-2 text-[0.8rem] text-gray-300">{category}</span>
           </div>
         </div>
       </div>
 
       <div className=" p-4 flex items-center mx-4">
-        <button 
-          className=""
-          onClick={() => deleteTask(id)}
-        >
+        <button className="" onClick={() => deleteTask(id)}>
           <MdDeleteOutline
             size={24}
             className="text-gray-300 hover:text-red-400 transition"
