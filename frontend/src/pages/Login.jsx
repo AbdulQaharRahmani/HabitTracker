@@ -2,11 +2,7 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa";
 import { MdEmail, MdLock } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-
-const sampleUser = {
-    userEmail: "shukriasul5@gmail.com",
-    userPassword: "Shukria@123",
-};
+import api from "../../services/api";
 
 export default function Login() {
     const [passwordType, setPasswordType] = useState("password");
@@ -20,21 +16,20 @@ export default function Login() {
     const navigate = useNavigate();
     const handleLogin = async (e) => {
         e.preventDefault();
-        if (!email || !password) return alert("Please fill all fields!");
+        if (!email.trim() || !password.trim()) return alert("Please fill all fields!");
         setLoading(true);
         try {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            if (
-                sampleUser.userEmail === email &&
-                sampleUser.userPassword === password
-            ) {
-                alert("Success! 🎉");
-                navigate("/");
-            } else {
-                alert("Invalid email or password!");
+            const response = await api.post("/auth/login", { email, password })
+            let token = response.data.data.token
+            if(token){
+                localStorage.setItem("token", token)
             }
+            alert("Welcome again!")
+            navigate("/")
         } catch (error) {
             console.log(`Could not login ${error}`);
+            const message = error.response?.data?.message || error.response?.data?.error || "Unknown Error";
+            alert(JSON.stringify(message))
         } finally {
             setLoading(false);
         }
@@ -69,6 +64,7 @@ export default function Login() {
                             />
                             <input
                                 type="email"
+                                required
                                 placeholder="Your Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -83,6 +79,7 @@ export default function Login() {
                             />
                             <input
                                 type={passwordType}
+                                required
                                 placeholder="Your Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}

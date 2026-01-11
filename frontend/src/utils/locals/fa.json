@@ -3,8 +3,43 @@
   "DASHBOARD": "داشبورد",
   "Habits": "عادت ها",
   "Tasks": "عملیات",
+  "Today": "امروز",
   "Statistics": "احتمالات",
   "Preferences": "ترجیحات",
   "Settings": "تنظیمات",
-  "View Profile": "دیدن پروفایل"
+  "View Profile": "دیدن پروفایل",
+
+  "Manage your account settings and preferences": "تنظیمات و ترجیحات حساب کاربری خود را مدیریت کنید",
+  "Profile Settings": "تنظیمات پروفایل",
+  "CHANGE PHOTO": "تغییر عکس",
+  "Display Name": "نام نمایشی",
+  "Email Address": "آدرس ایمیل",
+  "Change Password": "تغییر رمز عبور",
+
+  "General Preferences": "ترجیحات عمومی",
+  "Appearance": "ظاهر",
+  "Select your preferred theme": "تم مورد نظر خود را انتخاب کنید",
+  "Light Mode": "حالت روشن",
+  "Dark Mode": "حالت تاریک",
+
+  "Start Week On": "شروع هفته",
+  "Choose the first day of your week": "اولین روز هفته را انتخاب کنید",
+
+  "Saturday": "شنبه",
+  "Sunday": "یکشنبه",
+  "Monday": "دوشنبه",
+  "Tuesday": "سه‌شنبه",
+  "Wednesday": "چهارشنبه",
+  "Thursday": "پنجشنبه",
+  "Friday": "جمعه",
+
+  "Notifications": "اعلان‌ها",
+  "Daily Reminder": "یادآوری روزانه",
+  "Set a time to be reminded of your habits": "زمانی را برای یادآوری عادت‌های خود تنظیم کنید",
+  "Streak Alerts": "هشدارهای تداوم",
+  "Get notified when your streak is at risk": "هنگامی که تداوم شما در خطر است اطلاع داده شود",
+  "Weekly Summary Email": "ایمیل خلاصه هفتگی",
+  "Receive a weekly report of your progress": "گزارش هفتگی پیشرفت خود را دریافت کنید"
+
+
 }
