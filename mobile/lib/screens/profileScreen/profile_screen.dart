@@ -12,23 +12,12 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: AppTheme.background,
-        elevation: 0,
-        foregroundColor: AppTheme.textPrimary,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.edit_outlined),
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
             // Profile Picture with edit option
+            SizedBox(height: 25),
             Stack(
               children: [
                 CircleAvatar(

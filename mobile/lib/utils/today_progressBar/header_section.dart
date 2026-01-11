@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../app/app_theme.dart';
 
@@ -13,7 +14,7 @@ class SectionHeader extends StatelessWidget {
     return Row(
       children: [
         icon,
-        const SizedBox(width: 8),
+         SizedBox(width: 8.w),
         Text(
           title,
           style: const TextStyle(

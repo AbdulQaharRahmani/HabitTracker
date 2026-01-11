@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/utils/today_progressBar/task_item.dart';
 import '../../app/app_theme.dart';
 
@@ -18,16 +19,16 @@ class TaskCard extends StatelessWidget {
         taskCategoryMap[item.category] ?? taskCategoryMap['Other']!;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      margin: EdgeInsets.symmetric(vertical: 6.h),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: AppTheme.textWhite,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
@@ -35,8 +36,8 @@ class TaskCard extends StatelessWidget {
         children: [
           // ===== Task Icon =====
           Container(
-            width: 42,
-            height: 42,
+            width: 42.w,
+            height: 42.w,
             decoration: BoxDecoration(
               color: categoryConfig.color.withOpacity(0.15),
               shape: BoxShape.circle,
@@ -44,11 +45,11 @@ class TaskCard extends StatelessWidget {
             child: Icon(
               categoryConfig.icon,
               color: categoryConfig.color,
-              size: 22,
+              size: 22.sp,
             ),
           ),
 
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
 
           // ===== Task Info =====
           Expanded(
@@ -59,7 +60,7 @@ class TaskCard extends StatelessWidget {
                   item.title,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     color: item.done
                         ? AppTheme.textMuted
                         : AppTheme.textPrimary,
@@ -68,31 +69,36 @@ class TaskCard extends StatelessWidget {
                         : TextDecoration.none,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6.h),
                 Row(
                   children: [
-                    Icon(Icons.access_time,
-                        size: 14, color: AppTheme.textMuted),
-                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.access_time,
+                      size: 14.sp,
+                      color: AppTheme.textMuted,
+                    ),
+                    SizedBox(width: 4.w),
                     Text(
                       item.time,
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: TextStyle(
+                        fontSize: 12.sp,
                         color: AppTheme.textMuted,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10.w),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 3.h,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.surface,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
                         item.category,
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: TextStyle(
+                          fontSize: 11.sp,
                           color: AppTheme.textMuted,
                         ),
                       ),
@@ -103,26 +109,28 @@ class TaskCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 10),
+          SizedBox(width: 10.w),
 
           // ===== Done Checkbox =====
           GestureDetector(
             onTap: () => onToggleDone(!item.done),
             child: Container(
-              width: 36,
-              height: 36,
+              width: 36.w,
+              height: 36.w,
               decoration: BoxDecoration(
-                color:
-                item.done ? AppTheme.primary : AppTheme.background,
+                color: item.done
+                    ? AppTheme.primary
+                    : AppTheme.background,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 item.done
                     ? Icons.check
                     : Icons.radio_button_unchecked,
-                color:
-                item.done ? Colors.white : AppTheme.textMuted,
-                size: 20,
+                color: item.done
+                    ? Colors.white
+                    : AppTheme.textMuted,
+                size: 20.sp,
               ),
             ),
           ),

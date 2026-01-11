@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../app/app_theme.dart';
 
 class StatusCard extends StatelessWidget {
@@ -8,7 +8,8 @@ class StatusCard extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const StatusCard({super.key,
+  const StatusCard({
+    super.key,
     required this.color,
     required this.count,
     required this.title,
@@ -18,36 +19,40 @@ class StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: AppTheme.background,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 18,
+            radius: 18.r,
             backgroundColor: color.withOpacity(0.15),
             child: Text(
               count,
               style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
               ),
             ),
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: 6.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14.sp,
+                ),
               ),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  fontSize: 12,
+                style: TextStyle(
+                  fontSize: 12.sp,
                   color: AppTheme.textMuted,
                 ),
               ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/utils/today_progressBar/task.dart';
 import 'package:habit_tracker/utils/today_progressBar/task_item.dart';
 
 import 'daily_grid.dart';
+
 Widget dailySectionsList({
   required Map<String, List<TaskItem>> sections,
   required ValueChanged<TaskItem> onToggle,
@@ -23,19 +25,19 @@ Widget dailySectionsList({
         progress: total == 0 ? 0 : completed / total,
         streakDays: 5,
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: 16.h),
       ...sections.entries.map((entry) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               entry.key,
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             ...entry.value.map((task) {
               return TaskCard(
                 item: task,
@@ -45,7 +47,7 @@ Widget dailySectionsList({
                 },
               );
             }),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
           ],
         );
       }),
