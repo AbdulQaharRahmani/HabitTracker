@@ -14,6 +14,7 @@ class LoginCard extends StatefulWidget {
 
 class _LoginCardState extends State<LoginCard> {
   LoginController get controller => widget.controller;
+  bool _isPasswordHidden = true;
 
   @override
   Widget build(BuildContext context) {
@@ -82,12 +83,24 @@ class _LoginCardState extends State<LoginCard> {
               TextFormField(
                 controller: controller.passwordController,
                 validator: controller.passwordValidator,
-                obscureText: true,
+                obscureText: _isPasswordHidden,
                 style: TextStyle(fontSize: 14.sp),
                 decoration: InputDecoration(
                   hintText: '••••••••',
                   prefixIcon: Icon(Icons.lock_outline, size: 18.sp),
-                  suffixIcon: Icon(Icons.visibility_off, size: 18.sp),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordHidden
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      size: 18.sp,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordHidden = !_isPasswordHidden;
+                      });
+                    },
+                  ),
                   filled: true,
                   fillColor: AppTheme.inputBackground,
                   border: OutlineInputBorder(
@@ -103,19 +116,43 @@ class _LoginCardState extends State<LoginCard> {
                 width: double.infinity,
                 height: 48.h,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRoutes.home);
-                  },
+                  onPressed: controller.isLoading
+                      ? null
+                      : () async {
+                          final success = await controller.login();
+
+                          if (!context.mounted) return;
+
+                          if (success) {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              AppRoutes.home,
+                            );
+                          } else if (controller.errorMessage != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(controller.errorMessage!)),
+                            );
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14.r),
                     ),
                   ),
-                  child: Text(
-                    'Log In',
-                    style: TextStyle(color: AppTheme.textWhite),
-                  ),
+                  child: controller.isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          'Log In',
+                          style: TextStyle(color: AppTheme.textWhite),
+                        ),
                 ),
               ),
 
@@ -168,6 +205,7 @@ class _LoginCardState extends State<LoginCard> {
                 ),
               ),
               SizedBox(height: 14.h),
+
               /// Signup row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -180,10 +218,7 @@ class _LoginCardState extends State<LoginCard> {
                     onPressed: () {
                       Navigator.pushNamed(context, AppRoutes.signup);
                     },
-                    child: Text(
-                      'Sign up',
-                      style: TextStyle(fontSize: 12.sp),
-                    ),
+                    child: Text('Sign up', style: TextStyle(fontSize: 12.sp)),
                   ),
                 ],
               ),
