@@ -1,9 +1,12 @@
-import React from 'react'
 import Header from '../components/Header'
 import AddTask from '../components/AddTask'
 import TaskCard from '../components/TaskCard';
+import { useTaskCardStore } from "../store/useTaskCardStore";
+
 
 function Tasks () {
+  const tasks = useTaskCardStore((state) => state.tasks);
+  
   return (
     <div className="md:px-2 bg-gray-50 grid grid-cols gap-4">
       <div className="flex flex-rows justify-between my-2">
@@ -15,27 +18,10 @@ function Tasks () {
           <AddTask></AddTask>
         </span>
       </div>
-      <div className='grid gap-4'>
-        <TaskCard
-          title={"Complete project proposal"}
-          deadline={"Yesterday"}
-          category={"Work"}
-        />
-        <TaskCard
-          title={"Buy groceries for the week"}
-          deadline={"Today"}
-          category={"Personal"}
-        />
-        <TaskCard
-          title={"Schedule dentist appoinment"}
-          deadline={"Tomorrow"}
-          category={"Health"}
-        />
-        <TaskCard
-          title={"Call Mom"}
-          deadline={"No date"}
-          category={"Family"}
-        />
+      <div className="grid gap-4">
+        {tasks.map((task) => (
+          <TaskCard key={task.id} {...task} />
+        ))}
       </div>
     </div>
   );
