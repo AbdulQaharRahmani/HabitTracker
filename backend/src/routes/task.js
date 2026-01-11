@@ -4,6 +4,7 @@ import {
   createTask,
   filterTasks,
   toggleTaskStatus,
+  deleteTask,
   updateTask,
 } from '../controllers/taskController.js';
 import {
@@ -24,6 +25,7 @@ router.get(
   asyncHandler(filterTasks)
 );
 router.route('/').post(createTaskValidator, validate, asyncHandler(createTask));
+router.route('/:id').delete(IdValidator, validate, asyncHandler(deleteTask));
 router
   .route('/:id')
   .put(IdValidator, updateTaskValidator, validate, asyncHandler(updateTask));
