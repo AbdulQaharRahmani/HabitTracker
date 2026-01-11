@@ -85,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       icon: 'assets/icons/google-icon.png',
                     ),
                     SizedBox(width: 12.w),
-                    socialButton(label: 'Apple', icon: 'assets/apple-logo.png'),
+                    socialButton(label: 'Apple', icon: 'assets/icons/apple-logo.png'),
                   ],
                 ),
               ),
