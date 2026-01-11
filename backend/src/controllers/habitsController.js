@@ -3,8 +3,8 @@ import { AppError, notFound } from '../utils/error.js';
 import { HabitModel } from '../models/Habit.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 import { DateHelper } from '../utils/date.js';
-import { HabitCompletionModel } from '../models/HabitCompletion.js';
 import { CategoryModel } from '../models/Category.js';
+import { HabitCompletionModel } from '../models/habitCompletion.js';
 
 // Get all user habits
 export const getHabits = async (req, res) => {
