@@ -85,8 +85,11 @@ export const updateUsername = async (req, res) => {
 
   if (!username) throw new AppError('Please provide username', 400);
 
-  const isExistUsername = await UserModel.exists({ username });
-  if (isExistUsername) throw new AppError('User already exist', 409);
+  // check if username already exists for another user
+  const existingUser = await UserModel.findOne({ username });
+
+  if (existingUser && existingUser._id.toString() !== req.user._id.toString())
+    throw new AppError('User already exist with same username', 409);
 
   const user = await UserModel.findByIdAndUpdate(
     req.user._id,
@@ -101,6 +104,6 @@ export const updateUsername = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: 'Username updated',
+    message: 'Username updated successfully',
   });
 };
