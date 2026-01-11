@@ -19,9 +19,9 @@ const CardComponent = ({
         </div>
         <button
           onClick={onToggleComplete}
-          className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+          className={`w-6 h-6 rounded-[10px] flex items-center justify-center border-2 ${
             completed
-              ? 'bg-blue-500 border-blue-500'
+              ? 'bg-indigo-500 border-indigo-500'
               : 'bg-white border-gray-300'
           }`}
         >
