@@ -77,3 +77,30 @@ export const changePassword = async (req, res) => {
     .status(200)
     .json({ success: true, message: 'Password changed successfully' });
 };
+
+export const updateUsername = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized.', 401);
+
+  const { username } = req.body;
+
+  if (!username) throw new AppError('Please provide username', 400);
+
+  const isExistUsername = await UserModel.exists({ username });
+  if (isExistUsername) throw new AppError('User already exist', 409);
+
+  const user = await UserModel.findByIdAndUpdate(
+    req.user._id,
+    { username },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!user) throw notFound('User');
+
+  res.status(200).json({
+    success: true,
+    message: 'Username updated',
+  });
+};
