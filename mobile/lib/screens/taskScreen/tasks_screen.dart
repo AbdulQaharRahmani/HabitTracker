@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
 import 'package:habit_tracker/utils/tasks_page_component/tasks_card.dart';
+import '../../services/taskPageAPI/task_api.dart';
 import '../../utils/tasks_page_component/habit.dart';
 
 class TasksScreen extends StatefulWidget {
@@ -12,6 +14,13 @@ class TasksScreen extends StatefulWidget {
 class _TasksScreenState extends State<TasksScreen> {
   double avatarRadius = 10;
   double statusRadius = 5;
+  final TaskApiService _apiService = TaskApiService();
+  late Future<List<Habit>> _tasksFuture;
+  @override
+  void initState() {
+    super.initState();
+    _tasksFuture = _apiService.fetchTasks();
+  }
 
   late final Habit habit;
   @override
@@ -129,7 +138,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       ),
                     ),
                     onPressed: () {
-                      // TODO : action
+                      Navigator.push(context, MaterialPageRoute(builder: (_)=>NewTaskPage()));
                     },
 
                     child: Row(
@@ -209,7 +218,24 @@ class _TasksScreenState extends State<TasksScreen> {
             // ====== list to show habits card ======
             const SizedBox(height: 10),
             // ====== Tasks card ======
-            TasksCard(),
+            FutureBuilder<List<Habit>>(
+              future: _tasksFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text(snapshot.error.toString()));
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No tasks available'));
+                }
+
+                return TasksCard(habits: snapshot.data!);
+              },
+            ),
           ],
         ),
       ),
