@@ -3,14 +3,7 @@ import { UserModel } from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { OAuth2Client } from 'google-auth-library';
-
-//Create a Google OAuth2 client for login, token exchange, and verify the user's ID token
-const client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.REDIRECT_URI
-);
+import { client } from '../utils/googleOAuth.js';
 
 export const registerUser = async (req, res) => {
   const { email, password } = req.body;
@@ -95,9 +88,9 @@ export const handleGoogleCallback = async (req, res) => {
   const googleUserinfo = ticket.getPayload();
 
   //Check user by googleId or email
-  let user =
-    (await UserModel.findOne({ googleId: googleUserinfo.sub })) ||
-    (await UserModel.findOne({ email: googleUserinfo.email }));
+  let user = await UserModel.findOne({
+    $or: [{ googleId: googleUserinfo.sub }, { email: googleUserinfo.email }],
+  });
 
   if (!user) {
     //To prevent error assign a randome password for the user
@@ -109,23 +102,9 @@ export const handleGoogleCallback = async (req, res) => {
       profilePicture: googleUserinfo.picture,
       password: randomPassword,
     });
-    const token = jwt.sign(
-      { id: newUser._id, email: newUser.email },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
-
-    return res.status(200).json({
-      success: true,
-      message: 'User registered and login via Google',
-      data: {
-        token,
-        id: newUser._id,
-        email: newUser.email,
-      },
-    });
+    user = newUser;
   }
-  
+
   if (!user.googleId) {
     user.googleId = googleUserinfo.sub;
     await user.save();
