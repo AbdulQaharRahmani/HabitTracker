@@ -103,6 +103,7 @@ export const updateUserPreference = async (req, res) => {
     timezone: true,
     streakAlertEnabled: true,
     weeklySummaryEmailEnabled: true,
+    theme: true,
   };
 
   const updateQuery = {};

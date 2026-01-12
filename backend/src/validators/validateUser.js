@@ -72,6 +72,12 @@ export const updateUserPreferenceValidator = [
     .toLowerCase()
     .isIn([...Object.keys(DateHelper.TIMEZONES)])
     .withMessage('Invalid Timezone'),
+  body('theme')
+    .optional()
+    .trim()
+    .toLowerCase()
+    .isIn(['light', 'dark', 'system'])
+    .withMessage('Invalid Theme'),
 
   body('dailyReminderEnabled')
     .optional()

@@ -35,6 +35,11 @@ const preferenceSchema = new mongoose.Schema(
       type: String,
       default: 'Asia/Kabul',
     },
+    theme: {
+      type: String,
+      enum: ['light', 'dark', 'system'],
+      default: 'light',
+    },
     streakAlertEnabled: {
       type: Boolean,
       default: false,
