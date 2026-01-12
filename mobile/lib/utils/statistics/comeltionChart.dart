@@ -4,10 +4,29 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 
 class CompletionChart extends StatelessWidget {
-  const CompletionChart({super.key});
+  /// Completion percentages for last 30 days (0 - 100)
+  final List<double> values;
+
+  /// Labels (e.g dates)
+  final List<String> labels;
+
+  const CompletionChart({
+    super.key,
+    required this.values,
+    required this.labels,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (values.isEmpty || labels.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final double growth =
+    ((values.last - values.first).toDouble());
+
+    final bool isPositive = growth >= 0;
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -29,28 +48,31 @@ class CompletionChart extends StatelessWidget {
               Text(
                 'Completion Trend',
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
                   fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               const Spacer(),
 
-              /// +12% badge
+              /// Growth badge
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: 10.w,
                   vertical: 4.h,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.successBackground,
+                  color: isPositive
+                      ? AppTheme.successBackground
+                      : Colors.red,
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
-                  '+12%',
+                  '${isPositive ? '+' : ''}${growth.toStringAsFixed(1)}%',
                   style: TextStyle(
-                    color: AppTheme.success,
-                    fontWeight: FontWeight.w600,
+                    color:
+                    isPositive ? AppTheme.success : AppTheme.error,
                     fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -58,40 +80,16 @@ class CompletionChart extends StatelessWidget {
           ),
 
           SizedBox(height: 4.h),
+
           Text(
-            'Consistency over last 30 days',
+            'User activity over last 30 days',
             style: TextStyle(
               fontSize: 12.sp,
-              color: Colors.black54,
+              color: AppTheme.textMuted,
             ),
           ),
 
-          SizedBox(height: 16.h),
-
-          /// ===== 98% Badge =====
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 8.w,
-                vertical: 4.h,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Text(
-                '98%',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(height: 8.h),
+          SizedBox(height: 20.h),
 
           /// ===== Chart =====
           SizedBox(
@@ -100,86 +98,62 @@ class CompletionChart extends StatelessWidget {
               LineChartData(
                 minY: 0,
                 maxY: 100,
+                minX: 0,
+                maxX: values.length - 1,
 
                 gridData: FlGridData(show: false),
                 borderData: FlBorderData(show: false),
 
-                /// ===== Bottom labels =====
+                /// ===== Axis =====
                 titlesData: FlTitlesData(
-                  leftTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       interval: 1,
                       getTitlesWidget: (value, _) {
-                        switch (value.toInt()) {
-                          case 0:
-                            return _bottomText('Nov 1');
-                          case 1:
-                            return _bottomText('Nov 8');
-                          case 2:
-                            return _bottomText('Nov 15');
-                          case 3:
-                            return _bottomText('Nov 22');
-                          case 6:
-                            return _bottomText(
-                              'TODAY',
-                              color: AppTheme.chartLine,
-                              isBold: true,
-                            );
-                          default:
-                            return const SizedBox.shrink();
+                        final index = value.toInt();
+                        if (index < 0 || index >= labels.length) {
+                          return const SizedBox.shrink();
                         }
+
+                        final bool isToday =
+                            index == labels.length - 1;
+
+                        return Padding(
+                          padding: EdgeInsets.only(top: 8.h),
+                          child: Text(
+                            labels[index],
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              fontWeight:
+                              isToday ? FontWeight.w600 : null,
+                              color: isToday
+                                  ? AppTheme.chartLine
+                                  : AppTheme.textMuted,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),
                 ),
 
-                /// ===== Touch / Tooltip =====
-                lineTouchData: LineTouchData(
-                  handleBuiltInTouches: true,
-                  touchTooltipData: LineTouchTooltipData(
-                    tooltipBgColor: Colors.grey.shade900,
-                    tooltipRoundedRadius: 8.r,
-                    getTooltipItems: (spots) {
-                      return spots.map((spot) {
-                        return LineTooltipItem(
-                          '${spot.y.toInt()}%',
-                          TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12.sp,
-                          ),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ),
-
+                /// ===== Line =====
                 lineBarsData: [
                   LineChartBarData(
                     isCurved: true,
-                    barWidth: 4.w,
+                    barWidth: 3,
                     color: AppTheme.chartLine,
-
-                    /// last dot
-                    dotData: FlDotData(
-                      show: true,
-                      checkToShowDot: (spot, _) => spot.x == 6,
-                      getDotPainter: (spot, percent, bar, index) =>
-                          FlDotCirclePainter(
-                            radius: 5.r,
-                            color: AppTheme.chartLine,
-                            strokeWidth: 2.w,
-                            strokeColor: Colors.white,
-                          ),
-                    ),
-
+                    dotData: FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: const LinearGradient(
@@ -191,40 +165,42 @@ class CompletionChart extends StatelessWidget {
                         end: Alignment.bottomCenter,
                       ),
                     ),
-
-                    spots: const [
-                      FlSpot(0, 40),
-                      FlSpot(1, 60),
-                      FlSpot(2, 55),
-                      FlSpot(3, 75),
-                      FlSpot(4, 65),
-                      FlSpot(5, 85),
-                      FlSpot(6, 98),
-                    ],
+                    spots: List.generate(
+                      values.length,
+                          (i) => FlSpot(
+                        i.toDouble(),
+                        values[i],
+                      ),
+                    ),
                   ),
                 ],
+
+                /// ===== Tooltip =====
+                lineTouchData: LineTouchData(
+                  handleBuiltInTouches: true,
+                  touchTooltipData: LineTouchTooltipData(
+                    tooltipBgColor: Colors.black87,
+                    tooltipRoundedRadius: 8.r,
+                    getTooltipItems: (spots) {
+                      return spots.map(
+                            (spot) {
+                          return LineTooltipItem(
+                            '${spot.y.toInt()}%',
+                            TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          );
+                        },
+                      ).toList();
+                    },
+                  ),
+                ),
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _bottomText(
-      String text, {
-        Color color = AppTheme.textPrimary,
-        bool isBold = false,
-      }) {
-    return Padding(
-      padding: EdgeInsets.only(top: 8.h),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 11.sp,
-          color: color,
-          fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
-        ),
       ),
     );
   }
