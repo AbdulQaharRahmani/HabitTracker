@@ -39,7 +39,21 @@
   "Streak Alerts": "هشدارهای تداوم",
   "Get notified when your streak is at risk": "هنگامی که تداوم شما در خطر است اطلاع داده شود",
   "Weekly Summary Email": "ایمیل خلاصه هفتگی",
-  "Receive a weekly report of your progress": "گزارش هفتگی پیشرفت خود را دریافت کنید"
+  "Receive a weekly report of your progress": "گزارش هفتگی پیشرفت خود را دریافت کنید",
 
-
+  "New Task": "عملیات جدید",
+  "Manage your daily goals and todos.": "اهداف و کار های روزانه خود را مدیریت کنید.",
+  "Due": "موعد",
+  "Work": "کار",
+  "Personal": "شخصی",
+  "Exercise": "ورزش",
+  "Health": "صحتمندی",
+  "Family": "خانواده",
+  "Complete project proposal": "تکمیل کردن پروپوزال پروژه",
+  "Buy groceries for the week": " خریداری لوازم خانه این هفته",
+  "Schedule dentist appointment": "وقت داکتر دندان گرفتن",
+  "Call Mom": "زنگ زدن به مادر",
+  "Yesterday": "دیروز",
+  "Tomorrow": "فردا",
+  "No date": "تاریخ نامشخص"
 }
