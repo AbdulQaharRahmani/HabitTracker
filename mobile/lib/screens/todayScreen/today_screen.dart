@@ -118,16 +118,12 @@ class _TodayScreenState extends State<TodayScreen> {
                   setState(() => selectedDate = date);
                 },
               ),
-              // const SizedBox(height: 12),
-              // if we need categories we can add
-              // categories(),
               const SizedBox(height: 16),
               dailyGoalCard(
                 completed: completedTasks,
                 total: totalTasks,
                 progress: totalTasks == 0 ? 0 : completedTasks / totalTasks,
                 streakDays: 12,
-                //  Replace with backend value
               ),
               const SizedBox(height: 16),
               Expanded(

@@ -4,7 +4,6 @@ import CustomDatePicker from "./CustomDatePicker";
 
 function Today() {
   const [startDate, setStartDate] = useState(new Date());
-
   return (
     <div className="p-8 bg-[#F8F9FD] min-h-screen">
       <div className="mb-8 flex justify-between items-start">
@@ -25,7 +24,7 @@ function Today() {
           <div className=" rounded-[32px] p-6 shadow-sm border border-gray-50">
              <CustomDatePicker selectedDate={startDate} onChange={setStartDate} />
           </div>
-          <div>progress bar</div>
+          <div> <CircularProgress percent={75} /></div>
         </div>
 
       </div>
