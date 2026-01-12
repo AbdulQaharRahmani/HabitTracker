@@ -1,45 +1,33 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react';
 import TodayCard from './TodayCard';
 import useHabitStore from '../store/useHabitStore';
 
 const TodayList = () => {
-  const { habits: initialHabits, loading, error, fetchTodayHabits } = useHabitStore();
-  const [localHabits, setLocalHabits] = useState([]);
+  const { habits, loading, error, fetchTodayHabits, toggleHabit } = useHabitStore();
 
   useEffect(() => {
     fetchTodayHabits();
-  }, []);
+  }, [fetchTodayHabits]);
 
-  useEffect(() => {
-    if (initialHabits.length > 0) {
-      setLocalHabits(initialHabits);
-    }
-  }, [initialHabits]);
-
-  const handleToggleComplete = (id) => {
-    setLocalHabits(localHabits.map(habit =>
-      habit._id === id ? { ...habit, completed: !habit.completed } : habit
-    ));
-  };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <div className="p-10 text-center">Loading habits...</div>;
+  if (error) return <div className="p-10 text-red-500 text-center">{error}</div>;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 lg:m-0 sm:grid-cols-2 md:grid-cols-1 md:ml-12 gap-6 justify-items-start">
-      {localHabits.map((habit) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {habits.map((habit) => (
         <TodayCard
           key={habit._id}
-          id={habit._id}
           title={habit.title}
           description={habit.description}
-          category={habit.category?.icon}
+          categoryIcon={habit.category?.icon || "✨"}
+          color={habit.category?.backgroundColor || "blue"}
           completed={habit.completed}
-          onToggleComplete={() => handleToggleComplete(habit._id)}
+          onToggleComplete={() => toggleHabit(habit._id)}
+          progress={habit.completed ? 100 : 0}
         />
       ))}
     </div>
-  )
-}
+  );
+};
 
 export default TodayList;

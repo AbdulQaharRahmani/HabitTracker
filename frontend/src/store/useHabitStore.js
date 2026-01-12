@@ -7,7 +7,6 @@ const useHabitStore = create((set) => ({
   error: null,
   fetchTodayHabits: async () => {
     set({ loading: true, error: null });
-
     try {
         const habits = await getTodayHabits();
       set({ habits, loading: false });
@@ -18,6 +17,13 @@ const useHabitStore = create((set) => ({
       });
     }
   },
+  toggleHabit: (id) => {
+    set((state) => ({
+      habits: state.habits.map((habit) =>
+        habit._id === id ? { ...habit, completed: !habit.completed } : habit
+      ),
+    }));
+    },
 }));
 
 export default useHabitStore;
