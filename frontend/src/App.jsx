@@ -14,9 +14,30 @@ import Today from "./pages/Today";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LanguageSwitcher from "./components/internationalization";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
+    <>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={20}
+        containerClassName="z-[9999]"
+        toastOptions={{
+          duration: 5000,
+          className: "bg-gray-800 text-white rounded-lg shadow",
+          success: {
+            className: "bg-green-600 text-white",
+          },
+          error: {
+            className: "bg-red-600 text-white",
+          },
+          loading: {
+            className: "bg-blue-600 text-white",
+          },
+        }}
+      />
     <Router>
       <LanguageSwitcher />
       <Routes>
@@ -38,6 +59,7 @@ function App() {
         <Route path="*" element={<>not found</>} />
       </Routes>
     </Router>
+          </>
   );
 }
 
