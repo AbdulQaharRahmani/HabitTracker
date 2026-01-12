@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../services/api.js";
+import { registerUser } from "../server/auth.api";
 
 import { CiUser } from "react-icons/ci";
 import { AiOutlineMail } from "react-icons/ai";
@@ -25,39 +25,24 @@ function SignUp() {
   const signupUserHandler = async (e) => {
     e.preventDefault();
 
+    if (loading) return;
     setMessage(null);
-
     if (!formValidation()) return;
-
     setLoading(true);
-
     try {
-      const res = await api.post("/auth/register", {
+      const res = await registerUser({
         fullName: fullName.trim(),
         email: email.trim(),
         password: password.trim(),
       });
 
-      setMessage({ text: res.data.message, type: "success" });
-
-      if (res.data.token) localStorage.setItem("token", res.data.token);
-
+      setMessage({ text: res.message, type: "success" });
+      if (res.token) localStorage.setItem("token", res.token);
       resetHandler();
-
-      setTimeout(() => {
-        navigate("/");
-      }, 500);
+      setTimeout(() => navigate("/"), 500);
     } catch (err) {
-      console.log(err?.response?.data || err.message);
-
-      const errMsg =
-        err?.response?.data?.message ??
-        err?.response?.data?.error ??
-        err.message;
-      ("Something went wrong!!");
-
       setMessage({
-        text: errMsg,
+        text: err.message,
         type: "error",
       });
     } finally {
@@ -68,11 +53,9 @@ function SignUp() {
   const formValidation = () => {
     let tempErrors = {};
     let isValid = true;
-
     const fullNameTrmd = fullName.trim();
     const emailTrmd = email.trim();
     const passwordTrmd = password.trim();
-
     if (!fullNameTrmd) {
       tempErrors.fullName = "Full Name is required";
       isValid = false;
@@ -84,7 +67,6 @@ function SignUp() {
       tempErrors.email = "Email is invalid";
       isValid = false;
     }
-
     if (!passwordTrmd) {
       tempErrors.password = "Password is required";
       isValid = false;
@@ -92,14 +74,11 @@ function SignUp() {
       tempErrors.password = "Password must be at least 6 characters";
       isValid = false;
     }
-
     if (!checked) {
       tempErrors.terms = "You must accept terms";
       isValid = false;
     }
-
     setErrors(tempErrors);
-
     return isValid;
   };
 
