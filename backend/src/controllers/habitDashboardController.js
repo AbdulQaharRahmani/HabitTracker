@@ -34,22 +34,26 @@ export const getHabitsDashboard = async (req, res) => {
 
   const habitsCompleted = await HabitCompletionModel.aggregate([
     {
-      // Select only this user's completions for the current week
+      // Only this user's completions in the current week
       $match: {
         userId: req.user._id,
         date: { $gte: startOfWeek, $lte: endOfWeek },
       },
     },
     {
+      // One document per unique habit
       $group: {
-        _id: '$habitId', // Group by each habit → one group per habit
-        totalDone: { $sum: 1 }, // Count how many times this habit was completed in the week
+        _id: '$habitId',
       },
+    },
+    {
+      // Count how many unique habits exist
+      $count: 'totalDone',
     },
   ]);
 
-  const completedHabits = habitsCompleted[0].totalDone || 0;
-  // console.log(habitsCompleted[0]); // [ { _id: new ObjectId('695d3d61ba36511e5173f767'), totalDone: 1 } ]
+  const completedHabits = habitsCompleted[0]?.totalDone || 0;
+  console.log(habitsCompleted); // [ { totalDone: 1 } ]
 
   const completionRate = totalHabits
     ? Math.floor((completedHabits / totalHabits) * 100)
