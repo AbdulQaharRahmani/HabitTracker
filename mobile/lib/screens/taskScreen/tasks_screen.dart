@@ -5,7 +5,9 @@ import '../../services/taskPageAPI/task_api.dart';
 import '../../utils/tasks_page_component/habit.dart';
 
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key});
+  final String token;
+
+  const TasksScreen({super.key, required this.token});
 
   @override
   State<TasksScreen> createState() => _TasksScreenState();
@@ -16,13 +18,14 @@ class _TasksScreenState extends State<TasksScreen> {
   double statusRadius = 5;
   final TaskApiService _apiService = TaskApiService();
   late Future<List<Habit>> _tasksFuture;
+
   @override
   void initState() {
     super.initState();
-    _tasksFuture = _apiService.fetchTasks();
+    // ⚡ fetchTasks with the token
+    _tasksFuture = _apiService.fetchTasks(widget.token);
   }
 
-  late final Habit habit;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +38,7 @@ class _TasksScreenState extends State<TasksScreen> {
               padding: const EdgeInsets.only(left: 5, top: 6),
               child: Stack(
                 children: [
+                  // ====== User Avatar ======
                   Container(
                     height: 50,
                     width: 50,
@@ -47,6 +51,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       backgroundImage: AssetImage('assets/images/image.png'),
                     ),
                   ),
+                  // ====== Online Status Dot ======
                   Positioned(
                     bottom: 3,
                     right: 2,
@@ -64,17 +69,17 @@ class _TasksScreenState extends State<TasksScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            // ====== Text for uer name ======
+            // ====== Name and Profile ======
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(padding: EdgeInsetsGeometry.only(top: 15)),
+                Padding(padding: EdgeInsets.only(top: 15)),
                 Text(
                   'Ahmad Amiri',
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'Veiw Profile',
+                  'View Profile',
                   style: TextStyle(fontSize: 13, color: Colors.blue),
                 ),
               ],
@@ -93,7 +98,7 @@ class _TasksScreenState extends State<TasksScreen> {
               ),
               child: IconButton(
                 onPressed: () {
-                  // TODO: action
+                  // TODO: notification action
                 },
                 icon: Icon(
                   Icons.notifications_active_rounded,
@@ -106,13 +111,13 @@ class _TasksScreenState extends State<TasksScreen> {
         ],
       ),
 
-      // ====== The body of screen ======
+      // ====== Body ======
       body: SingleChildScrollView(
         padding: EdgeInsets.only(top: 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //  ====== Row for all tasks ======
+            // ====== Row: Title + New Task Button ======
             Container(
               padding: EdgeInsets.symmetric(horizontal: 30),
               child: Row(
@@ -138,9 +143,9 @@ class _TasksScreenState extends State<TasksScreen> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_)=>NewTaskPage()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => NewTaskPage()));
                     },
-
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -156,7 +161,7 @@ class _TasksScreenState extends State<TasksScreen> {
 
             const SizedBox(height: 5),
 
-            //  ======= search box  =======
+            // ====== Search Box ======
             Container(
               height: 44,
               margin: EdgeInsets.symmetric(horizontal: 30),
@@ -179,8 +184,9 @@ class _TasksScreenState extends State<TasksScreen> {
               ),
             ),
 
-            // ====== Row for to do and active ======
             const SizedBox(height: 10),
+
+            // ====== Row: To Do & Active Tasks ======
             Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -194,7 +200,6 @@ class _TasksScreenState extends State<TasksScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 25),
-
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                     height: 25,
@@ -215,9 +220,9 @@ class _TasksScreenState extends State<TasksScreen> {
               ],
             ),
 
-            // ====== list to show habits card ======
             const SizedBox(height: 10),
-            // ====== Tasks card ======
+
+            // ====== FutureBuilder to load Tasks ======
             FutureBuilder<List<Habit>>(
               future: _tasksFuture,
               builder: (context, snapshot) {
@@ -233,6 +238,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   return const Center(child: Text('No tasks available'));
                 }
 
+                // ====== Display TasksCard ======
                 return TasksCard(habits: snapshot.data!);
               },
             ),

@@ -28,14 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return const [
       TodayScreen(),
       HabitsScreen(),
-      TasksScreen(),
+      TasksScreen(
+        token:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NWJmNzdlYjEzZjMwNjgyMDg1OGI5NCIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3NjgxMTgwMzUsImV4cCI6MTc2ODIwNDQzNX0.5wFURarfZvj-pw7eBq3FOdxeedL8fUmhzaI6qCVIxwQ",
+      ),
       StatisticsScreen(),
-      SettingScreen()
+      SettingScreen(),
     ];
   }
 
   List<PersistentBottomNavBarItem> _navBarsItems() {
-
     return [
       PersistentBottomNavBarItem(
         icon: Icon(Iconsax.calendar_1),
@@ -72,7 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PersistentTabView(padding: EdgeInsets.only(top: 8,bottom: 4),
+    return PersistentTabView(
+      padding: EdgeInsets.only(top: 8, bottom: 4),
       context,
       controller: _controller,
       screens: _buildScreens(),
@@ -83,9 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
       handleAndroidBackButtonPress: true,
       stateManagement: true,
 
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(0),
-      ),
+      decoration: NavBarDecoration(borderRadius: BorderRadius.circular(0)),
     );
   }
 }
