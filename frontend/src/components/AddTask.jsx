@@ -1,6 +1,10 @@
 import { GrAdd } from "react-icons/gr";
+import { useTranslation } from "react-i18next";
+import i18n from "../utils/i18n";
 
 export default function AddTask () {
+  const { t } = useTranslation(); 
+
   return (
     <div>
       <button
@@ -10,7 +14,7 @@ export default function AddTask () {
         <span className="mx-2 font-normal">
           <GrAdd size={14} />
         </span>
-        <span>New Task</span>
+        <span>{t("New Task")}</span>
       </button>
     </div>
   );
