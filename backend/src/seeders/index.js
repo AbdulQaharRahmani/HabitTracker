@@ -306,7 +306,7 @@ const seed = async () => {
       description: 'Trip to canada',
       status: 'todo',
       priority: 'low',
-      dueDate: new Date(Date.now() + 7*SECONDS_IN_ONE_DAY),
+      dueDate: new Date(Date.now() + 7 * SECONDS_IN_ONE_DAY),
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
