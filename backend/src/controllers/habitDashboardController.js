@@ -11,7 +11,8 @@ export const getHabitsDashboard = async (req, res) => {
 
   // 2) Current Streak
   let currentStreak = 0;
-  let currentDay = dayjs();
+  let today = dayjs();
+  let currentDay = today.toDate();
 
   while (true) {
     const startOfDay = dayjs(currentDay).startOf('day').toDate();
@@ -29,8 +30,8 @@ export const getHabitsDashboard = async (req, res) => {
   }
 
   // 3) Completion Rate with aggregation for better
-  const startOfWeek = dayjs(currentDay).startOf('week').toDate();
-  const endOfWeek = dayjs(currentDay).endOf('week').toDate();
+  const startOfWeek = today.startOf('week').toDate();
+  const endOfWeek = today.endOf('week').toDate();
 
   const habitsCompleted = await HabitCompletionModel.aggregate([
     {
