@@ -78,12 +78,10 @@ export const updateUserPreferenceValidator = [
     .toLowerCase()
     .isIn(['light', 'dark', 'system'])
     .withMessage('Invalid Theme'),
-
   body('dailyReminderEnabled')
     .optional()
     .isBoolean()
     .withMessage('dailyReminderEnabled should be boolean'),
-  body('timezone').optional(),
   body('streakAlertEnabled')
     .optional()
     .isBoolean()
