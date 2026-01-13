@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { HiChevronDown, HiCheck } from "react-icons/hi";
+import useClickOutside from "../hooks/useClickOutside";
 
 export default function Dropdown({ items, value, getValue, placeholder }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false)
@@ -11,8 +12,9 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
         getValue(itemValue)
         setDropdownOpen(false)
     }
+    const dropdownRef = useClickOutside(()=> setDropdownOpen(false))
     return (<>
-        <div className="w-full relative">
+        <div className="w-full relative" ref={dropdownRef}>
             <div className="relative w-full">
                 <input
                     type="text"

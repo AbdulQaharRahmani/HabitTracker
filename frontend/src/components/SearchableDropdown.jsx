@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { HiChevronDown, HiCheck, HiPlus } from "react-icons/hi";
+import useClickOutside from "../hooks/useClickOutside";
 
 export default function SearchableDropdown({ items, value, getValue, onAdd, placeholder }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -23,9 +24,10 @@ export default function SearchableDropdown({ items, value, getValue, onAdd, plac
         setSearchTerm("");
         setDropdownOpen(false);
     };
+    const dropdownRef = useClickOutside(()=> setDropdownOpen(false))
 
     return (
-        <div className="w-full relative">
+        <div className="w-full relative" ref={dropdownRef}>
             <div className="relative w-full group">
                 <input
                     type="text"
