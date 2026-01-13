@@ -3,8 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   loginUser,
   registerUser,
-  redirectToGoogleAuth,
-  handleGoogleCallback,
+  googleLogin,
 } from '../controllers/authController.js';
 import {
   loginValidator,
@@ -23,7 +22,6 @@ router.post(
 router.post('/login', loginValidator, validate, asyncHandler(loginUser));
 
 //Google routes
-router.get('/google', asyncHandler(redirectToGoogleAuth));
-router.get('/google/callback', asyncHandler(handleGoogleCallback));
+router.post('/google', asyncHandler(googleLogin));
 
 export default router;

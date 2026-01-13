@@ -3,7 +3,7 @@ import { UserModel } from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { client } from '../utils/googleOAuth.js';
+import { verifyFrontendToken } from '../utils/googleOAuth.js';
 
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -58,36 +58,12 @@ export const loginUser = async (req, res) => {
   });
 };
 
-export const redirectToGoogleAuth = (req, res) => {
-  //Generate Google OAuth2 login URL for user authentication
-  const url = client.generateAuthUrl({
-    access_type: 'offline',
-    scope: ['openid', 'email', 'profile'],
-    prompt: 'consent',
-  });
+export const googleLogin = async (req, res) => {
+  const { id_token } = req.body;
+  if (!id_token) throw new AppError('Token missing', 400);
 
-  //return res.redirect(url)
-  res.status(200).json({
-    success: true,
-    message: 'click to the link for login via google',
-    data: url,
-  });
-};
-
-export const handleGoogleCallback = async (req, res) => {
-  const { code } = req.query;
-
-  //Exchange code for tokens
-  const { tokens } = await client.getToken(code);
-  client.setCredentials(tokens);
-
-  //Verify Google ID token securely
-  const ticket = await client.verifyIdToken({
-    idToken: tokens.id_token,
-    audience: process.env.GOOGLE_CLIENT_ID,
-  });
-
-  const googleUserinfo = ticket.getPayload();
+  const googleUserinfo = await verifyFrontendToken(id_token);
+  if (!googleUserinfo) throw new AppError('Invalid google token', 401);
 
   //Check user by googleId or email
   let user = await UserModel.findOne({
