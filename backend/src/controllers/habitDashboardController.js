@@ -1,6 +1,7 @@
 import { HabitModel } from '../models/Habit.js';
 import { HabitCompletionModel } from '../models/habitCompletion.js';
 import dayjs from 'dayjs';
+import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 
 export const getHabitsDashboard = async (req, res) => {
   // 1) Total Habits
@@ -35,30 +36,44 @@ export const getHabitsDashboard = async (req, res) => {
 
   const habitsCompleted = await HabitCompletionModel.aggregate([
     {
-      // Only this user's completions in the current week
       $match: {
         userId: req.user._id,
         date: { $gte: startOfWeek, $lte: endOfWeek },
       },
     },
     {
-      // One document per unique habit
-      $group: {
-        _id: '$habitId',
-      },
-    },
-    {
-      // Count how many unique habits exist
       $count: 'totalDone',
     },
   ]);
 
   const completedHabits = habitsCompleted[0]?.totalDone || 0;
-  console.log(habitsCompleted); // [ { totalDone: 1 } ]
 
-  const completionRate = totalHabits
-    ? Math.floor((completedHabits / totalHabits) * 100)
-    : 0;
+  //----------------------------
+
+  const isHabitForWeek = (habit) => {
+    const start = dayjs(startOfWeek);
+
+    for (let i = 0; i < 7; i++) {
+      if (isHabitForSelectedDay(habit, start.add(i, 'day'))) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const habits = await HabitModel.find({
+    userId: req.user._id,
+    isDeleted: false,
+  }).lean();
+
+  const habitsThisWeek = habits.filter(isHabitForWeek);
+  const totalHabitsWeek = habitsThisWeek.length;
+  console.log(totalHabitsWeek);
+
+  const completionRate =
+    totalHabitsWeek > 0
+      ? Math.floor((completedHabits / totalHabitsWeek) * 100)
+      : 0;
 
   res.status(200).json({
     success: true,
@@ -69,23 +84,3 @@ export const getHabitsDashboard = async (req, res) => {
     },
   });
 };
-
-// ---------------------------------
-
-// 3) Completion Rate without aggregation:
-
-// const startOfWeek = dayjs(currentDay).startOf('week').toDate();
-// const endOfWeek = dayjs(currentDay).endOf('week').toDate();
-
-// const habitsCompleted = await HabitCompletionModel.find({
-//   userId: req.user._id,
-//   date: { $gte: startOfWeek, $lte: endOfWeek },
-// });
-
-// const habitsCompletedIds = new Set(
-//   habitsCompleted.map((hab) => hab._id.toString())
-// );
-
-// const completionRate = totalHabits
-//    ? Math.floor((habitsCompletedIds.size / totalHabits) * 100)
-//   : 0;
