@@ -63,7 +63,11 @@ export const changePassword = async (req, res) => {
   const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
 
   if (!isPasswordMatch)
-    throw new AppError('Password is wrong', 400, ERROR_CODES.INVALIDCREDENTIAL);
+    throw new AppError(
+      'Password is wrong',
+      400,
+      ERROR_CODES.INVALID_CREDENTIAL
+    );
 
   const isPasswordSame = await bcrypt.compare(newPassword, user.password);
 
