@@ -44,7 +44,7 @@ export const loginUser = async (req, res) => {
     throw new AppError(
       'Incorrect Password',
       400,
-      ERROR_CODES.INVALIDCREDENTIAL
+      ERROR_CODES.INVALID_CREDENTIAL
     );
   }
 
