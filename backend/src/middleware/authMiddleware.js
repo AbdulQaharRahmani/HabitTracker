@@ -18,12 +18,20 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
   const token = authHeader.split(' ')[1];
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   if (!decoded.id) {
-    throw new AppError('Unauthorized: Invalid token payload', 401);
+    throw new AppError(
+      'Unauthorized: Invalid token payload',
+      401,
+      ERROR_CODES.INVALID_JWT
+    );
   }
 
   const user = await UserModel.findById(decoded.id);
   if (!user) {
-    throw new AppError('Unauthorized: User not found', 401);
+    throw new AppError(
+      'Unauthorized: User not found',
+      401,
+      ERROR_CODES.INVALID_JWT
+    );
   }
 
   const issueAt = decoded.iat * 1000; // convert iat from seconds to milliseconds
