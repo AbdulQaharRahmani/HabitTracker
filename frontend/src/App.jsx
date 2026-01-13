@@ -15,29 +15,30 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LanguageSwitcher from "./components/internationalization";
 import { Toaster } from "react-hot-toast";
+import "./styles/toast.css";
 
 function App() {
   return (
     <>
       <Toaster
-        position="top-center"
-        reverseOrder={false}
-        gutter={20}
-        containerClassName="z-[9999]"
-        toastOptions={{
-          duration: 5000,
-          className: "bg-gray-800 text-white rounded-lg shadow",
-          success: {
-            className: "bg-green-600 text-white",
-          },
-          error: {
-            className: "bg-red-600 text-white",
-          },
-          loading: {
-            className: "bg-blue-600 text-white",
-          },
-        }}
-      />
+      position="top-center"
+      reverseOrder={false}
+      gutter={20}
+      containerClassName="toast-container"
+      toastOptions={{
+        duration: 5000,
+        className: "toast-base",
+        success: {
+          className: "toast-success",
+        },
+        error: {
+          className: "toast-error",
+        },
+        loading: {
+          className: "toast-loading",
+        },
+      }}
+    />
     <Router>
       <LanguageSwitcher />
       <Routes>
