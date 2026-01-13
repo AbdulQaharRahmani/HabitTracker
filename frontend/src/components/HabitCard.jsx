@@ -1,20 +1,23 @@
 import { FaCheckCircle, FaCircle } from 'react-icons/fa';
 import HabitCardIcon from './HabitCardIcon';
-
-export default function HabitCard({ title, description, category, frequency, duration, viewMode, id }) {
+import {LuPencil} from "react-icons/lu"
+import useHabitStore from '../store/useHabitStore';
+export default function HabitCard({ title, description, categoryId, frequency, duration, viewMode, _id }) {
   const color = '#6366F1';
   const bgColor = '#EEF4FF';
-  const Icon = FaCheckCircle;  
-
+  const Icon = FaCheckCircle;
+  const {openEditHabitModal} = useHabitStore()
   return (
+    <>
+
     <div className={`
-        mx-auto p-4 rounded-xl bg-white shadow-sm flex items-start gap-4 min-h-[125px]
+        mx-auto p-4 rounded-xl bg-white shadow-sm flex-wrap flex items-start gap-4 min-h-[125px]
         ${viewMode === 'grid' ? 'w-full max-w-xs' : 'w-full'}
       `}
     >
       <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
 
-      <div>
+      <div className='flex-1'>
         <h3 className="text-xl font-semibold text-gray-500">{title ? title : "No Title"}</h3>
         <p className="text-sm text-gray-400">{description ? description : "No Description"}</p>
 
@@ -23,7 +26,7 @@ export default function HabitCard({ title, description, category, frequency, dur
             className="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md"
             style={{ backgroundColor: bgColor, color }}
           >
-            {category ? category : "No Category"}
+            {categoryId.name ? categoryId.name : "No Category"}
           </span>
 
           <span className="flex items-center text-[12px] text-gray-400">
@@ -33,6 +36,20 @@ export default function HabitCard({ title, description, category, frequency, dur
           </span>
         </div>
       </div>
-    </div>
+        <div className='flex items-center p-3 '>
+          <LuPencil size={20} className='hover:text-[#6366F1] cursor-pointer transition-colors duration-200'
+            onClick={() => {
+              openEditHabitModal({
+                _id,
+                title,
+                description,
+                categoryId: categoryId._id,
+                frequency
+              });
+            }}
+          ></LuPencil>
+        </div>
+      </div>
+        </>
   );
 }

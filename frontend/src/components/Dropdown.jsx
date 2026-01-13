@@ -11,23 +11,22 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
         getValue(itemValue)
         setDropdownOpen(false)
     }
-    const selectedItem = items.find((item)=> item.value === value)
-    const displayValue = selectedItem ? selectedItem.name : ""
-    return (
+    return (<>
         <div className="w-full relative">
             <div className="relative w-full">
                 <input
                     type="text"
                     placeholder={placeholder}
                     readOnly
-                    value={displayValue}
+                    value={value}
                     className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white p-4 pr-12 text-sm font-medium text-gray-700 shadow-sm transition-all caret-transparent focus:border-[#7B68EE] focus:ring-4 focus:ring-[#7B68EE]/15 outline-none capitalize"
                     onChange={getValue}
                     onClick={handleDropdownVisibility}
                 />
 
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 group-focus-within:text-[#7B68EE] transition-colors">
-                    <HiChevronDown size={21} className="text-[#7B68EE]" />
+                    <HiChevronDown size={21} className={`text-[#7B68EE] transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                    />
                 </div>
             </div>
             {
@@ -37,14 +36,14 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
                             <li
                                 key={item.id}
                                 data-value={item.value}
-                                className="group flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-sm text-gray-600 transition-all hover:bg-[#7B68EE]/10 hover:text-[#7B68EE]"
+                                className="group flex cursor-pointer items-center justify-start rounded-lg px-4 py-3 text-sm text-gray-600 transition-all hover:bg-[#7B68EE]/10 hover:text-[#7B68EE]"
                                 onClick={() => handleSelect(item.value)}
                             >
-                                <span className="font-medium">{item.name}</span>
+                                <span className="font-medium ps-4">{item.name}</span>
 
                                 <HiCheck
                                     size={18}
-                                    className="opacity-0 transition-opacity group-hover:opacity-100 text-[#7B68EE]"
+                                    className="opacity-0 transition-opacity group-hover:opacity-100 text-[#7B68EE] ms-auto"
                                 />
                             </li>
                         ))}
@@ -53,6 +52,7 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
             }
 
         </div>
+    </>
     );
 }
 

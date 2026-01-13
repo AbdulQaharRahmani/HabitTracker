@@ -1,8 +1,8 @@
 import { GrAdd } from "react-icons/gr";
-import useAddHabitStore from "../store/useAddHabitStore.js"
 import HabitModal from "./HabitModal.jsx";
+import useHabitStore from "../store/useHabitStore.js";
 export default function AddHabit() {
-    const { isModalOpen, setModalOpen, openAddHabitModal } = useAddHabitStore()
+    const { isModalOpen, openAddHabitModal } = useHabitStore()
     return (
         <div className="">
             <button className="bg-indigo-500 hover:bg-indigo-600  rounded-md px-4 py-2 text-white flex items-center justify-center shadow-md text-md transition ease-in-out duration-200"
