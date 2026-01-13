@@ -94,7 +94,7 @@ export const updateUserPreference = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized', 401);
 
   if (Object.keys(req.body).length === 0)
-    throw new AppError('No fields provide for update');
+    throw new AppError('No fields provide for update', 400);
 
   const allowedFieldsToUpdate = {
     weekStartDay: true,
@@ -118,11 +118,9 @@ export const updateUserPreference = async (req, res) => {
 
   const updatedPreference = await PreferenceModel.findOneAndUpdate(
     { userId: req.user._id },
-    { $set: updateQuery },
-    { new: true, runValidators: true }
+    { $set: updateQuery, $setOnInsert: { userId: req.user._id } },
+    { new: true, runValidators: true, upsert: true }
   );
-
-  if (!updatedPreference) throw notFound('User Preference');
 
   res.status(200).json({ success: true, data: updatedPreference });
 };
