@@ -3,6 +3,7 @@ import useHabitStore from "../store/useHabitStore";
 import Dropdown from "./Dropdown";
 import { FaTimes } from "react-icons/fa";
 import SearchableDropdown from "./SearchableDropdown";
+import toast from "react-hot-toast";
 
 const frequencyItems = [
     { id: "f1", name: "Daily", value: "daily" },
@@ -39,8 +40,7 @@ export default function HabitModal() {
         e.preventDefault();
 
         if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
-            alert("Title, Category, and Frequency are required");
-            return;
+           return toast.error("Title, Category, and Frequency are required");
         }
         await submitHabit(habitData, isEditingMode, currentHabitID);
         fetchHabits();

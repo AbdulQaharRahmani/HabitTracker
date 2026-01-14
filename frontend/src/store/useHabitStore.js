@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import api from "../../services/api"
+import toast from "react-hot-toast";
 const useHabitStore = create((set) => ({
     isModalOpen: false,
     isEditingMode: false,
@@ -30,7 +31,7 @@ const useHabitStore = create((set) => ({
             set({ categories: formatted });
         } catch (error) {
             const message = error.response?.data?.error || "Something went wrong";
-            alert(message)
+            toast.error(message)
             console.error("Failed to fetch categories", error);
         } finally {
             set({ loading: false });
@@ -41,10 +42,10 @@ const useHabitStore = create((set) => ({
         try {
             if (isEditingMode) {
                 await api.put(`/habits/${currentHabitID}`, data);
-                alert("Successfuly Updated the Habit!")
+                toast.success("Successfuly Updated the Habit!")
             } else {
                 await api.post("/habits", data);
-                alert("Successfuly Added the Habit!")
+                toast.success("Habit Added Successfully!")
             }
             set({
                 isModalOpen: false,
@@ -53,7 +54,7 @@ const useHabitStore = create((set) => ({
 
         } catch (error) {
             const message = error.response?.data?.error || "Something went wrong";
-            alert(message)
+            toast.error(message)
             console.log("Failed to add habit", error)
         } finally {
             set({ loading: false });
@@ -67,10 +68,10 @@ const useHabitStore = create((set) => ({
         }
         try {
             await api.post("/categories", newCategoryData)
-            alert("Successfully Added the Category")
+            toast.success("Successfully Added the Category")
         } catch (error) {
             const message = error.response?.data?.error || "Something went wrong";
-            alert(message)
+            toast.error(message)
             console.log("Failed to add user category", error)
 
         }
