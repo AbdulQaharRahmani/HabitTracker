@@ -22,13 +22,14 @@ function Today() {
         <div className="lg:col-span-8">
           <TodayList />
         </div>
-        <div className="lg:col-span-4 space-y-8">
-          <div className=" rounded-[32px] p-6 shadow-sm border border-gray-50">
+        <div className="lg:col-span-2">
+          <div className=" rounded-[32px] p-6 border border-gray-50">
              <CustomDatePicker selectedDate={startDate} onChange={setStartDate} />
           </div>
-          <div> <CircularProgress percent={75} /></div>
+          <div>
+            <CircularProgress percent={75} />
+          </div>
         </div>
-
       </div>
     </div>
   );
