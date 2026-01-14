@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import  Dropdown from './Dropdown';
+import Dropdown from './Dropdown';
 const months = [
   { name: "Jan", completed: 70 },
   { name: "Feb", completed: 20 },
@@ -44,23 +44,32 @@ const dataMap = {
 export default function StatisticsChart() {
   const [chartData, setChartData] = useState(months)
   const [activeFilter, setActiveFilter] = useState('months')
+  const [title, setTitle] = useState("Activity by Month")
   return (
     <>
-      <div className='w-full flex justify-end flex-start p-4'>
-        <div className='w-1/3 '>
+      <div className='w-full flex justify-end flex-start p-6'>
+        <div className='w-[200px] '>
           <Dropdown items={filterTerms} value={activeFilter} getValue={(selected) => {
             setActiveFilter(selected)
             setChartData(dataMap[selected])
+            setTitle(`Activity by ${selected}`)
           }}></Dropdown>
         </div>
       </div>
       <div className="w-full h-[300px] md:h-[400px]">
-
-        <ResponsiveContainer width="100%" height="100%">
+          <h2 className='capitalize p-4 text-[1.5rem] font-bold'>{title}</h2>
+        <ResponsiveContainer width="100%" height="100%" className="bg-white p-6 border rounded-lg">
 
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="0" vertical={false} stroke="#E5E7EB" />
+            <defs>
 
+              <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.8} />
+      <stop offset="95%" stopColor="#6366F1" stopOpacity={0.2} />
+    </linearGradient>
+
+            </defs>
             <XAxis
               dataKey="name"
               tick={{ fontSize: 12 }}
@@ -75,7 +84,9 @@ export default function StatisticsChart() {
               type="monotone"
               dataKey="completed"
               stroke="#6366F1"
-              fill="#C7D2FE"
+              fill="url(#fillGradient)"
+              strokeWidth={4}
+
             />
           </AreaChart>
         </ResponsiveContainer>
