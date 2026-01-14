@@ -88,8 +88,11 @@ export const updateUsername = async (req, res) => {
   // check if username already exists for another user
   const existingUser = await UserModel.findOne({ username });
 
-  if (existingUser && existingUser._id.toString() !== req.user._id.toString())
-    throw new AppError('User already exist with same username', 409);
+  if (username === existingUser.username)
+    throw new AppError(
+      'Your username is the same please add new Username',
+      400
+    );
 
   const user = await UserModel.findByIdAndUpdate(
     req.user._id,
