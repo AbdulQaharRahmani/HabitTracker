@@ -1,37 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/completion_chart.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/consistency_grid.dart';
+import 'package:habit_tracker/app/app_theme.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/completion_trend_card.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/consistency_heatmap.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/filter_tabs.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/top_performing_card.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/header.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/summary_card.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/tasks_item.dart';
 
-import 'widgets/header.dart';
-import 'widgets/summary_card.dart';
-
-class StatisticsScreen extends StatelessWidget {
-  const StatisticsScreen({super.key});
+class StatisticScreen extends StatelessWidget {
+  const StatisticScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.w),
-          child: const Column(
+          padding: const EdgeInsets.all(16),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ========== Header Section ==========
               StatisticsHeader(),
-              SizedBox(height: 20),
+              const SizedBox(height: 24),
+              // ========== Filter Section ==========
               FilterTabs(),
-              SizedBox(height: 20),
+
+              const SizedBox(height: 24),
+              // ========== Progress Overview Cards ==========
               SummaryCards(),
-              SizedBox(height: 20),
-              CompletionTrend(),
-              SizedBox(height: 24),
-              ConsistencySection(),
-              SizedBox(height: 24),
-              TopPerformingSection(),
+              const SizedBox(height: 32),
+
+              //========== Completion Trend Chart ==========
+              CompletionTrendCard(),
+
+              const SizedBox(height: 24),
+              // Consistency Heatmap
+              ConsistencyHeatmap(),
+              const SizedBox(height: 32),
+              const Text(
+                'Top Performing',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+
+              // ========== Top Performing Tasks ==========
+              TasksItem(),
             ],
           ),
         ),
