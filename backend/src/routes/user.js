@@ -4,11 +4,14 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   changePassword,
   updateUsername,
+  getUserPreference,
+  updateUserPreference,
 } from '../controllers/userController.js';
 import { validate } from '../middleware/validate.js';
 import {
   changePasswordValidator,
   updateUsernameValidator,
+  updateUserPreferenceValidator,
 } from '../validators/validateUser.js';
 import {
   getProfilePicture,
@@ -37,5 +40,13 @@ router.patch(
   validate,
   asyncHandler(updateUsername)
 );
+router
+  .route('/preference')
+  .get(asyncHandler(getUserPreference))
+  .put(
+    updateUserPreferenceValidator,
+    validate,
+    asyncHandler(updateUserPreference)
+  );
 
 export default router;

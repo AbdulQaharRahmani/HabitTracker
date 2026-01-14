@@ -67,3 +67,14 @@ export const deleteCategory = async (req, res) => {
 
   res.status(200).json({ success: true, data: category });
 };
+
+export const getCategories = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized.', 401);
+
+  const categories = await CategoryModel.find({ userId: req.user._id });
+
+  res.status(200).json({
+    success: true,
+    data: categories,
+  });
+};

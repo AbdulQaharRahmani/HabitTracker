@@ -2,6 +2,7 @@ import express from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   createTask,
+  getTasks,
   filterTasks,
   toggleTaskStatus,
   deleteTask,
@@ -17,14 +18,16 @@ import { IdValidator } from '../validators/validateId.js';
 
 const router = express.Router();
 
-router.route('/').post(asyncHandler(createTask));
 router.get(
   '/filter',
   filterTasksValidator,
   validate,
   asyncHandler(filterTasks)
 );
-router.route('/').post(createTaskValidator, validate, asyncHandler(createTask));
+router
+  .route('/')
+  .post(createTaskValidator, validate, asyncHandler(createTask))
+  .get(asyncHandler(getTasks));
 router.route('/:id').delete(IdValidator, validate, asyncHandler(deleteTask));
 router
   .route('/:id')

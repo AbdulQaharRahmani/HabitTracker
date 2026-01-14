@@ -62,3 +62,13 @@ body {
 .bg-white{
     background-color: #ffffff;
 }
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
