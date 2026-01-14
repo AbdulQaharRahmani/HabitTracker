@@ -1,6 +1,10 @@
 import express from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { loginUser, registerUser } from '../controllers/authController.js';
+import {
+  loginUser,
+  registerUser,
+  googleLogin,
+} from '../controllers/authController.js';
 import {
   loginValidator,
   registerValidator,
@@ -16,5 +20,8 @@ router.post(
   asyncHandler(registerUser)
 );
 router.post('/login', loginValidator, validate, asyncHandler(loginUser));
+
+//Google routes
+router.post('/google', asyncHandler(googleLogin));
 
 export default router;

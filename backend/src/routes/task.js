@@ -18,7 +18,6 @@ import { IdValidator } from '../validators/validateId.js';
 
 const router = express.Router();
 
-router.route('/').post(asyncHandler(createTask));
 router.get(
   '/filter',
   filterTasksValidator,
