@@ -1,3 +1,53 @@
+
 {
-  "welcome": "Welcome to React and react-i18next"
+  "welcome": "Welcome to React and react-i18next",
+  "Settings": "Settings",
+  "Manage your account settings and preferences": "Manage your account settings and preferences",
+  "Profile Settings": "Profile Settings",
+  "CHANGE PHOTO": "Change Photo",
+  "Display Name": "Display Name",
+  "Email Address": "Email Address",
+  "Change Password": "Change Password",
+
+  "General Preferences": "General Preferences",
+  "Appearance": "Appearance",
+  "Select your preferred theme": "Select your preferred theme",
+  "Light Mode": "Light Mode",
+  "Dark Mode": "Dark Mode",
+
+  "Start Week On": "Start Week On",
+  "Choose the first day of your week": "Choose the first day of your week",
+
+  "Saturday": "Saturday",
+  "Sunday": "Sunday",
+  "Monday": "Monday",
+  "Tuesday": "Tuesday",
+  "Wednesday": "Wednesday",
+  "Thursday": "Thursday",
+  "Friday": "Friday",
+
+  "Notifications": "Notifications",
+  "Daily Reminder": "Daily Reminder",
+  "Set a time to be reminded of your habits": "Set a time to be reminded of your habits",
+  "Streak Alerts": "Streak Alerts",
+  "Get notified when your streak is at risk": "Get notified when your streak is at risk",
+  "Weekly Summary Email": "Weekly Summary Email",
+  "Receive a weekly report of your progress": "Receive a weekly report of your progress",
+
+  "Tasks": "Tasks",
+  "New Task": "New Task",
+  "Manage your daily goals and todos.": "Manage your daily goals and todos.",
+  "Due": "Due",
+  "Personal": "Personal",
+  "Work": "Work",
+  "Exercise": "Exercise",
+  "Health": "Health",
+  "Family": "Family",
+  "Complete project proposal": "Complete project proposal",
+  "Buy groceries for the week": "Buy groceries for the week",
+  "Schedule dentist appointment": "Schedule dentist appointment",
+  "Call Mom": "Call Mom",
+  "Yesterday": "Yesterday",
+  "Tomorrow": "Tomorrow",
+  "No date": "No date"
 }

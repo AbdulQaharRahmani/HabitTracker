@@ -20,14 +20,27 @@ export const createCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
 
-  const { name, icon, backgroundColor } = req.body;
+  if (Object.keys(req.body).length === 0)
+    throw new AppError('No fields provided for update', 400);
+
+  const allowedFieldsToUpdate = {
+    name: true,
+    icon: true,
+    backgroundColor: true,
+  };
+
+  const updateQuery = {};
+
+  for (let key of Object.keys(req.body)) {
+    if (key in allowedFieldsToUpdate) updateQuery[key] = req.body[key];
+  }
 
   const category = await CategoryModel.findOneAndUpdate(
     {
       _id: req.params.id,
       userId: req.user._id,
     },
-    { name, icon, backgroundColor },
+    { $set: updateQuery },
     { new: true, runValidators: true }
   );
 
@@ -53,4 +66,15 @@ export const deleteCategory = async (req, res) => {
   if (!category) throw notFound('Category');
 
   res.status(200).json({ success: true, data: category });
+};
+
+export const getCategories = async (req, res) => {
+  if (!req.user) throw new AppError('User is not authorized.', 401);
+
+  const categories = await CategoryModel.find({ userId: req.user._id });
+
+  res.status(200).json({
+    success: true,
+    data: categories,
+  });
 };
