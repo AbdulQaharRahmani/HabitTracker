@@ -85,8 +85,6 @@ export const updateUsername = async (req, res) => {
 
   const { username } = req.body;
 
-  if (!username) throw new AppError('Please provide username', 400);
-
   // check if username already exists for another user
   const existingUser = await UserModel.findOne({ username });
 
