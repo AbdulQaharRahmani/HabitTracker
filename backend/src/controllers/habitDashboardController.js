@@ -73,60 +73,40 @@ export const getHabitsDashboard = async (req, res) => {
     },
   ]);
 
-  /*
-  let sum = 0;
-
-  result.map((res) => {
-    switch (res.frequency) {
-      case 'daily':
-        sum += res.CompletedHabits.length / 7;
-        // console.log(sum);
-        break;
-      case 'every-other-day':
-        sum += res.CompletedHabits.length / 3;
-        // console.log(sum);
-        break;
-      case 'weekly':
-        sum += res.CompletedHabits.length / 1;
-        // console.log(sum);
-        break;
-      case 'biweekly':
-        sum += res.CompletedHabits.length / 0.5;
-        // console.log(sum);
-        break;
-      default:
-        return;
-    }
-  });
-
-  console.log(Math.round(sum));
-  // console.log(result.length);
-  res.status(200).json(result);
-*/
-  /*
-  let totalExpectedCompletions = 0;
-  let totalActualCompletions = 0;
-
-  const frequencyMap = {
-    daily: 7,
-    'every-other-day': 3,
-    weekly: 1,
-    biweekly: 2,
-  };
+  let totalExpected = 0;
+  let totalCompleted = 0;
 
   habits.forEach((habit) => {
-    const expected = frequencyMap[habit.frequency] || 0;
+    const habitStart = dayjs(habit.createdAt).isAfter(startOfWeek)
+      ? dayjs(habit.createdAt)
+      : dayjs(startOfWeek);
+
+    // Count how many times this habit was actually completed
     const actual = habit.CompletedHabits.length;
 
-    totalExpectedCompletions += expected;
-    totalActualCompletions += Math.min(actual, expected);
+    let expected = 0; // Counter for how many times this habit should occur in the week
+
+    // Loop through each day from habitStart to the end of the week
+    let current = dayjs(habitStart);
+    const end = dayjs(endOfWeek);
+
+    while (current.isBefore(end) || current.isSame(end, 'day')) {
+      // Use helper to check if habit is supposed to occur on this day
+      if (isHabitForSelectedDay(habit, current)) expected++;
+      // Move to the next day
+      current = current.add(1, 'day');
+    }
+
+    // Add this habit's counts to the total counters
+    totalExpected += expected;
+    totalCompleted += actual;
   });
 
   const completionRate =
-    totalExpectedCompletions === 0
+    totalExpected === 0
       ? 0
-      : Math.round((totalActualCompletions / totalExpectedCompletions) * 100);
-*/
+      : Math.round((totalCompleted / totalExpected) * 100);
+
   res.status(200).json({
     success: true,
     data: {
