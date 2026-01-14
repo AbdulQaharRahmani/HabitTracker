@@ -38,16 +38,18 @@ class _FilterTabsState extends State<FilterTabs> {
                 color: isActive ? const Color(0xFF6C63FF) : Colors.white,
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(
-                  color: isActive ? const Color(0xFF6C63FF) : Colors.grey.shade300,
+                  color: isActive
+                      ? const Color(0xFF6C63FF)
+                      : Colors.grey.shade300,
                 ),
                 boxShadow: isActive
                     ? [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ]
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ]
                     : [],
               ),
               child: Text(
