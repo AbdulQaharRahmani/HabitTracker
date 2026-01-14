@@ -1,11 +1,19 @@
 import { TaskModel } from '../models/Task.js';
 import { DateHelper } from '../utils/date.js';
 import { AppError, notFound } from '../utils/error.js';
+import { CategoryModel } from '../models/Category.js';
 
 export const createTask = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized.', 401);
 
-  const { title, description, priority, dueDate } = req.body;
+  const { title, description, priority, dueDate, categoryId } = req.body;
+
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
+    categoryId,
+    req.user._id
+  );
+
+  if (!doesCategoryExist) throw notFound('Category');
 
   const task = await TaskModel.create({
     title,
@@ -13,6 +21,7 @@ export const createTask = async (req, res) => {
     priority,
     dueDate,
     userId: req.user._id,
+    categoryId,
   });
 
   res.status(201).json({
@@ -124,6 +133,7 @@ export const updateTask = async (req, res) => {
     status: true,
     priority: true,
     dueDate: true,
+    categoryId: true
   };
 
   const updateQuery = {};
@@ -132,6 +142,14 @@ export const updateTask = async (req, res) => {
     if (key in allowedFieldsToUpdate) updateQuery[key] = req.body[key];
   }
 
+  if (updateQuery?.categoryId) {
+    const doesCategoryExist = await CategoryModel.doesCategoryExist(
+      req.body.categoryId,
+      req.user._id
+    );
+    if (!doesCategoryExist) throw notFound('Category');
+  }
+  
   const task = await TaskModel.findOneAndUpdate(
     { _id: req.params.id, userId: req.user._id },
     { $set: updateQuery },
