@@ -14,11 +14,13 @@ import Today from "./pages/Today";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LanguageSwitcher from "./components/internationalization";
+import DarkMode from "./components/DarkMode";
 
 function App() {
   return (
     <Router>
       <LanguageSwitcher />
+      <DarkMode />
       <Routes>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
