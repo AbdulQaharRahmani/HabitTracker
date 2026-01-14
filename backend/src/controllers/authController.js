@@ -3,7 +3,7 @@ import { UserModel } from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { verifyFrontendToken } from '../utils/googleOAuth.js';
+import { verifyGoogleToken } from '../utils/googleOAuth.js';
 
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -62,7 +62,7 @@ export const googleLogin = async (req, res) => {
   const { id_token } = req.body;
   if (!id_token) throw new AppError('Token missing', 400);
 
-  const googleUserinfo = await verifyFrontendToken(id_token);
+  const googleUserinfo = await verifyGoogleToken(id_token);
   if (!googleUserinfo) throw new AppError('Invalid google token', 401);
 
   //Check user by googleId or email
