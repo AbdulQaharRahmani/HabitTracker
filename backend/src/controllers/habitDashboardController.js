@@ -45,54 +45,43 @@ export const getHabitsDashboard = async (req, res) => {
   const startOfWeek = today.startOf('week').toDate();
   const endOfWeek = today.endOf('week').toDate();
 
-  const habitsCompleted = await HabitCompletionModel.aggregate([
+  const result = await HabitModel.aggregate([
+    { $match: { userId: req.user._id, isDeleted: false } },
     {
-      $match: {
-        userId: req.user._id,
-        date: { $gte: startOfWeek, $lte: endOfWeek },
+      $lookup: {
+        from: 'habitcompletions',
+        localField: '_id',
+        foreignField: 'habitId',
+        as: 'CompletedHabits',
       },
     },
     {
-      $count: 'totalDone',
+      $addFields: {
+        CompletedHabits: {
+          $filter: {
+            input: '$CompletedHabits',
+            as: 'completion',
+            cond: {
+              $and: [
+                { $gte: ['$$completion.date', startOfWeek] },
+                { $lte: ['$$completion.date', endOfWeek] },
+              ],
+            },
+          },
+        },
+      },
     },
   ]);
 
-  const completedHabits = habitsCompleted[0]?.totalDone || 0;
-  console.log(completedHabits);
+  // console.log(result);
+  res.status(200).json(result);
 
-  //----------------------------
-
-  const isHabitForWeek = (habit) => {
-    const start = dayjs(startOfWeek);
-
-    for (let i = 0; i < 7; i++) {
-      if (isHabitForSelectedDay(habit, start.add(i, 'day'))) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const habits = await HabitModel.find({
-    userId: req.user._id,
-    isDeleted: false,
-  }).lean();
-
-  const habitsThisWeek = habits.filter(isHabitForWeek);
-  const totalHabitsWeek = habitsThisWeek.length;
-  console.log(totalHabitsWeek);
-
-  const completionRate =
-    totalHabitsWeek > 0
-      ? Math.round((completedHabits / totalHabitsWeek) * 100)
-      : 0;
-
-  res.status(200).json({
-    success: true,
-    data: {
-      totalHabits,
-      currentStreak,
-      completionRate,
-    },
-  });
+  // res.status(200).json({
+  //   success: true,
+  //   data: {
+  //     totalHabits,
+  //     currentStreak,
+  //     completionRate,
+  //   },
+  // });
 };
