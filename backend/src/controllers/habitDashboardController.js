@@ -19,10 +19,21 @@ export const getHabitsDashboard = async (req, res) => {
     const startOfDay = dayjs(currentDay).startOf('day').toDate();
     const endOfDay = dayjs(currentDay).endOf('day').toDate();
 
+    const activeHabitIds = (
+      await HabitModel.find({ userId: req.user._id, isDeleted: false }).select(
+        '_id'
+      )
+    ).map((h) => h._id);
+    console.log(activeHabitIds);
+
     const exist = await HabitCompletionModel.exists({
       userId: req.user._id,
+      habitId: { $in: activeHabitIds },
       date: { $gte: startOfDay, $lte: endOfDay },
     });
+    // console.log('exist', exist);
+    // console.log('startOfDay', startOfDay);
+    // console.log('endOfDay', endOfDay);
 
     if (exist) {
       currentStreak++;
@@ -47,6 +58,7 @@ export const getHabitsDashboard = async (req, res) => {
   ]);
 
   const completedHabits = habitsCompleted[0]?.totalDone || 0;
+  console.log(completedHabits);
 
   //----------------------------
 
@@ -72,7 +84,7 @@ export const getHabitsDashboard = async (req, res) => {
 
   const completionRate =
     totalHabitsWeek > 0
-      ? Math.floor((completedHabits / totalHabitsWeek) * 100)
+      ? Math.round((completedHabits / totalHabitsWeek) * 100)
       : 0;
 
   res.status(200).json({
