@@ -9,9 +9,24 @@ class SummaryCards extends StatelessWidget {
     return const Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        SummaryCard(title: 'Habits', value: '12', icon: Icons.checklist_outlined,iconColor: Colors.brown,),
-        SummaryCard(title: 'Streak', value: '5', icon: Icons.local_fire_department,iconColor:Colors.red),
-        SummaryCard(title: 'Rate', value: '87%', icon: Icons.percent,iconColor: Colors.deepPurple),
+        SummaryCard(
+          title: 'Habits',
+          value: '12',
+          icon: Icons.checklist_outlined,
+          iconColor: Colors.brown,
+        ),
+        SummaryCard(
+          title: 'Streak',
+          value: '5',
+          icon: Icons.local_fire_department,
+          iconColor: Colors.red,
+        ),
+        SummaryCard(
+          title: 'Rate',
+          value: '87%',
+          icon: Icons.percent,
+          iconColor: Colors.deepPurple,
+        ),
       ],
     );
   }
@@ -28,7 +43,7 @@ class SummaryCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.icon,
-    required this.iconColor
+    required this.iconColor,
   });
 
   @override
@@ -45,7 +60,7 @@ class SummaryCard extends StatelessWidget {
           CircleAvatar(
             backgroundColor: iconColor.withValues(alpha: 0.11),
 
-            child: Icon(icon, color:iconColor),
+            child: Icon(icon, color: iconColor),
           ),
           SizedBox(height: 10.h),
           Text(
@@ -54,7 +69,11 @@ class SummaryCard extends StatelessWidget {
           ),
           Text(
             title.toUpperCase(),
-            style: TextStyle(fontSize: 12.sp, color: Colors.grey,fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
