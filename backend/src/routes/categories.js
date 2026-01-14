@@ -4,18 +4,30 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
+  getCategories,
 } from '../controllers/categoryController.js';
 import { validate } from '../middleware/validate.js';
-import { categoryValidator } from '../validators/validateCategory.js';
+import {
+  createCategoryValidator,
+  updateCategoryValidator,
+} from '../validators/validateCategory.js';
 import { IdValidator } from '../validators/validateId.js';
 
 const router = express.Router();
 
-router.post('/', categoryValidator, validate, asyncHandler(createCategory));
+router
+  .route('/')
+  .post(createCategoryValidator, validate, asyncHandler(createCategory))
+  .get(asyncHandler(getCategories));
 
 router
   .route('/:id')
-  .put(IdValidator, categoryValidator, validate, asyncHandler(updateCategory))
+  .put(
+    IdValidator,
+    updateCategoryValidator,
+    validate,
+    asyncHandler(updateCategory)
+  )
   .delete(IdValidator, validate, asyncHandler(deleteCategory));
 
 export default router;
