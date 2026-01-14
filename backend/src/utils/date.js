@@ -40,4 +40,25 @@ export class DateHelper {
     d.setHours(23, 59, 59, 999);
     return d;
   }
+
+  static TIMEZONES = {
+    kabul: 'Asia/Kabul',
+    tehran: 'Asia/Tehran',
+    karachi: 'Asia/Karachi',
+    kolkata: 'Asia/Kolkata',
+    dubai: 'Asia/Dubai',
+    istanbul: 'Europe/Istanbul',
+    riyadh: 'Asia/Riyadh',
+    utc: 'UTC',
+    newyork: 'America/New_York',
+    chicago: 'America/Chicago',
+    denver: 'America/Denver',
+    london: 'Europe/London',
+    paris: 'Europe/Paris',
+    berlin: 'Europe/Berlin',
+    moscow: 'Europe/Moscow',
+    tashkent: 'Asia/Tashkent',
+    bishkek: 'Asia/Bishkek',
+    dushanbe: 'Asia/Dushanbe',
+  };
 }
