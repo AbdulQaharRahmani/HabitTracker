@@ -47,7 +47,9 @@ export default function StatisticsChart() {
   const [title, setTitle] = useState("Activity by Month")
   return (
     <>
-      <div className='w-full flex justify-end flex-start p-6'>
+      <div className='w-full flex md:justify-between gap-2 justify-center items-center flex-row flex-start p-6 pt-10 flex-wrap'>
+        <h2 className='capitalize text-[1.5rem] font-bold'>{title}</h2>
+
         <div className='w-[200px] '>
           <Dropdown items={filterTerms} value={activeFilter} getValue={(selected) => {
             setActiveFilter(selected)
@@ -55,19 +57,20 @@ export default function StatisticsChart() {
             setTitle(`Activity by ${selected}`)
           }}></Dropdown>
         </div>
+
       </div>
+
       <div className="w-full h-[300px] md:h-[400px]">
-          <h2 className='capitalize p-4 text-[1.5rem] font-bold'>{title}</h2>
-        <ResponsiveContainer width="100%" height="100%" className="bg-white p-6 border rounded-lg">
+        <ResponsiveContainer width="100%" height="100%" className="bg-white p-6 border rounded-[1.5rem]">
 
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="0" vertical={false} stroke="#E5E7EB" />
             <defs>
 
               <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.8} />
-      <stop offset="95%" stopColor="#6366F1" stopOpacity={0.2} />
-    </linearGradient>
+                <stop offset="5%" stopColor="#6366F1" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#6366F1" stopOpacity={0.2} />
+              </linearGradient>
 
             </defs>
             <XAxis
