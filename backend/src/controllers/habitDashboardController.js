@@ -1,6 +1,6 @@
+import dayjs from 'dayjs';
 import { HabitModel } from '../models/Habit.js';
 import { HabitCompletionModel } from '../models/habitCompletion.js';
-import dayjs from 'dayjs';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 
 export const getHabitsDashboard = async (req, res) => {
@@ -107,12 +107,35 @@ export const getHabitsDashboard = async (req, res) => {
       ? 0
       : Math.round((totalCompleted / totalExpected) * 100);
 
+  // 4) Chart data
+  const chartData = {};
+
+  const startOfMonth = dayjs(today).startOf('month').toDate();
+  let current = dayjs(startOfMonth);
+  const end = dayjs(today);
+  // console.log(startOfMonth, end);
+
+  // console.log(habitCompletions.length);
+
+  while (current.isBefore(end) || current.isSame(end, 'day')) {
+    console.log(current.toDate());
+    const todayCompletions = await HabitCompletionModel.countDocuments({
+      userId: req.user._id,
+      date: current,
+    });
+
+    chartData[current] = todayCompletions;
+    current = current.add(1, 'day');
+  }
+  console.log(chartData);
+
   res.status(200).json({
     success: true,
     data: {
       totalHabits,
       currentStreak,
       completionRate,
+      chartData,
     },
   });
 };
