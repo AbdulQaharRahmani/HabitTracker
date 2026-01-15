@@ -1,24 +1,28 @@
 import React from 'react'
 import DayilyConsistency from '../components/DailyConsistency'
 import Header from '../components/Header'
-import { MdDownload } from "react-icons/md";
 import ExportData from '../components/ExportData';
-
+import TotalHabitsStatics from '../components/TotalHabitsStatics';
 
 function Statistics() {
   return (
-    <div className=''>
+    <div className="">
       <div className="grid grid-cols-2 justify-between my-2 items-center mr-9">
         <Header
           title={"Your Progress"}
           subtitle={"Overview of your consistency and growth."}
         />
-        <span className='pt-6 ml-auto'>
+        <span className="pt-6 ml-auto">
           <ExportData />
         </span>
       </div>
 
-      <DayilyConsistency />
+      <div className='my-4'>
+        <TotalHabitsStatics></TotalHabitsStatics>
+      </div>
+      <div>
+        <DayilyConsistency />
+      </div>
     </div>
   );
 }
