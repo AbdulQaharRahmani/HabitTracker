@@ -1,7 +1,8 @@
-import { AppError } from '../utils/error.js';
+import { AppError, notFound } from '../utils/error.js';
 import { UserModel } from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { ERROR_CODES } from '../utils/constant.js';
 import crypto from 'crypto';
 import { verifyGoogleToken } from '../utils/googleOAuth.js';
 
@@ -10,7 +11,12 @@ export const registerUser = async (req, res) => {
 
   const emailExisted = await UserModel.exists({ email });
   if (emailExisted) {
-    throw new AppError('Email already exists', 400);
+    throw new AppError(
+      'Email already exists',
+      400,
+      ERROR_CODES.DUPLICATE,
+      'email'
+    );
   }
 
   const hashPassword = await bcrypt.hash(password, 12);
@@ -32,12 +38,16 @@ export const loginUser = async (req, res) => {
 
   const user = await UserModel.findOne({ email });
   if (!user) {
-    throw new AppError('User not existed!', 404);
+    throw notFound('User');
   }
 
   const pswMatch = await bcrypt.compare(password, user.password);
   if (!pswMatch) {
-    throw new AppError('Password is not correct', 400);
+    throw new AppError(
+      'Incorrect Password',
+      400,
+      ERROR_CODES.INVALID_CREDENTIAL
+    );
   }
 
   const token = jwt.sign(

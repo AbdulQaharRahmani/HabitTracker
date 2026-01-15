@@ -1,3 +1,4 @@
+import { ERROR_CODES } from './constant.js';
 import { AppError } from './error.js';
 
 export class DateHelper {
@@ -14,7 +15,12 @@ export class DateHelper {
     const d = new Date(date);
 
     if (isNaN(d.getTime())) {
-      throw new AppError('Invalid Date', 400);
+      throw new AppError(
+        'Invalid Date',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+        'date'
+      );
     }
     d.setHours(0, 0, 0, 0);
     return d;
@@ -24,7 +30,12 @@ export class DateHelper {
     const d = new Date(date);
 
     if (isNaN(d.getTime())) {
-      throw new AppError('Invalid Date', 400);
+      throw new AppError(
+        'Invalid Date',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+        'date'
+      );
     }
     d.setHours(23, 59, 59, 999);
     return d;

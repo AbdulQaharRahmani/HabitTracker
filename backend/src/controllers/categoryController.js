@@ -1,9 +1,15 @@
 import { CategoryModel } from '../models/Category.js';
 import { HabitModel } from '../models/Habit.js';
-import { AppError, notFound } from '../utils/error.js';
+import { ERROR_CODES } from '../utils/constant.js';
+import {
+  AppError,
+  noFieldsProvidedForUpdate,
+  notFound,
+  unauthorized,
+} from '../utils/error.js';
 
 export const createCategory = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const { name, icon, backgroundColor } = req.body;
 
@@ -18,10 +24,9 @@ export const createCategory = async (req, res) => {
 };
 
 export const updateCategory = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
-  if (Object.keys(req.body).length === 0)
-    throw new AppError('No fields provided for update', 400);
+  if (Object.keys(req.body).length === 0) throw noFieldsProvidedForUpdate();
 
   const allowedFieldsToUpdate = {
     name: true,
@@ -50,13 +55,19 @@ export const updateCategory = async (req, res) => {
 };
 
 export const deleteCategory = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const isCategoryInUsed = await HabitModel.exists({
     categoryId: req.params.id,
   });
 
-  if (isCategoryInUsed) throw new AppError('Category is in-used', 400);
+  if (isCategoryInUsed)
+    throw new AppError(
+      'Category is in-used',
+      400,
+      ERROR_CODES.RESOURCE_IN_USED,
+      'Category'
+    );
 
   const category = await CategoryModel.findOneAndDelete({
     _id: req.params.id,
@@ -69,7 +80,7 @@ export const deleteCategory = async (req, res) => {
 };
 
 export const getCategories = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const categories = await CategoryModel.find({ userId: req.user._id });
 
