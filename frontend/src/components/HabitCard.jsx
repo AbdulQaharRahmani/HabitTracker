@@ -17,6 +17,7 @@ const color = categoryId?.backgroundColor || '#6366F1';
     >
       <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
 
+<div className='flex justify-between w-full'>
       <div className='flex-1'>
         <h3 className="text-xl font-semibold text-gray-500 pr-12">{title ? title : "No Title"}</h3>
         <p className="text-sm text-gray-400">{description ? description : "No Description"}</p>
@@ -36,8 +37,8 @@ const color = categoryId?.backgroundColor || '#6366F1';
           </span>
         </div>
       </div>
-        <div className='absolute top-3 p-3 right-3'>
-          <LuPencil size={20} className='text-[#6366F1] cursor-pointer transition-colors duration-200'
+        <div>
+          <LuPencil size={20} className='text-[#6366F1] cursor-pointer'
             onClick={() => {
               openEditHabitModal({
                 _id,
@@ -48,6 +49,7 @@ const color = categoryId?.backgroundColor || '#6366F1';
               });
             }}
           ></LuPencil>
+        </div>
         </div>
       </div>
         </>
