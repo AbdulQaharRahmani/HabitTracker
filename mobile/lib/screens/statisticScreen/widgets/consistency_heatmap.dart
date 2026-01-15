@@ -10,7 +10,7 @@ class ConsistencyHeatmap extends StatelessWidget {
 
   // ========== Consistency Heatmap ==========
   Widget _buildConsistencyHeatmap() {
-    final weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    final weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

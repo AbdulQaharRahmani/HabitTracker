@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:habit_tracker/app/app_theme.dart';
 
 class CompletionTrendCard extends StatelessWidget {
   const CompletionTrendCard({super.key});
@@ -15,7 +16,7 @@ class CompletionTrendCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -52,14 +53,14 @@ class CompletionTrendCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                  color: AppTheme.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.trending_up,
-                      color: const Color(0xFF10B981),
+                      color:  AppTheme.success,
                       size: 16,
                     ),
                     const SizedBox(width: 4),
