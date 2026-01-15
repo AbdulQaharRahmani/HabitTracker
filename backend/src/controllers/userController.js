@@ -93,7 +93,7 @@ export const changePassword = async (req, res) => {
 };
 
 export const updateUsername = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const { username } = req.body;
 
@@ -102,7 +102,8 @@ export const updateUsername = async (req, res) => {
   if (username === user.username)
     throw new AppError(
       'Your username is the same please add new Username',
-      400
+      400,
+      ERROR_CODES.USERNAME_SAME_AS_OLD
     );
 
   user.username = username;
