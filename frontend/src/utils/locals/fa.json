@@ -55,5 +55,12 @@
   "Call Mom": "زنگ زدن به مادر",
   "Yesterday": "دیروز",
   "Tomorrow": "فردا",
-  "No date": "تاریخ نامشخص"
+  "No date": "تاریخ نامشخص",
+
+  "Your Progress": "روند شما",
+  "Overview of your consistency and growth.": "چشم اندازی به تمرکز و روند رشد شما.",
+  "TOTAL HABITS": "تعداد مجموعی عادت ها",
+  "CURRENT STREAK": "تداوم فعلی",
+  "COMPLETION RATE": "معادل تکمیلی",
+  "Export Data": "صدور داده"
 }

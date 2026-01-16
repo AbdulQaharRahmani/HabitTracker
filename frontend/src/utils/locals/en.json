@@ -49,5 +49,12 @@
   "Call Mom": "Call Mom",
   "Yesterday": "Yesterday",
   "Tomorrow": "Tomorrow",
-  "No date": "No date"
+  "No date": "No date",
+  
+  "Your Progress": "Your Progress",
+  "Overview of your consistency and growth.": "Overview of your consistency and growth.",
+  "TOTAL HABITS": "TOTAL HABITS",
+  "CURRENT STREAK": "CURRENT STREAK",
+  "COMPLETION RATE": "COMPLETION RATE",
+  "Export Data": "Export Data"
 }
