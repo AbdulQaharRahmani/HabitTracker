@@ -1,10 +1,8 @@
 import { FaShapes } from "react-icons/fa6";
-import { RiListView } from "react-icons/ri";
-
 
 export default function TotalHabitsStatics({totalHabits}) {
   return (
-    <div className="bg-white w-1/3 p-4 min-h-[160px] rounded-2xl shadow-sm border border-gray-100 relative group overflow-hidden ">
+    <div className="bg-white w-1/3 p-4 min-h-[180px] min-w-[200px] rounded-2xl shadow-md border border-gray-100 relative group overflow-hidden ">
       <svg
         viewBox="0 0 24 24"
         className="absolute right-4 w-32 h-32  text-indigo-200 opacity-20"
