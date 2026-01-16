@@ -1,8 +1,8 @@
 import { MdLocalFireDepartment } from "react-icons/md";
 
-export default function CurrentStreakStatics({ totalHabits }) {
+export default function CurrentStreakStatics({ currentStreak }) {
   return (
-    <div className="bg-white w-1/3 p-4 min-h-[180px] rounded-2xl shadow-md border border-gray-100 relative group overflow-hidden ">
+    <div className="bg-white w-1/3 p-4 min-h-[200px] rounded-2xl shadow-sm border border-gray-100 relative group overflow-hidden ">
       <svg
         viewBox="0 0 24 24"
         fill="currentColor"
@@ -21,7 +21,11 @@ export default function CurrentStreakStatics({ totalHabits }) {
           />
           <p className="text-gray-400 text-lg uppercase">CURRENT STREAK</p>
         </span>
-        <span>{totalHabits}</span>
+        <div className="text-gray-800 font-bold text-[2.5rem] mt-4">
+          {currentStreak}
+          <span className="text-gray-400 mx-2 font-normal text-[1rem] ">days</span>
+        </div>
+        
       </div>
     </div>
   );
