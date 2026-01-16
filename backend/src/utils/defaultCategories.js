@@ -11,8 +11,7 @@ export function getDefaultCategories(userId) {
   const categories = [];
 
   defaultCategories.forEach((category) => {
-    category.userId = userId;
-    categories.push(category);
+    categories.push({ ...category, userId });
   });
 
   return categories;
