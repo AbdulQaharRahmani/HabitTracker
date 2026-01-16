@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Header from "../components/Header.jsx";
+import DarkMode from "../components/DarkMode.jsx";
 import Search from "../components/Search.jsx";
 import AddHabit from "../components/AddHabit.jsx";
 import View from "../components/View.jsx";
