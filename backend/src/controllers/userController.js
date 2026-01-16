@@ -1,14 +1,20 @@
 import bcrypt from 'bcryptjs';
 import { UserModel } from '../models/User.js';
 import { deleteFile } from '../utils/deleteFile.js';
-import { AppError, notFound } from '../utils/error.js';
+import { AppError, notFound, unauthorized } from '../utils/error.js';
+import { ERROR_CODES } from '../utils/constant.js';
 import { PreferenceModel } from '../models/Preference.js';
 import { DateHelper } from '../utils/date.js';
 
 //  Upload or update user's profile picture
 export const uploadProfilePicture = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
-  if (!req.file) throw new AppError('Please upload a profile image', 400);
+  if (!req.user) throw unauthorized();
+  if (!req.file)
+    throw new AppError(
+      'Please upload a profile image',
+      400,
+      ERROR_CODES.UPLOAD_IMAGE
+    );
 
   const user = await UserModel.findById(req.user._id);
   if (!user) throw notFound('User');
@@ -48,7 +54,7 @@ export const getProfilePicture = async (req, res) => {
 };
 
 export const changePassword = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const { oldPassword, newPassword } = req.body;
 
@@ -58,14 +64,20 @@ export const changePassword = async (req, res) => {
 
   const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
 
-  if (!isPasswordMatch) throw new AppError('Password is wrong', 400);
+  if (!isPasswordMatch)
+    throw new AppError(
+      'Password is wrong',
+      400,
+      ERROR_CODES.INVALID_CREDENTIAL
+    );
 
   const isPasswordSame = await bcrypt.compare(newPassword, user.password);
 
   if (isPasswordSame)
     throw new AppError(
       'New password cannot be the same as the current password',
-      400
+      400,
+      ERROR_CODES.PASSWORD_SAME_AS_OLD
     );
 
   const hashedPassword = await bcrypt.hash(newPassword, 12);
