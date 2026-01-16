@@ -1,12 +1,19 @@
 import { MdLocalFireDepartment } from "react-icons/md";
+import i18n from "../utils/i18n";
+import { useTranslation } from "react-i18next";
 
 export default function CurrentStreakStatics({ currentStreak }) {
+  const { t } = useTranslation();
+  const isRTL = i18n.language === "fa";
+
   return (
-    <div className="bg-white w-1/3 p-4 min-h-[200px] rounded-2xl shadow-sm border border-gray-100 relative group overflow-hidden ">
+    <div className="bg-white w-1/3 p-4 min-h-[200px] min-w-[200px] rounded-2xl shadow-sm border border-gray-100 relative group overflow-hidden md:min-w-[170px] xxs:w-full">
       <svg
         viewBox="0 0 24 24"
         fill="currentColor"
-        className="absolute right-4 w-32 h-32 text-orange-400 opacity-20"
+        className={`absolute w-32 h-32 text-orange-400 opacity-20 ${
+          isRTL ? "left-4 scale-x-[-1]" : "right-4"
+        }`}
       >
         <path fill="none" d="M0 0h24v24H0z"></path>
         <path d="m12 12.9-2.13 2.09c-.56.56-.87 1.29-.87 2.07C9 18.68 10.35 20 12 20s3-1.32 3-2.94c0-.78-.31-1.52-.87-2.07L12 12.9z"></path>
@@ -19,13 +26,16 @@ export default function CurrentStreakStatics({ currentStreak }) {
             size={20}
             className="text-orange-500 bg-orange-100 w-10 h-12 p-2 rounded-md"
           />
-          <p className="text-gray-400 text-lg uppercase">CURRENT STREAK</p>
+          <p className="text-gray-400 text-lg uppercase">
+            {t("CURRENT STREAK")}
+          </p>
         </span>
         <div className="text-gray-800 font-bold text-[2.5rem] mt-4">
           {currentStreak}
-          <span className="text-gray-400 mx-2 font-normal text-[1rem] ">days</span>
+          <span className="text-gray-400 mx-2 font-normal text-[1rem] ">
+            days
+          </span>
         </div>
-        
       </div>
     </div>
   );
