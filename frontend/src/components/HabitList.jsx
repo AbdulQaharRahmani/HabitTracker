@@ -45,7 +45,7 @@ export default function HabitList({ viewMode }) {
               : "my-6 space-y-4 ml-[1.35rem]"
           }
         >
-          {allhabits.length === 0 ? (
+          {habits.length === 0 ? (
             <p className="text-gray-500 text-lg">
               You have no habits yet. Add your first habit.
             </p>
@@ -53,24 +53,24 @@ export default function HabitList({ viewMode }) {
             visibleHabits.map((habit) => (
               <HabitCard
                 key={habit._id}
-                _id={habit._id}
+                id={habit._id}
                 viewMode={viewMode}
                 title={habit.title}
                 description={habit.description}
-                categoryId={habit.categoryId}
+                category={habit.category}
                 frequency={habit.frequency}
                 duration={habit.duration}
               />
             ))
           )}
+          <Pagination
+            currentPage={page}
+            totalCount={habits.length}
+            siblingCount
+            pageSize={ITEMS_PER_PAGE}
+            onPageChange={setPage}
+          />
         </div>
-        <Pagination
-          currentPage={page}
-          totalCount={allhabits.length}
-          siblingCount
-          pageSize={ITEMS_PER_PAGE}
-          onPageChange={setPage}
-        />
       </>
     );
   }
