@@ -2,17 +2,33 @@ import dayjs from 'dayjs';
 import { HabitModel } from '../models/Habit.js';
 import { HabitCompletionModel } from '../models/habitCompletion.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
+import { PreferenceModel } from '../models/Preference.js';
+import { DateHelper } from '../utils/date.js';
+import { DAY_MAP } from '../utils/constant.js';
 
 export const getHabitsDashboard = async (req, res) => {
-  // 1) Total Habits
+  // Get user preference and start, end of week
+  const userPreference = await PreferenceModel.findOne({
+    userId: req.user._id,
+  }).select('weekStartDay');
+
+  const today = dayjs();
+
+  const weekStartDayNum = DAY_MAP[userPreference.weekStartDay];
+
+  const [startOfWeek, endOfWeek] = DateHelper.getStartAndEndOfWeek(
+    today,
+    weekStartDayNum
+  );
+
+  //----------- 1) Total Habits
   const totalHabits = await HabitModel.countDocuments({
     userId: req.user._id,
     isDeleted: false,
   });
 
-  // 2) Current Streak
+  //------------ 2) Current Streak
   let currentStreak = 0;
-  let today = dayjs();
   let currentDay = today.toDate();
 
   const activeHabitIds = (
@@ -20,7 +36,6 @@ export const getHabitsDashboard = async (req, res) => {
       '_id'
     )
   ).map((h) => h._id);
-  // console.log(activeHabitIds);
 
   while (true) {
     const startOfDay = dayjs(currentDay).startOf('day').toDate();
@@ -31,9 +46,6 @@ export const getHabitsDashboard = async (req, res) => {
       habitId: { $in: activeHabitIds },
       date: { $gte: startOfDay, $lte: endOfDay },
     });
-    // console.log('exist', exist);
-    // console.log('startOfDay', startOfDay);
-    // console.log('endOfDay', endOfDay);
 
     if (exist) {
       currentStreak++;
@@ -41,9 +53,7 @@ export const getHabitsDashboard = async (req, res) => {
     } else break;
   }
 
-  // 3) Completion Rate with aggregation for better
-  const startOfWeek = today.startOf('week').toDate();
-  const endOfWeek = today.endOf('week').toDate();
+  //------- 3) Completion Rate: Aggregate habits with their completions filtered to current week
 
   const habits = await HabitModel.aggregate([
     { $match: { userId: req.user._id, isDeleted: false } },
@@ -55,6 +65,7 @@ export const getHabitsDashboard = async (req, res) => {
         as: 'CompletedHabits',
       },
     },
+    // Filter completions to only those within the current week
     {
       $addFields: {
         CompletedHabits: {
@@ -63,8 +74,8 @@ export const getHabitsDashboard = async (req, res) => {
             as: 'completion',
             cond: {
               $and: [
-                { $gte: ['$$completion.date', startOfWeek] },
-                { $lte: ['$$completion.date', endOfWeek] },
+                { $gte: ['$$completion.date', startOfWeek.toDate()] },
+                { $lte: ['$$completion.date', endOfWeek.toDate()] },
               ],
             },
           },
@@ -76,30 +87,27 @@ export const getHabitsDashboard = async (req, res) => {
   let totalExpected = 0;
   let totalCompleted = 0;
 
+  // Calculate expected vs actual completions for each habit in the week
   habits.forEach((habit) => {
     const habitStart = dayjs(habit.createdAt).isAfter(startOfWeek)
       ? dayjs(habit.createdAt)
-      : dayjs(startOfWeek);
+      : startOfWeek;
 
-    // Count how many times this habit was actually completed
-    const actual = habit.CompletedHabits.length;
+    const actualCompletions = habit.CompletedHabits.length;
 
-    let expected = 0; // Counter for how many times this habit should occur in the week
+    let expectedOccurrences = 0;
+    let currentDay = dayjs(habitStart);
+    const weekEnd = dayjs(endOfWeek);
 
-    // Loop through each day from habitStart to the end of the week
-    let current = dayjs(habitStart);
-    const end = dayjs(endOfWeek);
-
-    while (current.isBefore(end) || current.isSame(end, 'day')) {
-      // Use helper to check if habit is supposed to occur on this day
-      if (isHabitForSelectedDay(habit, current)) expected++;
-      // Move to the next day
-      current = current.add(1, 'day');
+    while (currentDay.isBefore(weekEnd) || currentDay.isSame(weekEnd, 'day')) {
+      if (isHabitForSelectedDay(habit, currentDay)) {
+        expectedOccurrences++;
+      }
+      currentDay = currentDay.add(1, 'day');
     }
 
-    // Add this habit's counts to the total counters
-    totalExpected += expected;
-    totalCompleted += actual;
+    totalExpected += expectedOccurrences;
+    totalCompleted += actualCompletions;
   });
 
   const completionRate =
@@ -107,43 +115,39 @@ export const getHabitsDashboard = async (req, res) => {
       ? 0
       : Math.round((totalCompleted / totalExpected) * 100);
 
-  // 4) Chart data (daily completed habits for current month)
+  //------------- 4) Chart Data: Build daily completion counts for the current month
+
   const startOfMonth = dayjs(today).startOf('month').toDate();
   const endOfMonth = dayjs(today).endOf('month').toDate();
 
-  // 1) Get all completions for this month in ONE query
-  const completions = await HabitCompletionModel.find({
+  // Fetch all habit completions for the month
+  const monthlyCompletions = await HabitCompletionModel.find({
     userId: req.user._id,
-    date: {
-      $gte: startOfMonth,
-      $lte: endOfMonth,
-    },
+    date: { $gte: startOfMonth, $lte: endOfMonth },
   });
 
-  // 2) Group by day
-  const completionMap = {};
-
-  completions.forEach((c) => {
-    const day = dayjs(c.date).format('YYYY-MM-DD');
-    completionMap[day] = (completionMap[day] || 0) + 1;
+  // Group completions by date (YYYY-MM-DD)
+  const completionByDay = {};
+  monthlyCompletions.forEach((completion) => {
+    const dateKey = dayjs(completion.date).format('YYYY-MM-DD');
+    completionByDay[dateKey] = (completionByDay[dateKey] || 0) + 1;
   });
-  console.log(completionMap);
 
-  // 3) Build chart data day by day
+  // Build array of daily data from start of month to today
   const chartData = [];
+  let currentDate = dayjs(startOfMonth);
+  const todayEnd = dayjs(today);
 
-  let current = dayjs(startOfMonth);
-  const end = dayjs(today);
-
-  while (current.isBefore(end) || current.isSame(end, 'day')) {
-    const dayKey = current.format('YYYY-MM-DD');
-
+  while (
+    currentDate.isBefore(todayEnd) ||
+    currentDate.isSame(todayEnd, 'day')
+  ) {
+    const dateKey = currentDate.format('YYYY-MM-DD');
     chartData.push({
-      date: dayKey,
-      completed: completionMap[dayKey] || 0,
+      date: dateKey,
+      completed: completionByDay[dateKey] || 0,
     });
-
-    current = current.add(1, 'day');
+    currentDate = currentDate.add(1, 'day');
   }
 
   res.status(200).json({
