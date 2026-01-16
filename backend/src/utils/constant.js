@@ -15,3 +15,13 @@ export const ERROR_CODES = {
   UPLOAD_IMAGE: 'UPLOAD_IMAGE',
   PASSWORD_SAME_AS_OLD: 'PASSWORD_SAME_AS_OLD',
 };
+
+export const DAY_MAP = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+};
