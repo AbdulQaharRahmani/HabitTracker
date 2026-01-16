@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 import HabitCard from "./HabitCard";
 import api from "../../services/api";
+import Pagination from "./Pagination";
 
 export default function HabitList({ viewMode }) {
   const [habits, setHabits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [page, setPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 2;
+  const start = (page - 1) * ITEMS_PER_PAGE;
+
+  const visibleHabits = habits.slice(start, start + ITEMS_PER_PAGE);
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -52,24 +60,31 @@ export default function HabitList({ viewMode }) {
             : "my-6 space-y-4 ml-[1.35rem]"
         }
       >
-      {habits.length === 0 ? 
-        (
-          <p className="text-gray-500 text-lg">You have no habits yet. Add your first habit.</p>
+        {habits.length === 0 ? (
+          <p className="text-gray-500 text-lg">
+            You have no habits yet. Add your first habit.
+          </p>
         ) : (
-          habits.map((habit) => (
-          <HabitCard
-            key={habit._id}
-            id={habit._id}
-            viewMode={viewMode}
-            title={habit.title}
-            description={habit.description}
-            category={habit.category}
-            frequency={habit.frequency}
-            duration={habit.duration}
-          />
-      ))
-        )
-      }
+          visibleHabits.map((habit) => (
+            <HabitCard
+              key={habit._id}
+              id={habit._id}
+              viewMode={viewMode}
+              title={habit.title}
+              description={habit.description}
+              category={habit.category}
+              frequency={habit.frequency}
+              duration={habit.duration}
+            />
+          ))
+        )}
+        <Pagination
+          currentPage={page}
+          totalCount={habits.length}
+          siblingCount
+          pageSize={ITEMS_PER_PAGE}
+          onPageChange={setPage}
+        />
       </div>
     );
   }
