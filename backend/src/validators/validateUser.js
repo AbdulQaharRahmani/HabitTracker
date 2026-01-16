@@ -52,7 +52,7 @@ export const updateUsernameValidator = [
     .withMessage('Username is required')
     .isString()
     .withMessage('Username must be a string')
-    .isLength({ max: 30 })
+    .isLength({ max: 25 })
     .withMessage('The username length should be less than 25 letter')
     .trim(),
 ];
