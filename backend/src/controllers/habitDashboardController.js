@@ -107,27 +107,44 @@ export const getHabitsDashboard = async (req, res) => {
       ? 0
       : Math.round((totalCompleted / totalExpected) * 100);
 
-  // 4) Chart data
-  const chartData = {};
-
+  // 4) Chart data (daily completed habits for current month)
   const startOfMonth = dayjs(today).startOf('month').toDate();
+  const endOfMonth = dayjs(today).endOf('month').toDate();
+
+  // 1) Get all completions for this month in ONE query
+  const completions = await HabitCompletionModel.find({
+    userId: req.user._id,
+    date: {
+      $gte: startOfMonth,
+      $lte: endOfMonth,
+    },
+  });
+
+  // 2) Group by day
+  const completionMap = {};
+
+  completions.forEach((c) => {
+    const day = dayjs(c.date).format('YYYY-MM-DD');
+    completionMap[day] = (completionMap[day] || 0) + 1;
+  });
+  console.log(completionMap);
+
+  // 3) Build chart data day by day
+  const chartData = [];
+
   let current = dayjs(startOfMonth);
   const end = dayjs(today);
-  // console.log(startOfMonth, end);
-
-  // console.log(habitCompletions.length);
 
   while (current.isBefore(end) || current.isSame(end, 'day')) {
-    console.log(current.toDate());
-    const todayCompletions = await HabitCompletionModel.countDocuments({
-      userId: req.user._id,
-      date: current,
+    const dayKey = current.format('YYYY-MM-DD');
+
+    chartData.push({
+      date: dayKey,
+      completed: completionMap[dayKey] || 0,
     });
 
-    chartData[current] = todayCompletions;
     current = current.add(1, 'day');
   }
-  console.log(chartData);
 
   res.status(200).json({
     success: true,
