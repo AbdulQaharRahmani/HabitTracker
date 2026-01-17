@@ -2,6 +2,16 @@ import React, { useEffect } from 'react';
 import TodayCard from './TodayCard';
 import useHabitStore from '../store/useHabitStore';
 
+
+const iconMap = {
+  exercise: '🏋️‍♂️',
+  reading: '📚',
+  meditation: '🧘‍♀️',
+  coding:'💻',
+  cooking: '👩‍🍳',
+  default: '✨'
+};
+
 const TodayList = () => {
   const { habits, loading, error, fetchTodayHabits, toggleHabit } = useHabitStore();
 
@@ -19,7 +29,7 @@ const TodayList = () => {
           key={habit._id}
           title={habit.title}
           description={habit.description}
-          categoryIcon={habit.category?.icon || "✨"}
+          categoryIcon={habit.category?.icon || iconMap[habit.category.name]}
           color={habit.category?.backgroundColor || "blue"}
           completed={habit.completed}
           onToggleComplete={() => toggleHabit(habit._id)}

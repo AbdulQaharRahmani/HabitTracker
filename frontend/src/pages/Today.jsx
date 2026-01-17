@@ -23,34 +23,11 @@ function Today() {
               <TodayList />
           </div>
         <div className="flex flex-col gap-10 items-center ">
-          <CustomDatePicker />
+          <CustomDatePicker/>
           <CircularProgress percent={75} />
         </div>
       </div>
     </div>
   );
 }
-
-
-      // <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
-      //   <div>
-      //     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      //       {[1, 2, 3, 4].map((i) => (
-      //         <div
-      //           key={i}
-      //           className="h-[170px] bg-white rounded-2xl border border-dashed border-gray-300"
-      //         />
-      //       ))}
-      //     </div>
-      //   </div>
-
-      //   <div className="flex flex-col gap-10 items-center ">
-      //     <CustomDatePicker />
-      //     <CircularProgress percent={75} />
-      //   </div>
-      // </div>
-
-
-
-
 export default Today;
