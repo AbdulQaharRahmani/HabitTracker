@@ -4,6 +4,7 @@ import { MdEmail, MdLock } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import toast from "react-hot-toast";
+import useAuthStore from "../store/useAuthStore";
 
 export default function Login() {
     const [passwordType, setPasswordType] = useState("password");
@@ -15,18 +16,20 @@ export default function Login() {
         setPasswordType((prev) => (prev === "password" ? "text" : "password"));
     };
     const navigate = useNavigate();
+    const {login} = useAuthStore()
     const handleLogin = async (e) => {
         e.preventDefault();
         if (!email.trim() || !password.trim()) return toast.error("Please fill all fields!");
         setLoading(true);
         try {
             const response = await api.post("/auth/login", { email, password })
-            let token = response.data.data.token
+            const token = response.data.data.token
             if(token){
-                localStorage.setItem("token", token)
-            }
+            login(token)
             toast.success("Welcome again!");
             navigate("/")
+            }
+
         } catch (error) {
             console.log(`Could not login ${error}`);
             const message = error.response?.data?.message || error.response?.data?.error || "Unknown Error";
