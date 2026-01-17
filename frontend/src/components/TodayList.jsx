@@ -4,9 +4,10 @@ import useHabitStore from '../store/useHabitStore';
 
 
 const iconMap = {
-  exercise: '🏋️‍♂️',
+  Health: '🏋️‍♂️',
   reading: '📚',
   meditation: '🧘‍♀️',
+  Study: '📖',
   coding:'💻',
   cooking: '👩‍🍳',
   default: '✨'
@@ -22,6 +23,8 @@ const TodayList = () => {
   if (loading) return <div className="p-10 text-center">Loading habits...</div>;
   if (error) return <div className="p-10 text-red-500 text-center">{error}</div>;
 
+  console.log('Today Habits:', habits);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {habits.map((habit) => (
@@ -29,7 +32,10 @@ const TodayList = () => {
           key={habit._id}
           title={habit.title}
           description={habit.description}
-          categoryIcon={habit.category?.icon || iconMap[habit.category.name]}
+          categoryIcon={
+          habit.category?.icon ||
+          iconMap[habit.category?.name] ||
+          iconMap.default}
           color={habit.category?.backgroundColor || "blue"}
           completed={habit.completed}
           onToggleComplete={() => toggleHabit(habit._id)}
