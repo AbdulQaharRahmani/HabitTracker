@@ -32,7 +32,7 @@ function SignUp() {
     setLoading(true);
     try {
       const res = await registerUser({
-        username: fullName.trim(),
+        fullName: fullName.trim(),
         email: email.trim(),
         password: password.trim(),
       });
