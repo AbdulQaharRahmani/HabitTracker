@@ -19,8 +19,22 @@ function Pagination({
 
   if (currentPage === 0 || paginationRange.length < 2) return null;
 
+  const startItem = (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalCount);
+
   return (
     <div className="flex justify-center items-center pt-5">
+      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+        <p className="text-sm text-gray-700">
+          Displaying
+          <span className="font-medium"> {startItem} </span>
+          to
+          <span className="font-medium"> {endItem} </span>
+          out of
+          <span className="font-medium"> {totalCount} </span>
+          results
+        </p>
+      </div>
       <nav className="flex items-center gap-1">
         {/* Prev */}
         <button
