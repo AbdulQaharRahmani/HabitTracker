@@ -1,11 +1,25 @@
 import { TaskModel } from '../models/Task.js';
+import { ERROR_CODES } from '../utils/constant.js';
 import { DateHelper } from '../utils/date.js';
-import { AppError, notFound } from '../utils/error.js';
+import { CategoryModel } from '../models/Category.js';
+import {
+  AppError,
+  noFieldsProvidedForUpdate,
+  notFound,
+  unauthorized,
+} from '../utils/error.js';
 
 export const createTask = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
-  const { title, description, priority, dueDate } = req.body;
+  const { title, description, priority, dueDate, categoryId } = req.body;
+
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
+    categoryId,
+    req.user._id
+  );
+
+  if (!doesCategoryExist) throw notFound('Category');
 
   const task = await TaskModel.create({
     title,
@@ -13,6 +27,7 @@ export const createTask = async (req, res) => {
     priority,
     dueDate,
     userId: req.user._id,
+    categoryId,
   });
 
   res.status(201).json({
@@ -23,7 +38,7 @@ export const createTask = async (req, res) => {
 
 // Get task lists with pagination
 export const getTasks = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const limit = Number(req.query.limit) || 8;
   const page = Number(req.query.page) || 1;
@@ -40,17 +55,26 @@ export const getTasks = async (req, res) => {
 };
 
 export const deleteTask = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized', 401);
+  if (!req.user) throw unauthorized();
 
   const task = await TaskModel.findById(req.params.id);
   if (!task) throw notFound('Task');
 
   //Ensure the task belongs to the authenticated user
   if (String(req.user._id) !== String(task.userId))
-    throw new AppError('You are not allowed to remove this task', 403);
+    throw new AppError(
+      'You are not allowed to remove this task',
+      403,
+      ERROR_CODES.FORBIDDEN
+    );
 
   //Check task already deleted
-  if (task.isDeleted) throw new AppError('Task already deleted', 400);
+  if (task.isDeleted)
+    throw new AppError(
+      'Task already deleted',
+      400,
+      ERROR_CODES.RESOURCE_ALREADY_REMOVED
+    );
 
   task.deletedAt = new Date();
   task.isDeleted = true;
@@ -62,8 +86,9 @@ export const deleteTask = async (req, res) => {
     message: 'Task deleted successfully',
   });
 };
+
 export const filterTasks = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized', 401);
+  if (!req.user) throw unauthorized();
 
   const { searchTerm, status, priority, dueDate } = req.query;
 
@@ -93,7 +118,7 @@ export const filterTasks = async (req, res) => {
 };
 
 export const toggleTaskStatus = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authenticated', 401);
+  if (!req.user) throw unauthorized();
 
   const taskId = req.params.id;
 
@@ -113,10 +138,9 @@ export const toggleTaskStatus = async (req, res) => {
 };
 
 export const updateTask = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized', 401);
+  if (!req.user) unauthorized();
 
-  if (Object.keys(req.body).length === 0)
-    throw new AppError('No fields provided for update', 400);
+  if (Object.keys(req.body).length === 0) throw noFieldsProvidedForUpdate();
 
   const allowedFieldsToUpdate = {
     title: true,
@@ -124,6 +148,7 @@ export const updateTask = async (req, res) => {
     status: true,
     priority: true,
     dueDate: true,
+    categoryId: true
   };
 
   const updateQuery = {};
@@ -132,6 +157,14 @@ export const updateTask = async (req, res) => {
     if (key in allowedFieldsToUpdate) updateQuery[key] = req.body[key];
   }
 
+  if (updateQuery?.categoryId) {
+    const doesCategoryExist = await CategoryModel.doesCategoryExist(
+      req.body.categoryId,
+      req.user._id
+    );
+    if (!doesCategoryExist) throw notFound('Category');
+  }
+  
   const task = await TaskModel.findOneAndUpdate(
     { _id: req.params.id, userId: req.user._id },
     { $set: updateQuery },
