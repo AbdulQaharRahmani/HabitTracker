@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import '../../services/taskPageAPI/task_api.dart';
 
 class NewTaskPage extends StatefulWidget {
   const NewTaskPage({super.key});
@@ -13,6 +14,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
   final _descController = TextEditingController();
   final _timeController = TextEditingController();
 
+  final TaskApiService _apiService = TaskApiService();
+
+  bool _isLoading = false;
+
+  // TEMP TOKEN
+  final String token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NWJmNzdlYjEzZjMwNjgyMDg1OGI5NCIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3NjgxMTgwMzUsImV4cCI6MTc2ODIwNDQzNX0.5wFURarfZvj-pw7eBq3FOdxeedL8fUmhzaI6qCVIxwQ";
+
   String _selectedCategory = 'Work';
   final List<String> _categories = [
     'Work',
@@ -21,6 +30,38 @@ class _NewTaskPageState extends State<NewTaskPage> {
     'Fitness',
     'Personal',
   ];
+
+  Future<void> _createTask() async {
+    if (_titleController.text.isEmpty || _descController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Title and description are required')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _apiService.addTask(
+        token: token,
+        category: _selectedCategory.toLowerCase(),
+        title: _titleController.text.trim(),
+        description: _descController.text.trim(),
+        frequency: _timeController.text,
+        status: 'todo',
+        priority: 'medium',
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context, true); // return success
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,17 +135,17 @@ class _NewTaskPageState extends State<NewTaskPage> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Create Task',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.surface,
-                  ),
-                ),
+                onPressed: _isLoading ? null : _createTask,
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Create Task',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.surface,
+                        ),
+                      ),
               ),
             ),
           ],
@@ -128,10 +169,10 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   Widget _buildTextField(
-      TextEditingController controller,
-      String hint,
-      int maxLines,
-      ) {
+    TextEditingController controller,
+    String hint,
+    int maxLines,
+  ) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
