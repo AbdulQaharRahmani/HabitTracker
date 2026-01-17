@@ -9,7 +9,7 @@ export default function HabitList({ viewMode }) {
 
   const [page, setPage] = useState(1);
 
-  const ITEMS_PER_PAGE = 2;
+  const ITEMS_PER_PAGE = 10;
   const start = (page - 1) * ITEMS_PER_PAGE;
 
   const visibleHabits = allhabits.slice(start, start + ITEMS_PER_PAGE);
