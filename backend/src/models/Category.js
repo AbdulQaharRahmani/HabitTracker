@@ -8,6 +8,11 @@ const CategorySchema = new mongoose.Schema(
       minLength: 1,
       required: true,
     },
+    clientId: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

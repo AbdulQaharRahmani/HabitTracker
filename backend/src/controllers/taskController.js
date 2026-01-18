@@ -8,6 +8,7 @@ import {
   notFound,
   unauthorized,
 } from '../utils/error.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createTask = async (req, res) => {
   if (!req.user) throw unauthorized();
@@ -27,6 +28,7 @@ export const createTask = async (req, res) => {
     priority,
     dueDate,
     userId: req.user._id,
+    clientId: uuidv4(),
     categoryId,
   });
 
@@ -148,7 +150,7 @@ export const updateTask = async (req, res) => {
     status: true,
     priority: true,
     dueDate: true,
-    categoryId: true
+    categoryId: true,
   };
 
   const updateQuery = {};
@@ -164,7 +166,7 @@ export const updateTask = async (req, res) => {
     );
     if (!doesCategoryExist) throw notFound('Category');
   }
-  
+
   const task = await TaskModel.findOneAndUpdate(
     { _id: req.params.id, userId: req.user._id },
     { $set: updateQuery },
