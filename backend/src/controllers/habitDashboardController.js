@@ -90,7 +90,6 @@ export const getHabitsDashboard = async (req, res) => {
 
   // Calculate expected vs actual completions for each habit in the week
   habits.forEach((habit) => {
-    // const habitStart = dayjs(habit.createdAt)
     const habitStart = dayjs(habit.createdAt).isAfter(startOfWeek)
       ? dayjs(habit.createdAt)
       : startOfWeek;
