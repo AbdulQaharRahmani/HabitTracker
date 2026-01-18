@@ -1,4 +1,5 @@
 ﻿import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
 import habitRoutes from './routes/habits.js';
@@ -14,7 +15,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({ origin: '*' }));
-
+app.use(cookieParser());
 //#endregion
 
 //#region Route Middlewares

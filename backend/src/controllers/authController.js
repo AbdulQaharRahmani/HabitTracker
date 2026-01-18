@@ -1,6 +1,5 @@
-import { AppError, notFound } from '../utils/error.js';
+import { AppError, notFound, unauthorized } from '../utils/error.js';
 import { UserModel } from '../models/User.js';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { ERROR_CODES } from '../utils/constant.js';
 import crypto from 'crypto';
@@ -8,6 +7,12 @@ import { verifyGoogleToken } from '../utils/googleOAuth.js';
 import mongoose from 'mongoose';
 import { CategoryModel } from '../models/Category.js';
 import { getDefaultCategories } from '../utils/defaultCategories.js';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  hashRefreshToken,
+} from '../utils/jwt.js';
+import { refreshTokenModel } from '../models/RefreshToken.js';
 
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -74,17 +79,32 @@ export const loginUser = async (req, res) => {
     );
   }
 
-  const token = jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
-  );
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken();
+  const hashedToken = hashRefreshToken(refreshToken);
+
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
+
+  await refreshTokenModel.create({
+    userId: user._id,
+    token: hashedToken,
+    expiresAt: expiresAt,
+  });
+
+  //send token in cookie
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   res.status(200).json({
     success: true,
     message: 'Login Successfully',
     data: {
-      token,
+      accessToken,
       id: user._id,
       email: user.email,
       username: user.username,
@@ -145,19 +165,77 @@ export const googleLogin = async (req, res) => {
     await user.save();
   }
 
-  const token = jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
-  );
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken();
+  const hashedToken = hashRefreshToken(refreshToken);
+
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // expired at 7 days
+
+  await refreshTokenModel.create({
+    userId: user._id,
+    token: hashedToken,
+    expiresAt: expiresAt,
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   res.status(200).json({
     success: true,
     message: 'Login Successfully',
     data: {
-      token,
+      accessToken,
       id: user._id,
       email: user.email,
     },
   });
+};
+
+export const refreshAccessToken = async (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token) throw unauthorized();
+
+  const hashedToken = hashRefreshToken(token);
+  const storeToken = await refreshTokenModel.findOne({ token: hashedToken });
+
+  if (!storeToken) throw notFound('Token');
+
+  if (storeToken.expiresAt <= new Date())
+    throw new AppError('Refresh token expired', 403, ERROR_CODES.FORBIDDEN);
+
+  await refreshTokenModel.deleteOne({ token: hashedToken }); //delete previous hashed token
+
+  const accessToken = generateAccessToken(storeToken.userId);
+  const refreshToken = generateRefreshToken();
+
+  await refreshTokenModel.create({
+    userId: storeToken.userId,
+    token: hashRefreshToken(refreshToken),
+    expiresAt: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000), //expired at 7 days
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.status(200).json({ accessToken: accessToken });
+};
+
+export const logOutUser = async (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token) throw notFound('Token');
+
+  const hashed = hashRefreshToken(token);
+  await refreshTokenModel.deleteOne({ token: hashed });
+
+  res.clearCookie('refreshToken');
+  res.status(200).json({ success: true, message: 'Logout successfully' });
 };
