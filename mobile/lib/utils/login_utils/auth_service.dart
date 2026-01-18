@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../taskpage_components/token_storage.dart';
 
 class AuthService {
   final String baseUrl = "https://habit-tracker-17sr.onrender.com";
@@ -12,7 +13,7 @@ class AuthService {
     final url = Uri.parse("$baseUrl/api/auth/login");
 
     try {
-      print("🔵 trying to login...");
+      print("🔵 Trying to login...");
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -20,30 +21,25 @@ class AuthService {
       );
 
       final responseData = jsonDecode(response.body);
-      print("🟢Server response: ${response.body}");
+      print("🟢 Server response: ${response.body}");
 
       if (response.statusCode == 200 && responseData['success'] == true) {
-        final prefs = await SharedPreferences.getInstance();
-
-        String? tokenToSave;
+        // Save token using TokenStorage
         if (responseData['data'] != null && responseData['data']['token'] != null) {
-          tokenToSave = responseData['data']['token'];
-        }
-
-        if (tokenToSave != null) {
-          await prefs.setString('auth_token', tokenToSave);
+          final token = responseData['data']['token'];
+          await TokenStorage.saveToken(token);
           print("✅ Token saved successfully");
           return responseData;
         } else {
-          print("❌ Error:Token filed not found in server response.");
-          return {"success": false, "message": "The token structure in not valid"};
+          print("❌ Token not found in server response.");
+          return {"success": false, "message": "Invalid token structure"};
         }
       } else {
-        return {"success": false, "message": responseData['message'] ?? "Error in login"};
+        return {"success": false, "message": responseData['message'] ?? "Login failed"};
       }
     } catch (e) {
       print("🔴 Exception error: $e");
-      return {"success": false, "message": "Error with connecting to network"};
+      return {"success": false, "message": "Network or server error"};
     }
   }
 }

@@ -4,7 +4,7 @@ import 'package:habit_tracker/screens/categoryScreen/add_category.dart';
 
 import '../../app/app_theme.dart';
 import '../../utils/category/category_card.dart';
-import '../../utils/category/model.dart';
+import '../../utils/category/category_model.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
