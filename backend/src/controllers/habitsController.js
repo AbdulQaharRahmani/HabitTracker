@@ -109,6 +109,7 @@ export const createHabit = async (req, res) => {
     order: habitCount + 1,
     categoryId,
     clientId: uuidv4(),
+    startDate: new Date(),
   });
 
   res.status(201).json({
