@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa";
 import { MdEmail, MdLock } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import toast from "react-hot-toast";
 
 export default function Login() {
     const [passwordType, setPasswordType] = useState("password");
@@ -16,7 +17,7 @@ export default function Login() {
     const navigate = useNavigate();
     const handleLogin = async (e) => {
         e.preventDefault();
-        if (!email.trim() || !password.trim()) return alert("Please fill all fields!");
+        if (!email.trim() || !password.trim()) return toast.error("Please fill all fields!");
         setLoading(true);
         try {
             const response = await api.post("/auth/login", { email, password })
@@ -24,12 +25,12 @@ export default function Login() {
             if(token){
                 localStorage.setItem("token", token)
             }
-            alert("Welcome again!")
+            toast.success("Welcome again!");
             navigate("/")
         } catch (error) {
             console.log(`Could not login ${error}`);
             const message = error.response?.data?.message || error.response?.data?.error || "Unknown Error";
-            alert(JSON.stringify(message))
+            toast.error(`${JSON.stringify(message)}`)
         } finally {
             setLoading(false);
         }
