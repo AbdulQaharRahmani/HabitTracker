@@ -35,7 +35,10 @@ export const syncOfflineData = async (req, res) => {
       });
       newOfflineCategories[category.clientId] = newCategory._id.toString();
       operationLogsList.push({ operationId: category.operationId, userId });
-      result.applied.push({ operationId: category.operationId });
+      result.applied.push({
+        operationId: category.operationId,
+        _id: newCategory._id.toString(),
+      });
     } catch (error) {
       result.failed.push({
         ...category,
@@ -60,9 +63,12 @@ export const syncOfflineData = async (req, res) => {
         createQuery.categoryId = newOfflineCategories[clientCategoryId];
       }
 
-      await HabitModel.create(createQuery);
+      const newHabit = await HabitModel.create(createQuery);
       operationLogsList.push({ operationId: habit.operationId, userId });
-      result.applied.push({ operationId: habit.operationId });
+      result.applied.push({
+        operationId: habit.operationId,
+        _id: newHabit._id.toString(),
+      });
     } catch (error) {
       result.failed.push({
         ...habit,
@@ -84,9 +90,12 @@ export const syncOfflineData = async (req, res) => {
         createQuery.categoryId = newOfflineCategories[clientCategoryId];
       }
 
-      await TaskModel.create(createQuery);
+      const newTask = await TaskModel.create(createQuery);
       operationLogsList.push({ operationId: task.operationId, userId });
-      result.applied.push({ operationId: task.operationId });
+      result.applied.push({
+        operationId: task.operationId,
+        _id: newTask._id.toString(),
+      });
     } catch (error) {
       result.failed.push({
         ...task,
