@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { HiChevronDown, HiCheck } from "react-icons/hi";
+import useClickOutside from "../hooks/useClickOutside";
 
 export default function Dropdown({ items, value, getValue, placeholder }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false)
@@ -11,8 +12,9 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
         getValue(itemValue)
         setDropdownOpen(false)
     }
-    return (
-        <div className="w-full relative">
+    const dropdownRef = useClickOutside(()=> setDropdownOpen(false))
+    return (<>
+        <div className="w-full relative" ref={dropdownRef}>
             <div className="relative w-full">
                 <input
                     type="text"
@@ -25,7 +27,8 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
                 />
 
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 group-focus-within:text-[#7B68EE] transition-colors">
-                    <HiChevronDown size={21} className="text-[#7B68EE]" />
+                    <HiChevronDown size={21} className={`text-[#7B68EE] transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                    />
                 </div>
             </div>
             {
@@ -35,14 +38,14 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
                             <li
                                 key={item.id}
                                 data-value={item.value}
-                                className="group flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-sm text-gray-600 transition-all hover:bg-[#7B68EE]/10 hover:text-[#7B68EE]"
+                                className="group flex cursor-pointer items-center justify-start rounded-lg px-4 py-3 text-sm text-gray-600 transition-all hover:bg-[#7B68EE]/10 hover:text-[#7B68EE]"
                                 onClick={() => handleSelect(item.value)}
                             >
-                                <span className="font-medium">{item.name}</span>
+                                <span className="font-medium ps-4">{item.name}</span>
 
                                 <HiCheck
                                     size={18}
-                                    className="opacity-0 transition-opacity group-hover:opacity-100 text-[#7B68EE]"
+                                    className="opacity-0 transition-opacity group-hover:opacity-100 text-[#7B68EE] ms-auto"
                                 />
                             </li>
                         ))}
@@ -51,6 +54,7 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
             }
 
         </div>
+    </>
     );
 }
 
