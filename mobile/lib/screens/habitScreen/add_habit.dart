@@ -130,10 +130,9 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     super.initState();
     _fetchCategories();
   }
-
+// Method for getting token from cache
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    // باید دقیقاً همان کلیدی باشد که در auth_service استفاده کردیم
     return prefs.getString('auth_token');
   }
 
@@ -147,13 +146,11 @@ class _AddHabitFormState extends State<_AddHabitForm> {
 
     try {
       final token = await _getToken();
-
-      // لاگ کردن توکن برای اطمینان (در کنسول چک کنید)
       print("🚀 Fetching Categories with Token: ${token != null ? 'Present' : 'NULL'}");
 
       if (token == null) {
         setState(() {
-          _errorMessage = "خطا: لطفاً دوباره وارد حساب شوید (توکن یافت نشد)";
+          _errorMessage = "Error: Please relogin to account, token not found)";
           _isLoadingCategories = false;
         });
         return;
@@ -172,7 +169,6 @@ class _AddHabitFormState extends State<_AddHabitForm> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedData = jsonDecode(response.body);
 
-        // دسترسی به کلید data طبق JSON شما
         final List<dynamic> categoriesJson = decodedData['data'];
 
         setState(() {
@@ -191,7 +187,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     } catch (e) {
       print("❌ Connection Exception: $e");
       setState(() {
-        _errorMessage = "خطای اتصال اینترنت";
+        _errorMessage = "Error with connecting to network";
         _isLoadingCategories = false;
       });
     }
@@ -208,7 +204,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
       final token = await _getToken();
 
       if (token == null) {
-        _showSnackBar("لطفاً دوباره لاگین کنید");
+        _showSnackBar("Please login again");
         setState(() => _isSubmitting = false);
         return;
       }
@@ -223,7 +219,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
           "title": _titleCtl.text.trim(),
           "description": _descCtl.text.trim(),
           "frequency": _frequency.toLowerCase(),
-          "categoryId": _selectedCategory!.id, // استفاده از ID کتگوری
+          "categoryId": _selectedCategory!.id,
         }),
       ).timeout(const Duration(seconds: 20));
 
@@ -238,10 +234,10 @@ class _AddHabitFormState extends State<_AddHabitForm> {
         Navigator.pop(context);
       } else {
         print("❌ Submit Error Body: ${response.body}");
-        _showSnackBar("ثبت نشد: ${response.statusCode}");
+        _showSnackBar("Not registered: ${response.statusCode}");
       }
     } catch (e) {
-      _showSnackBar("خطای اتصال");
+      _showSnackBar("connection error");
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
