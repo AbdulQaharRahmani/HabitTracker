@@ -8,6 +8,7 @@ import { PreferenceModel } from '../models/Preference.js';
 import { DateHelper } from '../utils/date.js';
 import { DAY_MAP, ERROR_CODES } from '../utils/constant.js';
 import { AppError } from '../utils/error.js';
+import { getActiveHabitIds } from '../utils/habit.js';
 
 export const getHabitsDashboard = async (req, res) => {
   // Get user preference and start, end of week
@@ -34,11 +35,7 @@ export const getHabitsDashboard = async (req, res) => {
   let currentStreak = 0;
   let currentDay = today.toDate();
 
-  const activeHabitIds = (
-    await HabitModel.find({ userId: req.user._id, isDeleted: false }).select(
-      '_id'
-    )
-  ).map((h) => h._id);
+  const activeHabitIds = await getActiveHabitIds(req.user._id);
 
   while (true) {
     const startOfDay = dayjs(currentDay).startOf('day').toDate();
@@ -154,11 +151,7 @@ export const getHabitChartData = async (req, res) => {
     );
   }
 
-  const activeHabitIds = (
-    await HabitModel.find({ userId: req.user._id, isDeleted: false }).select(
-      '_id'
-    )
-  ).map((h) => h._id);
+  const activeHabitIds = await getActiveHabitIds(req.user._id);
 
   const completions = await HabitCompletionModel.aggregate([
     {
