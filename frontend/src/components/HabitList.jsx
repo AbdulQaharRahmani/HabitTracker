@@ -3,11 +3,11 @@ import HabitCard from "./HabitCard";
 import useHabitStore from "../store/useHabitStore";
 
 export default function HabitList({ viewMode }) {
- const { habits, loading, error, fetchHabits } = useHabitStore();
+ const { allhabits, loading, error, fetchHabits } = useHabitStore();
 
   useEffect(() => {
     fetchHabits();
-  }, []);
+  }, [fetchHabits]);
   if (loading) {
     return (
       <p className="text-gray-300 text-lg text-semibold my-4 text-center">
@@ -33,11 +33,11 @@ export default function HabitList({ viewMode }) {
             : "my-6 space-y-4 ml-[1.35rem]"
         }
       >
-      {habits.length === 0 ?
+      {allhabits.length === 0 ?
         (
           <p className="text-gray-500 text-lg">You have no habits yet. Add your first habit.</p>
         ) : (
-          habits.map((habit) => (
+          allhabits.map((habit) => (
           <HabitCard
             key={habit._id}
             _id={habit._id}
