@@ -46,7 +46,8 @@ export const getTasks = async (req, res) => {
 
   const tasks = await TaskModel.find({ userId: req.user._id, deletedAt: null })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .populate('categoryId', 'name icon backgroundColor');
 
   res.status(200).json({
     success: true,
@@ -112,7 +113,9 @@ export const filterTasks = async (req, res) => {
     };
   }
 
-  const tasks = await TaskModel.find({ ...query }).lean();
+  const tasks = await TaskModel.find({ ...query })
+    .populate('categoryId', 'name icon backgroundColor')
+    .lean();
 
   res.status(200).json({ success: true, data: tasks });
 };
@@ -148,7 +151,7 @@ export const updateTask = async (req, res) => {
     status: true,
     priority: true,
     dueDate: true,
-    categoryId: true
+    categoryId: true,
   };
 
   const updateQuery = {};
@@ -164,7 +167,7 @@ export const updateTask = async (req, res) => {
     );
     if (!doesCategoryExist) throw notFound('Category');
   }
-  
+
   const task = await TaskModel.findOneAndUpdate(
     { _id: req.params.id, userId: req.user._id },
     { $set: updateQuery },
