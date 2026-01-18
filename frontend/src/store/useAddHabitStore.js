@@ -19,10 +19,6 @@ const useAddHabitStore = create((set) => ({
             }
         }))
     }
-
-
-
-
 }))
 
 export default useAddHabitStore

@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { HiChevronDown, HiCheck } from "react-icons/hi";
 
-export function Dropdown({ items, value, getValue, placeholder }) {
+export default function Dropdown({ items, value, getValue, placeholder }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false)
 
     const handleDropdownVisibility = () => {
         setDropdownOpen(!isDropdownOpen)
     }
     const handleSelect = (itemValue) => {
-        getValue({ target: { value: itemValue } })
+        getValue(itemValue)
         setDropdownOpen(false)
     }
     return (
