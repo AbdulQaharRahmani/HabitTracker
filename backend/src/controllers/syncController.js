@@ -1,5 +1,6 @@
 import { CategoryModel } from '../models/Category.js';
 import { HabitModel } from '../models/Habit.js';
+import { HabitCompletionModel } from '../models/HabitCompletion.js';
 import { OperationLogModel } from '../models/OperationLog.js';
 import { PreferenceModel } from '../models/Preference.js';
 import { TaskModel } from '../models/Task.js';
@@ -19,10 +20,12 @@ export const syncOfflineData = async (req, res) => {
     habitOperations,
     taskOperations,
     userPreferenceOperations,
+    habitCompletionOperations,
   ] = await getOperations(req.body.operations, userId, result);
 
   const operationLogsList = [];
   const newOfflineCategories = {};
+  const newOfflineHabits = {};
 
   // Get last habit order
   const lastHabit = await HabitModel.findOne({ userId })
@@ -64,12 +67,14 @@ export const syncOfflineData = async (req, res) => {
         startDate: habit.payload.startDate || new Date(),
       };
 
-      const clientCategoryId = habit.payload.categoryClientId;
+      const clientCategoryId = habit.payload?.categoryClientId;
       if (clientCategoryId && clientCategoryId in newOfflineCategories) {
         createQuery.categoryId = newOfflineCategories[clientCategoryId];
       }
 
       const newHabit = await HabitModel.create(createQuery);
+
+      newOfflineHabits[habit.clientId] = newHabit._id.toString();
       operationLogsList.push({ operationId: habit.operationId, userId });
       result.applied.push({
         operationId: habit.operationId,
@@ -126,13 +131,21 @@ export const syncOfflineData = async (req, res) => {
           updateQuery[key] = category.payload[key];
       }
 
-      await CategoryModel.updateOne(
+      const updated = await CategoryModel.findOneAndUpdate(
         { userId, clientId: category.clientId },
-        { $set: updateQuery }
+        { $set: updateQuery },
+        { new: true }
       );
 
-      operationLogsList.push({ operationId: category.operationId, userId });
-      result.applied.push({ operationId: category.operationId });
+      if (updated) {
+        operationLogsList.push({ operationId: category.operationId, userId });
+        result.applied.push({
+          operationId: category.operationId,
+          _id: updated._id.toString(),
+        });
+      } else {
+        result.failed.push({ ...category, message: 'Category not found' });
+      }
     } catch (error) {
       result.failed.push({ ...category, message: error.message });
     }
@@ -147,9 +160,7 @@ export const syncOfflineData = async (req, res) => {
         frequency: true,
         order: true,
       };
-
       const updateQuery = {};
-
       for (const key of Object.keys(habit.payload)) {
         if (key in allowedFieldsToUpdate) updateQuery[key] = habit.payload[key];
       }
@@ -161,13 +172,21 @@ export const syncOfflineData = async (req, res) => {
         updateQuery.categoryId = newOfflineCategories[updateQuery.categoryId];
       }
 
-      await HabitModel.updateOne(
+      const updated = await HabitModel.findOneAndUpdate(
         { userId, clientId: habit.clientId },
-        { $set: updateQuery }
+        { $set: updateQuery },
+        { new: true }
       );
 
-      operationLogsList.push({ operationId: habit.operationId, userId });
-      result.applied.push({ operationId: habit.operationId });
+      if (updated) {
+        operationLogsList.push({ operationId: habit.operationId, userId });
+        result.applied.push({
+          operationId: habit.operationId,
+          _id: updated._id.toString(),
+        });
+      } else {
+        result.failed.push({ ...habit, message: 'Habit not found' });
+      }
     } catch (error) {
       result.failed.push({ ...habit, message: error.message });
     }
@@ -197,13 +216,21 @@ export const syncOfflineData = async (req, res) => {
         updateQuery.categoryId = newOfflineCategories[updateQuery.categoryId];
       }
 
-      await TaskModel.updateOne(
+      const updated = await TaskModel.findOneAndUpdate(
         { userId, clientId: task.clientId },
-        { $set: updateQuery }
+        { $set: updateQuery },
+        { new: true }
       );
 
-      operationLogsList.push({ operationId: task.operationId, userId });
-      result.applied.push({ operationId: task.operationId });
+      if (updated) {
+        operationLogsList.push({ operationId: task.operationId, userId });
+        result.applied.push({
+          operationId: task.operationId,
+          _id: updated._id.toString(),
+        });
+      } else {
+        result.failed.push({ ...task, message: 'Task not found' });
+      }
     } catch (error) {
       result.failed.push({ ...task, message: error.message });
     }
@@ -226,7 +253,10 @@ export const syncOfflineData = async (req, res) => {
       }
 
       operationLogsList.push({ operationId: habit.operationId, userId });
-      result.applied.push({ operationId: habit.operationId });
+      result.applied.push({
+        operationId: habit.operationId,
+        _id: habitRecord._id.toString(),
+      });
     } catch (error) {
       result.failed.push({ ...habit, message: error.message });
     }
@@ -250,7 +280,10 @@ export const syncOfflineData = async (req, res) => {
       }
 
       operationLogsList.push({ operationId: task.operationId, userId });
-      result.applied.push({ operationId: task.operationId });
+      result.applied.push({
+        operationId: task.operationId,
+        _id: taskRecord._id.toString(),
+      });
     } catch (error) {
       result.failed.push({ ...task, message: error.message });
     }
@@ -264,7 +297,6 @@ export const syncOfflineData = async (req, res) => {
         userId,
         clientId: category.clientId,
       });
-
       if (!categoryRecord) {
         result.failed.push({ ...category, message: 'Category not found' });
         continue;
@@ -289,7 +321,10 @@ export const syncOfflineData = async (req, res) => {
 
       await CategoryModel.deleteOne({ _id: categoryRecord._id });
       operationLogsList.push({ operationId: category.operationId, userId });
-      result.applied.push({ operationId: category.operationId });
+      result.applied.push({
+        operationId: category.operationId,
+        _id: categoryRecord._id.toString(),
+      });
     } catch (error) {
       result.failed.push({ ...category, message: error.message });
     }
@@ -341,6 +376,52 @@ export const syncOfflineData = async (req, res) => {
     }
   }
 
+  for (const completionOp of habitCompletionOperations) {
+    try {
+      const payload = completionOp.payload;
+
+      let habitId = payload?.habitId;
+
+      if (payload.habitClientId && newOfflineHabits[payload.habitClientId]) {
+        habitId = newOfflineHabits[payload.habitClientId];
+      }
+
+      const startOfDay = DateHelper.getStartOfDate(payload.date);
+      const endOfDay = DateHelper.getEndOfDate(payload.date);
+
+      const existing = await HabitCompletionModel.findOne({
+        habitId,
+        userId,
+        date: { $gte: startOfDay, $lte: endOfDay },
+      });
+
+      if (existing) {
+        result.applied.push({
+          operationId: completionOp.operationId,
+          _id: existing._id.toString(),
+        });
+        continue;
+      }
+
+      const newCompletion = await HabitCompletionModel.create({
+        habitId,
+        userId,
+        date: payload.date,
+      });
+
+      operationLogsList.push({ operationId: completionOp.operationId, userId });
+      result.applied.push({
+        operationId: completionOp.operationId,
+        _id: newCompletion._id.toString(),
+      });
+    } catch (error) {
+      result.failed.push({
+        ...completionOp,
+        message: error.message,
+      });
+    }
+  }
+
   await UserModel.findByIdAndUpdate(userId, { lastTimeSync: new Date() });
   result.lastTimeSync = new Date();
 
@@ -356,6 +437,7 @@ async function getOperations(operations, userId, result) {
   const habitOperations = [];
   const taskOperations = [];
   const userPreferenceOperations = [];
+  const habitCompletionOperations = [];
 
   const existingOps = await OperationLogModel.find({ userId })
     .select('operationId')
@@ -385,6 +467,10 @@ async function getOperations(operations, userId, result) {
         userPreferenceOperations.push(op);
         break;
       }
+      case 'habitCompletion': {
+        habitCompletionOperations.push(op);
+        break;
+      }
       default: {
         result.invalidEntity.push(op);
         break;
@@ -397,5 +483,6 @@ async function getOperations(operations, userId, result) {
     habitOperations,
     taskOperations,
     userPreferenceOperations,
+    habitCompletionOperations,
   ];
 }
