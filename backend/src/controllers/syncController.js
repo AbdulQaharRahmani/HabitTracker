@@ -1,8 +1,10 @@
 import { CategoryModel } from '../models/Category.js';
 import { HabitModel } from '../models/Habit.js';
 import { OperationLogModel } from '../models/OperationLog.js';
+import { PreferenceModel } from '../models/Preference.js';
 import { TaskModel } from '../models/Task.js';
 import { UserModel } from '../models/User.js';
+import { DateHelper } from '../utils/date.js';
 import { unauthorized } from '../utils/error.js';
 
 export const syncOfflineData = async (req, res) => {
@@ -10,10 +12,14 @@ export const syncOfflineData = async (req, res) => {
 
   const userId = req.user._id;
 
-  const result = { applied: [], skipped: [], failed: [] };
+  const result = { applied: [], skipped: [], failed: [], invalidEntity: [] };
 
-  const [categoryOperations, habitOperations, taskOperations] =
-    await getOperations(req.body.operations, userId, result);
+  const [
+    categoryOperations,
+    habitOperations,
+    taskOperations,
+    userPreferenceOperations,
+  ] = await getOperations(req.body.operations, userId, result);
 
   const operationLogsList = [];
   const newOfflineCategories = {};
@@ -289,6 +295,52 @@ export const syncOfflineData = async (req, res) => {
     }
   }
 
+  for (const userPreferenceOperation of userPreferenceOperations) {
+    try {
+      const payload = userPreferenceOperation.payload;
+
+      const allowedFieldsToUpdate = {
+        weekStartDay: true,
+        dailyReminderTime: true,
+        dailyReminderEnabled: true,
+        timezone: true,
+        streakAlertEnabled: true,
+        weeklySummaryEmailEnabled: true,
+        theme: true,
+      };
+
+      const updateQuery = {};
+
+      for (let key of Object.keys(payload)) {
+        if (key in allowedFieldsToUpdate) updateQuery[key] = payload[key];
+      }
+
+      if (updateQuery.timezone) {
+        updateQuery.timezone = DateHelper.TIMEZONES[updateQuery.timezone];
+      }
+
+      const preference = await PreferenceModel.findOneAndUpdate(
+        { userId },
+        { $setOnInsert: { userId }, $set: updateQuery },
+        { upsert: true, new: true, runValidators: true }
+      );
+
+      operationLogsList.push({
+        operationId: userPreferenceOperation.operationId,
+        userId,
+      });
+      result.applied.push({
+        operationId: userPreferenceOperation.operationId,
+        _id: preference._id.toString(),
+      });
+    } catch (error) {
+      result.failed.push({
+        ...userPreferenceOperation,
+        message: error.message,
+      });
+    }
+  }
+
   await UserModel.findByIdAndUpdate(userId, { lastTimeSync: new Date() });
   result.lastTimeSync = new Date();
 
@@ -303,7 +355,7 @@ async function getOperations(operations, userId, result) {
   const categoryOperations = [];
   const habitOperations = [];
   const taskOperations = [];
-  const invalidEntity = [];
+  const userPreferenceOperations = [];
 
   const existingOps = await OperationLogModel.find({ userId })
     .select('operationId')
@@ -329,12 +381,21 @@ async function getOperations(operations, userId, result) {
         taskOperations.push(op);
         break;
       }
+      case 'userPreference': {
+        userPreferenceOperations.push(op);
+        break;
+      }
       default: {
-        invalidEntity.push(op);
+        result.invalidEntity.push(op);
         break;
       }
     }
   }
 
-  return [categoryOperations, habitOperations, taskOperations, invalidEntity];
+  return [
+    categoryOperations,
+    habitOperations,
+    taskOperations,
+    userPreferenceOperations,
+  ];
 }
