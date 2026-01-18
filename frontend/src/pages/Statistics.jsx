@@ -6,6 +6,7 @@ import CurrentStreakStatics from '../components/CurrentStreakStatics';
 import CompletionRateStatics from '../components/CompletionRateStatics';
 import i18n from '../utils/i18n';
 import { useTranslation } from "react-i18next";
+import StatisticsChart from '../components/StatisticsChart'
 
 function Statistics() {
   const { t } = useTranslation();
@@ -45,6 +46,7 @@ function Statistics() {
       </div>
       <div className="ml-7 ">
         <DayilyConsistency />
+        <StatisticsChart />
       </div>
     </div>
   );
