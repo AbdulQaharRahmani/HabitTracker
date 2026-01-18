@@ -1,11 +1,33 @@
 import { create } from "zustand"
 import api from "../../services/api"
 import toast from "react-hot-toast";
+import { getTodayHabits } from "../../services/habitService";
 const useHabitStore = create((set) => ({
+  habits: [],
+  loading: false,
+  error: null,
+  fetchTodayHabits: async () => {
+    set({ loading: true, error: null });
+    try {
+        const habits = await getTodayHabits();
+      set({ habits, loading: false });
+    } catch (err) {
+      set({
+        error: err.response?.data?.message || "Failed to load habits",
+        loading: false,
+      });
+    }
+  },
+  toggleHabit: (id) => {
+    set((state) => ({
+      habits: state.habits.map((habit) =>
+        habit._id === id ? { ...habit, completed: !habit.completed } : habit
+      ),
+    }));
+    },
     isModalOpen: false,
     isEditingMode: false,
     currentHabitID: null,
-    loading: false,
 
     habitData: {
         title: "",
@@ -77,13 +99,13 @@ const useHabitStore = create((set) => ({
         }
 
     },
-    habits: [],
+    allhabits: [],
     fetchHabits: async () => {
-        set({ loading: true });
+        set({ loading: true, error: null });
         try {
             const response = await api.get("/habits");
             const data = response.data;
-            set({ habits: Array.isArray(data) ? data : data.data || [] });
+            set({ allhabits: Array.isArray(data) ? data : data.data || [] });
         } catch (err) {
             const message = err.response?.data?.message || "Failed to fetch habits";
             set({ error: message });
