@@ -8,6 +8,7 @@ import { CategoryModel } from '../models/Category.js';
 import { TaskModel } from '../models/Task.js';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { getDefaultCategories } from '../utils/defaultCategories.js';
 dotenv.config();
 
 await connectDB();
@@ -106,13 +107,9 @@ const seed = async () => {
     password: hashedPassword,
   });
 
-  // Create Category Data
-  const categories = await CategoryModel.insertMany([
-    { name: 'Other', userId: user._id, clientId: uuidv4() },
-    { name: 'Health', userId: user._id, clientId: uuidv4() },
-    { name: 'Study', userId: user._id, clientId: uuidv4() },
-    { name: 'Work', userId: user._id, clientId: uuidv4() },
-  ]);
+  const defaultCategories = getDefaultCategories(user._id);
+
+  const categories = await CategoryModel.insertMany(defaultCategories);
 
   const startDate = new Date();
 
