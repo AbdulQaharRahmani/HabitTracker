@@ -92,6 +92,29 @@ export const changePassword = async (req, res) => {
     .json({ success: true, message: 'Password changed successfully' });
 };
 
+export const updateUsername = async (req, res) => {
+  if (!req.user) throw unauthorized();
+
+  const { username } = req.body;
+
+  const user = await UserModel.findById(req.user._id);
+
+  if (username === user.username)
+    throw new AppError(
+      'Your username is the same please add new Username',
+      400,
+      ERROR_CODES.USERNAME_SAME_AS_OLD
+    );
+
+  user.username = username;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Username updated successfully',
+  });
+};
+
 export const getUserPreference = async (req, res) => {
   if (!req.user) throw new AppError('User is not authorized', 401);
 
