@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'habit.dart';
+import 'task.dart';
 
 class TasksCard extends StatelessWidget {
-  final List<Habit> habits;
+  final List<Task> habits;
 
   const TasksCard({super.key, required this.habits});
 
@@ -58,7 +58,7 @@ class TasksCard extends StatelessWidget {
   }
 }
 
-Widget _buildHabitCard(Habit habit, {bool isCompleted = false}) {
+Widget _buildHabitCard(Task task, {bool isCompleted = false}) {
   return Card(
     color: isCompleted ? Colors.grey.shade200 : Colors.white,
     elevation: 0,
@@ -77,7 +77,7 @@ Widget _buildHabitCard(Habit habit, {bool isCompleted = false}) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  habit.title,
+                  task.title,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -86,7 +86,7 @@ Widget _buildHabitCard(Habit habit, {bool isCompleted = false}) {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  habit.description,
+                  task.description,
                   style: TextStyle(
                     fontSize: 14,
                     color: isCompleted ? Colors.grey : Colors.black87,
