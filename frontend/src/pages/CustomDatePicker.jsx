@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Today.css";
 
+// Custom Header Component
 const CustomHeader = ({
   date,
   decreaseMonth,

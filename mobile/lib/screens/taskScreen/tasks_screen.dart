@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
 import 'package:habit_tracker/utils/tasks_page_component/tasks_card.dart';
 import '../../services/taskPageAPI/task_api.dart';
-import '../../utils/tasks_page_component/task.dart';
+import '../../utils/tasks_page_component/habit.dart';
 
 class TasksScreen extends StatefulWidget {
   final String token;
@@ -17,7 +17,7 @@ class _TasksScreenState extends State<TasksScreen> {
   double avatarRadius = 10;
   double statusRadius = 5;
   final TaskApiService _apiService = TaskApiService();
-  late Future<List<Task>> _tasksFuture;
+  late Future<List<Habit>> _tasksFuture;
 
   @override
   void initState() {
@@ -141,17 +141,9 @@ class _TasksScreenState extends State<TasksScreen> {
                         ),
                       ),
                     ),
-                    onPressed: () async {
-                      bool? taskCreated = await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => NewTaskPage()),
-                      );
-
-                      if (taskCreated == true) {
-                        setState(() {
-                          _tasksFuture = _apiService.fetchTasks(); // refresh tasks
-                        });
-                      }
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => NewTaskPage()));
                     },
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -230,7 +222,7 @@ class _TasksScreenState extends State<TasksScreen> {
             const SizedBox(height: 10),
 
             // ====== FutureBuilder to load Tasks ======
-            FutureBuilder<List<Task>>(
+            FutureBuilder<List<Habit>>(
               future: _tasksFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -246,7 +238,7 @@ class _TasksScreenState extends State<TasksScreen> {
                 }
 
                 // ====== Display TasksCard ======
-                return TasksCard(tasks: snapshot.data!);
+                return TasksCard(habits: snapshot.data!);
               },
             ),
           ],

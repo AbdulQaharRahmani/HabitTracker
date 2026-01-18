@@ -1,5 +1,5 @@
 import { FaTimes } from "react-icons/fa";
-import  Dropdown  from "./Dropdown";
+import { Dropdown } from "./Dropdown";
 import useAddHabitStore from "../store/useAddHabitStore";
 import api from "../../services/api";
 const frequencyItems = [

@@ -1,4 +1,4 @@
-class Task {
+class Habit {
   final String id;
   final String title;
   final String description;
@@ -8,10 +8,11 @@ class Task {
   final String userId;
   final DateTime? deletedAt;
   final bool isDeleted;
+  final bool isCompleted;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  Task({
+  Habit({
     required this.id,
     required this.title,
     required this.description,
@@ -21,39 +22,38 @@ class Task {
     required this.userId,
     this.deletedAt,
     required this.isDeleted,
+    required this.isCompleted,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  factory Task.fromJson(Map<String, dynamic> json) {
-    return Task(
+  factory Habit.fromJson(Map<String, dynamic> json) {
+    return Habit(
       id: json['_id'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      status: json['status'] ?? 'todo',
-      priority: json['priority'] ?? 'medium',
-      dueDate: json['dueDate'] != null ? DateTime.tryParse(json['dueDate']) : null,
+      status: json['status'] ?? '',
+      priority: json['priority'] ?? '',
+      dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
       userId: json['userId'] ?? '',
-      deletedAt: json['deletedAt'] != null ? DateTime.tryParse(json['deletedAt']) : null,
+      deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
       isDeleted: json['isDeleted'] ?? false,
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
-          : DateTime.now(),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.tryParse(json['updatedAt']) ?? DateTime.now()
-          : DateTime.now(),
+      isCompleted: json['isCompleted'] ?? false,
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 
-  Map<String, dynamic> toJson({String? categoryId}) {
-    final map = {
+  Map<String, dynamic> toJson() {
+    return {
       'title': title,
       'description': description,
       'status': status,
       'priority': priority,
-      if (categoryId != null) 'categoryId': categoryId,
-      if (dueDate != null) 'dueDate': dueDate!.toIso8601String(),
+      'dueDate': dueDate?.toIso8601String(),
+      'userId': userId,
+      'isDeleted': isDeleted,
+      'isCompleted': isCompleted,
     };
-    return map;
   }
 }

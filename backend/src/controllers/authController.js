@@ -5,9 +5,6 @@ import bcrypt from 'bcryptjs';
 import { ERROR_CODES } from '../utils/constant.js';
 import crypto from 'crypto';
 import { verifyGoogleToken } from '../utils/googleOAuth.js';
-import mongoose from 'mongoose';
-import { CategoryModel } from '../models/Category.js';
-import { getDefaultCategories } from '../utils/defaultCategories.js';
 
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -24,37 +21,16 @@ export const registerUser = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 12);
 
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  await UserModel.create({
+    username,
+    email,
+    password: hashPassword,
+  });
 
-  try {
-    const user = await UserModel.create(
-      [
-        {
-          username,
-          email,
-          password: hashPassword,
-        },
-      ],
-      { session }
-    );
-
-    const defaultCategories = getDefaultCategories(user[0]._id);
-
-    await CategoryModel.insertMany(defaultCategories, { session });
-
-    await session.commitTransaction();
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-    });
-  } catch (error) {
-    await session.abortTransaction();
-    throw error;
-  } finally {
-    await session.endSession();
-  }
+  res.status(201).json({
+    success: true,
+    message: 'User registered successfully',
+  });
 };
 
 export const loginUser = async (req, res) => {
@@ -107,37 +83,14 @@ export const googleLogin = async (req, res) => {
   if (!user) {
     //To prevent error assign a randome password for the user
     const randomPassword = crypto.randomBytes(32).toString('hex');
-    const session = await mongoose.startSession();
-
-    session.startTransaction();
-
-    try {
-      const newUser = await UserModel.create(
-        [
-          {
-            googleId: googleUserinfo.sub,
-            email: googleUserinfo.email,
-            username: googleUserinfo.name,
-            profilePicture: googleUserinfo.picture,
-            password: randomPassword,
-          },
-        ],
-        { session }
-      );
-
-      user = newUser[0];
-
-      const defaultCategories = getDefaultCategories(user._id);
-
-      await CategoryModel.insertMany(defaultCategories, { session });
-
-      await session.commitTransaction();
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    const newUser = await UserModel.create({
+      googleId: googleUserinfo.sub,
+      email: googleUserinfo.email,
+      username: googleUserinfo.name,
+      profilePicture: googleUserinfo.picture,
+      password: randomPassword,
+    });
+    user = newUser;
   }
 
   if (!user.googleId) {

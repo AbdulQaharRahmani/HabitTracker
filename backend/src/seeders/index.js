@@ -7,7 +7,6 @@ import { HabitCompletionModel } from '../models/HabitCompletion.js';
 import { CategoryModel } from '../models/Category.js';
 import { TaskModel } from '../models/Task.js';
 import bcrypt from 'bcryptjs';
-import { getDefaultCategories } from '../utils/defaultCategories.js';
 dotenv.config();
 
 await connectDB();
@@ -107,10 +106,12 @@ const seed = async () => {
   });
 
   // Create Category Data
-
-  const defaultCategories = getDefaultCategories(user._id);
-
-  const categories = await CategoryModel.insertMany(defaultCategories);
+  const categories = await CategoryModel.insertMany([
+    { name: 'Other', userId: user._id },
+    { name: 'Health', userId: user._id },
+    { name: 'Study', userId: user._id },
+    { name: 'Work', userId: user._id },
+  ]);
 
   const startDate = new Date();
 

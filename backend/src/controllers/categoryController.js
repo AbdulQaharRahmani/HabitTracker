@@ -1,6 +1,5 @@
 import { CategoryModel } from '../models/Category.js';
 import { HabitModel } from '../models/Habit.js';
-import { TaskModel } from '../models/Task.js';
 import { ERROR_CODES } from '../utils/constant.js';
 import {
   AppError,
@@ -58,9 +57,9 @@ export const updateCategory = async (req, res) => {
 export const deleteCategory = async (req, res) => {
   if (!req.user) throw unauthorized();
 
-  const isCategoryInUsed =
-    (await HabitModel.exists({ categoryId: req.params.id })) ||
-    (await TaskModel.exists({ categoryId: req.params.id }));
+  const isCategoryInUsed = await HabitModel.exists({
+    categoryId: req.params.id,
+  });
 
   if (isCategoryInUsed)
     throw new AppError(
