@@ -4,21 +4,25 @@ import ExportData from '../components/ExportData';
 import TotalHabitsStatics from '../components/TotalHabitsStatics';
 import CurrentStreakStatics from '../components/CurrentStreakStatics';
 import CompletionRateStatics from '../components/CompletionRateStatics';
-import useHabitStore from "../store/useHabitStore";
 import i18n from '../utils/i18n';
 import { useTranslation } from "react-i18next";
-import { useEffect } from 'react';
 
 function Statistics() {
-  const habits = useHabitStore((state) => state.habits);
-  const fetchHabits = useHabitStore((state) => state.fetchHabits);
-  const totalHabits = habits.length;
   const { t } = useTranslation();
   const isRTL = i18n.language === "fa";
 
-  useEffect(() => {
-  fetchHabits();
-  }, [fetchHabits]);
+  const persianDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+
+  function convertToPersianDigits(str) {
+    return str.replace(/\d/g, d => persianDigits[d]);
+  }
+  
+  function formatNumber(value) {
+    if (i18n.language === "fa") {
+      return convertToPersianDigits(String(value));
+    }
+    return String(value);
+  }
 
   return (
     <div className="">
@@ -34,9 +38,9 @@ function Statistics() {
 
       <div className="my-4">
         <div className="flex items-center lg:gap-6 ml-7  mr-9 md:gap-2 sm:gap-2 md:flex xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
-          <TotalHabitsStatics totalHabits={totalHabits} />
-          <CurrentStreakStatics currentStreak="5" />
-          <CompletionRateStatics completionRate="75" />
+          <TotalHabitsStatics totalHabits={formatNumber(10)}/>
+          <CurrentStreakStatics currentStreak={formatNumber(5)}/>
+          <CompletionRateStatics completionRate={formatNumber(75)} />
         </div>
       </div>
       <div className="ml-7 ">
