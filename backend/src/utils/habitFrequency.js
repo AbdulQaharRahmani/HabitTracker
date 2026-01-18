@@ -9,6 +9,8 @@ export const isHabitForSelectedDay = (habit, selectedDate) => {
   if (selected.isBefore(habitStart, 'day')) return false;
 
   const selectedDay = selected.day(); //exp: 0 = Sunday, 1 = monday
+  const selectedDateOfMonth = selectedDate.date(); // 1-31
+  const habitStartDateOfMonth = habitStart.date();
 
   switch (habit.frequency) {
     case 'daily':
@@ -32,6 +34,9 @@ export const isHabitForSelectedDay = (habit, selectedDate) => {
       const weeksSinceStart = Math.floor(selected.diff(habitStart, 'day') / 7);
       return selectedDay === habitStart.day() && weeksSinceStart % 2 === 0;
     }
+
+    case 'monthly':
+      return selectedDateOfMonth === habitStartDateOfMonth;
 
     default:
       return false;
