@@ -41,6 +41,7 @@ const HabitSchema = new mongoose.Schema(
     startDate: {
       type: Date,
       required: true,
+      default: new Date(),
     },
   },
   {
