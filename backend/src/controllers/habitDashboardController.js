@@ -90,6 +90,7 @@ export const getHabitsDashboard = async (req, res) => {
 
   // Calculate expected vs actual completions for each habit in the week
   habits.forEach((habit) => {
+    // const habitStart = dayjs(habit.createdAt)
     const habitStart = dayjs(habit.createdAt).isAfter(startOfWeek)
       ? dayjs(habit.createdAt)
       : startOfWeek;
@@ -125,6 +126,7 @@ export const getHabitsDashboard = async (req, res) => {
     {
       $match: {
         userId: req.user._id,
+        habitId: { $in: activeHabitIds },
         date: { $gte: startDate.toDate(), $lte: endDate.toDate() },
       },
     },
@@ -151,6 +153,9 @@ export const getHabitsDashboard = async (req, res) => {
     completionMap[r._id] = r.completed;
   });
 
+  // { '2025-12-02': 3 },
+  // { '2025-12-04': 1 },
+
   const chartData = [];
   let currentDate = startDate;
 
@@ -164,6 +169,12 @@ export const getHabitsDashboard = async (req, res) => {
 
     currentDate = currentDate.add(1, 'day');
   }
+
+  // [
+  //  { date: '2025-12-02', completed: 3 },
+  //  { date: '2025-12-03', completed: 0 },  // missing day
+  //  { date: '2025-12-04', completed: 1 },
+  // ]
 
   res.status(200).json({
     success: true,
