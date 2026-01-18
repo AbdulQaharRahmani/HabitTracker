@@ -7,6 +7,7 @@ import { HabitCompletionModel } from '../models/HabitCompletion.js';
 import { CategoryModel } from '../models/Category.js';
 import { TaskModel } from '../models/Task.js';
 import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
 
 await connectDB();
@@ -107,10 +108,10 @@ const seed = async () => {
 
   // Create Category Data
   const categories = await CategoryModel.insertMany([
-    { name: 'Other', userId: user._id },
-    { name: 'Health', userId: user._id },
-    { name: 'Study', userId: user._id },
-    { name: 'Work', userId: user._id },
+    { name: 'Other', userId: user._id, clientId: uuidv4() },
+    { name: 'Health', userId: user._id, clientId: uuidv4() },
+    { name: 'Study', userId: user._id, clientId: uuidv4() },
+    { name: 'Work', userId: user._id, clientId: uuidv4() },
   ]);
 
   const startDate = new Date();
@@ -127,6 +128,7 @@ const seed = async () => {
       categoryId: categories[2]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
+      clientId: uuidv4(),
     },
     {
       title: 'Play Football',
@@ -137,6 +139,7 @@ const seed = async () => {
       categoryId: categories[1]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
+      clientId: uuidv4(),
     },
     {
       title: 'Study Book of Proof',
@@ -147,6 +150,7 @@ const seed = async () => {
       categoryId: categories[2]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
+      clientId: uuidv4(),
     },
     {
       title: 'Play Basketball',
@@ -157,6 +161,7 @@ const seed = async () => {
       categoryId: categories[1]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
+      clientId: uuidv4(),
     },
     {
       title: 'AI',
@@ -167,6 +172,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
+      clientId: uuidv4(),
     },
     {
       title: 'MongoDB',
@@ -177,6 +183,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
+      clientId: uuidv4(),
     },
     {
       title: 'Nodejs',
@@ -187,6 +194,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate),
+      clientId: uuidv4(),
     },
     {
       title: 'React',
@@ -197,6 +205,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Exercise',
@@ -207,6 +216,7 @@ const seed = async () => {
       categoryId: categories[1]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Read a book',
@@ -217,6 +227,7 @@ const seed = async () => {
       categoryId: categories[2]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Meditation',
@@ -227,6 +238,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Clean home',
@@ -237,6 +249,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Grocery shopping',
@@ -247,6 +260,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Call family',
@@ -257,6 +271,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Journal',
@@ -267,6 +282,7 @@ const seed = async () => {
       categoryId: categories[0]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Learn Spanish',
@@ -277,6 +293,7 @@ const seed = async () => {
       categoryId: categories[2]._id,
       createdAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
   ];
 
@@ -290,6 +307,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + 3 * SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Organize meeting notes',
@@ -300,6 +318,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Plan weekend trip',
@@ -310,6 +329,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Send project report',
@@ -320,6 +340,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + 10 * SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Update LinkedIn profile',
@@ -330,6 +351,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Run antivirus scan',
@@ -340,6 +362,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Update system drivers',
@@ -350,6 +373,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Backup document',
@@ -360,6 +384,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Prepare presentation',
@@ -370,6 +395,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Review contract',
@@ -380,6 +406,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + 5 * SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Pay internet bill',
@@ -390,6 +417,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Pay water bill',
@@ -400,6 +428,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Book doctor appointment',
@@ -410,6 +439,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Call family',
@@ -420,6 +450,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
+      clientId: uuidv4(),
     },
     {
       title: 'Watch a movie',
@@ -430,6 +461,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
     {
       title: 'Grocery shopping',
@@ -440,6 +472,7 @@ const seed = async () => {
       userId: user._id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      clientId: uuidv4(),
     },
   ];
 
