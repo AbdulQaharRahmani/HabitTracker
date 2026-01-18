@@ -92,7 +92,7 @@ export const filterTasks = async (req, res) => {
 
   const { searchTerm, status, priority, dueDate } = req.query;
 
-  let query = { userId: req.user._id };
+  let query = { userId: req.user._id, deletedAt: null };
 
   if (searchTerm)
     query.$or = [
@@ -114,7 +114,7 @@ export const filterTasks = async (req, res) => {
 
   const tasks = await TaskModel.find({ ...query }).lean();
 
-  res.status(200).json({ success: true, data: tasks });
+  res.status(200).json({ success: true, results: tasks.length, data: tasks });
 };
 
 export const toggleTaskStatus = async (req, res) => {
@@ -148,7 +148,7 @@ export const updateTask = async (req, res) => {
     status: true,
     priority: true,
     dueDate: true,
-    categoryId: true
+    categoryId: true,
   };
 
   const updateQuery = {};
@@ -164,7 +164,7 @@ export const updateTask = async (req, res) => {
     );
     if (!doesCategoryExist) throw notFound('Category');
   }
-  
+
   const task = await TaskModel.findOneAndUpdate(
     { _id: req.params.id, userId: req.user._id },
     { $set: updateQuery },
