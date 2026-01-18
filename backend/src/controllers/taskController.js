@@ -125,6 +125,7 @@ export const toggleTaskStatus = async (req, res) => {
   const task = await TaskModel.findOne({
     _id: taskId,
     userId: req.user._id,
+    deletedAt: null,
   });
 
   if (!task) throw notFound('Task');
