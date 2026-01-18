@@ -33,7 +33,7 @@ export default function CurrentStreakStatics({ currentStreak }) {
         <div className="text-gray-800 font-bold text-[2.5rem] mt-4">
           {currentStreak}
           <span className="text-gray-400 mx-2 font-normal text-[1rem] ">
-            days
+            {t("days")}
           </span>
         </div>
       </div>
