@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  lastTimeSync: {
+    type: Date,
+    default: null,
+  },
 });
 
 export const UserModel = mongoose.model('User', UserSchema);
