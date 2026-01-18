@@ -167,7 +167,7 @@ export const updateTask = async (req, res) => {
   }
 
   const task = await TaskModel.findOneAndUpdate(
-    { _id: req.params.id, userId: req.user._id },
+    { _id: req.params.id, userId: req.user._id, deletedAt: null },
     { $set: updateQuery },
     {
       new: true,
