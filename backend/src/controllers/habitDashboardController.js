@@ -6,7 +6,8 @@ import { HabitCompletionModel } from '../models/habitCompletion.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 import { PreferenceModel } from '../models/Preference.js';
 import { DateHelper } from '../utils/date.js';
-import { DAY_MAP } from '../utils/constant.js';
+import { DAY_MAP, ERROR_CODES } from '../utils/constant.js';
+import { AppError } from '../utils/error.js';
 
 export const getHabitsDashboard = async (req, res) => {
   // Get user preference and start, end of week
@@ -117,9 +118,28 @@ export const getHabitsDashboard = async (req, res) => {
       : Math.round((totalCompleted / totalExpected) * 100);
 
   //------------- 4) Chart Data: Build daily completion counts for last (n) days
-  const days = Number(req.query.days) || 30;
-  const startDate = today.subtract(days - 1, 'day').startOf('day');
-  const endDate = today.endOf('day');
+  const startDate = req.query.startDate
+    ? dayjs(req.query.startDate).startOf('day')
+    : today.clone().subtract(29, 'day').startOf('day');
+
+  const endDate = req.query.endDate
+    ? dayjs(req.query.endDate).endOf('day')
+    : today.endOf('day');
+
+  if (!startDate.isValid() || !endDate.isValid()) {
+    throw new AppError(
+      'Invalid date format',
+      400,
+      ERROR_CODES.INVALID_DATE_FORMAT
+    );
+  }
+  if (endDate.isBefore(startDate)) {
+    throw new AppError(
+      'End date is before start date',
+      400,
+      ERROR_CODES.END_DATE_BEFORE_START_DATE
+    );
+  }
 
   const results = await HabitCompletionModel.aggregate([
     {
@@ -156,9 +176,9 @@ export const getHabitsDashboard = async (req, res) => {
   // { '2025-12-04': 1 },
 
   const chartData = [];
-  let currentDate = startDate;
+  let currentDate = startDate.clone();
 
-  while (currentDate.isSameOrBefore(today, 'day')) {
+  while (currentDate.isSameOrBefore(endDate, 'day')) {
     const dateKey = currentDate.format('YYYY-MM-DD');
 
     chartData.push({
