@@ -12,7 +12,7 @@ class AuthService {
     final url = Uri.parse("$baseUrl/api/auth/login");
 
     try {
-      print("🔵 در حال تلاش برای ورود...");
+      print("🔵 trying to login...");
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -20,12 +20,11 @@ class AuthService {
       );
 
       final responseData = jsonDecode(response.body);
-      print("🟢 پاسخ سرور: ${response.body}");
+      print("🟢Server response: ${response.body}");
 
       if (response.statusCode == 200 && responseData['success'] == true) {
         final prefs = await SharedPreferences.getInstance();
 
-        // اصلاح مسیر استخراج توکن بر اساس لاگ ارسالی شما
         String? tokenToSave;
         if (responseData['data'] != null && responseData['data']['token'] != null) {
           tokenToSave = responseData['data']['token'];
@@ -33,18 +32,18 @@ class AuthService {
 
         if (tokenToSave != null) {
           await prefs.setString('auth_token', tokenToSave);
-          print("✅ توکن با موفقیت ذخیره شد.");
+          print("✅ Token saved successfully");
           return responseData;
         } else {
-          print("❌ خطا: فیلد توکن در پاسخ سرور یافت نشد.");
-          return {"success": false, "message": "ساختار توکن نامعتبر است"};
+          print("❌ Error:Token filed not found in server response.");
+          return {"success": false, "message": "The token structure in not valid"};
         }
       } else {
-        return {"success": false, "message": responseData['message'] ?? "خطا در ورود"};
+        return {"success": false, "message": responseData['message'] ?? "Error in login"};
       }
     } catch (e) {
-      print("🔴 خطای استثنا: $e");
-      return {"success": false, "message": "خطای اتصال به شبکه"};
+      print("🔴 Exception error: $e");
+      return {"success": false, "message": "Error with connecting to network"};
     }
   }
 }
