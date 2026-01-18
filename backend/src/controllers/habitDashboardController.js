@@ -117,7 +117,20 @@ export const getHabitsDashboard = async (req, res) => {
       ? 0
       : Math.round((totalCompleted / totalExpected) * 100);
 
-  //------------- 4) Chart Data: Build daily completion counts for last (n) days
+  res.status(200).json({
+    success: true,
+    data: {
+      totalHabits,
+      currentStreak,
+      completionRate,
+    },
+  });
+};
+
+// Chart Data: Build daily completion counts for given date
+export const getHabitChartData = async (req, res) => {
+  const today = dayjs();
+
   const startDate = req.query.startDate
     ? dayjs(req.query.startDate).startOf('day')
     : today.clone().subtract(29, 'day').startOf('day');
@@ -141,7 +154,13 @@ export const getHabitsDashboard = async (req, res) => {
     );
   }
 
-  const results = await HabitCompletionModel.aggregate([
+  const activeHabitIds = (
+    await HabitModel.find({ userId: req.user._id, isDeleted: false }).select(
+      '_id'
+    )
+  ).map((h) => h._id);
+
+  const completions = await HabitCompletionModel.aggregate([
     {
       $match: {
         userId: req.user._id,
@@ -168,7 +187,7 @@ export const getHabitsDashboard = async (req, res) => {
   // ]
 
   const completionMap = {};
-  results.forEach((r) => {
+  completions.forEach((r) => {
     completionMap[r._id] = r.completed;
   });
 
@@ -197,11 +216,6 @@ export const getHabitsDashboard = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    data: {
-      totalHabits,
-      currentStreak,
-      completionRate,
-      chartData,
-    },
+    data: chartData,
   });
 };
