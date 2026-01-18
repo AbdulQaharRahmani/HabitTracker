@@ -14,9 +14,31 @@ import Today from "./pages/Today";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LanguageSwitcher from "./components/internationalization";
+import { Toaster } from "react-hot-toast";
+import "./styles/toast.css";
 
 function App() {
   return (
+    <>
+      <Toaster
+      position="top-center"
+      reverseOrder={false}
+      gutter={20}
+      containerClassName="toast-container"
+      toastOptions={{
+        duration: 5000,
+        className: "toast-base",
+        success: {
+          className: "toast-success",
+        },
+        error: {
+          className: "toast-error",
+        },
+        loading: {
+          className: "toast-loading",
+        },
+      }}
+    />
     <Router>
       <LanguageSwitcher />
       <Routes>
@@ -38,6 +60,7 @@ function App() {
         <Route path="*" element={<>not found</>} />
       </Routes>
     </Router>
+          </>
   );
 }
 

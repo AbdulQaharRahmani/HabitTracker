@@ -1,14 +1,20 @@
 import dayjs from 'dayjs';
-import { AppError, notFound } from '../utils/error.js';
+import {
+  AppError,
+  noFieldsProvidedForUpdate,
+  notFound,
+  unauthorized,
+} from '../utils/error.js';
 import { HabitModel } from '../models/Habit.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 import { DateHelper } from '../utils/date.js';
 import { HabitCompletionModel } from '../models/HabitCompletion.js';
 import { CategoryModel } from '../models/Category.js';
+import { ERROR_CODES } from '../utils/constant.js';
 
 // Get all user habits
 export const getHabits = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const habits = await HabitModel.findByUserAndSortByOrder(req.user._id);
 
@@ -21,7 +27,7 @@ export const getHabits = async (req, res) => {
 
 // Get all user habits for selected date
 export const getHabitsByDate = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   // 1) Get date from query
   const dateString = req.query.date;
@@ -30,7 +36,12 @@ export const getHabitsByDate = async (req, res) => {
     : dayjs();
 
   if (dateString && !selectedDate.isValid())
-    throw new AppError('Invalid date format', 400);
+    throw new AppError(
+      'Invalid date format',
+      400,
+      ERROR_CODES.VALIDATION_ERROR,
+      'date'
+    );
 
   const startOfDay = selectedDate.startOf('day').toDate();
   const endOfDay = selectedDate.endOf('day').toDate();
@@ -76,7 +87,7 @@ export const getHabitsByDate = async (req, res) => {
 
 // Create user habit
 export const createHabit = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const { title, description, frequency, categoryId } = req.body;
 
@@ -105,10 +116,9 @@ export const createHabit = async (req, res) => {
 };
 
 export const updateHabit = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
-  if (Object.keys(req.body).length === 0)
-    throw new AppError('No fields provided for update', 400);
+  if (Object.keys(req.body).length === 0) throw noFieldsProvidedForUpdate();
 
   const allowedFieldsToUpdate = {
     title: true,
@@ -149,15 +159,24 @@ export const updateHabit = async (req, res) => {
 };
 
 export const deleteHabit = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
+  if (!req.user) throw unauthorized();
 
   const habit = await HabitModel.findById(req.params.id);
   if (!habit) throw notFound('Habit');
 
   if (!habit.isOwner(req.user._id))
-    throw new AppError('You are not allowed to delete this habit', 403);
+    throw new AppError(
+      'You are not allowed to delete this habit',
+      403,
+      ERROR_CODES.FORBIDDEN
+    );
 
-  if (habit.isDeleted) throw new AppError('Habit is already deleted', 400);
+  if (habit.isDeleted)
+    throw new AppError(
+      'Habit is already deleted',
+      400,
+      ERROR_CODES.RESOURCE_ALREADY_REMOVED
+    );
 
   habit.isDeleted = true;
   await habit.save();
@@ -169,18 +188,16 @@ export const deleteHabit = async (req, res) => {
 };
 
 export const reorderHabits = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized.', 401);
-
-  //* request body has this structure => {
-  //   "habits": [
-  //     { "_id": "habitId1", "order": 1 },
-  //     { "_id": "habitId2", "order": 2 }
-  //   ]
-  // }
+  if (!req.user) throw unauthorized();
 
   const { habits } = req.body;
 
-  if (!habits) throw new AppError('No habits provided', 400);
+  if (!habits)
+    throw new AppError(
+      'No habits provided',
+      400,
+      ERROR_CODES.NO_FIELDS_PROVIDED
+    );
 
   const habitIds = habits.map((h) => h._id);
 
@@ -190,7 +207,11 @@ export const reorderHabits = async (req, res) => {
   }).select('_id');
 
   if (userHabits.length !== habits.length)
-    throw new AppError('Not allowed to modify these habits', 403);
+    throw new AppError(
+      'Not allowed to modify these habits',
+      403,
+      ERROR_CODES.FORBIDDEN
+    );
 
   const operations = habits.map((habit) => {
     return {
@@ -212,7 +233,7 @@ export const reorderHabits = async (req, res) => {
 //Mark habit as completed.
 //Route: Post => api/habits/:id/complete
 export const completeHabit = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized', 401);
+  if (!req.user) throw unauthorized();
 
   const habit = await HabitModel.findById(req.params.id);
 
@@ -220,11 +241,19 @@ export const completeHabit = async (req, res) => {
 
   // Validate habit ownership
   if (!habit.isOwner(req.user._id))
-    throw new AppError('Not allowed to modify this habit', 403);
+    throw new AppError(
+      'Not allowed to modify this habit',
+      403,
+      ERROR_CODES.FORBIDDEN
+    );
 
   // Validate if habit is completed for the same day
   if (await HabitCompletionModel.isAlreadyCompleted(req.params.id))
-    throw new AppError('Habit is already completed', 400);
+    throw new AppError(
+      'Habit is already completed',
+      400,
+      ERROR_CODES.ALREADY_COMPLETED
+    );
 
   const habitCompletion = await HabitCompletionModel.create({
     habitId: habit._id,
@@ -239,7 +268,7 @@ export const completeHabit = async (req, res) => {
 
 // Unmark habit completion if exist, otherwise throw error
 export const uncompleteHabit = async (req, res) => {
-  if (!req.user) throw new AppError('User is not authorized', 401);
+  if (!req.user) throw unauthorized();
 
   const habit = await HabitModel.findById(req.params.id);
 
@@ -247,7 +276,11 @@ export const uncompleteHabit = async (req, res) => {
 
   // Validate habit ownership
   if (!habit.isOwner(req.user._id))
-    throw new AppError('Not allowed to modify this habit', 403);
+    throw new AppError(
+      'Not allowed to modify this habit',
+      403,
+      ERROR_CODES.FORBIDDEN
+    );
 
   const [startOfToday, endOfToday] = DateHelper.getStartAndEndOfToday();
 
