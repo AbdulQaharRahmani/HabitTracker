@@ -18,7 +18,7 @@ export const getHabitsDashboard = async (req, res) => {
 
   const today = dayjs();
 
-  const weekStartDayNum = DAY_MAP[userPreference?.weekStartDay];
+  const weekStartDayNum = DAY_MAP[userPreference?.weekStartDay ?? 'saturday'];
 
   const [startOfWeek, endOfWeek] = DateHelper.getStartAndEndOfWeek(
     today,
