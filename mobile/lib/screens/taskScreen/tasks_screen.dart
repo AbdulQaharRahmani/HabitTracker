@@ -22,8 +22,7 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   void initState() {
     super.initState();
-    // ⚡ fetchTasks with the token
-    _tasksFuture = _apiService.fetchTasks(widget.token);
+      _tasksFuture = _apiService.fetchTasks();
   }
 
   @override

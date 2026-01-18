@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import '../../services/category_api/category_api.dart';
 import '../../services/taskPageAPI/task_api.dart';
+import '../../utils/tasks_page_component/token_storage.dart';
+import '../../utils/tasks_page_component/category.dart';
 
 class NewTaskPage extends StatefulWidget {
   const NewTaskPage({super.key});
@@ -10,28 +13,59 @@ class NewTaskPage extends StatefulWidget {
 }
 
 class _NewTaskPageState extends State<NewTaskPage> {
+  // ====== Controllers ======
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
   final _timeController = TextEditingController();
 
+  // ====== API Services ======
   final TaskApiService _apiService = TaskApiService();
+  final CategoryApiService _categoryApi = CategoryApiService();
 
+  // ====== UI State ======
   bool _isLoading = false;
+  bool _isTokenLoading = true;
+  String? _token;
 
-  // TEMP TOKEN
-  final String token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NWJmNzdlYjEzZjMwNjgyMDg1OGI5NCIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJpYXQiOjE3NjgxMTgwMzUsImV4cCI6MTc2ODIwNDQzNX0.5wFURarfZvj-pw7eBq3FOdxeedL8fUmhzaI6qCVIxwQ";
+  // ====== Categories ======
+  List<Category> _categories = [];
+  String? _selectedCategoryId; // store _id of selected category
 
-  String _selectedCategory = 'Work';
-  final List<String> _categories = [
-    'Work',
-    'Health',
-    'Learning',
-    'Fitness',
-    'Personal',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadTokenAndCategories();
+  }
 
+  // ====== Load token and fetch categories ======
+  Future<void> _loadTokenAndCategories() async {
+    final token = await TokenStorage.getToken();
+    if (token == null) {
+      setState(() => _isTokenLoading = false);
+      return;
+    }
+
+    final categories = await _categoryApi.fetchCategories();
+
+    setState(() {
+      _token = token;
+      _categories = categories;
+      if (categories.isNotEmpty) {
+        _selectedCategoryId = categories.first.id; // default first category
+      }
+      _isTokenLoading = false;
+    });
+  }
+
+  // ====== Create Task ======
   Future<void> _createTask() async {
+    if (_token == null || _selectedCategoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login and select a category')),
+      );
+      return;
+    }
+
     if (_titleController.text.isEmpty || _descController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Title and description are required')),
@@ -43,8 +77,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
     try {
       await _apiService.addTask(
-        token: token,
-        category: _selectedCategory.toLowerCase(),
+       category: _selectedCategoryId!, // send id to backend
         title: _titleController.text.trim(),
         description: _descController.text.trim(),
         frequency: _timeController.text,
@@ -53,11 +86,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
       );
 
       if (!mounted) return;
-      Navigator.pop(context, true); // return success
+      Navigator.pop(context, true);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -65,15 +98,17 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isTokenLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
-        elevation: 0,
         backgroundColor: AppTheme.surface,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        elevation: 0,
         centerTitle: true,
         title: const Text(
           'Create New Task',
@@ -87,14 +122,10 @@ class _NewTaskPageState extends State<NewTaskPage> {
           children: [
             _buildLabel('Task Title'),
             _buildTextField(_titleController, 'Enter title...', 1),
-
             const SizedBox(height: 20),
-
             _buildLabel('Description'),
             _buildTextField(_descController, 'Enter description...', 3),
-
             const SizedBox(height: 20),
-
             Row(
               children: [
                 Expanded(
@@ -102,11 +133,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildLabel('Frequency'),
-                      _buildTextField(
-                        _timeController,
-                        "write frequency for tasks",
-                        1,
-                      ),
+                      _buildTextField(_timeController, 'write frequency for tasks', 1),
                     ],
                   ),
                 ),
@@ -122,30 +149,28 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 ),
               ],
             ),
-
             const SizedBox(height: 40),
-
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
+                onPressed: _isLoading ? null : _createTask,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                onPressed: _isLoading ? null : _createTask,
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
-                        'Create Task',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.surface,
-                        ),
-                      ),
+                  'Create Task',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.surface,
+                  ),
+                ),
               ),
             ),
           ],
@@ -168,17 +193,12 @@ class _NewTaskPageState extends State<NewTaskPage> {
     );
   }
 
-  Widget _buildTextField(
-    TextEditingController controller,
-    String hint,
-    int maxLines,
-  ) {
+  Widget _buildTextField(TextEditingController controller, String hint, int maxLines) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: AppTheme.textMuted),
         filled: true,
         fillColor: const Color(0xfff3f4f6),
         border: OutlineInputBorder(
@@ -198,13 +218,17 @@ class _NewTaskPageState extends State<NewTaskPage> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: AppTheme.background,
-          value: _selectedCategory,
+          value: _selectedCategoryId,
           isExpanded: true,
           items: _categories
-              .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+              .map(
+                (cat) => DropdownMenuItem(
+              value: cat.id,
+              child: Text(cat.name),
+            ),
+          )
               .toList(),
-          onChanged: (val) => setState(() => _selectedCategory = val!),
+          onChanged: (val) => setState(() => _selectedCategoryId = val),
         ),
       ),
     );
