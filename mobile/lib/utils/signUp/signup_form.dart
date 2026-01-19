@@ -113,6 +113,7 @@ class _SignupFormState extends State<SignupForm> {
                     height: 48.h,
                     child: ElevatedButton(
                       onPressed: () async {
+
                         final ok = await controller.signUp();
                         if (!mounted) return;
                         if (ok) {
