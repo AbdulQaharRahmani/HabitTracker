@@ -1,35 +1,17 @@
-import { useEffect, useState } from "react";
 import { FaMoon, FaSun } from "react-icons/fa";
+import { useTheme } from "../components/ThemeContext";
 
 export default function DarkMode() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("theme");
-      return saved === "dark";
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-
-    if (isDark) {
-      root.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      root.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDark]);
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <button
-      onClick={() => setIsDark((prev) => !prev)}
-      // Positioning and styling updated for professional look beside LanguageSwitcher
+      onClick={toggleTheme}
       className="
         fixed top-4 end-[6rem] z-50
         rounded-full p-2
-        bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600
+        bg-gray-100 hover:bg-gray-200
+        dark:bg-gray-700 dark:hover:bg-gray-600
         transition-colors shadow-md
       "
     >

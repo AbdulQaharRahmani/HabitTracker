@@ -1,8 +1,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../components/ThemeContext";
 
 const Settings = () => {
   const { t } = useTranslation();
+  const { isDark, setTheme } = useTheme();
 
   return (
     <div className="min-h-screen p-6 font-sans transition-colors duration-200 bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">
@@ -81,9 +83,15 @@ const Settings = () => {
                     {t("Select your preferred theme")}.
                   </p>
                 </div>
-                <select className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
-                  <option>Light Mode</option>
-                  <option>Dark Mode</option>
+                <select
+                  value={isDark ? "dark" : "light"}
+                  onChange={(e) => setTheme(e.target.value)}
+                  className="px-4 py-2 text-sm transition-all border outline-none
+    bg-slate-50 border-slate-200 rounded-lg min-w-[180px]
+    dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                >
+                  <option value="light">{t("Light Mode")}</option>
+                  <option value="dark">{t("Dark Mode")}</option>
                 </select>
               </div>
 
