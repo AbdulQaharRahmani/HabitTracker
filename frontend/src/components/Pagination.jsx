@@ -23,7 +23,7 @@ function Pagination({
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
   return (
-    <div className="flex justify-between items-center pt-5">
+    <div className=" flex flex-col justify-between items-center gap-5 pt-10 mx-auto">
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between mr-8">
         <p className="text-sm text-gray-700">
           Displaying
