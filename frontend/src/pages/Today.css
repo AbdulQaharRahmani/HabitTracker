@@ -10,7 +10,7 @@
   border-bottom: none;
 }
 
-/* Optional: style for the custom header layout */
+/* Optional: style for the custom header layout from previous turn */
 .custom-header {
   display: flex;
   justify-content: space-between;
@@ -22,81 +22,28 @@
   font-weight: bold;
 }
 
-/* 3. Main calendar container */
+/* 3. Add border-radius and padding to the main calendar container */
 .custom-calendar {
-  border-radius: 12px;
-  padding: 10px;
+  border-radius: 12px; /* Slightly reduce border radius */
+  padding: 10px; /* Reduce overall calendar padding */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: none;
   margin-top: 10px;
-  background-color: #ffffff;
-  color: #111827; /* gray-900 */
 }
 
-/* ===================== */
-/* 🌙 DARK MODE OVERRIDES */
-/* ===================== */
-
-.dark .custom-calendar {
-  background-color: #1f2937; /* gray-800 */
-  color: #f9fafb; /* gray-50 */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-/* Header text */
-.dark .month-year-label {
-  color: #f9fafb;
-}
-
-/* Header buttons */
-.dark .custom-header button {
-  color: #e5e7eb; /* gray-200 */
-}
-
-.dark .custom-header button:disabled {
-  color: #6b7280; /* gray-500 */
-}
-
-/* 4. Day cell spacing and size */
+/* 4. Adjust day cell spacing and size (Key changes for overall size reduction) */
 .react-datepicker__day,
 .react-datepicker__day-name {
-  width: 1.8rem;
-  line-height: 1.8rem;
-  margin: 0.1rem;
+  width: 1.8rem; /* **DECREASE THIS VALUE** to make the calendar smaller */
+  line-height: 1.8rem; /* Keep this equal to the width */
+  margin: 0.1rem; /* Slightly reduce space between cells */
 }
 
-/* Day text */
-.dark .react-datepicker__day {
-  color: #e5e7eb;
-}
-
-/* Hover */
-.dark .react-datepicker__day:hover {
-  background-color: #374151; /* gray-700 */
-}
-
-/* Selected day */
+/* Optional: style for the selected day button to be round */
 .react-datepicker__day--selected {
   border-radius: 50%;
 }
 
-.dark .react-datepicker__day--selected,
-.dark .react-datepicker__day--keyboard-selected {
-  background-color: #6366f1; /* indigo-500 */
-  color: #ffffff;
-}
-
-/* Disabled days */
-.dark .react-datepicker__day--disabled {
-  color: #6b7280;
-}
-
-/* Keep outside-month days hidden even in dark mode */
-.dark .react-datepicker__day--outside-month {
-  color: transparent;
-}
-
-/* Layout container */
 .container {
   display: grid;
   grid-template-columns: 2fr 0.7fr;
