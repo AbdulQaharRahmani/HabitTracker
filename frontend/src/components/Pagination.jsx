@@ -23,8 +23,8 @@ function Pagination({
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
   return (
-    <div className="flex justify-center items-center pt-5">
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+    <div className="flex justify-between items-center pt-5">
+      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between mr-8">
         <p className="text-sm text-gray-700">
           Displaying
           <span className="font-medium"> {startItem} </span>
@@ -35,14 +35,14 @@ function Pagination({
           results
         </p>
       </div>
-      <nav className="flex items-center gap-1">
+      <nav className="flex items-center gap-1.5 sm:justify-end">
         {/* Prev */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="p-2 rounded-full border text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+          className="p-2 rounded-full border border-gray-500 text-gray-900 hover:bg-gray-100 disabled:opacity-40"
         >
-          <VscChevronLeft />
+          <VscChevronLeft className="text-gray-900" />
         </button>
 
         {paginationRange.map((page, index) => {
@@ -78,9 +78,9 @@ function Pagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="p-2 rounded-full border text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+          className="p-2 rounded-full border border-gray-500 text-gray-900 hover:bg-gray-100 disabled:opacity-40"
         >
-          <VscChevronRight />
+          <VscChevronRight className="text-gray-900" />
         </button>
       </nav>
     </div>
