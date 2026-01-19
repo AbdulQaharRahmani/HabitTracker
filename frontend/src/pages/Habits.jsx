@@ -40,7 +40,4 @@ export default function Habits() {
       </div>
     </div>
   );
-
-};
-
 }
