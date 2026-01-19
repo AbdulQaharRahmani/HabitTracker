@@ -28,4 +28,5 @@ router.post('/google', asyncHandler(googleLogin));
 
 router.post('/refresh', asyncHandler(refreshAccessToken));
 router.post('/logout', asyncHandler(logOutUser));
+
 export default router;
