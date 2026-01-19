@@ -1,62 +1,41 @@
-import React, { useEffect } from "react";
-import TodayCard from "./TodayCard";
-import useHabitStore from "../store/useHabitStore";
+import React, { useEffect } from 'react';
+import TodayCard from './TodayCard';
+import useHabitStore from '../store/useHabitStore';
+
 
 const iconMap = {
-  Health: "🏋️‍♂️",
-  reading: "📚",
-  meditation: "🧘‍♀️",
-  Study: "📖",
-  coding: "💻",
-  cooking: "👩‍🍳",
-  default: "✨",
+  Health: '🏋️‍♂️',
+  reading: '📚',
+  meditation: '🧘‍♀️',
+  Study: '📖',
+  coding:'💻',
+  cooking: '👩‍🍳',
+  default: '✨'
 };
 
 const TodayList = () => {
-  const { habits, loading, error, fetchTodayHabits, toggleHabit } =
-    useHabitStore();
+  const { habits, loading, error, fetchTodayHabits, toggleHabit } = useHabitStore();
 
   useEffect(() => {
     fetchTodayHabits();
   }, [fetchTodayHabits]);
 
-  if (loading)
-    return (
-      <div
-        className="p-10 text-center font-medium
-        text-slate-600 dark:text-gray-400
-        transition-colors"
-      >
-        Loading habits...
-      </div>
-    );
+  if (loading) return <div className="p-10 text-center">Loading habits...</div>;
+  if (error) return <div className="p-10 text-red-500 text-center">{error}</div>;
 
-  if (error)
-    return (
-      <div
-        className="p-10 text-center font-medium
-        text-red-600 dark:text-red-400
-        transition-colors"
-      >
-        {error}
-      </div>
-    );
+  console.log('Today Habits:', habits);
 
   return (
-    <div
-      className="grid grid-cols-1 md:grid-cols-2 gap-6
-        transition-colors"
-    >
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {habits.map((habit) => (
         <TodayCard
           key={habit._id}
           title={habit.title}
           description={habit.description}
           categoryIcon={
-            habit.category?.icon ||
-            iconMap[habit.category?.name] ||
-            iconMap.default
-          }
+          habit.category?.icon ||
+          iconMap[habit.category?.name] ||
+          iconMap.default}
           color={habit.category?.backgroundColor || "blue"}
           completed={habit.completed}
           onToggleComplete={() => toggleHabit(habit._id)}
