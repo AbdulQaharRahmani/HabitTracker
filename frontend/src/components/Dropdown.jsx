@@ -1,57 +1,83 @@
 import { useState } from "react";
 import { HiChevronDown, HiCheck } from "react-icons/hi";
+import useClickOutside from "../hooks/useClickOutside";
 
 export default function Dropdown({ items, value, getValue, placeholder }) {
-    const [isDropdownOpen, setDropdownOpen] = useState(false)
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-    const handleDropdownVisibility = () => {
-        setDropdownOpen(!isDropdownOpen)
-    }
-    const handleSelect = (itemValue) => {
-        getValue(itemValue)
-        setDropdownOpen(false)
-    }
-    return (
-        <div className="w-full relative">
-            <div className="relative w-full">
-                <input
-                    type="text"
-                    placeholder={placeholder}
-                    readOnly
-                    value={value}
-                    className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white p-4 pr-12 text-sm font-medium text-gray-700 shadow-sm transition-all caret-transparent focus:border-[#7B68EE] focus:ring-4 focus:ring-[#7B68EE]/15 outline-none capitalize"
-                    onChange={getValue}
-                    onClick={handleDropdownVisibility}
-                />
+  const handleDropdownVisibility = () => setDropdownOpen(!isDropdownOpen);
 
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 group-focus-within:text-[#7B68EE] transition-colors">
-                    <HiChevronDown size={21} className="text-[#7B68EE]" />
-                </div>
-            </div>
-            {
-                isDropdownOpen && (
-                    <ul className="mt-3 max-h-64 rounded-2xl overflow-y-scroll w-full absolute border z-10 border-gray-100 bg-white p-2 shadow-2xl ring-1 ring-black/5">
-                        {items.map((item) => (
-                            <li
-                                key={item.id}
-                                data-value={item.value}
-                                className="group flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-sm text-gray-600 transition-all hover:bg-[#7B68EE]/10 hover:text-[#7B68EE]"
-                                onClick={() => handleSelect(item.value)}
-                            >
-                                <span className="font-medium">{item.name}</span>
+  const handleSelect = (itemValue) => {
+    getValue(itemValue);
+    setDropdownOpen(false);
+  };
 
-                                <HiCheck
-                                    size={18}
-                                    className="opacity-0 transition-opacity group-hover:opacity-100 text-[#7B68EE]"
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                )
-            }
+  const dropdownRef = useClickOutside(() => setDropdownOpen(false));
 
+  return (
+    <div className="w-full relative" ref={dropdownRef}>
+      {/* Input */}
+      <div className="relative w-full group">
+        <input
+          type="text"
+          placeholder={placeholder}
+          readOnly
+          value={value}
+          onClick={handleDropdownVisibility}
+          className="
+            w-full cursor-pointer rounded-xl border
+            border-gray-200 dark:border-gray-700
+            bg-white dark:bg-gray-800
+            p-4 pr-12 text-sm font-medium
+            text-gray-700 dark:text-gray-200
+            shadow-sm transition-all
+            focus:border-[#7B68EE] focus:ring-4 focus:ring-[#7B68EE]/15
+            outline-none capitalize
+          "
+        />
+        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none transition-transform">
+          <HiChevronDown
+            size={21}
+            className={`text-[#7B68EE] dark:text-[#7B68EE] transition-transform duration-200 ${
+              isDropdownOpen ? "rotate-180" : ""
+            }`}
+          />
         </div>
-    );
+      </div>
+
+      {/* Dropdown Menu */}
+      {isDropdownOpen && (
+        <ul
+          className="
+          mt-2 w-full max-h-64 overflow-y-auto rounded-2xl border
+          border-gray-100 dark:border-gray-700
+          bg-white dark:bg-gray-900 p-2 shadow-2xl ring-1 ring-black/5
+          transition-colors z-10 absolute
+        "
+        >
+          {items.map((item) => (
+            <li
+              key={item.id ?? item.value}
+              data-value={item.value}
+              onClick={() => handleSelect(item.value)}
+              className="
+                group flex cursor-pointer items-center justify-start
+                rounded-lg px-4 py-3 text-sm
+                text-gray-600 dark:text-gray-300
+                transition-all
+                hover:bg-[#7B68EE]/10 dark:hover:bg-[#7B68EE]/20
+                hover:text-[#7B68EE] dark:hover:text-[#7B68EE]
+              "
+            >
+              <span className="font-medium pl-4">{item.name}</span>
+              <HiCheck
+                size={18}
+                className="opacity-0 group-hover:opacity-100 text-[#7B68EE] dark:text-[#7B68EE] ml-auto transition-opacity"
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
-
-

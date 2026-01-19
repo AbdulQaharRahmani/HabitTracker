@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import HabitCard from "./HabitCard";
 import api from "../../services/api";
 import Pagination from "./Pagination";
+import useHabitStore from "../store/useHabitStore";
 
 export default function HabitList({ viewMode }) {
-  const [habits, setHabits] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+ const { allhabits, loading, error, fetchHabits } = useHabitStore();
 
   const [page, setPage] = useState(1);
 
@@ -33,8 +32,7 @@ export default function HabitList({ viewMode }) {
     };
 
     fetchHabits();
-  }, []);
-
+  }, [fetchHabits]);
   if (loading) {
     return (
       <p className="text-gray-300 text-lg text-semibold my-4 text-center">
@@ -85,6 +83,24 @@ export default function HabitList({ viewMode }) {
           pageSize={ITEMS_PER_PAGE}
           onPageChange={setPage}
         />
+      {allhabits.length === 0 ?
+        (
+          <p className="text-gray-500 text-lg">You have no habits yet. Add your first habit.</p>
+        ) : (
+          allhabits.map((habit) => (
+          <HabitCard
+            key={habit._id}
+            _id={habit._id}
+            viewMode={viewMode}
+            title={habit.title}
+            description={habit.description}
+            categoryId={habit.categoryId}
+            frequency={habit.frequency}
+            duration={habit.duration}
+          />
+      ))
+        )
+      }
       </div>
     );
   }
