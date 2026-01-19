@@ -5,7 +5,7 @@ import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
 
 export default function HabitList({ viewMode }) {
- const { allhabits, loading, error, fetchHabits } = useHabitStore();
+  const { allhabits, loading, error, fetchHabits } = useHabitStore();
 
   const [page, setPage] = useState(1);
 
@@ -51,31 +51,33 @@ export default function HabitList({ viewMode }) {
 
   if (!error && !loading) {
     return (
-      <div
-        className={
-          viewMode === "grid"
-            ? "grid grid-cols-1 lg:grid-cols-3 lg:ml-6 sm:grid-cols-2 md:grid-cols-1 md:ml-[2.25rem] gap-6 justify-items-start"
-            : "my-6 space-y-4 ml-[1.35rem]"
-        }
-      >
-        {habits.length === 0 ? (
-          <p className="text-gray-500 text-lg">
-            You have no habits yet. Add your first habit.
-          </p>
-        ) : (
-          visibleHabits.map((habit) => (
-            <HabitCard
-              key={habit._id}
-              id={habit._id}
-              viewMode={viewMode}
-              title={habit.title}
-              description={habit.description}
-              category={habit.category}
-              frequency={habit.frequency}
-              duration={habit.duration}
-            />
-          ))
-        )}
+      <>
+        <div
+          className={
+            viewMode === "grid"
+              ? "grid grid-cols-1 lg:grid-cols-3 lg:ml-6 sm:grid-cols-2 md:grid-cols-1 md:ml-[2.25rem] gap-6 justify-items-start"
+              : "my-6 space-y-4 ml-[1.35rem]"
+          }
+        >
+          {habits.length === 0 ? (
+            <p className="text-gray-500 text-lg">
+              You have no habits yet. Add your first habit.
+            </p>
+          ) : (
+            visibleHabits.map((habit) => (
+              <HabitCard
+                key={habit._id}
+                id={habit._id}
+                viewMode={viewMode}
+                title={habit.title}
+                description={habit.description}
+                category={habit.category}
+                frequency={habit.frequency}
+                duration={habit.duration}
+              />
+            ))
+          )}
+        </div>
         <Pagination
           currentPage={page}
           totalCount={habits.length}
@@ -83,25 +85,25 @@ export default function HabitList({ viewMode }) {
           pageSize={ITEMS_PER_PAGE}
           onPageChange={setPage}
         />
-      {allhabits.length === 0 ?
-        (
-          <p className="text-gray-500 text-lg">You have no habits yet. Add your first habit.</p>
+        {allhabits.length === 0 ? (
+          <p className="text-gray-500 text-lg">
+            You have no habits yet. Add your first habit.
+          </p>
         ) : (
           allhabits.map((habit) => (
-          <HabitCard
-            key={habit._id}
-            _id={habit._id}
-            viewMode={viewMode}
-            title={habit.title}
-            description={habit.description}
-            categoryId={habit.categoryId}
-            frequency={habit.frequency}
-            duration={habit.duration}
-          />
-      ))
-        )
-      }
-      </div>
+            <HabitCard
+              key={habit._id}
+              _id={habit._id}
+              viewMode={viewMode}
+              title={habit.title}
+              description={habit.description}
+              categoryId={habit.categoryId}
+              frequency={habit.frequency}
+              duration={habit.duration}
+            />
+          ))
+        )}
+      </>
     );
   }
 }
