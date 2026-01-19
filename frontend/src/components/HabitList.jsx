@@ -35,13 +35,40 @@ export default function HabitList({ viewMode }) {
 
   if (!error && !loading) {
     return (
-      <div
-        className={
-          viewMode === "grid"
-            ? "grid grid-cols-1 lg:grid-cols-3 lg:ml-6 sm:grid-cols-2 md:grid-cols-1 md:ml-[2.25rem] gap-6 justify-items-start"
-            : "my-6 space-y-4 ml-[1.35rem]"
-        }
-      >
+      <>
+        <div
+          className={
+            viewMode === "grid"
+              ? "grid grid-cols-1 lg:grid-cols-3 lg:ml-6 sm:grid-cols-2 md:grid-cols-1 md:ml-[2.25rem] gap-6 justify-items-start"
+              : "my-6 space-y-4 ml-[1.35rem]"
+          }
+        >
+          {habits.length === 0 ? (
+            <p className="text-gray-500 text-lg">
+              You have no habits yet. Add your first habit.
+            </p>
+          ) : (
+            visibleHabits.map((habit) => (
+              <HabitCard
+                key={habit._id}
+                id={habit._id}
+                viewMode={viewMode}
+                title={habit.title}
+                description={habit.description}
+                category={habit.category}
+                frequency={habit.frequency}
+                duration={habit.duration}
+              />
+            ))
+          )}
+        </div>
+        <Pagination
+          currentPage={page}
+          totalCount={habits.length}
+          siblingCount
+          pageSize={ITEMS_PER_PAGE}
+          onPageChange={setPage}
+        />
         {allhabits.length === 0 ? (
           <p className="text-gray-500 text-lg">
             You have no habits yet. Add your first habit.
@@ -60,7 +87,7 @@ export default function HabitList({ viewMode }) {
             />
           ))
         )}
-      </div>
+      </>
     );
   }
 }
