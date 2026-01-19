@@ -29,9 +29,18 @@ const taskSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
     deletedAt: {
       type: Date,
       default: null,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -39,6 +48,9 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-taskSchema.index({ title: 1, userId: 1 }, { unique: true });
+taskSchema.index(
+  { title: 1, userId: 1 },
+  { unique: true, partialFilterExpression: { deletedAt: null } }
+);
 
 export const TaskModel = mongoose.model('Task', taskSchema);

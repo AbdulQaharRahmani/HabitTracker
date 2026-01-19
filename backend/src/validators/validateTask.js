@@ -2,6 +2,7 @@ import { body, query } from 'express-validator';
 
 export const createTaskValidator = [
   body('title')
+    .trim()
     .notEmpty()
     .withMessage('Title is required')
     .isString()
@@ -9,16 +10,15 @@ export const createTaskValidator = [
     .isLength({ min: 1, max: 30 })
     .withMessage(
       'The title length should be greater than 1 and less than 30 letter'
-    )
-    .trim(),
+    ),
 
   body('description')
     .optional()
+    .trim()
     .isString()
     .withMessage('Description should be string')
     .isLength({ max: 200 })
-    .withMessage('Description can be up to 200 characters')
-    .trim(),
+    .withMessage('Description can be up to 200 characters'),
 
   body('priority')
     .optional()
@@ -35,26 +35,32 @@ export const createTaskValidator = [
     .isISO8601()
     .withMessage('DueDate must be a valid date')
     .toDate(),
+
+  body('categoryId')
+    .notEmpty()
+    .withMessage('Category is required')
+    .isMongoId()
+    .withMessage('CategoryId is invalid'),
 ];
 
 export const updateTaskValidator = [
   body('title')
     .optional()
+    .trim()
     .isString()
     .withMessage('Title should be a string')
     .isLength({ min: 1, max: 30 })
     .withMessage(
       'The title length should be greater than 1 and less than 30 letter'
-    )
-    .trim(),
+    ),
 
   body('description')
     .optional()
+    .trim()
     .isString()
     .withMessage('Description should be string')
     .isLength({ max: 200 })
-    .withMessage('Description can be up to 200 characters')
-    .trim(),
+    .withMessage('Description can be up to 200 characters'),
 
   body('priority')
     .optional()
@@ -71,6 +77,12 @@ export const updateTaskValidator = [
     .isISO8601()
     .withMessage('DueDate must be a valid date')
     .toDate(),
+
+  body('categoryId')
+    .optional()
+    .trim()
+    .isMongoId()
+    .withMessage('CategoryId is invalid'),
 ];
 
 export const filterTasksValidator = [
