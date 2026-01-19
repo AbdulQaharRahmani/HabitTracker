@@ -4,6 +4,8 @@ import {
   loginUser,
   registerUser,
   googleLogin,
+  refreshAccessToken,
+  logOutUser,
 } from '../controllers/authController.js';
 import {
   loginValidator,
@@ -24,4 +26,6 @@ router.post('/login', loginValidator, validate, asyncHandler(loginUser));
 //Google routes
 router.post('/google', asyncHandler(googleLogin));
 
+router.post('/refresh', asyncHandler(refreshAccessToken));
+router.post('/logout', asyncHandler(logOutUser));
 export default router;
