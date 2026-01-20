@@ -4,54 +4,128 @@ import { useTaskCardStore } from "../store/useTaskCardStore";
 import { FaTimes } from "react-icons/fa";
 import Dropdown from "./Dropdown";
 import toast from "react-hot-toast";
+import i18n from "../utils/i18n";
 
 export default function AddTask() {
   const { t } = useTranslation();
+  const isRTL = i18n.language === "fa"
 
   const { isModalOpen, setModalOpen, taskData, setTaskData, addTask } = useTaskCardStore();
 
   const deadlineItems = [
-    { id: "d1", name: "Today", value: "today" },
-    { id: "d2", name: "Tomorrow", value: "tomorrrow" },
-    { id: "d3", name: "Saturday", value: "saturday" },
-    { id: "d4", name: "Sunday", value: "sunday" },
-    { id: "d5", name: "Monday", value: "monday" },
-    { id: "d6", name: "Tuesday", value: "tuesday" },
-    { id: "d7", name: "Wednesday", value: "wednesday" },
-    { id: "d8", name: "Thursday", value: "thursday" },
-    { id: "d9", name: "Friday", value: "friday" },
+    {
+      id: "d1",
+      name: isRTL ? "امروز" : "Today",
+      value: isRTL ? "امروز" : "Today",
+    },
+    {
+      id: "d2",
+      name: isRTL ? "فردا" : "Tomorrow",
+      value: isRTL ? "فردا" : "Tomorrow",
+    },
+    {
+      id: "d3",
+      name: isRTL ? "شنبه" : "Saturday",
+      value: isRTL ? "شنبه" : "Saturday",
+    },
+    {
+      id: "d4",
+      name: isRTL ? "یکشنبه" : "Sunday",
+      value: isRTL ? "یکشنبه" : "Sunday",
+    },
+    {
+      id: "d5",
+      name: isRTL ? "دوشنبه" : "Monday",
+      value: isRTL ? "دوشنبه" : "Monday",
+    },
+    {
+      id: "d6",
+      name: isRTL ? "سه شنبه" : "Tuesday",
+      value: isRTL ? "سه شنبه" : "Tuesday",
+    },
+    {
+      id: "d7",
+      name: isRTL ? "چهارشنبه" : "Wednesday",
+      value: isRTL ? "چهارشنبه" : "Wednesday",
+    },
+    {
+      id: "d8",
+      name: isRTL ? "پنجشنبه" : "Thursday",
+      value: isRTL ? "پنجشنبه" : "Thursday",
+    },
+    {
+      id: "d9",
+      name: isRTL ? "جمعه" : "Friday",
+      value: isRTL ? "جمعه" : "Friday",
+    },
   ];
 
   const categoryItems = [
-    { id: "c1", name: "Health & Fitness", value: "Health" },
-    { id: "c2", name: "Mental Wellness", value: "Mental" },
-    { id: "c3", name: "Productivity", value: "Productivity" },
-    { id: "c4", name: "Finance", value: "Finance" },
-    { id: "c5", name: "Social", value: "Social" },
-    { id: "c6", name: "Hobbies", value: "Hobbies" },
-    { id: "c7", name: "Learning", value: "Learning" },
+    {
+      id: "c1",
+      name: isRTL ? "صحتمندی و فیتنس" : "Health & Fitness",
+      value: isRTL ? "صحتمندی و فیتنس" : "Health & Fitness",
+    },
+    {
+      id: "c2",
+      name: isRTL ? "سلامت روحی" : "Mental Wellness",
+      value: isRTL ? "سلامت روحی" : "Mental Wellness",
+    },
+    {
+      id: "c3",
+      name: isRTL ? "فعالیتمندی" : "Productivity",
+      value: isRTL ? "فعالیتمندی" : "Productivity",
+    },
+    {
+      id: "c4",
+      name: isRTL ? "اقتصادی" : "Finance",
+      value: isRTL ? "اقتصادی" : "Finance",
+    },
+    {
+      id: "c5",
+      name: isRTL ? "اجتماعی" : "Social",
+      value: isRTL ? "اجتماعی" : "Social",
+    },
+    {
+      id: "c6",
+      name: isRTL ? "سرگرمی" : "Hobbies",
+      value: isRTL ? "سرگرمی" : "Hobbies",
+    },
+    {
+      id: "c7",
+      name: isRTL ? "یادگیری" : "Learning",
+      value: isRTL ? "یادگیری" : "Learning",
+    }
   ];
 
   const HandleTaskCreation = (e) => {
     e.preventDefault();
 
     if (!taskData.title) {
-      toast.error("Title is required!");
+      isRTL
+        ? toast.error("عنوان الزامی است!")
+        : toast.error("Title is required!");
       return;
     }
 
     if (!taskData.description) {
-      toast.error("Description is required!");
+      isRTL
+        ? toast.error("توضیحات الزامی است!")
+        : toast.error("Descripton is required!");
       return;
     }
 
     if (!taskData.deadline) {
-      toast.error("Deadline is required!");
+      isRTL
+        ? toast.error("تاریخ ختم عملیات الزامی است!")
+        : toast.error("Deadline is required!");
       return;
     }
 
     if (!taskData.category) {
-      toast.error("Category is required!");
+      isRTL
+        ? toast.error("کتگوری الزامی است!")
+        : toast.error("Category is required!");
       return;
     }
 
@@ -72,9 +146,13 @@ export default function AddTask() {
       setTaskData("category", "");
 
       setModalOpen();
-      toast.success("Task added successfully!");
+      isRTL
+        ? toast.success("تسک با موفقیت اضافه شد!")
+        : toast.success("Task added successfully!");
     } catch (error) {
-      toast.error("Sorry! could not save new task", error);
+      isRTL
+        ? toast.error("متاسفانه تسک  اضافه نشد!", error)
+        : toast.error("Sorry! could not save new task", error);
     } 
   };
 
@@ -88,7 +166,7 @@ export default function AddTask() {
         <span className="mx-2 font-normal">
           <GrAdd size={14} />
         </span>
-        <span>{t("New Task")}</span>
+        <span>{t("Add New Task")}</span>
       </button>
       <div>
         {isModalOpen && (
@@ -104,7 +182,7 @@ export default function AddTask() {
               "
             >
               <div className="flex justify-between p-2">
-                <h2 className="font-bold">Add New Task</h2>
+                <h2 className="font-bold">{t("Add New Task")}</h2>
                 <FaTimes
                   onClick={() => setModalOpen(false)}
                   className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
@@ -118,16 +196,18 @@ export default function AddTask() {
                 onSubmit={HandleTaskCreation}
               >
                 <label htmlFor="title">
-                  Title <span className="text-red-600">*</span>
+                  {t("Title")} <span className="text-red-600">*</span>
                 </label>
 
                 <input
                   type="text"
                   id="title"
-                  placeholder="Enter task title"
+                  placeholder={
+                    isRTL ? "عنوان را وارد کنید" : "Enter task title"
+                  }
                   value={taskData.title}
                   onChange={(e) => setTaskData("title", e.target.value)}
-                  className="
+                  className={`
                     border-2 rounded-md p-2
                     bg-gray-50 dark:bg-gray-800
                     border-gray-200 dark:border-gray-700
@@ -135,13 +215,15 @@ export default function AddTask() {
                     placeholder:text-sm placeholder-gray-500 dark:placeholder-gray-400
                     focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE]
                     outline-none transition-all
-                  "
+                  `}
                 />
 
-                <label htmlFor="description">Description</label>
+                <label htmlFor="description">{t("Description")}</label>
                 <textarea
                   id="description"
-                  placeholder="Enter task description"
+                  placeholder={
+                    isRTL ? "توضیحات را وارد کنید" : "Enter task description"
+                  }
                   value={taskData.description}
                   onChange={(e) => setTaskData("description", e.target.value)}
                   className="
@@ -156,21 +238,25 @@ export default function AddTask() {
                 />
 
                 <label>
-                  Deadline <span className="text-red-600">*</span>
+                  {t("Deadline")} <span className="text-red-600">*</span>
                 </label>
                 <Dropdown
                   items={deadlineItems}
-                  placeholder="Choose Deadline"
+                  placeholder={
+                    isRTL ? "موعد ختم را انخاب کنید" : "Choose Deadline"
+                  }
                   value={taskData.deadline || ""}
                   getValue={(value) => setTaskData("deadline", value)}
                 />
 
                 <label>
-                  Category <span className="text-red-600">*</span>
+                  {t("Category")} <span className="text-red-600">*</span>
                 </label>
                 <Dropdown
                   items={categoryItems}
-                  placeholder="Choose Category"
+                  placeholder={
+                    isRTL ? " کتګوری را انخاب کنید" : "Choose Category"
+                  }
                   value={taskData.category || ""}
                   getValue={(value) => setTaskData("category", value)}
                 />
@@ -186,12 +272,12 @@ export default function AddTask() {
                     "
                     style={{ backgroundColor: "#7B68EE" }}
                   >
-                    Save
+                    {t("Save")}
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setModalClose()}
+                    onClick={() => setModalOpen(false)}
                     className="
                       w-full py-3.5 font-semibold rounded-xl
                       border-2
@@ -201,7 +287,7 @@ export default function AddTask() {
                       transition-all active:scale-[0.98]
                     "
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                 </div>
               </form>
