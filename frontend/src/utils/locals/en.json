@@ -69,5 +69,13 @@
   "Task added successfully!": "Task added successfully!",
   "Sorry! could not save new task": "Sorry! could not save new task",
   "Loading": "Loading...",
-  "You have no tasks to show": "You have no tasks to show."
+  "You have no tasks to show": "You have no tasks to show.",
+
+  "Add New Task": "Add New Task",
+  "Title": "Title",
+  "Description": "Description",
+  "Deadline": "Deadline",
+  "Category": "Category",
+  "Save": "Save",
+  "Cancel": "Cancel"
 }

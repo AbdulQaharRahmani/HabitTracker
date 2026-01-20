@@ -76,5 +76,13 @@
   "Task added successfully!": "عمیلات با موفقیت اضافه شد",
   "Sorry! could not save new task": "خطا! عملیات ذخیره نشد",
   "Loading": "درحال بارگذاری...",
-  "You have no tasks to show": "وظیفه‌ای برای نمایش وجود ندارد."
+  "You have no tasks to show": "وظیفه‌ای برای نمایش وجود ندارد.",
+
+  "Add New Task": "اضافه کردن عملیات جدید",
+  "Title": "عنوان",
+  "Description": "توضیحات",
+  "Deadline": "موعد",
+  "Category": "کتگوری",
+  "Save": "ذخیره",
+  "Cancel": "لغو"
 }
