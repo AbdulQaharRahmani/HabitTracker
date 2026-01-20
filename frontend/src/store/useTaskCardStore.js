@@ -48,7 +48,7 @@ export const useTaskCardStore = create((set) => ({
   completeTask: (id) =>
     set((state) => ({
       tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, done: true } : task,
+        task.id === id ? { ...task, done: !task.done } : task,
       ),
     })),
 
