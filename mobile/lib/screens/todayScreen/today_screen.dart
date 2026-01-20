@@ -126,7 +126,7 @@ class _TodayScreenState extends State<TodayScreen> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Error while fetching data: $e';
+        _error = ' Error while fetching data: $e';
       });
     } finally {
       setState(() {
