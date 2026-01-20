@@ -45,7 +45,7 @@ export default function HabitList({ viewMode }) {
               : "my-6 space-y-4 ml-[1.35rem]"
           }
         >
-          {habits.length === 0 ? (
+          {allhabits.length === 0 ? (
             <p className="text-gray-500 text-lg">
               You have no habits yet. Add your first habit.
             </p>
