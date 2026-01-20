@@ -5,6 +5,8 @@ import { useProfilePhotoStore } from '../../store/useProfilePhotoStore';
 function ProfilePhoto() {
     const fileInputref = useRef(null);
   const { t } = useTranslation();
+  const [preview, setPreview] = useState(null);
+
 
   const { userProfileUrl, fetchProfilePhoto, uploadProfilePhoto, loading } = useProfilePhotoStore();
 
@@ -18,25 +20,26 @@ function ProfilePhoto() {
     fileInputref.current.click();
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert('Please select a valid image file.');
-      return;
-    }
+  if (!file.type.startsWith('image/')) {
+    alert('Please select a valid image file.');
+    return;
+  }
 
-    const previewUrl = URL.createObjectURL(file);
-    useProfilePhotoStore.setState({userProfileUrl:previewUrl});
-    uploadProfilePhoto(file,userId);
-  };
+  uploadProfilePhoto(file, userId);
+};
+
+
+
 
   return (
     <div className="flex flex-col items-center space-y-4">
       <div className="relative w-24 h-24 overflow-hidden border-4 border-white rounded-full shadow-md dark:border-gray-800 bg-orange-100 dark:bg-gray-800">
         <img
-          src={userProfileUrl}
+          src={preview || userProfileUrl}
           alt="Profile"
           className="object-cover w-full h-full"
         />

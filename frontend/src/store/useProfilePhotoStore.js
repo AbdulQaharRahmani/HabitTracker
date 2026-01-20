@@ -1,52 +1,47 @@
-import { create } from "zustand";
-import { getProfilePicture, uploadProfilePicture } from "../../services/userProfileService";
-
-
+import { create } from 'zustand';
+import { getProfilePicture, uploadProfilePicture } from '../../services/userProfileService';
 
 const DEFAULT_AVATAR =
   'https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg';
 
-
 export const useProfilePhotoStore = create((set) => ({
-    profileUrl: DEFAULT_AVATAR,
-    loading: false,
-    error: null,
-    fetchProfilePhoto: async (userId) => {
-        try {
-            set({ loading: true, error: null });
+  userProfileUrl: DEFAULT_AVATAR,
+  loading: false,
+  error: null,
 
-            const response = await getProfilePicture(userId);
-
-            if (response.data?.success && response.data?.data) {
-
-                set({ profileUrl: response.data.data });
-
-            }
-        } catch (error) {
-            console.error('Fetch profile photo error:', error);
-            set({ error: 'Failed to load profile photo' });
-        } finally {
-            set({ loading: false });
-       }
-    },
-
-    uploadProfilePhoto:async (file, userId) => {
+  fetchProfilePhoto: async (userId) => {
     try {
-      set({ loading: true, error: null });
+      set({ loading: true });
 
-      await uploadProfilePicture(file);
+      const res = await getProfilePicture(userId);
 
-      const response = await getProfilePicture(userId);
-
-      if (response.data?.success && response.data?.data) {
-        set({ profileUrl: response.data.data });
+      if (res.data?.success && res.data?.data) {
+        set({ userProfileUrl: res.data.data });
+      } else {
+        set({ userProfileUrl: DEFAULT_AVATAR });
       }
-    } catch (error) {
-      console.error('Upload profile photo error:', error);
-      set({ error: 'Failed to upload profile photo' });
+    } catch (err) {
+      console.error(err);
+      set({ userProfileUrl: DEFAULT_AVATAR });
     } finally {
       set({ loading: false });
     }
   },
-}))
 
+  uploadProfilePhoto: async (file, userId) => {
+    try {
+      set({ loading: true });
+
+      await uploadProfilePicture(file);
+
+      const res = await getProfilePicture(userId);
+      if (res.data?.success && res.data?.data) {
+        set({ userProfileUrl: res.data.data });
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+}));
