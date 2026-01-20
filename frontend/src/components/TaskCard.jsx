@@ -32,13 +32,17 @@ export default function TaskCard({title, description, deadline, category, done, 
       <div className="grid grid-cols-2 justify-between items-start flex-1 md:justify-start md:grid-cols-[2fr_1fr]">
         <div className="my-1">
           <div
-            className={`py-3 px-4 text-lg font-bold transition dark:text-gray-100 ${
-              done ? "text-gray-400 line-through" : "text-gray-800"
-            }`}
+            className={`py-3 px-4 transition`}
           >
-            {t(title)}
+            <h3 className={`font-bold dark:text-gray-100 text-lg ${
+              done ? "text-gray-400 line-through" : "text-gray-800"
+            }`}>
+              {t(title)}
+            </h3>
             <div>
-              <p className="text-gray-400 text-sm font-normal mt-1">
+              <p
+                className="text-gray-400 text-sm font-normal mt-1 "
+              >
                 {t(description)}
               </p>
             </div>
