@@ -27,7 +27,9 @@ function Statistics() {
 
   return (
     <div className="">
-      <div className={`flex justify-between my-2 items-center mx-9 xxs:ml-0`}>
+      <div className={`flex justify-between my-2 items-center mx-9 xxs:ml-0 ${
+        isRTL ? "xxs:ml-7" : "xxs:ml-auto"
+      }`}>
         <Header
           title={t("Your Progress")}
           subtitle={t("Overview of your consistency and growth.")}
