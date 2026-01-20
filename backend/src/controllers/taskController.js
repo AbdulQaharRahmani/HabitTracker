@@ -48,7 +48,8 @@ export const getTasks = async (req, res) => {
 
   const tasks = await TaskModel.find({ userId: req.user._id, deletedAt: null })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .populate('categoryId', 'name icon backgroundColor');
 
   res.status(200).json({
     success: true,
@@ -114,7 +115,9 @@ export const filterTasks = async (req, res) => {
     };
   }
 
-  const tasks = await TaskModel.find({ ...query }).lean();
+  const tasks = await TaskModel.find({ ...query })
+    .populate('categoryId', 'name icon backgroundColor')
+    .lean();
 
   res.status(200).json({ success: true, data: tasks });
 };

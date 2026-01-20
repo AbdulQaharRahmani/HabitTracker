@@ -34,15 +34,16 @@ dependencies:
   dio: ^5.4.0
   flutter_secure_storage: ^9.0.0
   provider: ^6.1.2
-  flutter_colorpicker:
+  flutter_heatmap_calendar:
+  fl_chart: ^0.66.2
   intl:
   iconsax:
-  shared_preferences:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   persistent_bottom_nav_bar: ^6.2.1
   icons_plus: ^4.0.0
+  google_fonts:
 
 dev_dependencies:
   flutter_test:
