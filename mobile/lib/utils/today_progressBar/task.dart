@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/utils/today_progressBar/task_item.dart';
 import '../../app/app_theme.dart';
+import '../../utils/today_progressBar/task_item.dart';
 
 class TaskCard extends StatelessWidget {
   final TaskItem item;
@@ -15,14 +15,14 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categoryConfig =
-        taskCategoryMap[item.category] ?? taskCategoryMap['Other']!;
+    final Color itemColor = item.color;
+    final IconData itemIcon = item.icon;
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 6.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: AppTheme.textWhite,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
           BoxShadow(
@@ -34,30 +34,32 @@ class TaskCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // ===== Task Icon =====
+          // ===== Icon =====
           Container(
             width: 42.w,
             height: 42.w,
             decoration: BoxDecoration(
-              color: categoryConfig.color.withOpacity(0.15),
+              color: itemColor.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              categoryConfig.icon,
-              color: categoryConfig.color,
+              itemIcon,
+              color: itemColor,
               size: 22.sp,
             ),
           ),
 
           SizedBox(width: 12.w),
 
-          // ===== Task Info =====
+          // ===== Info =====
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   item.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14.sp,
@@ -79,7 +81,7 @@ class TaskCard extends StatelessWidget {
                     ),
                     SizedBox(width: 4.w),
                     Text(
-                      item.time,
+                      item.frequency,
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: AppTheme.textMuted,
@@ -92,11 +94,11 @@ class TaskCard extends StatelessWidget {
                         vertical: 3.h,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.surface,
+                        color: AppTheme.inputBackground,
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
-                        item.category,
+                       item.category,
                         style: TextStyle(
                           fontSize: 11.sp,
                           color: AppTheme.textMuted,
@@ -111,10 +113,11 @@ class TaskCard extends StatelessWidget {
 
           SizedBox(width: 10.w),
 
-          // ===== Done Checkbox =====
+          // ===== Checkbox =====
           GestureDetector(
             onTap: () => onToggleDone(!item.done),
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               width: 36.w,
               height: 36.w,
               decoration: BoxDecoration(
@@ -124,9 +127,7 @@ class TaskCard extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                item.done
-                    ? Icons.check
-                    : Icons.radio_button_unchecked,
+                item.done ? Icons.check : Icons.radio_button_unchecked,
                 color: item.done
                     ? Colors.white
                     : AppTheme.textMuted,

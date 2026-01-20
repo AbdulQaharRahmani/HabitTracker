@@ -26,34 +26,6 @@ Widget dailyGoalCard({
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /// Top Row
-        Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                 Text(
-                  'Daily Goal',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$completed of $total habits completed',
-                  style: const TextStyle(color: AppTheme.textMuted),
-                ),
-              ],
-            ),
-            const Spacer(),
-            streakBadgeWithValue(streakDays),
-          ],
-        ),
-
-         SizedBox(height: 16.h),
-
-        // Progress Row
         Row(
           children: [
             const Text(
@@ -75,7 +47,7 @@ Widget dailyGoalCard({
           ],
         ),
 
-         SizedBox(height: 8.h),
+        SizedBox(height: 8.h),
 
         /// Progress Bar
         ClipRRect(
@@ -88,7 +60,7 @@ Widget dailyGoalCard({
           ),
         ),
 
-         SizedBox(height: 16.h),
+        SizedBox(height: 16.h),
       ],
     ),
   );
