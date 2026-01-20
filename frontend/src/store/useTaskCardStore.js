@@ -64,4 +64,33 @@ export const useTaskCardStore = create((set) => ({
     set((state) => ({
       tasks: state.tasks.filter((task) => task._id !== id),
     })),
+
+  isModalOpen: false,
+
+  taskData: {
+    title: "",
+    description: "",
+    deadline: null,
+    category: null,
+  },
+
+  setModalOpen: () => {
+    set((state) => ({
+      isModalOpen: !state.isModalOpen,
+    }));
+  },
+
+  setTaskData: (item, value) => {
+    set((state) => ({
+      taskData: {
+        ...state.taskData,
+        [item]: value,
+      },
+    }));
+  },
+
+  addTask: (task) =>
+    set((state) => ({
+      tasks: [...state.tasks, task],
+    })),
 }));
