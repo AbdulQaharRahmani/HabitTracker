@@ -49,5 +49,13 @@
   "Call Mom": "Call Mom",
   "Yesterday": "Yesterday",
   "Tomorrow": "Tomorrow",
-  "No date": "No date"
+  "No date": "No date",
+
+  "Add New Task": "Add New Task",
+  "Title": "Title",
+  "Description": "Description",
+  "Deadline": "Deadline",
+  "Category": "Category",
+  "Save": "Save",
+  "Cancel": "Cancel"
 }

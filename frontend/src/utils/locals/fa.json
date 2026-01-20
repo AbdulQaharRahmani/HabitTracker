@@ -55,5 +55,13 @@
   "Call Mom": "زنگ زدن به مادر",
   "Yesterday": "دیروز",
   "Tomorrow": "فردا",
-  "No date": "تاریخ نامشخص"
+  "No date": "تاریخ نامشخص",
+
+  "Add New Task": "اضافه کردن عملیات جدید",
+  "Title": "عنوان",
+  "Description": "توضیحات",
+  "Deadline": "موعد",
+  "Category": "کتگوری",
+  "Save": "ذخیره",
+  "Cancel": "لغو"
 }
