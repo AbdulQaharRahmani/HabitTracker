@@ -7,7 +7,7 @@ export default function CompletionRateStatics({ completionRate }) {
   const isRTL = i18n.language === "fa";
 
   return (
-    <div className="bg-white w-1/3 p-4 min-h-[200px] min-w-[200px] rounded-2xl shadow-sm border border-gray-100 relative group overflow-hidden md:min-w-[170px] xxs:w-full">
+    <div className="bg-white dark:bg-gray-800 dark:border-gray-700 w-1/3 p-4 min-h-[200px] min-w-[200px] rounded-2xl shadow-sm border border-gray-100 relative group overflow-hidden md:min-w-[170px] xxs:w-full">
       <svg
         fill="currentColor"
         viewBox="0 0 256 256"
@@ -24,11 +24,11 @@ export default function CompletionRateStatics({ completionRate }) {
             size={20}
             className="text-green-500 bg-green-100 w-10 h-12 p-2 rounded-md"
           />
-          <p className="text-gray-400 text-lg uppercase">
+          <p className="text-gray-400 text-lg uppercase dark:text-gray-300">
             {t("COMPLETION RATE")}
           </p>
         </span>
-        <div className="text-gray-800 font-bold text-[2.5rem] mt-4">
+        <div className="text-gray-800 dark:text-gray-100 font-bold text-[2.5rem] mt-4">
           {completionRate}%
         </div>
       </div>
