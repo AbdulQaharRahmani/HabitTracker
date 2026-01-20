@@ -17,6 +17,10 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: '*' }));
 
+if (process.env.NODE_ENV === 'production') {
+  app.use(requestLogger);
+}
+
 //#endregion
 
 //#region Route Middlewares
@@ -48,8 +52,9 @@ app.use((req, res) => {
 
 //#endregion
 
-app.use(requestLogger);
-app.use(errorLogger);
+if (process.env.NODE_ENV === 'production') {
+  app.use(errorLogger);
+}
 
 //#region Error Handler middleware
 
