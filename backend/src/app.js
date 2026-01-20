@@ -8,6 +8,8 @@ import taskRoutes from './routes/task.js';
 import categoryRoutes from './routes/categories.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
+import { errorLogger, requestLogger } from './middleware/logger.js';
+
 const app = express();
 
 //#region Normal Midlleware
@@ -45,6 +47,9 @@ app.use((req, res) => {
 });
 
 //#endregion
+
+app.use(requestLogger);
+app.use(errorLogger);
 
 //#region Error Handler middleware
 
