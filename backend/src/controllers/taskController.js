@@ -1,6 +1,7 @@
 import { TaskModel } from '../models/Task.js';
 import { ERROR_CODES } from '../utils/constant.js';
 import { DateHelper } from '../utils/date.js';
+import { CategoryModel } from '../models/Category.js';
 import {
   AppError,
   noFieldsProvidedForUpdate,
@@ -11,7 +12,14 @@ import {
 export const createTask = async (req, res) => {
   if (!req.user) throw unauthorized();
 
-  const { title, description, priority, dueDate } = req.body;
+  const { title, description, priority, dueDate, categoryId } = req.body;
+
+  const doesCategoryExist = await CategoryModel.doesCategoryExist(
+    categoryId,
+    req.user._id
+  );
+
+  if (!doesCategoryExist) throw notFound('Category');
 
   const task = await TaskModel.create({
     title,
@@ -19,6 +27,7 @@ export const createTask = async (req, res) => {
     priority,
     dueDate,
     userId: req.user._id,
+    categoryId,
   });
 
   res.status(201).json({
@@ -37,7 +46,8 @@ export const getTasks = async (req, res) => {
 
   const tasks = await TaskModel.find({ userId: req.user._id, deletedAt: null })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .populate('categoryId', 'name icon backgroundColor');
 
   res.status(200).json({
     success: true,
@@ -103,7 +113,9 @@ export const filterTasks = async (req, res) => {
     };
   }
 
-  const tasks = await TaskModel.find({ ...query }).lean();
+  const tasks = await TaskModel.find({ ...query })
+    .populate('categoryId', 'name icon backgroundColor')
+    .lean();
 
   res.status(200).json({ success: true, data: tasks });
 };
@@ -139,12 +151,21 @@ export const updateTask = async (req, res) => {
     status: true,
     priority: true,
     dueDate: true,
+    categoryId: true,
   };
 
   const updateQuery = {};
 
   for (let key of Object.keys(req.body)) {
     if (key in allowedFieldsToUpdate) updateQuery[key] = req.body[key];
+  }
+
+  if (updateQuery?.categoryId) {
+    const doesCategoryExist = await CategoryModel.doesCategoryExist(
+      req.body.categoryId,
+      req.user._id
+    );
+    if (!doesCategoryExist) throw notFound('Category');
   }
 
   const task = await TaskModel.findOneAndUpdate(
