@@ -5,6 +5,7 @@ export const useTaskCardStore = create((set) => ({
     {
       id: 1,
       title: "Complete project proposal",
+      description: "This is the description part",
       deadline: "Yesterday",
       category: "Work",
       done: false,
@@ -12,6 +13,7 @@ export const useTaskCardStore = create((set) => ({
     {
       id: 2,
       title: "Buy groceries for the week",
+      description: "This is the description part",
       deadline: "Today",
       category: "Personal",
       done: false,
@@ -19,6 +21,7 @@ export const useTaskCardStore = create((set) => ({
     {
       id: 3,
       title: "Schedule dentist appointment",
+      description: "This is the description part",
       deadline: "Tomorrow",
       category: "Health",
       done: false,
@@ -26,23 +29,53 @@ export const useTaskCardStore = create((set) => ({
     {
       id: 4,
       title: "Call Mom",
+      description: "This is the description part",
       deadline: "No date",
       category: "Family",
       done: false,
     },
   ],
 
-    completeTask: (id) =>
-        set((state) => ({
-            tasks: state.tasks.map((task) =>
-                task.id === id ? { ...task, done: true } : task
-            ),
-        })
-    ),
+  isModalOpen: false,
 
-    deleteTask: (id) => 
-        set((state) => ({
-            tasks: state.tasks.filter((task) => task.id !== id)
-        }),
-    ),
+  taskData: {
+    title: "",
+    description: "",
+    deadline: null,
+    category: null,
+  },
+
+  completeTask: (id) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === id ? { ...task, done: true } : task,
+      ),
+    })),
+
+  deleteTask: (id) => {
+    set((state) => ({
+      tasks: state.tasks.filter((task) => task.id !== id),
+    }))
+  },
+
+  setModalOpen: () => {
+    set((state) => ({
+      isModalOpen: !state.isModalOpen,
+    }));
+  },
+
+  setTaskData: (item, value) => {
+    set((state) => ({
+      taskData: {
+        ...state.taskData,
+        [item]: value,
+      },
+    }));
+  },
+
+  addTask: (task) =>
+    set((state) => ({
+      tasks: [...state.tasks, task],
+    })),
+  
 }));
