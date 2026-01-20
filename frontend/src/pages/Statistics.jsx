@@ -27,7 +27,7 @@ function Statistics() {
 
   return (
     <div className="">
-      <div className="flex justify-between my-2 items-center mx-9">
+      <div className={`flex justify-between my-2 items-center mx-9 xxs:ml-0`}>
         <Header
           title={t("Your Progress")}
           subtitle={t("Overview of your consistency and growth.")}
@@ -39,8 +39,8 @@ function Statistics() {
 
       <div className="my-4">
         <div className="flex items-center lg:gap-6 ml-7  mr-9 md:gap-2 sm:gap-2 md:flex xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
-          <TotalHabitsStatics totalHabits={formatNumber(10)}/>
-          <CurrentStreakStatics currentStreak={formatNumber(5)}/>
+          <TotalHabitsStatics totalHabits={formatNumber(10)} />
+          <CurrentStreakStatics currentStreak={formatNumber(5)} />
           <CompletionRateStatics completionRate={formatNumber(75)} />
         </div>
       </div>
