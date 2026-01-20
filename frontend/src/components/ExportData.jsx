@@ -6,7 +6,7 @@ export default function ExportData () {
   const { t } = useTranslation(); 
 
   return (
-    <div className="">
+    <div>
       <button
         className="bg-white hover:bg-indigo-50 rounded-lg px-4 py-2 flex items-center justify-center shadow-md text-md transition ease-in duration-200 border-2 border-gray-200"
         type="button"

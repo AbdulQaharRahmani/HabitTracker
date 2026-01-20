@@ -27,12 +27,12 @@ function Statistics() {
 
   return (
     <div className="">
-      <div className="grid grid-cols-2 justify-between my-2 items-center mr-9">
+      <div className="flex justify-between my-2 items-center mx-9">
         <Header
           title={t("Your Progress")}
           subtitle={t("Overview of your consistency and growth.")}
         />
-        <span className={`pt-6 ml-auto ${isRTL ? "mr-[26rem]" : "ml-auto"}`}>
+        <span className={`pt-9`}>
           <ExportData />
         </span>
       </div>
