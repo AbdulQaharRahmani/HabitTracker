@@ -4,18 +4,26 @@ import { useTaskCardStore } from "../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import i18n from "../utils/i18n";
 
-export default function TaskCard ({title, deadline, category, done, id}) {
+export default function TaskCard({ title, deadline, category, done, id }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
-
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
 
   return (
-    <div className="flex bg-white rounded-xl shadow-sm mx-8">
+    <div
+      className="
+        flex mx-8 rounded-xl shadow-sm transition
+        bg-white dark:bg-gray-800
+        text-gray-900 dark:text-gray-100
+      "
+    >
+      {/* Complete button */}
       <div
-        className={`flex items-center justify-between border-gray-300 mx-4 px-4 pr-8 text-center ${
-          i18n.language === "fa" ? "border-l pl-10" : "border-r "
-        }`}
+        className={`
+          flex items-center justify-between mx-4 px-4 pr-8 text-center
+          border-gray-300 dark:border-gray-600
+          ${i18n.language === "fa" ? "border-l pl-10" : "border-r"}
+        `}
       >
         <button onClick={() => completeTask(id)}>
           {done ? (
@@ -23,40 +31,67 @@ export default function TaskCard ({title, deadline, category, done, id}) {
           ) : (
             <FaRegCircle
               size={20}
-              className="text-gray-300 hover:text-green-400 transiton ease-in duration-100"
+              className="
+                text-gray-300 dark:text-gray-500
+                hover:text-green-400 transition
+              "
             />
           )}
         </button>
       </div>
 
-      <div className="grid grid-cols-2 justify-between items-start flex-1 md:justify-start md:grid-cols-[2fr_1fr]">
+      {/* Content */}
+      <div className="grid grid-cols-2 flex-1 md:grid-cols-[2fr_1fr]">
         <div className="my-1">
           <div
-            className={`py-3 px-4 text-lg font-bold transition ${
-              done ? "text-gray-400 line-through" : "text-gray-800"
-            }`}
+            className={`
+              py-3 px-4 text-lg font-bold transition
+              ${
+                done
+                  ? "text-gray-400 dark:text-gray-500 line-through"
+                  : "text-gray-800 dark:text-gray-100"
+              }
+            `}
           >
             {t(title)}
           </div>
 
           <div className="flex flex-rows-2">
-            <span className="bg-indigo-100 w-1/1 block rounded-xl mb-2 mx-4 p-2">
-              <p className="flex flex-rows gap-2 text-[0.8rem] text-semibold text-indigo-600">
+            {/* Deadline */}
+            <span
+              className="
+                block rounded-xl mb-2 mx-4 p-2
+                bg-indigo-100 dark:bg-indigo-900/40
+              "
+            >
+              <p
+                className="
+                  flex gap-2 text-[0.8rem] font-semibold
+                  text-indigo-600 dark:text-indigo-300
+                "
+              >
                 <FaCircle size={6} className="mt-2" />
-                {t("Due")}:
-                <span className="">{t(deadline)}</span>
+                {t("Due")}:<span>{t(deadline)}</span>
               </p>
             </span>
-            <span className="py-2 text-[0.8rem] text-gray-300">{t(category)}</span>
+
+            {/* Category */}
+            <span className="py-2 text-[0.8rem] text-gray-400 dark:text-gray-500">
+              {t(category)}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className=" p-4 flex items-center mx-4">
-        <button className="" onClick={() => deleteTask(id)}>
+      {/* Delete */}
+      <div className="p-4 flex items-center mx-4">
+        <button onClick={() => deleteTask(id)}>
           <MdDeleteOutline
             size={24}
-            className="text-gray-300 hover:text-red-400 transition"
+            className="
+              text-gray-300 dark:text-gray-500
+              hover:text-red-400 transition
+            "
           />
         </button>
       </div>

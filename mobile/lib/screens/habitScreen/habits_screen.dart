@@ -68,8 +68,15 @@ class _HabitsScreenState extends State<HabitsScreen> {
                             borderRadius: BorderRadius.circular(11)
                         ),
                         onPressed: () {
-                          AddHabitDialog();
+                          AddHabitDialog.show(
+                            context,
+                            onSubmit: (data) {
+                              // اینجا دیتای هبیت ساخته‌شده را می‌گیری
+                              print(data.title);
+                            },
+                          );
                         },
+
                         icon: Icon(Icons.add,color: Color(0xFFFFFFFF),),
                         label: Padding(
                           padding: const EdgeInsets.only(right: 5),

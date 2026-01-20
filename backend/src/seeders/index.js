@@ -7,6 +7,7 @@ import { HabitCompletionModel } from '../models/HabitCompletion.js';
 import { CategoryModel } from '../models/Category.js';
 import { TaskModel } from '../models/Task.js';
 import bcrypt from 'bcryptjs';
+import { getDefaultCategories } from '../utils/defaultCategories.js';
 dotenv.config();
 
 await connectDB();
@@ -106,12 +107,10 @@ const seed = async () => {
   });
 
   // Create Category Data
-  const categories = await CategoryModel.insertMany([
-    { name: 'Other', userId: user._id },
-    { name: 'Health', userId: user._id },
-    { name: 'Study', userId: user._id },
-    { name: 'Work', userId: user._id },
-  ]);
+
+  const defaultCategories = getDefaultCategories(user._id);
+
+  const categories = await CategoryModel.insertMany(defaultCategories);
 
   const startDate = new Date();
 
@@ -288,6 +287,7 @@ const seed = async () => {
       priority: 'low',
       dueDate: new Date(startDate.getTime() + 3 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[2]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + 3 * SECONDS_IN_ONE_DAY),
     },
@@ -298,6 +298,7 @@ const seed = async () => {
       priority: 'high',
       dueDate: new Date(Date.now() + SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[0]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -308,6 +309,7 @@ const seed = async () => {
       priority: 'low',
       dueDate: new Date(Date.now() + 7 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[2]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -318,6 +320,7 @@ const seed = async () => {
       priority: 'high',
       dueDate: new Date(startDate.getTime() + 10 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[3]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + 10 * SECONDS_IN_ONE_DAY),
     },
@@ -328,6 +331,7 @@ const seed = async () => {
       priority: 'high',
       dueDate: new Date(Date.now() + 7 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[2]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -338,6 +342,7 @@ const seed = async () => {
       priority: 'medium',
       dueDate: new Date(Date.now() + 5 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[1]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -348,6 +353,7 @@ const seed = async () => {
       priority: 'medium',
       dueDate: new Date(Date.now() + 10 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[3]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -358,6 +364,7 @@ const seed = async () => {
       priority: 'medium',
       dueDate: new Date(Date.now() + 15 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[2]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -368,6 +375,7 @@ const seed = async () => {
       priority: 'medium',
       dueDate: new Date(Date.now() + SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[0]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -378,6 +386,7 @@ const seed = async () => {
       priority: 'high',
       dueDate: new Date(startDate.getTime() + 5 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[2]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + 5 * SECONDS_IN_ONE_DAY),
     },
@@ -388,6 +397,7 @@ const seed = async () => {
       priority: 'low',
       dueDate: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[1]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -398,6 +408,7 @@ const seed = async () => {
       priority: 'high',
       dueDate: new Date(Date.now() + 30 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[2]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -408,6 +419,7 @@ const seed = async () => {
       priority: 'high',
       dueDate: new Date(Date.now() + 30 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[0]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -418,6 +430,7 @@ const seed = async () => {
       priority: 'medium',
       dueDate: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[3]._id,
       createdAt: new Date(startDate),
       updatedAt: new Date(startDate.getTime() + SECONDS_IN_ONE_DAY),
     },
@@ -428,6 +441,7 @@ const seed = async () => {
       priority: 'low',
       dueDate: new Date(Date.now() + 7 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[1]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -438,6 +452,7 @@ const seed = async () => {
       priority: 'low',
       dueDate: new Date(Date.now() + 2 * SECONDS_IN_ONE_DAY),
       userId: user._id,
+      categoryId: categories[2]._id,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
