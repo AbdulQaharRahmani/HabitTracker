@@ -63,7 +63,7 @@ export default function HabitList({ viewMode }) {
             ))
           )}
         </div>
-        {/* <Pagination
+        <Pagination
           currentPage={page}
           totalCount={allhabits.length}
           siblingCount
