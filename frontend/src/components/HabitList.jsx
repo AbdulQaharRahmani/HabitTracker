@@ -43,33 +43,32 @@ export default function HabitList({ viewMode }) {
               : "my-6 space-y-4 ml-[1.35rem]"
           }
         >
-
-        {allhabits.length === 0 ? (
-          <p className="text-gray-500 text-lg">
-            You have no habits yet. Add your first habit.
-          </p>
-        ) : (
-          visibleHabits.map((habit) => (
-            <HabitCard
-              key={habit._id}
-              _id={habit._id}
-              viewMode={viewMode}
-              title={habit.title}
-              description={habit.description}
-              categoryId={habit.categoryId}
-              frequency={habit.frequency}
-              duration={habit.duration}
-            />
-          ))
-        )}
-          <Pagination
+          {allhabits.length === 0 ? (
+            <p className="text-gray-500 text-lg">
+              You have no habits yet. Add your first habit.
+            </p>
+          ) : (
+            visibleHabits.map((habit) => (
+              <HabitCard
+                key={habit._id}
+                _id={habit._id}
+                viewMode={viewMode}
+                title={habit.title}
+                description={habit.description}
+                categoryId={habit.categoryId}
+                frequency={habit.frequency}
+                duration={habit.duration}
+              />
+            ))
+          )}
+        </div>
+        <Pagination
           currentPage={page}
           totalCount={allhabits.length}
           siblingCount
           pageSize={ITEMS_PER_PAGE}
           onPageChange={setPage}
-          />
-          </div>
+        />
       </>
     );
   }
