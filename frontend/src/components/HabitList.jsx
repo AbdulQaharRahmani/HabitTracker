@@ -12,27 +12,12 @@ export default function HabitList({ viewMode }) {
   const ITEMS_PER_PAGE = 10;
   const start = (page - 1) * ITEMS_PER_PAGE;
 
-  const visibleHabits = habits.slice(start, start + ITEMS_PER_PAGE);
+  const visibleHabits = allhabits.slice(start, start + ITEMS_PER_PAGE);
 
   useEffect(() => {
-    const fetchHabits = async () => {
-      try {
-        const response = await api.get("/habits");
-        const data = response.data;
-        setHabits(Array.isArray(data) ? data : data.data || []);
-      } catch (err) {
-        setError(
-          err.response?.data?.message ||
-            err.response?.data?.error ||
-            "Failed to fetch habits",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchHabits();
   }, [fetchHabits]);
+
   if (loading) {
     return (
       <p className="text-gray-300 text-lg text-semibold my-4 text-center">
@@ -59,7 +44,7 @@ export default function HabitList({ viewMode }) {
               : "my-6 space-y-4 ml-[1.35rem]"
           }
         >
-          {habits.length === 0 ? (
+          {allhabits.length === 0 ? (
             <p className="text-gray-500 text-lg">
               You have no habits yet. Add your first habit.
             </p>
@@ -78,13 +63,13 @@ export default function HabitList({ viewMode }) {
             ))
           )}
         </div>
-        <Pagination
+        {/* <Pagination
           currentPage={page}
-          totalCount={habits.length}
+          totalCount={allhabits.length}
           siblingCount
           pageSize={ITEMS_PER_PAGE}
           onPageChange={setPage}
-        />
+        /> */}
         {allhabits.length === 0 ? (
           <p className="text-gray-500 text-lg">
             You have no habits yet. Add your first habit.
