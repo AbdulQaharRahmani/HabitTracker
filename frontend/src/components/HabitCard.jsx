@@ -27,7 +27,7 @@ const color = categoryId?.backgroundColor || '#6366F1';
             className="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md"
             style={{ backgroundColor: bgColor, color }}
           >
-            {categoryId.name ? categoryId.name : "No Category"}
+            {categoryId?.name ? categoryId?.name : "No Category"}
           </span>
 
           <span className="flex items-center text-[12px] text-gray-400">

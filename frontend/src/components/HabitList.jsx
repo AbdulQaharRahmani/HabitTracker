@@ -17,6 +17,7 @@ export default function HabitList({ viewMode }) {
   useEffect(() => {
     fetchHabits();
   }, [fetchHabits]);
+
   if (loading) {
     return (
       <p className="text-gray-300 text-lg text-semibold my-4 text-center">
@@ -43,7 +44,7 @@ export default function HabitList({ viewMode }) {
               : "my-6 space-y-4 ml-[1.35rem]"
           }
         >
-          {habits.length === 0 ? (
+          {allhabits.length === 0 ? (
             <p className="text-gray-500 text-lg">
               You have no habits yet. Add your first habit.
             </p>
@@ -62,13 +63,13 @@ export default function HabitList({ viewMode }) {
             ))
           )}
         </div>
-        <Pagination
+        {/* <Pagination
           currentPage={page}
-          totalCount={habits.length}
+          totalCount={allhabits.length}
           siblingCount
           pageSize={ITEMS_PER_PAGE}
           onPageChange={setPage}
-        />
+        /> */}
         {allhabits.length === 0 ? (
           <p className="text-gray-500 text-lg">
             You have no habits yet. Add your first habit.
