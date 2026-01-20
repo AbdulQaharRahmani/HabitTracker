@@ -15,3 +15,14 @@ export const requestLogger = (req, res, next) => {
 
   next();
 };
+
+export const errorLogger = (err, req, res, next) => {
+  logger.error('error', {
+    method: req.method,
+    path: req.originalUrl,
+    message: err.message,
+    stack: err.stack,
+  });
+
+  next();
+};
