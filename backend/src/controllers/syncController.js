@@ -1,6 +1,6 @@
 import { CategoryModel } from '../models/Category.js';
 import { HabitModel } from '../models/Habit.js';
-import { HabitCompletionModel } from '../models/HabitCompletion.js';
+import { HabitCompletionModel } from '../models/habitCompletion.js';
 import { OperationLogModel } from '../models/OperationLog.js';
 import { PreferenceModel } from '../models/Preference.js';
 import { TaskModel } from '../models/Task.js';

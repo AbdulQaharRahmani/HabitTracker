@@ -3,7 +3,7 @@ import { connectDB } from '../config/database.js';
 import dotenv from 'dotenv';
 import { UserModel } from '../models/User.js';
 import { HabitModel } from '../models/Habit.js';
-import { HabitCompletionModel } from '../models/HabitCompletion.js';
+import { HabitCompletionModel } from '../models/habitCompletion.js';
 import { CategoryModel } from '../models/Category.js';
 import { TaskModel } from '../models/Task.js';
 import bcrypt from 'bcryptjs';
