@@ -61,6 +61,12 @@ export const useTaskCardStore = create((set) => ({
   setModalOpen: () => {
     set((state) => ({
       isModalOpen: !state.isModalOpen,
+      taskData: {
+        title: "",
+        description: "",
+        deadline: null,
+        category: null,
+      },
     }));
   },
 
