@@ -114,7 +114,7 @@ export const filterTasks = async (req, res) => {
 
   const tasks = await TaskModel.find({ ...query }).lean();
 
-  res.status(200).json({ success: true, results: tasks.length, data: tasks });
+  res.status(200).json({ success: true, data: tasks });
 };
 
 export const toggleTaskStatus = async (req, res) => {
