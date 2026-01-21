@@ -102,30 +102,22 @@ export default function AddTask() {
     e.preventDefault();
 
     if (!taskData.title) {
-      isRTL
-        ? toast.error("عنوان الزامی است!")
-        : toast.error("Title is required!");
+      toast.error(t("Title is required!"));
       return;
     }
 
     if (!taskData.description) {
-      isRTL
-        ? toast.error("توضیحات الزامی است!")
-        : toast.error("Descripton is required!");
+      toast.error(t("Descripton is required!"));
       return;
     }
 
     if (!taskData.deadline) {
-      isRTL
-        ? toast.error("تاریخ ختم عملیات الزامی است!")
-        : toast.error("Deadline is required!");
+      toast.error(t("Deadline is required!"));
       return;
     }
 
     if (!taskData.category) {
-      isRTL
-        ? toast.error("کتگوری الزامی است!")
-        : toast.error("Category is required!");
+      toast.error(t("Category is required!"));
       return;
     }
 
@@ -146,13 +138,9 @@ export default function AddTask() {
       setTaskData("category", "");
 
       setModalOpen();
-      isRTL
-        ? toast.success("تسک با موفقیت اضافه شد!")
-        : toast.success("Task added successfully!");
+      toast.success(t("Task added successfully!"));
     } catch (error) {
-      isRTL
-        ? toast.error("متاسفانه تسک  اضافه نشد!", error)
-        : toast.error("Sorry! could not save new task", error);
+      toast.error(t("Sorry! could not save new task", error));
     } 
   };
 
@@ -203,7 +191,7 @@ export default function AddTask() {
                   type="text"
                   id="title"
                   placeholder={
-                    isRTL ? "عنوان را وارد کنید" : "Enter task title"
+                    t("Enter task title")
                   }
                   value={taskData.title}
                   onChange={(e) => setTaskData("title", e.target.value)}
@@ -222,7 +210,7 @@ export default function AddTask() {
                 <textarea
                   id="description"
                   placeholder={
-                    isRTL ? "توضیحات را وارد کنید" : "Enter task description"
+                    t("Enter task description")
                   }
                   value={taskData.description}
                   onChange={(e) => setTaskData("description", e.target.value)}
@@ -243,7 +231,7 @@ export default function AddTask() {
                 <Dropdown
                   items={deadlineItems}
                   placeholder={
-                    isRTL ? "موعد ختم را انخاب کنید" : "Choose Deadline"
+                    t("Choose Deadline")
                   }
                   value={taskData.deadline || ""}
                   getValue={(value) => setTaskData("deadline", value)}
@@ -255,7 +243,7 @@ export default function AddTask() {
                 <Dropdown
                   items={categoryItems}
                   placeholder={
-                    isRTL ? " کتګوری را انخاب کنید" : "Choose Category"
+                    t("Choose Category")
                   }
                   value={taskData.category || ""}
                   getValue={(value) => setTaskData("category", value)}

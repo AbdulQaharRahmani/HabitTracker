@@ -58,5 +58,15 @@
   "Deadline": "Deadline",
   "Category": "Category",
   "Save": "Save",
-  "Cancel": "Cancel"
+  "Cancel": "Cancel",
+  "Enter task title": "Enter task title",
+  "Enter task description": "Enter task description",
+  "Choose Deadline": "Choose Deadline",
+  "Choose Category": "Choose Category",
+  "Title is required!": "Title is required!",
+  "Descripton is required!": "Descripton is required!",
+  "Deadline is required!": "Deadline is required!",
+  "Category is required!": "Category is required!",
+  "Task added successfully!": "Task added successfully!",
+  "Sorry! could not save new task": "Sorry! could not save new task"
 }
