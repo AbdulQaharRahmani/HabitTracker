@@ -7,7 +7,6 @@ function ProfilePhoto() {
   const { t } = useTranslation();
   const [preview, setPreview] = useState(null);
 
-
   const { userProfileUrl, fetchProfilePhoto, uploadProfilePhoto, loading } = useProfilePhotoStore();
 
   const userId = "696f11b31ab597ee7ce63a0b";
@@ -29,11 +28,13 @@ const handleFileChange = (event) => {
     return;
   }
 
+  const objectUrl = URL.createObjectURL(file);
+  setPreview(objectUrl);
+
   uploadProfilePhoto(file, userId);
+
+  return () => URL.revokeObjectURL(objectUrl);
 };
-
-
-
 
   return (
     <div className="flex flex-col items-center space-y-4">
