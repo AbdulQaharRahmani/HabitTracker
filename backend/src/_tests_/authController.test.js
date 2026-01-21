@@ -47,7 +47,7 @@ describe('Auth Controller - unit tests', () => {
 
     await expect(async () => registerUser(req, res)).rejects.toThrow(AppError);
     await expect(async () => registerUser(req, res)).rejects.toThrow(
-      'Email exists already'
+      'Email already exists'
     );
   });
 
