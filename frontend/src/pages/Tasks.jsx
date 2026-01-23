@@ -1,6 +1,6 @@
 import Header from "../components/Header";
-import AddTask from "../components/AddTask";
-import TaskCard from "../components/TaskCard";
+import AddTask from "../components/tasks/AddTask";
+import TaskCard from "../components/tasks/TaskCard";
 import { useTaskCardStore } from "../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import i18n from "../utils/i18n";

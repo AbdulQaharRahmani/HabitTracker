@@ -1,8 +1,8 @@
 import { FaRegCircle, FaCircle, FaCheckCircle } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import { useTaskCardStore } from "../store/useTaskCardStore";
+import { useTaskCardStore } from "../../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
-import i18n from "../utils/i18n";
+import i18n from "../../utils/i18n";
 
 export default function TaskCard({title, description, deadline, category, done, id,}) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
