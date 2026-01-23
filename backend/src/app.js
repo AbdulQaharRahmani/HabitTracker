@@ -10,6 +10,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
 
 const app = express();
 
@@ -23,9 +24,11 @@ app.use(cors({ origin: '*' }));
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
   limit: 100,
+  message: 'Too many requests, please try again later.',
 });
 
 app.use('/api', limiter);
+app.use(mongoSanitize());
 
 //#endregion
 
