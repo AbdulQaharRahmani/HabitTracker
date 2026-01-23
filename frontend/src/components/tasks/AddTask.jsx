@@ -1,10 +1,10 @@
 import { GrAdd } from "react-icons/gr";
 import { useTranslation } from "react-i18next";
-import { useTaskCardStore } from "../store/useTaskCardStore";
+import { useTaskCardStore } from "../../store/useTaskCardStore";
 import { FaTimes } from "react-icons/fa";
-import Dropdown from "./Dropdown";
+import Dropdown from "../Dropdown";
 import toast from "react-hot-toast";
-import i18n from "../utils/i18n";
+import i18n from "../../utils/i18n";
 
 export default function AddTask() {
   const { t } = useTranslation();
