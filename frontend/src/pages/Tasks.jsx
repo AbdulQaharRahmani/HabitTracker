@@ -7,15 +7,15 @@ import { useTranslation } from "react-i18next";
 import i18n from "../utils/i18n";
 
 function Tasks() {
-  const tasks = useTaskCardStore((state) => state.tasks);
-  const fetchTasks = useTaskCardStore((state) => state.fetchTasks);
-  const loading = useTaskCardStore((state) => state.loading);
-  const error = useTaskCardStore((state) => state.error);
+  const { tasks, fetchTasks, loading, error } = useTaskCardStore(
+    (state) => state,
+  );
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 8;
   useEffect(() => {
     fetchTasks(ITEMS_PER_PAGE, page);
+    console.log("tasks", tasks);
   }, [page]);
 
   const { t } = useTranslation();
