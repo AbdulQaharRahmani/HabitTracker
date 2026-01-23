@@ -18,13 +18,15 @@ export const useTaskCardStore = create((set) => ({
   },
   completeTask: (id) =>
     set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, done: true } : task,
-      ),
+      tasks: state.tasks.map((task) => {
+        return task._id === id
+          ? { ...task, status: task.status === "done" ? "todo" : "done" }
+          : task;
+      }),
     })),
 
   deleteTask: (id) =>
     set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
+      tasks: state.tasks.filter((task) => task._id !== id),
     })),
 }));

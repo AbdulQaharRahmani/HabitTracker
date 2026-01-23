@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "../utils/formatDate";
 import i18n from "../utils/i18n";
 
-export default function TaskCard({ title, categoryId, dueDate, status, id }) {
+export default function TaskCard({ title, categoryId, dueDate, status, _id }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
 
@@ -36,7 +36,7 @@ export default function TaskCard({ title, categoryId, dueDate, status, id }) {
           ${i18n.language === "fa" ? "border-l pl-10" : "border-r"}
         `}
       >
-        <button onClick={() => completeTask(id)}>
+        <button onClick={() => completeTask(_id)}>
           {status === "done" ? (
             <FaCheckCircle size={20} className="text-green-400" />
           ) : (
@@ -98,7 +98,7 @@ export default function TaskCard({ title, categoryId, dueDate, status, id }) {
 
       {/* Delete */}
       <div className="p-4 flex items-center mx-4">
-        <button onClick={() => deleteTask(id)}>
+        <button onClick={() => deleteTask(_id)}>
           <MdDeleteOutline
             size={24}
             className="
