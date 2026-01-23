@@ -2,11 +2,22 @@ import { FaRegCircle, FaCircle, FaCheckCircle } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { useTaskCardStore } from "../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
+import { formatDate } from "../utils/formatDate";
 import i18n from "../utils/i18n";
 
-export default function TaskCard({ title, deadline, category, done, id }) {
+export default function TaskCard({ title, categoryId, dueDate, status, id }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
+
+  const { label, type } = formatDate(dueDate);
+
+  const dueStyles = {
+    today: "bg-orange-100/70 text-orange-500",
+    yesterday: "bg-red-100/70 text-red-500",
+    tomorrow: "bg-blue-100/70 text-blue-600",
+    none: "bg-gray-100/100 text-gray-500",
+  };
+
   const { t } = useTranslation();
 
   return (
@@ -26,7 +37,7 @@ export default function TaskCard({ title, deadline, category, done, id }) {
         `}
       >
         <button onClick={() => completeTask(id)}>
-          {done ? (
+          {status === "done" ? (
             <FaCheckCircle size={20} className="text-green-400" />
           ) : (
             <FaRegCircle
@@ -47,7 +58,7 @@ export default function TaskCard({ title, deadline, category, done, id }) {
             className={`
               py-3 px-4 text-lg font-bold transition
               ${
-                done
+                status === "done"
                   ? "text-gray-400 dark:text-gray-500 line-through"
                   : "text-gray-800 dark:text-gray-100"
               }
@@ -59,25 +70,27 @@ export default function TaskCard({ title, deadline, category, done, id }) {
           <div className="flex flex-rows-2">
             {/* Deadline */}
             <span
-              className="
-                block rounded-xl mb-2 mx-4 p-2
-                bg-indigo-100 dark:bg-indigo-900/40
-              "
+              className={`
+                block rounded-lg mb-2 mx-4 py-1 px-3
+                bg-indigo-100 dark:bg-indigo-900/40 ${dueStyles[type]}
+               `}
             >
               <p
                 className="
                   flex gap-2 text-[0.8rem] font-semibold
-                  text-indigo-600 dark:text-indigo-300
+
                 "
               >
                 <FaCircle size={6} className="mt-2" />
-                {t("Due")}:<span>{t(deadline)}</span>
+                <span>
+                  {t("Due")}: {t(label)}
+                </span>
               </p>
             </span>
-
-            {/* Category */}
-            <span className="py-2 text-[0.8rem] text-gray-400 dark:text-gray-500">
-              {t(category)}
+            <span
+              className={`py-2 text-[0.8rem] text-[${categoryId.backgroundColor}] dark:text-gray-500 ‍`}
+            >
+              {t(categoryId.name)}
             </span>
           </div>
         </div>
