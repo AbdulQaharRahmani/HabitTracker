@@ -9,6 +9,7 @@ import categoryRoutes from './routes/categories.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 
@@ -18,6 +19,13 @@ app.use(helmet());
 
 app.use(express.json());
 app.use(cors({ origin: '*' }));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  limit: 100,
+});
+
+app.use('/api', limiter);
 
 //#endregion
 
