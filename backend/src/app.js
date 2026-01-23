@@ -8,9 +8,13 @@ import taskRoutes from './routes/task.js';
 import categoryRoutes from './routes/categories.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
+import helmet from 'helmet';
+
 const app = express();
 
 //#region Normal Midlleware
+
+app.use(helmet());
 
 app.use(express.json());
 app.use(cors({ origin: '*' }));
