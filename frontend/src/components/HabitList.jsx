@@ -2,12 +2,19 @@ import { useState, useEffect } from "react";
 import HabitCard from "./HabitCard";
 import useHabitStore from "../store/useHabitStore";
 
-export default function HabitList({ viewMode }) {
- const { allhabits, loading, error, fetchHabits } = useHabitStore();
+export default function HabitList({ viewMode, searchTerm }) {
+  const { allhabits, loading, error, fetchHabits } = useHabitStore();
 
   useEffect(() => {
     fetchHabits();
   }, [fetchHabits]);
+
+  const filteredHabits = allhabits.filter(
+    (habit) =>
+      habit.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      habit.description.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   if (loading) {
     return (
       <p className="text-gray-300 text-lg text-semibold my-4 text-center">
@@ -33,24 +40,24 @@ export default function HabitList({ viewMode }) {
             : "my-6 space-y-4 ml-[1.35rem]"
         }
       >
-      {allhabits.length === 0 ?
-        (
-          <p className="text-gray-500 text-lg">You have no habits yet. Add your first habit.</p>
+        {filteredHabits.length === 0 ? (
+          <p className="text-gray-500 text-lg">
+            No habits found matching "{searchTerm}".
+          </p>
         ) : (
-          allhabits.map((habit) => (
-          <HabitCard
-            key={habit._id}
-            _id={habit._id}
-            viewMode={viewMode}
-            title={habit.title}
-            description={habit.description}
-            categoryId={habit.categoryId}
-            frequency={habit.frequency}
-            duration={habit.duration}
-          />
-      ))
-        )
-      }
+          filteredHabits.map((habit) => (
+            <HabitCard
+              key={habit._id}
+              _id={habit._id}
+              viewMode={viewMode}
+              title={habit.title}
+              description={habit.description}
+              categoryId={habit.categoryId}
+              frequency={habit.frequency}
+              duration={habit.duration}
+            />
+          ))
+        )}
       </div>
     );
   }
