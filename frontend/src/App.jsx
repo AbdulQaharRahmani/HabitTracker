@@ -14,6 +14,7 @@ import Today from "./pages/Today";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LanguageSwitcher from "./components/internationalization";
+import DarkMode from "./components/DarkMode";
 import { Toaster } from "react-hot-toast";
 import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
