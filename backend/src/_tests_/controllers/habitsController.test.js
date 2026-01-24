@@ -23,9 +23,6 @@ import { createHabit, getHabits } from '../../controllers/habitsController';
 import { HabitModel } from '../../models/Habit';
 import { CategoryModel } from '../../models/Category';
 import { AppError } from '../../utils/error';
-import { isHabitForSelectedDay } from '../../utils/habitFrequency';
-import { DateHelper } from '../../utils/date';
-import { HabitCompletionModel } from '../../models/HabitCompletion';
 
 vi.mock('../../models/Habit.js');
 vi.mock('../../models/Category.js');
@@ -160,7 +157,9 @@ describe('Create Habit', () => {
   it('4. Error: Unauthorized -> throws 401 error', async () => {
     req.user = null;
 
-    await expect(createHabit(req, res)).rejects.toThrow();
+    await expect(createHabit(req, res)).rejects.toMatchObject({
+      status: 401,
+    });
 
     try {
       await createHabit(req, res);

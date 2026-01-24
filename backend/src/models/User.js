@@ -6,6 +6,10 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
+  googleId: {
+    type: String,
+    default: null,
+  },
   username: {
     type: String,
     required: true,
@@ -24,5 +28,15 @@ const UserSchema = new mongoose.Schema({
     default: null,
   },
 });
+
+UserSchema.index(
+  { googleId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      googleId: { $ne: null },
+    },
+  }
+);
 
 export const UserModel = mongoose.model('User', UserSchema);
