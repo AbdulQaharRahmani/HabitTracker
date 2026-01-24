@@ -6,6 +6,7 @@ const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
     error: null,
+    habitCompletions: 0,
     selectedDate: new Date(),
     setSelectedDate: (date) => {
         set({ selectedDate: date })
@@ -15,7 +16,8 @@ const useHabitStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             const habits = await getHabitsByDate(get().selectedDate);
-            set({ habits, loading: false });
+            const completionsCount = habits.filter(habit=> habit.completed).length
+            set({ habits, loading: false, habitCompletions: completionsCount });
         } catch (err) {
             console.log(err)
             set({
@@ -31,19 +33,22 @@ const useHabitStore = create((set, get) => ({
                 habit._id === id ? { ...habit, completed: !habit.completed } : habit
             ),
         }));
-        const newState =  habitToToggle.completed
+        const completionState = habitToToggle.completed
         try {
             if (habitToToggle.completed) {
                 await api.delete(`/habits/${id}/complete`)
+                set((state)=> ({habitCompletions: state.habitCompletions -1}))
             } else {
                 await api.post(`/habits/${id}/complete`)
+                set((state)=> ({habitCompletions: state.habitCompletions +1}))
+
             }
 
         } catch (err) {
             console.log(err)
             set((state) => ({
             habits: state.habits.map((habit) =>
-                habit._id === id ? { ...habit, completed: newState } : habit
+                habit._id === id ? { ...habit, completed: completionState } : habit
             ),
         }));
 
