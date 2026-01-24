@@ -1,11 +1,8 @@
-import React, { useState } from "react";
 import TodayList from "../components/TodayList";
 import CustomDatePicker from "./CustomDatePicker";
 import CircularProgress from "./../components/habits/CircularProgress";
 
 function Today() {
-  const [startDate, setStartDate] = useState(new Date());
-
   return (
     <div className="p-8 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Header */}

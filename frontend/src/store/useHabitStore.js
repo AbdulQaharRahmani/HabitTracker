@@ -1,29 +1,53 @@
 import { create } from "zustand"
 import api from "../../services/api"
 import toast from "react-hot-toast";
-import { getTodayHabits } from "../../services/habitService";
-const useHabitStore = create((set) => ({
-  habits: [],
-  loading: false,
-  error: null,
-  fetchTodayHabits: async () => {
-    set({ loading: true, error: null });
-    try {
-        const habits = await getTodayHabits();
-      set({ habits, loading: false });
-    } catch (err) {
-      set({
-        error: err.response?.data?.message || "Failed to load habits",
-        loading: false,
-      });
-    }
-  },
-  toggleHabit: (id) => {
-    set((state) => ({
-      habits: state.habits.map((habit) =>
-        habit._id === id ? { ...habit, completed: !habit.completed } : habit
-      ),
-    }));
+import { getHabitsByDate } from "../../services/habitService";
+const useHabitStore = create((set, get) => ({
+    habits: [],
+    loading: false,
+    error: null,
+    selectedDate: new Date(),
+    setSelectedDate: (date) => {
+        set({ selectedDate: date })
+        get().fetchHabitsByDate(date)
+    },
+    fetchHabitsByDate: async () => {
+        set({ loading: true, error: null });
+        try {
+            const habits = await getHabitsByDate(get().selectedDate);
+            set({ habits, loading: false });
+        } catch (err) {
+            console.log(err)
+            set({
+                error: err.response?.data?.message || "Failed to load habits",
+                loading: false,
+            });
+        }
+    },
+    toggleHabit: async (id) => {
+       const habitToToggle = get().habits.find(habit=> habit._id === id)
+        set((state) => ({
+            habits: state.habits.map((habit) =>
+                habit._id === id ? { ...habit, completed: !habit.completed } : habit
+            ),
+        }));
+        const newState =  habitToToggle.completed
+        try {
+            if (habitToToggle.completed) {
+                await api.delete(`/habits/${id}/complete`)
+            } else {
+                await api.post(`/habits/${id}/complete`)
+            }
+
+        } catch (err) {
+            console.log(err)
+            set((state) => ({
+            habits: state.habits.map((habit) =>
+                habit._id === id ? { ...habit, completed: newState } : habit
+            ),
+        }));
+
+        }
     },
     isModalOpen: false,
     isEditingMode: false,
