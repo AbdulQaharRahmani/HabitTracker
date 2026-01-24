@@ -55,7 +55,7 @@ class SignUpController {
     }
 
     final result = await _authService.registerUser(
-      name: usernameController.text,
+      username: usernameController.text,
       email: emailController.text,
       password: passwordController.text,
     );

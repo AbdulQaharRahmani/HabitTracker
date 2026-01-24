@@ -1,3 +1,5 @@
+import '../category/category_model.dart';
+
 class Task {
   final String id;
   final String title;
@@ -9,6 +11,7 @@ class Task {
   final bool isDeleted;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final CategoryModel? category;
 
   Task({
     required this.id,
@@ -21,6 +24,7 @@ class Task {
     required this.isDeleted,
     required this.createdAt,
     required this.updatedAt,
+    this.category,
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
@@ -30,16 +34,25 @@ class Task {
       description: json['description'] ?? '',
       status: json['status'] ?? 'todo',
       priority: json['priority'] ?? 'medium',
-      dueDate: json['dueDate'] != null ? DateTime.tryParse(json['dueDate']) : null,
+      dueDate: json['dueDate'] != null
+          ? DateTime.tryParse(json['dueDate'])
+          : null,
       userId: json['userId'] ?? '',
       isDeleted: json['isDeleted'] ?? false,
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : DateTime.now(),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : DateTime.now(),
+      category: json['category'] != null
+          ? CategoryModel.fromJson(json['category'])
+          : null,
     );
   }
 
   Map<String, dynamic> toJson({String? categoryId}) {
-    final map = {
+    return {
       'title': title,
       'description': description,
       'status': status,
@@ -47,6 +60,8 @@ class Task {
       if (categoryId != null) 'categoryId': categoryId,
       if (dueDate != null) 'dueDate': dueDate!.toIso8601String(),
     };
-    return map;
   }
+
+
+  bool get isDone => status == 'done';
 }

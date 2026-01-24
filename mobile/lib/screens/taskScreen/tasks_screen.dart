@@ -18,8 +18,8 @@ class _TasksScreenState extends State<TasksScreen> {
   final TextEditingController _searchController = TextEditingController();
   String? _token;
 
-  double avatarRadius = 10;
-  double statusRadius = 5;
+  final double avatarRadius = 10;
+  final double statusRadius = 5;
 
   @override
   void initState() {
@@ -31,15 +31,27 @@ class _TasksScreenState extends State<TasksScreen> {
     final token = await TokenStorage.getToken();
     setState(() {
       _token = token;
-      _tasksFuture = token != null ? _apiService.fetchTasks(token: token) : Future.value([]);
+      _tasksFuture = token != null ? _apiService.fetchTasks(token: token, page: 1) : Future.value([]);
     });
   }
 
-  void _refreshTasks() {
+  Future<void> _refreshTasks() async {
     if (_token == null) return;
+    final tasks = await _apiService.fetchTasks(token: _token!, page: 1);
     setState(() {
-      _tasksFuture = _apiService.fetchTasks(token: _token!);
+      _tasksFuture = Future.value(tasks);
     });
+  }
+
+  void _toggleTaskStatus(Task task) async {
+    if (_token != null) {
+      await _apiService.toggleTaskStatus(
+        taskId: task.id,
+        currentStatus: task.status,
+        token: _token,
+      );
+    }
+    await _refreshTasks();
   }
 
   @override
@@ -54,7 +66,6 @@ class _TasksScreenState extends State<TasksScreen> {
               padding: const EdgeInsets.only(left: 5, top: 6),
               child: Stack(
                 children: [
-                  // ====== User Avatar ======
                   Container(
                     height: 50,
                     width: 50,
@@ -62,12 +73,8 @@ class _TasksScreenState extends State<TasksScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.grey.shade300, width: 2),
                     ),
-                    child: CircleAvatar(
-                      radius: avatarRadius,
-                      child: Icon(Icons.person),
-                    ),
+                    child: CircleAvatar(radius: avatarRadius, child: const Icon(Icons.person)),
                   ),
-                  // ====== Online Status Dot ======
                   Positioned(
                     bottom: 3,
                     right: 2,
@@ -85,19 +92,12 @@ class _TasksScreenState extends State<TasksScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            // ====== Name and Profile ======
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 Padding(padding: EdgeInsets.only(top: 15)),
-                Text(
-                  'Ahmad Amiri',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'View Profile',
-                  style: TextStyle(fontSize: 13, color: Colors.blue),
-                ),
+                Text('Ahmad Amiri', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                Text('View Profile', style: TextStyle(fontSize: 13, color: Colors.blue)),
               ],
             ),
           ],
@@ -108,19 +108,10 @@ class _TasksScreenState extends State<TasksScreen> {
             child: Container(
               width: 50,
               height: 50,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
               child: IconButton(
-                onPressed: () {
-                  // TODO: notification action
-                },
-                icon: const Icon(
-                  Icons.notifications_active_rounded,
-                  color: Colors.black,
-                  size: 30,
-                ),
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_active_rounded, color: Colors.black, size: 30),
               ),
             ),
           ),
@@ -131,39 +122,36 @@ class _TasksScreenState extends State<TasksScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ====== Row: Title + New Task Button ======
+            // Header + New Task
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'All Tasks',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                  ),
+                  const Text('All Tasks', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
                   ElevatedButton(
                     style: ButtonStyle(
-                      padding: MaterialStatePropertyAll(
-                        const EdgeInsets.only(right: 0, left: 6),
-                      ),
-                      fixedSize: MaterialStatePropertyAll(const Size(105, 30)),
-                      backgroundColor: MaterialStatePropertyAll(Colors.blue),
-                      elevation: MaterialStatePropertyAll(0),
+                      padding: const MaterialStatePropertyAll(EdgeInsets.only(right: 0, left: 6)),
+                      fixedSize: const MaterialStatePropertyAll(Size(105, 30)),
+                      backgroundColor: const MaterialStatePropertyAll(Colors.blue),
+                      elevation: const MaterialStatePropertyAll(0),
                       shape: MaterialStatePropertyAll(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                     onPressed: () async {
-                      bool? taskCreated = await Navigator.push(
+                      final newTask = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const NewTaskPage()),
                       );
-                      if (taskCreated == true) _refreshTasks();
+                      if (newTask != null) {
+                        await _refreshTasks();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Task created successfully!'), backgroundColor: Colors.green),
+                        );
+                      }
                     },
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: const [
                         Icon(Icons.add, color: Colors.white),
                         SizedBox(width: 5),
@@ -174,18 +162,14 @@ class _TasksScreenState extends State<TasksScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 10),
 
-            // ====== Search Box ======
+            // Search Box
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Container(
                 height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                ),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(25)),
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
                   children: [
@@ -208,64 +192,63 @@ class _TasksScreenState extends State<TasksScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 10),
 
-            // ====== Tasks List ======
+            // Tasks List
             FutureBuilder<List<Task>>(
               future: _tasksFuture,
               builder: (context, snapshot) {
                 if (_token == null) return const Center(child: Text('No token found'));
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+                if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
                 if (snapshot.hasError) return Center(child: Text(snapshot.error.toString()));
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No tasks available'));
-                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) return const Center(child: Text('No tasks available'));
 
                 final filteredTasks = snapshot.data!
                     .where((t) => t.title.toLowerCase().contains(_searchController.text.toLowerCase()))
                     .toList();
 
+                final activeTasks = filteredTasks.where((t) => t.status != 'done').toList();
+                final completedTasks = filteredTasks.where((t) => t.status == 'done').toList();
+
                 return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ====== Row: To Do & Active Tasks ======
+                    // Active Tasks
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'To Do',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                          ),
+                          const Text('To Do', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                             height: 25,
-                            width: 70,
+                            width: 80,
                             decoration: BoxDecoration(
                               color: Colors.blue.shade100,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Center(
-                              child: Text(
-                                '${filteredTasks.where((t) => t.status != 'done').length} Active',
-                                style: TextStyle(
-                                  color: Colors.blue.shade800,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              child: Text('${activeTasks.length} Active',
+                                  style: TextStyle(color: Colors.blue.shade800, fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 15),
+                    TasksCard(tasks: activeTasks, onStatusChanged: (task) => _toggleTaskStatus(task)),
 
+                    const SizedBox(height: 20),
+                    if (completedTasks.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: const Text('Completed',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.grey)),
+                      ),
                     const SizedBox(height: 10),
-
-                    // ====== Tasks Cards ======
-                    TasksCard(tasks: filteredTasks),
+                    if (completedTasks.isNotEmpty)
+                      TasksCard(tasks: completedTasks, onStatusChanged: (task) => _toggleTaskStatus(task)),
                   ],
                 );
               },
