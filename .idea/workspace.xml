@@ -5,139 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1f3da058-9203-446b-a536-84e9b43c0197" name="Changes" comment="The login connected with the render backend and work correctly">
-      <change afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.dart_tool/package_graph.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.dart_tool/version" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/HabitTracker.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/deviceManager.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/controllers/categoryController.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/controllers/taskController.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/controllers/userController.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/middleware/upload.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/middleware/validate.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/models/Category.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/routes/categories.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/routes/task.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/routes/user.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/seeders/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/utils/deleteFile.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/validators/validateCategory.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/validators/validateHabit.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/validators/validateId.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/validators/validateTask.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/services/api.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/assets/calendar-today.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/assets/habit-pic.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/assets/profile-pic5.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/assets/settings-pic.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/assets/statics-pic.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/assets/tasks-pic.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/AddHabit.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/AddHabitModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/DailyConsistency.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/DarkMode.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Dropdown.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/HabitCard.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/HabitCardIcon.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Header.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Search.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/View.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/internationalization.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/CustomDatePicker.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Today.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/store/useAddHabitStore.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/utils/i18n.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/utils/locals/en.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/utils/locals/fa.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/features/add_habit_model.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/features/routes.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/habitScreen/add_habit.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/habitScreen/habits_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/homeScreen/home_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/profileScreen/profile_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/settingScreen/setting_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/signUpScreen/signup_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/taskScreen/add_task_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/todayScreen/today_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/services/auth_service.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/login/login_card.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/login_utils/auth_service.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/login_utils/controller.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_card.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_header.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_icons.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_items.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_profile_card.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/setting_utils/setting_section.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/custom_text_field.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/form_label.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/signup_form.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/social_buttons.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/square_tiles.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/categories.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/daily_grid.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/daily_section_list.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/date_selector.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/header_section.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/status_bar.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/streak_badge.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/task.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/task_item.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/top_bar.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/node_modules/.package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/controllers/habitsController.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/habitsController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/middleware/authMiddleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/middleware/authMiddleware.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/middleware/validateUser.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/validators/validateUser.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/models/Habit.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/models/Habit.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/models/HabitCompletion.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/models/Task.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/models/Task.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/models/User.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/models/User.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/models/habitCompletion.js" beforeDir="false" afterPath="$PROJECT_DIR$/HabitCompletion.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/routes/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/routes/habits.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/habits.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/utils/date.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/utils/date.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/react.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Sidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Sidebar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Habits.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Habits.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Settings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Settings.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Statistics.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Statistics.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Today.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Today.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/app/app_theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/app/app_theme.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/features/habit/model.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/home_screan.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/screens/loginScreen/login_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/settingPage/setting_screen.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/signup_screen.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/statisticPage/statistics_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/screens/statisticScreen/statistics_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/taskPage/tasks_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/screens/taskScreen/tasks_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screans/todayPage/today_screen.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/custom_text_field.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/form_label.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/header_card_login.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/login/header_card_login.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/helper.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/login_card.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/sign_up_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/sign_up_button.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/signup_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/signup_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/signup_form.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/square_tiles.dart" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/categoryScreen/add_category.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/screens/categoryScreen/category_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/category/category_card.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/lib/utils/category/model.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mobile/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mobile/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/pubspec.yaml" afterDir="false" />
     </list>
@@ -200,7 +73,7 @@
     "cidr.known.project.marker": "true",
     "com.google.services.firebase.aqiPopupShown": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "#106 on Merging implement__habit__list__feature-#16",
+    "git-widget-placeholder": "implement-categories-screen-ui-183",
     "ignore.virus.scanning.warn.message": "true",
     "io.flutter.reload.alreadyRun": "true",
     "kotlin-language-version-configured": "true",

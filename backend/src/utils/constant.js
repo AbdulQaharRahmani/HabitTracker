@@ -14,4 +14,16 @@ export const ERROR_CODES = {
   ALREADY_COMPLETED: 'ALREADY_COMPLETED',
   UPLOAD_IMAGE: 'UPLOAD_IMAGE',
   PASSWORD_SAME_AS_OLD: 'PASSWORD_SAME_AS_OLD',
+  END_DATE_BEFORE_START_DATE: 'END_DATE_BEFORE_START_DATE',
+  INVALID_DATE_FORMAT: 'INVALID_DATE_FORMAT',
+};
+
+export const DAY_MAP = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
 };
