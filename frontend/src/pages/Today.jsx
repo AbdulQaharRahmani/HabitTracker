@@ -7,7 +7,7 @@ function Today() {
   const [startDate, setStartDate] = useState(new Date());
 
   return (
-    <div className="p-8 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="p-8 min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       {/* Header */}
       <div className="mb-8 flex justify-between items-start">
         <div>
