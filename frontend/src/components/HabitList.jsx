@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import HabitCard from "./HabitCard";
 import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
-import api from "../../services/api";
-import Pagination from "./Pagination";
 
 export default function HabitList({ viewMode }) {
   const { allhabits, loading, error, fetchHabits } = useHabitStore();
@@ -53,24 +51,24 @@ export default function HabitList({ viewMode }) {
             visibleHabits.map((habit) => (
               <HabitCard
                 key={habit._id}
-                id={habit._id}
+                _id={habit._id}
                 viewMode={viewMode}
                 title={habit.title}
                 description={habit.description}
-                category={habit.category}
+                categoryId={habit.categoryId}
                 frequency={habit.frequency}
                 duration={habit.duration}
               />
             ))
           )}
-          <Pagination
-            currentPage={page}
-            totalCount={habits.length}
-            siblingCount
-            pageSize={ITEMS_PER_PAGE}
-            onPageChange={setPage}
-          />
         </div>
+        <Pagination
+          currentPage={page}
+          totalCount={allhabits.length}
+          siblingCount
+          pageSize={ITEMS_PER_PAGE}
+          onPageChange={setPage}
+        />
       </>
     );
   }
