@@ -12,7 +12,7 @@ function Tasks() {
   );
 
   const [page, setPage] = useState(1);
-  const ITEMS_PER_PAGE = 8;
+  const ITEMS_PER_PAGE = 20;
   useEffect(() => {
     fetchTasks(ITEMS_PER_PAGE, page);
     console.log("tasks", tasks);
