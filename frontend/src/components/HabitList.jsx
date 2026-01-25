@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import HabitCard from "./HabitCard";
+import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
 import api from "../../services/api";
 import Pagination from "./Pagination";
