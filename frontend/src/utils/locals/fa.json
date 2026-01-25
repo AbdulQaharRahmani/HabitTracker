@@ -55,5 +55,24 @@
   "Call Mom": "زنگ زدن به مادر",
   "Yesterday": "دیروز",
   "Tomorrow": "فردا",
-  "No date": "تاریخ نامشخص"
+  "No date": "تاریخ نامشخص",
+  "This is the description part": "این بخش توضیحات است.",
+
+  "Add New Task": "اضافه کردن عملیات جدید",
+  "Title": "عنوان",
+  "Description": "توضیحات",
+  "Deadline": "موعد",
+  "Category": "کتگوری",
+  "Save": "ذخیره",
+  "Cancel": "لغو",
+  "Enter task title": "عنوان را وارد کنید",
+  "Enter task description": "توضیحات را وارد کنید",
+  "Choose Deadline": "موعد را انتخاب کنید",
+  "Choose Category": "کتگوری را انتخاب کنید",
+  "Title is required!": "عنوان الزامی است!",
+  "Descripton is required!": "توضیحات الزامی است!",
+  "Deadline is required!": "تاریخ ختم الزامی است!",
+  "Category is required!": "کتگوری الزامی است!",
+  "Task added successfully!": "عمیلات با موفقیت اضافه شد",
+  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد"
 }

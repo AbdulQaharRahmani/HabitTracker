@@ -1,6 +1,6 @@
 import Header from "../components/Header";
-import AddTask from "../components/AddTask";
-import TaskCard from "../components/TaskCard";
+import AddTask from "../components/tasks/AddTask";
+import TaskCard from "../components/tasks/TaskCard";
 import { useTaskCardStore } from "../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import i18n from "../utils/i18n";
@@ -13,7 +13,7 @@ function Tasks() {
     <div
       className={`
         md:px-2 grid gap-4
-        bg-gray-50 dark:bg-gray-900
+        bg-gray-50 dark:bg-gray-950
         text-gray-900 dark:text-gray-100
         ${i18n.language === "fa" ? "rtl" : "ltr"}
       `}
