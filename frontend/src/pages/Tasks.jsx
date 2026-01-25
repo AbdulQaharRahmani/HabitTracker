@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import AddTask from "../components/tasks/AddTask";
 import TaskCard from "../components/tasks/TaskCard";
@@ -7,6 +8,16 @@ import i18n from "../utils/i18n";
 
 function Tasks() {
   const tasks = useTaskCardStore((state) => state.tasks);
+  const fetchTasks = useTaskCardStore((state) => state.fetchTasks);
+  const loading = useTaskCardStore((state) => state.loading);
+  const error = useTaskCardStore((state) => state.error);
+
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
+  useEffect(() => {
+    fetchTasks(ITEMS_PER_PAGE, page);
+  }, [page]);
+
   const { t } = useTranslation();
 
   return (
@@ -39,16 +50,29 @@ function Tasks() {
         </span>
       </div>
 
-      <div
-        className={`
+      {loading && (
+        <div className="text-center text-gray-500 ">{t("Loading")}</div>
+      )}
+      {error && <div className="text-cener text-red-500">{error}</div>}
+
+      {!loading && !error && tasks.length > 0 && (
+        <div
+          className={`
           grid gap-4
           ${i18n.language === "fa" ? "rtl" : "ltr"}
         `}
-      >
-        {tasks.map((task) => (
-          <TaskCard key={task.id} {...task} />
-        ))}
-      </div>
+        >
+          {tasks.map((task) => (
+            <TaskCard key={task._id} {...task} />
+          ))}
+        </div>
+      )}
+
+      {!loading && !error && tasks.length === 0 && (
+        <div className="text-center text-gray-500">
+          {t("You have no tasks to show")}
+        </div>
+      )}
     </div>
   );
 }
