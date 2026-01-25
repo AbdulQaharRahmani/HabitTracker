@@ -21,20 +21,11 @@ export default function TaskCard({ title, categoryId, dueDate, status, _id }) {
   const { t } = useTranslation();
 
   return (
-    <div
-      className="
-        flex mx-8 rounded-xl shadow-sm transition
-        bg-white dark:bg-gray-800
-        text-gray-900 dark:text-gray-100
-      "
-    >
-      {/* Complete button */}
+    <div className="flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8">
       <div
-        className={`
-          flex items-center justify-between mx-4 px-4 pr-8 text-center
-          border-gray-300 dark:border-gray-600
-          ${i18n.language === "fa" ? "border-l pl-10" : "border-r"}
-        `}
+        className={`flex items-center justify-between border-gray-300 mx-4 px-4 pr-8 text-center ${
+          i18n.language === "fa" ? "border-l pl-10" : "border-r "
+        }`}
       >
         <button onClick={() => completeTask(_id)}>
           {status === "done" ? (
@@ -42,17 +33,13 @@ export default function TaskCard({ title, categoryId, dueDate, status, _id }) {
           ) : (
             <FaRegCircle
               size={20}
-              className="
-                text-gray-300 dark:text-gray-500
-                hover:text-green-400 transition
-              "
+              className="text-gray-300 hover:text-green-400 transiton ease-in duration-100"
             />
           )}
         </button>
       </div>
 
-      {/* Content */}
-      <div className="grid grid-cols-2 flex-1 md:grid-cols-[2fr_1fr]">
+      <div className="grid grid-cols-2 justify-between items-start flex-1 md:justify-start md:grid-cols-[2fr_1fr]">
         <div className="my-1">
           <div
             className={`
@@ -65,6 +52,11 @@ export default function TaskCard({ title, categoryId, dueDate, status, _id }) {
             `}
           >
             {t(title)}
+            <div>
+              <p className="text-gray-400 text-sm font-normal mt-1">
+                {t(description)}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-rows-2 items-center">

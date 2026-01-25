@@ -6,6 +6,41 @@ export const useTaskCardStore = create((set) => ({
   loading: false,
   error: null,
 
+  isModalOpen: false,
+
+  taskData: {
+    title: "",
+    description: "",
+    deadline: null,
+    category: null,
+  },
+
+  setModalOpen: () => {
+    set((state) => ({
+      isModalOpen: !state.isModalOpen,
+      taskData: {
+        title: "",
+        description: "",
+        deadline: null,
+        category: null,
+      },
+    }));
+  },
+
+  setTaskData: (item, value) => {
+    set((state) => ({
+      taskData: {
+        ...state.taskData,
+        [item]: value,
+      },
+    }));
+  },
+
+  addTask: (task) =>
+    set((state) => ({
+      tasks: [...state.tasks, task],
+    })),
+
   fetchTasks: async (limit, page) => {
     set({ loading: true, error: null });
     try {

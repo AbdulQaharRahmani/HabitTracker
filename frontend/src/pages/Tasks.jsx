@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import AddTask from "../components/AddTask";
+import AddTask from "../components/tasks/AddTask";
 import TaskCard from "../components/tasks/TaskCard";
 import { useTaskCardStore } from "../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";

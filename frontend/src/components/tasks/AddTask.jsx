@@ -8,9 +8,10 @@ import i18n from "../../utils/i18n";
 
 export default function AddTask() {
   const { t } = useTranslation();
-  const isRTL = i18n.language === "fa"
+  const isRTL = i18n.language === "fa";
 
-  const { isModalOpen, setModalOpen, taskData, setTaskData, addTask } = useTaskCardStore();
+  const { isModalOpen, setModalOpen, taskData, setTaskData, addTask } =
+    useTaskCardStore();
 
   const deadlineItems = [
     {
@@ -95,37 +96,29 @@ export default function AddTask() {
       id: "c7",
       name: isRTL ? "یادگیری" : "Learning",
       value: isRTL ? "یادگیری" : "Learning",
-    }
+    },
   ];
 
   const HandleTaskCreation = (e) => {
     e.preventDefault();
 
     if (!taskData.title) {
-      isRTL
-        ? toast.error("عنوان الزامی است!")
-        : toast.error("Title is required!");
+      toast.error(t("Title is required!"));
       return;
     }
 
     if (!taskData.description) {
-      isRTL
-        ? toast.error("توضیحات الزامی است!")
-        : toast.error("Descripton is required!");
+      toast.error(t("Descripton is required!"));
       return;
     }
 
     if (!taskData.deadline) {
-      isRTL
-        ? toast.error("تاریخ ختم عملیات الزامی است!")
-        : toast.error("Deadline is required!");
+      toast.error(t("Deadline is required!"));
       return;
     }
 
     if (!taskData.category) {
-      isRTL
-        ? toast.error("کتگوری الزامی است!")
-        : toast.error("Category is required!");
+      toast.error(t("Category is required!"));
       return;
     }
 
@@ -137,7 +130,7 @@ export default function AddTask() {
       category: taskData.category,
       done: false,
     };
-    try{
+    try {
       addTask(newTask);
 
       setTaskData("title", "");
@@ -146,13 +139,9 @@ export default function AddTask() {
       setTaskData("category", "");
 
       setModalOpen();
-      isRTL
-        ? toast.success("تسک با موفقیت اضافه شد!")
-        : toast.success("Task added successfully!");
+      toast.success(t("Task added successfully!"));
     } catch (error) {
-      isRTL
-        ? toast.error("متاسفانه تسک  اضافه نشد!", error)
-        : toast.error("Sorry! could not save new task", error);
+      toast.error(t("Sorry! could not save new task", error));
     }
   };
 
@@ -202,9 +191,7 @@ export default function AddTask() {
                 <input
                   type="text"
                   id="title"
-                  placeholder={
-                    isRTL ? "عنوان را وارد کنید" : "Enter task title"
-                  }
+                  placeholder={t("Enter task title")}
                   value={taskData.title}
                   onChange={(e) => setTaskData("title", e.target.value)}
                   className={`
@@ -221,9 +208,7 @@ export default function AddTask() {
                 <label htmlFor="description">{t("Description")}</label>
                 <textarea
                   id="description"
-                  placeholder={
-                    isRTL ? "توضیحات را وارد کنید" : "Enter task description"
-                  }
+                  placeholder={t("Enter task description")}
                   value={taskData.description}
                   onChange={(e) => setTaskData("description", e.target.value)}
                   className="
@@ -242,9 +227,7 @@ export default function AddTask() {
                 </label>
                 <Dropdown
                   items={deadlineItems}
-                  placeholder={
-                    isRTL ? "موعد ختم را انخاب کنید" : "Choose Deadline"
-                  }
+                  placeholder={t("Choose Deadline")}
                   value={taskData.deadline || ""}
                   getValue={(value) => setTaskData("deadline", value)}
                 />
@@ -254,9 +237,7 @@ export default function AddTask() {
                 </label>
                 <Dropdown
                   items={categoryItems}
-                  placeholder={
-                    isRTL ? " کتګوری را انخاب کنید" : "Choose Category"
-                  }
+                  placeholder={t("Choose Category")}
                   value={taskData.category || ""}
                   getValue={(value) => setTaskData("category", value)}
                 />
