@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import api from "../../services/api"
 import toast from "react-hot-toast";
-import { getHabitsByDate } from "../../services/habitService";
+import { completeHabit, getHabitsByDate, unCompleteHabit } from "../../services/habitService";
 const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
@@ -39,10 +39,10 @@ const useHabitStore = create((set, get) => ({
         const completionState = habitToToggle.completed
         try {
             if (habitToToggle.completed) {
-                await api.delete(`/habits/${id}/complete`)
+                completeHabit(id)
                 set((state)=> ({habitCompletions: state.habitCompletions -1}))
             } else {
-                await api.post(`/habits/${id}/complete`)
+                unCompleteHabit(id)
                 set((state)=> ({habitCompletions: state.habitCompletions +1}))
 
             }
