@@ -1,19 +1,26 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProfilePhotoStore } from '../../store/useProfilePhotoStore';
+import useAuthStore from '../../store/useAuthStore';
 
 function ProfilePhoto() {
-    const fileInputref = useRef(null);
+  const fileInputref = useRef(null);
   const { t } = useTranslation();
   const [preview, setPreview] = useState(null);
 
   const { userProfileUrl, fetchProfilePhoto, uploadProfilePhoto, loading } = useProfilePhotoStore();
+   const userId = useAuthStore((state) => state.user);
 
-  const userId = "696f11b31ab597ee7ce63a0b";
+  console.log("User ID in ProfilePhoto component:", userId);
 
-  useEffect(() => {
+
+  console.log("User ID in ProfilePhoto component:", userId);
+
+useEffect(() => {
+  if (userId && userId !== "undefined") {
     fetchProfilePhoto(userId);
-  }, [fetchProfilePhoto, userId]);
+  }
+}, [fetchProfilePhoto, userId]);
 
   const handleButtonClick = () => {
     fileInputref.current.click();
