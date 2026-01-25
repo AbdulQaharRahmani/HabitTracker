@@ -27,6 +27,9 @@ const useHabitStore = create((set, get) => ({
         }
     },
     toggleHabit: async (id) => {
+        if(get().selectedDate.toDateString() !== new Date().toDateString()){
+            return toast.error("You can only mark today's habit as completed or uncompleted")
+        }
        const habitToToggle = get().habits.find(habit=> habit._id === id)
         set((state) => ({
             habits: state.habits.map((habit) =>

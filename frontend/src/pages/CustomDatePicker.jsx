@@ -35,9 +35,8 @@ function CustomDatePicker() {
     <DatePicker
       selected={selectedDate}
       onChange={handleDateChange}
+      maxDate={new Date()}
       inline
-      minDate={new Date()}
-      filterDate={(date) => date.getDay() !== 6 && date.getDay() !== 0}
       calendarClassName="custom-calendar"
       renderCustomHeader={CustomHeader}
     />
