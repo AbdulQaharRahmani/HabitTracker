@@ -40,7 +40,7 @@ function Statistics() {
       </div>
 
       <div className="my-4">
-        <div className="flex items-center lg:mr-9 sm:mr-0 lg:gap-6 ml-7 md:gap-2 sm:gap-2 md:flex xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
+        <div className="flex items-center lg:mr-9 sm:mr-0 lg:flex lg:gap-6 ml-7 md:gap-2 sm:gap-2 md:grid-rows-3 xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
           <TotalHabitsStatics totalHabits={formatNumber(10)} />
           <CurrentStreakStatics currentStreak={formatNumber(5)} />
           <CompletionRateStatics completionRate={formatNumber(75)} />
