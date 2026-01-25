@@ -74,5 +74,7 @@
   "Deadline is required!": "تاریخ ختم الزامی است!",
   "Category is required!": "کتگوری الزامی است!",
   "Task added successfully!": "عمیلات با موفقیت اضافه شد",
-  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد"
+  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد",
+  "Loading": "درحال بارگذاری...",
+  "You have no tasks to show": "وظیفه‌ای برای نمایش وجود ندارد."
 }
