@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../app/app_theme.dart';
 import 'tasks_model.dart';
 
 class TasksCard extends StatelessWidget {
@@ -29,7 +30,7 @@ class TasksCard extends StatelessWidget {
         return Card(
           margin: const EdgeInsets.fromLTRB(21, 0, 21, 10),
           elevation: 0,
-          color: done ? Colors.grey.shade200 : Colors.white,
+          color: done ? Colors.grey.shade300: AppTheme.surface ,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
           child: Padding(
             padding: const EdgeInsets.all(14),

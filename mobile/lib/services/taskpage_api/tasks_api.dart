@@ -126,7 +126,7 @@ class TaskApiService {
     final newStatus = currentStatus == 'done' ? 'todo' : 'done';
 
     final response = await http.patch(
-      Uri.parse('$baseUrl/tasks/$taskId'),
+      Uri.parse('$baseUrl/tasks/$taskId/status'),
       headers: {
         'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json',
