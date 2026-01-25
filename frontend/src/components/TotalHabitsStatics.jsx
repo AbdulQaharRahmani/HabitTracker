@@ -21,8 +21,7 @@ export default function TotalHabitsStatics({totalHabits}) {
       <div className="p-2">
         <span className="flex gap-2 items-center">
           <FaShapes
-            size={20}
-            className="text-indigo-500 bg-indigo-100 w-10 h-12 p-2 rounded-md"
+            className="text-indigo-500 bg-indigo-100 w-10 h-12 p-2 rounded-md flex-shrink-0"
           />
           <p className="text-gray-400 text-lg uppercase dark:text-gray-300">{t("TOTAL HABITS")}</p>
         </span>

@@ -23,8 +23,7 @@ export default function CurrentStreakStatics({ currentStreak }) {
       <div className="p-2">
         <span className="flex gap-2 items-center">
           <MdLocalFireDepartment
-            size={20}
-            className="text-orange-500 bg-orange-100 w-10 h-12 p-2 rounded-md"
+            className="text-orange-500 bg-orange-100 w-10 h-12 p-2 rounded-md flex-shrink-0"
           />
           <p className="text-gray-400 dark:text-gray-300 text-lg uppercase">
             {t("CURRENT STREAK")}

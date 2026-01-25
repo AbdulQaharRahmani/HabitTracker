@@ -21,8 +21,7 @@ export default function CompletionRateStatics({ completionRate }) {
       <div className="p-2">
         <span className="flex gap-2 items-center">
           <PiCircleDashedBold
-            size={20}
-            className="text-green-500 bg-green-100 w-10 h-12 p-2 rounded-md"
+            className="text-green-500 bg-green-100 w-10 h-12 p-2 rounded-md flex-shrink-0"
           />
           <p className="text-gray-400 text-lg uppercase dark:text-gray-300">
             {t("COMPLETION RATE")}

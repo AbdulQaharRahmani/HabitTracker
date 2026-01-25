@@ -27,7 +27,7 @@ function Statistics() {
 
   return (
     <div className="">
-      <div className={`flex justify-between my-2 items-center mx-9 xxs:ml-0 ${
+      <div className={`flex justify-between my-2 items-center lg:mr-9  sm:mr-0 xxs:mr-0 xxs:ml-0 ${
         isRTL ? "xxs:ml-7" : "xxs:ml-auto"
       }`}>
         <Header
@@ -40,7 +40,7 @@ function Statistics() {
       </div>
 
       <div className="my-4">
-        <div className="flex items-center lg:gap-6 ml-7  mr-9 md:gap-2 sm:gap-2 md:flex xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
+        <div className="flex items-center lg:mr-9 sm:mr-0 lg:gap-6 ml-7 md:gap-2 sm:gap-2 md:flex xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
           <TotalHabitsStatics totalHabits={formatNumber(10)} />
           <CurrentStreakStatics currentStreak={formatNumber(5)} />
           <CompletionRateStatics completionRate={formatNumber(75)} />
