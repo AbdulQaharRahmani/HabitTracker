@@ -19,7 +19,17 @@ const TodayList = () => {
   useEffect(() => {
     fetchHabitsByDate();
   }, [fetchHabitsByDate]);
-
+  if(habits.length === 0){
+    return(
+        <div
+        className="p-10 text-center font-medium
+        text-slate-600 dark:text-gray-400
+        transition-colors"
+      >
+        No habits for current date!
+      </div>
+    )
+  }
   if (loading)
     return (
       <div
