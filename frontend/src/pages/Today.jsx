@@ -6,7 +6,7 @@ import useHabitStore from "../store/useHabitStore";
 function Today() {
   const {habitCompletions, habits} = useHabitStore()
   const allHabits = habits.length;
-  const completionPercentage = allHabits > 0 ? (habitCompletions/allHabits * 100): 0
+  const completionPercentage = allHabits > 0 ? Math.round((habitCompletions/allHabits * 100)): 0
   return (
     <div className="p-8 min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       {/* Header */}
