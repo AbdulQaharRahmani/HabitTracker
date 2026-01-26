@@ -1,6 +1,7 @@
 import { create } from "zustand";
+import api from "../../services/api";
 
-export const useTaskCardStore = create((set) => ({
+export  const useTaskCardStore = create((set) => ({
   tasks: [
     {
       id: 1,
@@ -36,6 +37,9 @@ export const useTaskCardStore = create((set) => ({
     },
   ],
 
+  loading: false,
+  error: null,
+
   isModalOpen: false,
 
   taskData: {
@@ -55,7 +59,7 @@ export const useTaskCardStore = create((set) => ({
   deleteTask: (id) => {
     set((state) => ({
       tasks: state.tasks.filter((task) => task.id !== id),
-    }))
+    }));
   },
 
   setModalOpen: () => {
@@ -79,9 +83,65 @@ export const useTaskCardStore = create((set) => ({
     }));
   },
 
-  addTask: (task) =>
-    set((state) => ({
-      tasks: [...state.tasks, task],
-    })),
-  
+  categories: [],
+
+  fetchCategories: async () => {
+    set({ loading: true });
+    try {
+      const response = await api.get("/categories");
+      const formatted = response.data.data.map((cat) => ({
+        id: cat._id,
+        name: cat.name,
+        value: cat._id,
+        color: cat.backgroundColor || "#dbd6f9",
+      }));
+      set({ categories: formatted });
+    } catch (error) {
+      const message = error.response?.data?.error || "Something went wrong";
+      toast.error(message);
+      console.error("Failed to fetch categories", error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  addTask: async (taskPayload) => {
+    
+    try {
+      const payload = {
+        title: taskPayload.title,
+        description: taskPayload.description,
+        deadline: taskPayload.deadline,
+        categoryId: taskPayload.categoryId, //for backend
+      };
+
+      const res = await api.post("/tasks", payload);
+
+      set((state) => {
+        const categoryName =
+          state.categories.find((c) => c.id === taskPayload.categoryId)?.name ||
+          "—";
+
+        return {
+          tasks: [
+            ...state.tasks,
+            {
+              id: res.data?.data?._id || Date.now(),
+              title: taskPayload.title,
+              description: taskPayload.description,
+              deadline: taskPayload.deadline,
+              category: categoryName, //for UI
+              done: false,
+            },
+          ],
+        };
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Add task failed:", error.response?.data || error.message);
+      throw error;
+    }
+  },
+
 }));
