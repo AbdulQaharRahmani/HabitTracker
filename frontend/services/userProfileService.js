@@ -9,3 +9,11 @@ export const uploadProfilePicture = (file) => {
   formData.append('profilePicture', file);
   return api.post('/users/profile-picture', formData);
 };
+
+
+export const updateUserPrefrences = (userId, preferences) => {
+  return api.put(`/users/preference`, preferences);
+}
+
+
+
