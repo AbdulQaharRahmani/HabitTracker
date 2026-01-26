@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../components/ThemeContext";
+import ProfilePhoto from "../components/setting/ProfilePhoto";
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -25,7 +26,7 @@ const Settings = () => {
               {t("Profile Settings")}
             </h2>
             <div className="flex flex-col md:flex-row gap-8">
-              <div className="flex flex-col items-center space-y-4">
+              {/* <div className="flex flex-col items-center space-y-4">
                 <div className="overflow-hidden border-4 border-white rounded-full w-24 h-24 shadow-md dark:border-gray-800 bg-orange-100 dark:bg-gray-800">
                   <img
                     src="https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg"
@@ -36,8 +37,8 @@ const Settings = () => {
                 <button className="px-4 py-2 text-xs font-semibold transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">
                   {t("CHANGE PHOTO")}
                 </button>
-              </div>
-
+              </div> */}
+              <ProfilePhoto/>
               <div className="flex-1 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
