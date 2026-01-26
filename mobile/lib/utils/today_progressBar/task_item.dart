@@ -1,45 +1,52 @@
 import 'package:flutter/material.dart';
 import '../../app/app_theme.dart';
 
-/// ---------------- Task Category Configuration ----------------
-class TaskCategoryConfig {
-  final String name;
+/// ---------------- Category UI Config ----------------
+class TaskCategoryUI {
   final IconData icon;
   final Color color;
 
-  const TaskCategoryConfig({
-    required this.name,
+  const TaskCategoryUI({
     required this.icon,
     required this.color,
   });
 }
 
-/// Map categoryId -> TaskCategoryConfig
-const Map<String, TaskCategoryConfig> taskCategoryMapById = {
-  '696e1bb23a4cf5a7398b8405': TaskCategoryConfig(
-    name: 'Study',
+/// ---------------- Category Maps ----------------
+
+/// By category name (fallback-safe)
+final Map<String, TaskCategoryUI> taskCategoryMapByName = {
+  'study': const TaskCategoryUI(
     icon: Icons.school_outlined,
     color: AppTheme.primary,
   ),
-  '696e1bb23a4cf5a7398b8406': TaskCategoryConfig(
-    name: 'Sport',
+  'sport': const TaskCategoryUI(
     icon: Icons.fitness_center,
     color: AppTheme.success,
   ),
-  '696e1bb23a4cf5a7398b8407': TaskCategoryConfig(
-    name: 'Personal',
-    icon: Icons.task_alt,
+  'work': const TaskCategoryUI(
+    icon: Icons.work_outline,
     color: AppTheme.warning,
   ),
-  '696e1bb23a4cf5a7398b8408': TaskCategoryConfig(
-    name: 'Work',
-    icon: Icons.work_outline,
+  'health': const TaskCategoryUI(
+    icon: Icons.favorite_outline,
+    color: AppTheme.error,
+  ),
+  'personal': TaskCategoryUI(
+    icon: Icons.task_alt,
     color: AppTheme.primary,
   ),
 };
 
-/// ---------------- Task / Habit Model ----------------
+/// Default fallback
+const TaskCategoryUI defaultCategoryUI = TaskCategoryUI(
+  icon: Icons.task_alt,
+  color: AppTheme.primary,
+);
+
+/// ---------------- Task / Habit Unified UI Model ----------------
 class TaskItem {
+  /// Common
   final String id;
   final String title;
   final String description;
@@ -47,9 +54,11 @@ class TaskItem {
   final String category;
   final IconData icon;
   final Color color;
-  final String sourceType;
-  bool done;
+  final String sourceType; // 'task' | 'habit'
   final DateTime createdAt;
+
+  /// UI State
+  bool done;
 
   TaskItem({
     required this.id,
@@ -64,38 +73,16 @@ class TaskItem {
     this.done = false,
   });
 
-  // ---------------- FACTORIES ----------------
+  // ---------------------------------------------------------------------------
+  // FACTORY (TASK ONLY – بدون تغییر رفتار تسک)
+  // ---------------------------------------------------------------------------
 
-  /// Creates TaskItem from API task JSON
-  factory TaskItem.fromApiJson(Map<String, dynamic> json) {
-    final categoryId = json['categoryId']?.toString() ?? '';
-    final config = taskCategoryMapById[categoryId] ??
-        const TaskCategoryConfig(
-          name: 'Other',
-          icon: Icons.task_alt,
-          color: AppTheme.primary,
-        );
+  factory TaskItem.fromApiJson(Map<String, dynamic> json, DateTime forDate) {
+    final categoryName =
+    (json['category']?['name'] ?? 'task').toString().toLowerCase();
 
-    return TaskItem(
-      id: json['_id'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      frequency: 'daily',
-      category: config.name,
-      icon: config.icon,
-      color: config.color,
-      sourceType: 'task',
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-      done: json['status'] == 'done',
-    );
-  }
-
-  /// Creates TaskItem from API habit JSON
-  factory TaskItem.fromHabitApiJson(Map<String, dynamic> json) {
-    final categoryJson = json['categoryId'] ?? {};
-    final categoryName = (categoryJson['name'] ?? 'Other').toString();
-    final icon = TaskItem.mapIcon(categoryJson['icon']?.toString());
-    final color = TaskItem.hexToColor(categoryJson['backgroundColor']?.toString());
+    final ui =
+        taskCategoryMapByName[categoryName] ?? defaultCategoryUI;
 
     return TaskItem(
       id: json['_id'] ?? '',
@@ -103,45 +90,47 @@ class TaskItem {
       description: json['description'] ?? '',
       frequency: json['frequency'] ?? 'daily',
       category: categoryName,
-      icon: icon,
-      color: color,
-      sourceType: 'habit',
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-      done: false,
+      icon: ui.icon,
+      color: ui.color,
+      sourceType: 'task',
+      createdAt:
+      DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      done: json['status'] == 'done',
     );
   }
+// In task.dart (your TaskItem file)
+  factory TaskItem.fromHabitJson(Map<String, dynamic> json, DateTime forDate) {
+    final categoryName = (json['category']?['name'] ?? 'habit').toString().toLowerCase();
 
-  // ---------------- STATIC HELPERS ----------------
+    // Assume API has 'completedDates' array or 'isCompleted' for the date
+    bool isDone = false;
+    if (json['completedDates'] != null) {
+      // Check if forDate is in completedDates (array of ISO strings or timestamps)
+      isDone = (json['completedDates'] as List).any((d) {
+        final completedDate = DateTime.tryParse(d) ?? DateTime(1970);
+        return DateUtils.isSameDay(completedDate, forDate);
+      });
+    } else if (json['isCompleted'] != null) {
+      isDone = json['isCompleted'] == true;  // Or json['status'] == 'completed'
+    } // Adjust this based on your API docs/response
 
-  /// Convert hex string to Color safely
-  static Color hexToColor(String? hex) {
-    if (hex == null || hex.isEmpty) return AppTheme.primary;
-
-    final cleanedHex = hex.replaceAll('#', '');
-    if (cleanedHex.length != 6) return AppTheme.primary;
-
-    return Color(int.parse('FF$cleanedHex', radix: 16));
+    return TaskItem(
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      frequency: json['frequency'] ?? 'daily',
+      category: categoryName,
+      icon: TaskItem.resolveIcon(apiIconName: json['icon'], categoryName: categoryName),
+      color: TaskItem.resolveColor(apiHexColor: json['color'], categoryName: categoryName),
+      sourceType: 'habit',
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      done: isDone,  // Key fix: Set based on API data for the date
+    );
   }
+  // ---------------------------------------------------------------------------
+  // LOGIC
+  // ---------------------------------------------------------------------------
 
-  /// Map simple string to icon
-  static IconData mapIcon(String? name) {
-    switch (name?.toLowerCase()) {
-      case 'study':
-        return Icons.school;
-      case 'health':
-        return Icons.favorite;
-      case 'sport':
-        return Icons.sports_soccer;
-      case 'work':
-        return Icons.work;
-      default:
-        return Icons.task;
-    }
-  }
-
-  // ---------------- LOGIC ----------------
-
-  /// Determines if task/habit applies to the given date
   bool appliesToDate(DateTime date) {
     final start = DateTime(createdAt.year, createdAt.month, createdAt.day);
     final target = DateTime(date.year, date.month, date.day);
@@ -159,5 +148,51 @@ class TaskItem {
       default:
         return false;
     }
+  }
+
+  void toggle() {
+    done = !done;
+  }
+
+  // ---------------------------------------------------------------------------
+  // STATIC HELPERS (Used by HabitMapper)
+  // ---------------------------------------------------------------------------
+
+  static IconData resolveIcon({
+    String? apiIconName,
+    String? categoryName,
+  }) {
+    if (apiIconName != null && apiIconName.isNotEmpty) {
+      switch (apiIconName.toLowerCase()) {
+        case 'study':
+          return Icons.school;
+        case 'sport':
+          return Icons.fitness_center;
+        case 'work':
+          return Icons.work;
+        case 'health':
+          return Icons.favorite;
+      }
+    }
+
+    final key = categoryName?.toLowerCase();
+    return taskCategoryMapByName[key]?.icon ??
+        defaultCategoryUI.icon;
+  }
+
+  static Color resolveColor({
+    String? apiHexColor,
+    String? categoryName,
+  }) {
+    if (apiHexColor != null && apiHexColor.startsWith('#')) {
+      final hex = apiHexColor.replaceAll('#', '');
+      if (hex.length == 6) {
+        return Color(int.parse('FF$hex', radix: 16));
+      }
+    }
+
+    final key = categoryName?.toLowerCase();
+    return taskCategoryMapByName[key]?.color ??
+        defaultCategoryUI.color;
   }
 }

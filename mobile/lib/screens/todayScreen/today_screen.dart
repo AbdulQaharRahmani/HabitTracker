@@ -100,8 +100,8 @@ class _TodayScreenState extends State<TodayScreen> {
     });
 
     try {
-      final tasks = await _api.fetchTasks();
-      final habits = await _api.fetchHabits();
+      final tasks = await _api.fetchTasks(forDate: selectedDate);
+      final habits = await _api.fetchHabits(forDate: selectedDate);
 
       final itemsTasks = tasks.where((t) => t.appliesToDate(date)).toList();
       final itemsHabits = habits.where((h) => h.appliesToDate(date)).toList();
@@ -134,28 +134,26 @@ class _TodayScreenState extends State<TodayScreen> {
       });
     }
   }
-
-  Future<void> _toggleDone(TaskItem item, bool done) async {
-    setState(() {
-      item.done = done;
-    });
+  Future<void> _toggleDone(TaskItem item) async {
+    final previous = item.done;
 
     final success = await _api.setItemCompletion(
-      id: item.id,
-      done: done,
+      item: item,
       forDate: selectedDate,
-      type: item.sourceType,
     );
 
-    if (!success) {
+    if (success) {
       setState(() {
-        item.done = !done;
+        item.done = !previous;
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error while updating server')),
-        );
-      }
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error while updating'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -213,8 +211,8 @@ class _TodayScreenState extends State<TodayScreen> {
               ...entry.value.map((item) {
                 return TaskCard(
                   item: item,
-                  onToggleDone: (done) {
-                    _toggleDone(item, done);
+                  onToggleDone: (_) {
+                    _toggleDone(item);
                   },
                 );
               }).toList(),
