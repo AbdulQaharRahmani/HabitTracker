@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 const HabitSchema = new mongoose.Schema(
   {
+    clientId: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -32,6 +37,11 @@ const HabitSchema = new mongoose.Schema(
     },
     order: {
       type: Number,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+      default: new Date(),
     },
   },
   {
