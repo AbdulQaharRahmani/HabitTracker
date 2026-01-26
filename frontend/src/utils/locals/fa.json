@@ -74,5 +74,11 @@
   "Deadline is required!": "تاریخ ختم الزامی است!",
   "Category is required!": "کتگوری الزامی است!",
   "Task added successfully!": "عمیلات با موفقیت اضافه شد",
-  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد"
+
+  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد",
+
+  "Chess": "شطرنج",
+  "Other": "متفرقه",
+  "Peach": "میوه جات",
+  "Study": "درس خواندن"
 }
