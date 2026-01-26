@@ -93,48 +93,34 @@ class ApiService {
   }) async {
     final headers = await _defaultHeaders();
     final date = _formatDate(forDate);
-
     try {
       if (item.sourceType == 'habit') {
         final url = Uri.parse("$baseUrl/api/habits/${item.id}/complete");
-
         print("📤 Habit toggle request: id=${item.id}, done=${item.done}, date=$date, url=$url");
-
         late http.Response res;
-
-        if (!item.done) {
-          // COMPLETE → POST
+        if (item.done) {
+          // Intended to COMPLETE → POST
           res = await http.post(url, headers: headers, body: jsonEncode({"date": date}));
         } else {
-          // UNDO → DELETE
+          // Intended to UNDO → DELETE
           res = await http.delete(url, headers: headers, body: jsonEncode({"date": date}));
         }
-
         print("📥 Response: ${res.statusCode} ${res.body}");
-
         if (res.statusCode == 200 || res.statusCode == 201) {
-          item.done = !item.done;
           return true;
-        } else if (!item.done && res.statusCode == 400 && (jsonDecode(res.body)['code'] ?? '') == 'ALREADY_COMPLETED') {
-          item.done = true; // Sync state if already completed
+        } else if (item.done && res.statusCode == 400 && (jsonDecode(res.body)['code'] ?? '') == 'ALREADY_COMPLETED') {
+          // Sync state if already completed (UI is already optimistically set to true)
           return true;
         }
-
         return false;
       }
-
       // TASK
       final url = Uri.parse("$baseUrl/api/tasks/${item.id}/status");
-      final newDone = !item.done;
-      final res = await http.patch(url, headers: headers, body: jsonEncode({"done": newDone, "date": date}));
-
+      final res = await http.patch(url, headers: headers, body: jsonEncode({"done": item.done, "date": date}));
       if (res.statusCode == 200) {
-        item.done = newDone;
         return true;
       }
-
       return false;
-
     } catch (e) {
       print("setItemCompletion exception: $e");
       return false;

@@ -51,12 +51,13 @@ class _TodayScreenState extends State<TodayScreen> {
   List<DateTime> _buildDateRange(DateTime start) {
     return List.generate(
       31,
-          (i) => DateTime(start.year, start.month, start.day + i),
+      (i) => DateTime(start.year, start.month, start.day + i),
     );
   }
+
   void _scrollToToday() {
     final todayIndex = dateRange.indexWhere(
-          (d) => DateUtils.isSameDay(d, selectedDate),
+      (d) => DateUtils.isSameDay(d, selectedDate),
     );
 
     if (todayIndex == -1 || !_dateScrollController.hasClients) return;
@@ -67,10 +68,7 @@ class _TodayScreenState extends State<TodayScreen> {
     double offset =
         (todayIndex * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
 
-    offset = offset.clamp(
-      0.0,
-      _dateScrollController.position.maxScrollExtent,
-    );
+    offset = offset.clamp(0.0, _dateScrollController.position.maxScrollExtent);
 
     _dateScrollController.animateTo(
       offset,
@@ -134,20 +132,20 @@ class _TodayScreenState extends State<TodayScreen> {
       });
     }
   }
+
   Future<void> _toggleDone(TaskItem item) async {
     final previous = item.done;
-
+    setState(() {
+      item.done = !previous;
+    });
     final success = await _api.setItemCompletion(
       item: item,
       forDate: selectedDate,
     );
-
-    if (success) {
+    if (!success && mounted) {
       setState(() {
-        item.done = !previous;
+        item.done = previous;
       });
-    } else {
-      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error while updating'),
@@ -226,8 +224,11 @@ class _TodayScreenState extends State<TodayScreen> {
   }
 
   // ---------------- Shimmer placeholders ----------------
-  Widget _shimmerBox(
-      {double height = 16, double width = double.infinity, BorderRadius? borderRadius}) {
+  Widget _shimmerBox({
+    double height = 16,
+    double width = double.infinity,
+    BorderRadius? borderRadius,
+  }) {
     return Shimmer.fromColors(
       baseColor: AppTheme.shadow,
       highlightColor: AppTheme.textWhite,
@@ -249,7 +250,7 @@ class _TodayScreenState extends State<TodayScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Shimmer.fromColors(
-            baseColor:AppTheme.shadow,
+            baseColor: AppTheme.shadow,
             highlightColor: AppTheme.textWhite,
             child: Container(
               width: 42.w,
@@ -265,13 +266,25 @@ class _TodayScreenState extends State<TodayScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _shimmerBox(height: 14.h, width: 0.5.sw, borderRadius: BorderRadius.circular(6.r)),
+                _shimmerBox(
+                  height: 14.h,
+                  width: 0.5.sw,
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
                 SizedBox(height: 8.h),
                 Row(
                   children: [
-                    _shimmerBox(height: 12.h, width: 60.w, borderRadius: BorderRadius.circular(6.r)),
+                    _shimmerBox(
+                      height: 12.h,
+                      width: 60.w,
+                      borderRadius: BorderRadius.circular(6.r),
+                    ),
                     SizedBox(width: 10.w),
-                    _shimmerBox(height: 12.h, width: 80.w, borderRadius: BorderRadius.circular(12.r)),
+                    _shimmerBox(
+                      height: 12.h,
+                      width: 80.w,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
                   ],
                 ),
               ],
@@ -279,7 +292,7 @@ class _TodayScreenState extends State<TodayScreen> {
           ),
           SizedBox(width: 10.w),
           Shimmer.fromColors(
-            baseColor:AppTheme.shadow,
+            baseColor: AppTheme.shadow,
             highlightColor: AppTheme.textWhite,
             child: Container(
               width: 36.w,
@@ -301,7 +314,11 @@ class _TodayScreenState extends State<TodayScreen> {
       children: [
         Row(
           children: [
-            _shimmerBox(height: 16.h, width: 120.w, borderRadius: BorderRadius.circular(6.r)),
+            _shimmerBox(
+              height: 16.h,
+              width: 120.w,
+              borderRadius: BorderRadius.circular(6.r),
+            ),
           ],
         ),
         SizedBox(height: 8.h),
@@ -323,16 +340,32 @@ class _TodayScreenState extends State<TodayScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _shimmerBox(height: 20.h, width: 0.4.sw, borderRadius: BorderRadius.circular(6.r)),
+                    _shimmerBox(
+                      height: 20.h,
+                      width: 0.4.sw,
+                      borderRadius: BorderRadius.circular(6.r),
+                    ),
                     SizedBox(height: 6.h),
-                    _shimmerBox(height: 12.h, width: 0.6.sw, borderRadius: BorderRadius.circular(6.r)),
+                    _shimmerBox(
+                      height: 12.h,
+                      width: 0.6.sw,
+                      borderRadius: BorderRadius.circular(6.r),
+                    ),
                   ],
                 ),
               ),
               SizedBox(width: 12.w),
-              _shimmerBox(height: 40.h, width: 40.h, borderRadius: BorderRadius.circular(40.r)),
+              _shimmerBox(
+                height: 40.h,
+                width: 40.h,
+                borderRadius: BorderRadius.circular(40.r),
+              ),
               SizedBox(width: 8.w),
-              _shimmerBox(height: 40.h, width: 40.h, borderRadius: BorderRadius.circular(40.r)),
+              _shimmerBox(
+                height: 40.h,
+                width: 40.h,
+                borderRadius: BorderRadius.circular(40.r),
+              ),
             ],
           ),
         ),
@@ -345,12 +378,20 @@ class _TodayScreenState extends State<TodayScreen> {
             itemCount: 7,
             separatorBuilder: (_, __) => SizedBox(width: 8.w),
             itemBuilder: (context, index) {
-              return _shimmerBox(height: 64.h, width: 64.w, borderRadius: BorderRadius.circular(12.r));
+              return _shimmerBox(
+                height: 64.h,
+                width: 64.w,
+                borderRadius: BorderRadius.circular(12.r),
+              );
             },
           ),
         ),
         SizedBox(height: 16.h),
-        _shimmerBox(height: 96.h, width: double.infinity, borderRadius: BorderRadius.circular(12.r)),
+        _shimmerBox(
+          height: 96.h,
+          width: double.infinity,
+          borderRadius: BorderRadius.circular(12.r),
+        ),
         SizedBox(height: 16.h),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -414,16 +455,16 @@ class _TodayScreenState extends State<TodayScreen> {
                     : _error != null
                     ? Center(child: Text(_error!))
                     : RefreshIndicator(
-                  onRefresh: () => _loadForDate(selectedDate),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      _buildSectionList('Habits', _habitSections),
-                      _buildSectionList('Tasks', _taskSections),
-                      const SizedBox(height: 40),
-                    ],
-                  ),
-                ),
+                        onRefresh: () => _loadForDate(selectedDate),
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: [
+                            _buildSectionList('Habits', _habitSections),
+                            _buildSectionList('Tasks', _taskSections),
+                            const SizedBox(height: 40),
+                          ],
+                        ),
+                      ),
               ),
             ],
           ),
