@@ -6,35 +6,46 @@ import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
 import { useDebounce } from "../hooks/useDebounce";
 
 const Settings = () => {
-  const { t } = useTranslation();
-  const { isDark, setTheme } = useTheme();
-  const { preferences, fetchUserPreferences, updateUserPrefrences } =
-    useProfilePhotoStore();
-    const [localPrefs, setLocalPrefs] = useState(null);
-    const debouncedPrefs = useDebounce(localPrefs, 700);
-    const isInitialLoad = useRef(true);
+   const { t } = useTranslation();
+  const { setTheme } = useTheme();
 
-    useEffect(() => {
-      fetchUserPreferences();
-    }, []);
+  const {
+    preferences,
+    fetchUserPreferences,
+    updateUserPrefrences
+  } = useProfilePhotoStore();
 
-    useEffect(() => {
-      if (preferences) {
-        setLocalPrefs(preferences);
-      }
-    }, [preferences]);
+  const [localPrefs, setLocalPrefs] = useState(null);
 
-    useEffect(() => {
-      if (!debouncedPrefs) return;
+  const debouncedPrefs = useDebounce(localPrefs, 700);
+  const isInitialLoad = useRef(true);
 
-      if (isInitialLoad.current) {
-        isInitialLoad.current = false;
-        return;
-      }
+  useEffect(() => {
+    fetchUserPreferences();
+  }, [fetchUserPreferences]);
 
-      updateUserPrefrences(debouncedPrefs);
-    }, [debouncedPrefs]);
+  useEffect(() => {
+    if (!preferences) return;
 
+    setLocalPrefs(preferences);
+
+    if (preferences.theme) {
+      setTheme(preferences.theme);
+    }
+  }, [preferences, setTheme]);
+
+  useEffect(() => {
+    if (!debouncedPrefs) return;
+
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false;
+      return;
+    }
+
+    updateUserPrefrences(debouncedPrefs);
+  }, [debouncedPrefs, updateUserPrefrences]);
+
+  if (!localPrefs) return null;
 
   return (
     <div className="min-h-screen p-6 font-sans transition-colors duration-200 bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">
@@ -55,18 +66,6 @@ const Settings = () => {
               {t("Profile Settings")}
             </h2>
             <div className="flex flex-col md:flex-row gap-8">
-              {/* <div className="flex flex-col items-center space-y-4">
-                <div className="overflow-hidden border-4 border-white rounded-full w-24 h-24 shadow-md dark:border-gray-800 bg-orange-100 dark:bg-gray-800">
-                  <img
-                    src="https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg"
-                    alt="Profile"
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-                <button className="px-4 py-2 text-xs font-semibold transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">
-                  {t("CHANGE PHOTO")}
-                </button>
-              </div> */}
               <ProfilePhoto/>
               <div className="flex-1 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

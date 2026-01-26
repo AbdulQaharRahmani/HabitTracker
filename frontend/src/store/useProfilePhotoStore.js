@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getProfilePicture, updateUserPrefrences, uploadProfilePicture } from '../../services/userProfileService';
+import { getProfilePicture, getUserPrefrences, updateUserPrefrences, uploadProfilePicture } from '../../services/userProfileService';
 
 const DEFAULT_AVATAR =
   'https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg';
@@ -45,27 +45,35 @@ export const useProfilePhotoStore = create((set) => ({
       set({ loading: false });
     }
   },
-  fetchUserPreferences: async () => {
-    try {
-      set({ loading: true });
-      const res = await api.get("/users/preference");
-      set({ preferences: res.data });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      set({ loading: false });
+
+fetchUserPreferences: async () => {
+  try {
+    set({ loading: true });
+
+    const res = await getUserPrefrences();
+
+    if (res.data?.success) {
+      set({ preferences: res.data.data });
     }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    set({ loading: false });
+  }
+},
+
+updateUserPrefrences: async (preferences) => {
+  try {
+    set({ loading: true });
+    const res = await updateUserPrefrences(null, preferences);
+    if (res.data?.success) {
+      set({ preferences: res.data.data });
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    set({ loading: false });
+  }
   },
 
-  updateUserPrefrences: async (preferences) => {
-    try {
-      set({ loading: true });
-      await updateUserPrefrences(null, preferences);
-      set({ preferences });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      set({ loading: false });
-    }
-  }
 }));

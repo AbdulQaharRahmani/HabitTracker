@@ -15,5 +15,9 @@ export const updateUserPrefrences = (userId, preferences) => {
   return api.put(`/users/preference`, preferences);
 }
 
+export const getUserPrefrences = () => {
+  return api.get(`/users/preference`);
+}
+
 
 
