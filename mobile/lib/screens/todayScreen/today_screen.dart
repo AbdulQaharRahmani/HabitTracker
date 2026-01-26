@@ -19,7 +19,10 @@ class TodayScreen extends StatefulWidget {
 
 class _TodayScreenState extends State<TodayScreen> {
   final ApiService _api = ApiService();
-
+  bool get _isToday {
+    final now = DateTime.now();
+    return DateUtils.isSameDay(selectedDate, now);
+  }
   DateTime selectedDate = DateTime.now();
   late DateTime loginDate;
   late List<DateTime> dateRange;
@@ -134,7 +137,20 @@ class _TodayScreenState extends State<TodayScreen> {
   }
 
   Future<void> _toggleDone(TaskItem item) async {
+    if (!_isToday) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You can only complete habits for today'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     final previous = item.done;
+
     setState(() {
       item.done = !previous;
     });
@@ -142,7 +158,7 @@ class _TodayScreenState extends State<TodayScreen> {
       item: item,
       forDate: selectedDate,
     );
-    if (!success && mounted) {
+    if (!success && mounted ) {
       setState(() {
         item.done = previous;
       });

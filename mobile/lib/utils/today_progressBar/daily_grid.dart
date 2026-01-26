@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/utils/today_progressBar/streak_badge.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../app/app_theme.dart';
 Widget dailyGoalCard({
@@ -11,17 +10,27 @@ Widget dailyGoalCard({
   final percentText = '${(progress * 100).round()}%';
 
   return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(percentText),
+      Text(
+        percentText,
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      SizedBox(height: 6.h),
       ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 10,
-                    backgroundColor: AppTheme.background,
-                    valueColor: const AlwaysStoppedAnimation(AppTheme.primary),
-                  ),
-            ),
+        borderRadius: BorderRadius.circular(8),
+        child: LinearProgressIndicator(
+          value: progress,
+          minHeight: 10.h,
+          backgroundColor: AppTheme.textWhite,
+          valueColor: const AlwaysStoppedAnimation(
+            AppTheme.primary,
+          ),
+        ),
+      ),
     ],
   );
 }
