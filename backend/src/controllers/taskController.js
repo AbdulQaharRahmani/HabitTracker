@@ -46,7 +46,7 @@ export const getTasks = async (req, res) => {
   const page = Number(req.query.page) || 1;
   const skip = (page - 1) * limit;
 
-  const tasks = await TaskModel.find({ userId: req.user._id, deletedAt: null })
+  const tasks = await TaskModel.find({ userId: req.user._id, isDeleted: false })
     .skip(skip)
     .limit(limit)
     .populate('categoryId', 'name icon backgroundColor');
@@ -95,7 +95,7 @@ export const filterTasks = async (req, res) => {
 
   const { searchTerm, status, priority, dueDate } = req.query;
 
-  let query = { userId: req.user._id };
+  let query = { userId: req.user._id, isDeleted: false };
 
   if (searchTerm)
     query.$or = [
@@ -130,6 +130,7 @@ export const toggleTaskStatus = async (req, res) => {
   const task = await TaskModel.findOne({
     _id: taskId,
     userId: req.user._id,
+    isDeleted: false,
   });
 
   if (!task) throw notFound('Task');
@@ -171,7 +172,7 @@ export const updateTask = async (req, res) => {
   }
 
   const task = await TaskModel.findOneAndUpdate(
-    { _id: req.params.id, userId: req.user._id },
+    { _id: req.params.id, userId: req.user._id, isDeleted: false },
     { $set: updateQuery },
     {
       new: true,
