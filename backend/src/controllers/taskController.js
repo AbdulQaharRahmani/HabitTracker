@@ -8,6 +8,7 @@ import {
   notFound,
   unauthorized,
 } from '../utils/error.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createTask = async (req, res) => {
   if (!req.user) throw unauthorized();
@@ -27,6 +28,7 @@ export const createTask = async (req, res) => {
     priority,
     dueDate,
     userId: req.user._id,
+    clientId: uuidv4(),
     categoryId,
   });
 
