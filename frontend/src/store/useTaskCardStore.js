@@ -1,48 +1,67 @@
 import { create } from "zustand";
+import { getTasks } from "../../services/tasksService";
 
 export const useTaskCardStore = create((set) => ({
-  tasks: [
-    {
-      id: 1,
-      title: "Complete project proposal",
-      deadline: "Yesterday",
-      category: "Work",
-      done: false,
-    },
-    {
-      id: 2,
-      title: "Buy groceries for the week",
-      deadline: "Today",
-      category: "Personal",
-      done: false,
-    },
-    {
-      id: 3,
-      title: "Schedule dentist appointment",
-      deadline: "Tomorrow",
-      category: "Health",
-      done: false,
-    },
-    {
-      id: 4,
-      title: "Call Mom",
-      deadline: "No date",
-      category: "Family",
-      done: false,
-    },
-  ],
+  tasks: [],
+  loading: false,
+  error: null,
 
-    completeTask: (id) =>
-        set((state) => ({
-            tasks: state.tasks.map((task) =>
-                task.id === id ? { ...task, done: true } : task
-            ),
-        })
-    ),
+  isModalOpen: false,
 
-    deleteTask: (id) => 
-        set((state) => ({
-            tasks: state.tasks.filter((task) => task.id !== id)
-        }),
-    ),
+  taskData: {
+    title: "",
+    description: "",
+    deadline: null,
+    category: null,
+  },
+
+  setModalOpen: () => {
+    set((state) => ({
+      isModalOpen: !state.isModalOpen,
+      taskData: {
+        title: "",
+        description: "",
+        deadline: null,
+        category: null,
+      },
+    }));
+  },
+
+  setTaskData: (item, value) => {
+    set((state) => ({
+      taskData: {
+        ...state.taskData,
+        [item]: value,
+      },
+    }));
+  },
+
+  addTask: (task) =>
+    set((state) => ({
+      tasks: [...state.tasks, task],
+    })),
+
+  fetchTasks: async (limit, page) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await getTasks(limit, page);
+
+      set({ tasks: response.data, loading: false });
+    } catch (err) {
+      set({ error: err?.message || "An error occurred", loading: false });
+    }
+  },
+  completeTask: (id) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) => {
+        return task._id === id
+          ? { ...task, status: task.status === "done" ? "todo" : "done" }
+          : task;
+      }),
+    })),
+
+  deleteTask: (id) =>
+    set((state) => ({
+      tasks: state.tasks.filter((task) => task._id !== id),
+    })),
 }));
