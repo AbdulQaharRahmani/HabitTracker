@@ -12,7 +12,7 @@ class Task {
   final DateTime createdAt;
   final DateTime updatedAt;
   final CategoryModel? category;
-
+  final String? categoryId;
   Task({
     required this.id,
     required this.title,
@@ -25,9 +25,22 @@ class Task {
     required this.createdAt,
     required this.updatedAt,
     this.category,
+    this.categoryId,
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
+    CategoryModel? category;
+    String? categoryId;
+
+    if (json['categoryId'] != null) {
+      if (json['categoryId'] is Map<String, dynamic>) {
+        category = CategoryModel.fromJson(json['categoryId']);
+        categoryId = category.id;
+      } else if (json['categoryId'] is String) {
+        categoryId = json['categoryId'] as String;
+      }
+    }
+
     return Task(
       id: json['_id'] ?? '',
       title: json['title'] ?? '',
@@ -45,22 +58,11 @@ class Task {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
           : DateTime.now(),
-      category: json['category'] != null
-          ? CategoryModel.fromJson(json['category'])
-          : null,
+      category: category,
+      categoryId: categoryId,
     );
   }
 
-  Map<String, dynamic> toJson({String? categoryId}) {
-    return {
-      'title': title,
-      'description': description,
-      'status': status,
-      'priority': priority,
-      if (categoryId != null) 'categoryId': categoryId,
-      if (dueDate != null) 'dueDate': dueDate!.toIso8601String(),
-    };
-  }
 
 
   bool get isDone => status == 'done';

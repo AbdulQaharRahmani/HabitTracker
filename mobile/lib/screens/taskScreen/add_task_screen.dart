@@ -99,8 +99,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       if (!mounted) return;
 
       if (res['success'] == true) {
-        // ✅ Return the created task data to the previous screen
-        Navigator.pop(context, res['data']);
+              Navigator.pop(context, res['data']);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(res['error'] ?? 'Failed to create task')),
@@ -263,46 +262,100 @@ class _NewTaskPageState extends State<NewTaskPage> {
     );
   }
 
+
+
   Widget _buildCategoryDropdown() {
-    if (_categories.isEmpty) return const Text('No categories available');
+    if (_categories.isEmpty) {
+      return const Text(
+        'No categories available',
+        style: TextStyle(color: Colors.grey),
+      );
+    }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: AppTheme.background,
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withValues(alpha: 0.06),
+        //     blurRadius: 10,
+        //     offset: const Offset(0, 4),
+        //   ),
+        // ],
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedCategoryId,
           isExpanded: true,
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.grey,
+          ),
+          dropdownColor: Colors.white,
+          borderRadius: BorderRadius.circular(16),
           items: [
             ..._categories.map((cat) {
-              return DropdownMenuItem(
+              return DropdownMenuItem<String>(
                 value: cat.id,
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(6),
+                      width: 34,
+                      height: 34,
                       decoration: BoxDecoration(
                         color: cat.backgroundColor,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: cat.backgroundColor.withValues(alpha: 0.4),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      child: Icon(cat.icon, color: Colors.white, size: 20),
+                      child: Icon(
+                        cat.icon,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(cat.name),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        cat.name,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               );
-            }),
-            const DropdownMenuItem(
+            }).toList(),
+            const DropdownMenuItem<String>(
               value: 'add_new',
               child: Row(
                 children: [
-                  Icon(Icons.add_circle_outline, color: Colors.blue),
-                  SizedBox(width: 8),
-                  Text('Add new category'),
+                  Icon(
+                    Icons.add_circle_outline_rounded,
+                    color: Colors.blue,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Add new category',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue,
+                    ),
+                  ),
                 ],
               ),
             ),

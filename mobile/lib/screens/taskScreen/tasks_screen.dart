@@ -75,6 +75,22 @@ class _TasksScreenState extends State<TasksScreen> {
     await _refreshTasks();
   }
 
+  // edit tasks
+  Future<void> _editTask(Task task) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => EditTaskPage(task: task)),
+    );
+
+    if (result != null) {
+      await _refreshTasks();
+    }
+
+    if (result == 'deleted') {
+      await _refreshTasks();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,34 +101,17 @@ class _TasksScreenState extends State<TasksScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 5, top: 6),
-              child: Stack(
-                children: [
-                  Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey.shade300, width: 2),
-                    ),
-                    child: CircleAvatar(
-                      radius: avatarRadius,
-                      child: const Icon(Icons.person),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 3,
-                    right: 2,
-                    child: Container(
-                      width: statusRadius * 2,
-                      height: statusRadius * 2,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-                ],
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey.shade300, width: 2),
+                ),
+                child: CircleAvatar(
+                  radius: avatarRadius,
+                  child: const Icon(Icons.person),
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -123,10 +122,6 @@ class _TasksScreenState extends State<TasksScreen> {
                 Text(
                   'Ahmad Amiri',
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'View Profile',
-                  style: TextStyle(fontSize: 13, color: Colors.blue),
                 ),
               ],
             ),
@@ -321,16 +316,12 @@ class _TasksScreenState extends State<TasksScreen> {
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 15),
                     TasksCard(
                       tasks: activeTasks,
                       onStatusChanged: (task) => _toggleTaskStatus(task),
-                      onEdit: (task) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => EditTaskPage(task: task,)),
-                        );
-                      },
+                      onEdit: (task) => _editTask(task),
                     ),
 
                     const SizedBox(height: 10),
@@ -351,12 +342,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       TasksCard(
                         tasks: completedTasks,
                         onStatusChanged: (task) => _toggleTaskStatus(task),
-                        onEdit: (task) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => EditTaskPage(task: task,)),
-                          );
-                        },
+                        onEdit: (task) => _editTask(task),
                       ),
                   ],
                 );

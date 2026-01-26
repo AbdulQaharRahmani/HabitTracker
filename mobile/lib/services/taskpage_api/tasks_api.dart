@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../../utils/taskpage_components/tasks_model.dart';
@@ -89,9 +90,8 @@ class TaskApiService {
   /// ===============================
   /// Update existing task
   /// ===============================
-  Future<Task> updateTask(
-      String taskId, Map<String, dynamic> updatedFields, String token) async {
-    final response = await http.patch(
+  Future<Task> updateTask(String taskId, Map<String, dynamic> updatedFields, String token) async {
+    final response = await http.put(
       Uri.parse('$baseUrl/tasks/$taskId'),
       headers: {
         'Authorization': 'Bearer $token',
@@ -100,14 +100,27 @@ class TaskApiService {
       body: jsonEncode(updatedFields),
     );
 
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      return Task.fromJson(body['data']);
+    debugPrint('Raw server response: ${response.body}');
+
+    // decode once
+    final Map<String, dynamic> body = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && body['success'] == true) {
+      // decode the data field if needed
+      final data = body['data'];
+      if (data is Map<String, dynamic>) {
+        return Task.fromJson(data);
+      } else if (data is String) {
+              return Task.fromJson(jsonDecode(data));
+      } else {
+        throw Exception('Unexpected format for data: $data');
+      }
     } else {
-      final body = jsonDecode(response.body);
       throw Exception(body['message'] ?? 'Failed to update task');
     }
   }
+
+
 
 
   /// ===============================
@@ -138,4 +151,27 @@ class TaskApiService {
       throw Exception('Failed to update task status');
     }
   }
+
+
+  /// ===============================
+  /// delete Tasks
+  /// ===============================
+
+  Future<void> deleteTask(String taskId, String token) async {
+    final url = Uri.parse('$baseUrl/tasks/$taskId');
+
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('Failed to delete task');
+    }
+  }
+
+
 }
