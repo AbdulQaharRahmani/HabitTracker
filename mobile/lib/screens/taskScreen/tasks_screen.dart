@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
+import '../../app/app_theme.dart';
 import '../../services/taskpage_api/tasks_api.dart';
 import '../../utils/taskpage_components/tasks_card.dart';
 import '../../utils/taskpage_components/tasks_model.dart';
@@ -171,7 +172,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       ),
                       fixedSize: const WidgetStatePropertyAll(Size(105, 30)),
                       backgroundColor: const WidgetStatePropertyAll(
-                        Colors.blue,
+                        AppTheme.primary,
                       ),
                       elevation: const WidgetStatePropertyAll(0),
                       shape: WidgetStatePropertyAll(
