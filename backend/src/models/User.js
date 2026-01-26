@@ -27,6 +27,10 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  lastTimeSync: {
+    type: Date,
+    default: null,
+  },
 });
 
 UserSchema.index(

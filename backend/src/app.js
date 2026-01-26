@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import taskRoutes from './routes/task.js';
 import categoryRoutes from './routes/categories.js';
+import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api/categories', authMiddleware, categoryRoutes);
 app.use('/api/habits', authMiddleware, habitRoutes);
 app.use('/api/tasks', authMiddleware, taskRoutes);
 app.use('/api/users', authMiddleware, userRoutes);
+app.use('/api/offline-data', authMiddleware, syncRoutes);
 
 //#endregion
 

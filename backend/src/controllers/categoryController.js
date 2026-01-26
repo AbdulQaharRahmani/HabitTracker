@@ -8,6 +8,7 @@ import {
   notFound,
   unauthorized,
 } from '../utils/error.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createCategory = async (req, res) => {
   if (!req.user) throw unauthorized();
@@ -19,6 +20,7 @@ export const createCategory = async (req, res) => {
     name,
     icon,
     backgroundColor,
+    clientId: uuidv4(),
   });
 
   res.status(201).json({ success: true, data: category });
