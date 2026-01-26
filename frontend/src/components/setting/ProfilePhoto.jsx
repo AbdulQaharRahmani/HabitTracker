@@ -1,53 +1,55 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useProfilePhotoStore } from '../../store/useProfilePhotoStore';
-import useAuthStore from '../../store/useAuthStore';
+import React, { useRef, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useProfilePhotoStore } from "../../store/useProfilePhotoStore";
+import useAuthStore from "../../store/useAuthStore";
 
 function ProfilePhoto() {
-  const fileInputref = useRef(null);
+  const fileInputRef = useRef(null);
   const { t } = useTranslation();
   const [preview, setPreview] = useState(null);
 
-  const { userProfileUrl, fetchProfilePhoto, uploadProfilePhoto, loading } = useProfilePhotoStore();
-   const userId = useAuthStore((state) => state.user);
+  const { userProfileUrl, fetchProfilePhoto, uploadProfilePhoto, loading } =
+    useProfilePhotoStore();
 
-  console.log("User ID in ProfilePhoto component:", userId);
+  const userId = useAuthStore((state) => state.userId);
 
-
-  console.log("User ID in ProfilePhoto component:", userId);
-
-useEffect(() => {
-  if (userId && userId !== "undefined") {
+  useEffect(() => {
+    if (!userId) return;
     fetchProfilePhoto(userId);
-  }
-}, [fetchProfilePhoto, userId]);
+  }, [fetchProfilePhoto, userId]);
 
   const handleButtonClick = () => {
-    fileInputref.current.click();
+    fileInputRef.current.click();
   };
 
-const handleFileChange = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file || !userId) return;
 
-  if (!file.type.startsWith('image/')) {
-    alert('Please select a valid image file.');
-    return;
-  }
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file.");
+      return;
+    }
 
-  const objectUrl = URL.createObjectURL(file);
-  setPreview(objectUrl);
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
 
-  uploadProfilePhoto(file, userId);
+    await uploadProfilePhoto(file, userId);
 
-  return () => URL.revokeObjectURL(objectUrl);
-};
+    setPreview(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
   return (
     <div className="flex flex-col items-center space-y-4">
       <div className="relative w-24 h-24 overflow-hidden border-4 border-white rounded-full shadow-md dark:border-gray-800 bg-orange-100 dark:bg-gray-800">
         <img
-          src={preview || userProfileUrl}
+          src={loading && preview ? preview : userProfileUrl}
           alt="Profile"
           className="object-cover w-full h-full"
         />
@@ -57,7 +59,7 @@ const handleFileChange = (event) => {
         type="file"
         className="hidden"
         accept="image/*"
-        ref={fileInputref}
+        ref={fileInputRef}
         onChange={handleFileChange}
       />
 
