@@ -101,11 +101,6 @@ export const useTaskCardStore = create((set) => ({
     }
   },
 
-  addTask: (task) =>
-    set((state) => ({
-      tasks: [...state.tasks, task],
-    })),
-
   fetchTasks: async (limit, page) => {
     set({ loading: true, error: null });
     try {
