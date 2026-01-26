@@ -39,10 +39,10 @@ const useHabitStore = create((set, get) => ({
         const completionState = habitToToggle.completed
         try {
             if (habitToToggle.completed) {
-                completeHabit(id)
+               await unCompleteHabit(id)
                 set((state)=> ({habitCompletions: state.habitCompletions -1}))
             } else {
-                unCompleteHabit(id)
+               await completeHabit(id)
                 set((state)=> ({habitCompletions: state.habitCompletions +1}))
 
             }
