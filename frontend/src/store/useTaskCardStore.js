@@ -1,41 +1,11 @@
 import { create } from "zustand";
+import { getTasks } from "../../services/tasksService";
 import api from "../../services/api";
 
-export  const useTaskCardStore = create((set) => ({
-  tasks: [
-    {
-      id: 1,
-      title: "Complete project proposal",
-      description: "This is the description part",
-      deadline: "Yesterday",
-      category: "Work",
-      done: false,
-    },
-    {
-      id: 2,
-      title: "Buy groceries for the week",
-      description: "This is the description part",
-      deadline: "Today",
-      category: "Personal",
-      done: false,
-    },
-    {
-      id: 3,
-      title: "Schedule dentist appointment",
-      description: "This is the description part",
-      deadline: "Tomorrow",
-      category: "Health",
-      done: false,
-    },
-    {
-      id: 4,
-      title: "Call Mom",
-      description: "This is the description part",
-      deadline: "No date",
-      category: "Family",
-      done: false,
-    },
-  ],
+export const useTaskCardStore = create((set) => ({
+  tasks: [],
+  loading: false,
+  error: null,
 
   loading: false,
   error: null,
@@ -47,19 +17,6 @@ export  const useTaskCardStore = create((set) => ({
     description: "",
     deadline: null,
     category: null,
-  },
-
-  completeTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, done: !task.done } : task,
-      ),
-    })),
-
-  deleteTask: (id) => {
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
-    }));
   },
 
   setModalOpen: () => {
@@ -144,4 +101,32 @@ export  const useTaskCardStore = create((set) => ({
     }
   },
 
+  addTask: (task) =>
+    set((state) => ({
+      tasks: [...state.tasks, task],
+    })),
+
+  fetchTasks: async (limit, page) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await getTasks(limit, page);
+
+      set({ tasks: response.data, loading: false });
+    } catch (err) {
+      set({ error: err?.message || "An error occurred", loading: false });
+    }
+  },
+  completeTask: (id) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) => {
+        return task._id === id
+          ? { ...task, status: task.status === "done" ? "todo" : "done" }
+          : task;
+      }),
+    })),
+
+  deleteTask: (id) =>
+    set((state) => ({
+      tasks: state.tasks.filter((task) => task._id !== id),
+    })),
 }));

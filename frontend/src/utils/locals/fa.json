@@ -56,6 +56,17 @@
   "Yesterday": "دیروز",
   "Tomorrow": "فردا",
   "No date": "تاریخ نامشخص",
+  "Loading": "درحال بارگذاری...",
+  "You have no tasks to show": "وظیفه‌ای برای نمایش وجود ندارد.",
+
+  "Your Progress": "روند شما",
+  "Overview of your consistency and growth.": "چشم اندازی به تمرکز و روند رشد شما.",
+  "TOTAL HABITS": "تعداد مجموعی عادت ها",
+  "CURRENT STREAK": "تداوم فعلی",
+  "COMPLETION RATE": "معادل تکمیلی",
+  "Export Data": "صدور داده",
+  "days": "روز",
+
   "This is the description part": "این بخش توضیحات است.",
 
   "Add New Task": "اضافه کردن عملیات جدید",
@@ -75,10 +86,9 @@
   "Category is required!": "کتگوری الزامی است!",
   "Task added successfully!": "عمیلات با موفقیت اضافه شد",
 
-  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد",
-
   "Chess": "شطرنج",
   "Other": "متفرقه",
   "Peach": "میوه جات",
-  "Study": "درس خواندن"
+  "Study": "درس خواندن",
+  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد"
 }

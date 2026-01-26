@@ -1,4 +1,3 @@
-
 {
   "welcome": "Welcome to React and react-i18next",
   "Settings": "Settings",
@@ -50,6 +49,14 @@
   "Yesterday": "Yesterday",
   "Tomorrow": "Tomorrow",
   "No date": "No date",
+  
+  "Your Progress": "Your Progress",
+  "Overview of your consistency and growth.": "Overview of your consistency and growth.",
+  "TOTAL HABITS": "TOTAL HABITS",
+  "CURRENT STREAK": "CURRENT STREAK",
+  "COMPLETION RATE": "COMPLETION RATE",
+  "Export Data": "Export Data",
+  "days": "days",
   "This is the description part": "This is the description part",
 
   "Add New Task": "Add New Task",
@@ -71,9 +78,9 @@
   "Sorry! could not save new task": "Sorry! could not save new task",
 
   "Loading": "Loading...",
-  "You have no tasks to show": "You have no tasks to show.",
   "Chess": "Chess",
   "Other": "Other",
   "Peach": "Peach",
-  "Study": "Study"
+  "Study": "Study",
+  "You have no tasks to show": "You have no tasks to show."
 }
