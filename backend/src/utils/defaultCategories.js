@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 const defaultCategories = [
   { name: 'sport', icon: 'sport', backgroundColor: '#ed6f07' },
   { name: 'health', icon: 'health', backgroundColor: '#82ed18' },
@@ -11,7 +13,7 @@ export function getDefaultCategories(userId) {
   const categories = [];
 
   defaultCategories.forEach((category) => {
-    categories.push({ ...category, userId });
+    categories.push({ ...category, userId, clientId: uuidv4() });
   });
 
   return categories;
