@@ -27,57 +27,52 @@ export default function AddTask() {
     }
   }, [isModalOpen, fetchCategories]);
 
+  const weekdays = [
+    { id: "d1", name: isRTL ? "شنبه" : "Saturday", day: 0 },
+    { id: "d2", name: isRTL ? "یکشنبه" : "Sunday", day: 1 },
+    { id: "d3", name: isRTL ? "دوشنبه" : "Monday", day: 2 },
+    { id: "d4", name: isRTL ? "سه‌شنبه" : "Tuesday", day: 3 },
+    { id: "d5", name: isRTL ? "چهارشنبه" : "Wednesday", day: 4 },
+    { id: "d6", name: isRTL ? "پنج‌شنبه" : "Thursday", day: 5 },
+    { id: "d7", name: isRTL ? "جمعه" : "Friday", day: 6 },
+  ];
+
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+
   const deadlineItems = [
     {
-      id: "d1",
+      id: "today",
       name: isRTL ? "امروز" : "Today",
-      value: isRTL ? "امروز" : "Today",
+      value: today.toISOString(),
     },
     {
-      id: "d2",
+      id: "tomorrow",
       name: isRTL ? "فردا" : "Tomorrow",
-      value: isRTL ? "فردا" : "Tomorrow",
+      value: tomorrow.toISOString(),
     },
-    {
-      id: "d3",
-      name: isRTL ? "شنبه" : "Saturday",
-      value: isRTL ? "شنبه" : "Saturday",
-    },
-    {
-      id: "d4",
-      name: isRTL ? "یکشنبه" : "Sunday",
-      value: isRTL ? "یکشنبه" : "Sunday",
-    },
-    {
-      id: "d5",
-      name: isRTL ? "دوشنبه" : "Monday",
-      value: isRTL ? "دوشنبه" : "Monday",
-    },
-    {
-      id: "d6",
-      name: isRTL ? "سه شنبه" : "Tuesday",
-      value: isRTL ? "سه شنبه" : "Tuesday",
-    },
-    {
-      id: "d7",
-      name: isRTL ? "چهارشنبه" : "Wednesday",
-      value: isRTL ? "چهارشنبه" : "Wednesday",
-    },
-    {
-      id: "d8",
-      name: isRTL ? "پنجشنبه" : "Thursday",
-      value: isRTL ? "پنجشنبه" : "Thursday",
-    },
-    {
-      id: "d9",
-      name: isRTL ? "جمعه" : "Friday",
-      value: isRTL ? "جمعه" : "Friday",
-    },
+    ...weekdays.map((w) => ({
+    id: w.id,
+    name: w.name,
+    value: getNextWeekdayDate(w.day).toISOString(),
+    })),
   ];
+
+  function getNextWeekdayDate(targetDay) {
+    const today = new Date();
+    const day = today.getDay();
+    let diff = targetDay - day;
+    if (diff <= 0) diff += 7;
+    const nextDate = new Date(today);
+    nextDate.setDate(today.getDate() + diff);
+    nextDate.setHours(0, 0, 0, 0);
+    return nextDate;
+  }
   
   const selectedCategoryName =
-    categories.find((cat) =>cat.value === taskData.category)?.name || "";
-  
+    categories.find((cat) => cat.value === taskData.category)?.name || "";
+
   const HandleTaskCreation = async (e) => {
     e.preventDefault();
 
@@ -91,7 +86,7 @@ export default function AddTask() {
       return;
     }
 
-    if (!taskData.deadline) {
+    if (!taskData.dueDate) {
       toast.error(t("Deadline is required!"));
       return;
     }
@@ -104,16 +99,16 @@ export default function AddTask() {
     const taskPayload = {
       title: taskData.title,
       description: taskData.description,
-      deadline: taskData.deadline,
+      dueDate: taskData.dueDate,
       categoryId: taskData.category,
     };
 
-    try{
+    try {
       await addTask(taskPayload);
 
       setTaskData("title", "");
       setTaskData("description", "");
-      setTaskData("deadline", "");
+      setTaskData("dueDate", "");
       setTaskData("category", "");
 
       setModalOpen();
@@ -206,8 +201,8 @@ export default function AddTask() {
                 <Dropdown
                   items={deadlineItems}
                   placeholder={t("Choose Deadline")}
-                  value={taskData.deadline || ""}
-                  getValue={(value) => setTaskData("deadline", value)}
+                  value={taskData.dueDate || ""}
+                  getValue={(value) => setTaskData("dueDate", value)}
                 />
 
                 <label>
