@@ -4,7 +4,7 @@ import { getProfilePicture, getUserPrefrences, updateUserPrefrences, uploadProfi
 const DEFAULT_AVATAR =
   'https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg';
 
-export const useProfilePhotoStore = create((set) => ({
+export const useProfilePhotoStore = create((set,get) => ({
   userProfileUrl: DEFAULT_AVATAR,
   loading: false,
   preferences: null,
@@ -34,7 +34,6 @@ export const useProfilePhotoStore = create((set) => ({
       set({ loading: true });
 
       await uploadProfilePicture(file);
-
       const res = await getProfilePicture(userId);
       if (res.data?.success && res.data?.data) {
         set({ userProfileUrl: res.data.data });
@@ -49,9 +48,7 @@ export const useProfilePhotoStore = create((set) => ({
 fetchUserPreferences: async () => {
   try {
     set({ loading: true });
-
     const res = await getUserPrefrences();
-
     if (res.data?.success) {
       set({ preferences: res.data.data });
     }
@@ -62,18 +59,33 @@ fetchUserPreferences: async () => {
   }
 },
 
-updateUserPrefrences: async (preferences) => {
+updateUserPrefrences: async (newSettings) => {
+  const currentPrefs = get().preferences || {};
+  const merged = { ...currentPrefs, ...newSettings };
+  const forbiddenFields = [
+    'timezone',
+    '_id',
+    '__v',
+    'userId',
+    'createdAt',
+    'updatedAt'
+  ];
+  const sanitizedPayload = Object.keys(merged).reduce((acc, key) => {
+    const value = merged[key];
+
+    if (!forbiddenFields.includes(key) && value !== null && value !== "") {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+
   try {
-    set({ loading: true });
-    const res = await updateUserPrefrences(null, preferences);
+    const res = await updateUserPrefrences(sanitizedPayload);
     if (res.data?.success) {
       set({ preferences: res.data.data });
     }
   } catch (err) {
-    console.error(err);
-  } finally {
-    set({ loading: false });
+    console.error("Backend Error Details:", err.response?.data);
   }
-  },
-
+},
 }));

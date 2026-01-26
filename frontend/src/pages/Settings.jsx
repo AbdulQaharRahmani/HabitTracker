@@ -15,35 +15,34 @@ const Settings = () => {
     updateUserPrefrences
   } = useProfilePhotoStore();
 
-  const [localPrefs, setLocalPrefs] = useState(null);
-
+const [localPrefs, setLocalPrefs] = useState(null);
   const debouncedPrefs = useDebounce(localPrefs, 700);
-  const isInitialLoad = useRef(true);
-
+  const hasInitialized = useRef(false);
   useEffect(() => {
     fetchUserPreferences();
-  }, [fetchUserPreferences]);
+  }, []);
 
-  useEffect(() => {
-    if (!preferences) return;
+useEffect(() => {
+  if (preferences && !hasInitialized.current) {
+    const cleanInitial = Object.fromEntries(
+      Object.entries(preferences).filter(([_, v]) => v !== null)
+    );
+    setLocalPrefs(cleanInitial);
 
-    setLocalPrefs(preferences);
+    if (preferences.theme) setTheme(preferences.theme);
+    hasInitialized.current = true;
+  }
+}, [preferences, setTheme]);
 
-    if (preferences.theme) {
-      setTheme(preferences.theme);
+useEffect(() => {
+  if (hasInitialized.current && debouncedPrefs) {
+    const prefsToSend = { ...debouncedPrefs };
+    if (prefsToSend.timezone === null) {
+      delete prefsToSend.timezone;
     }
-  }, [preferences, setTheme]);
-
-  useEffect(() => {
-    if (!debouncedPrefs) return;
-
-    if (isInitialLoad.current) {
-      isInitialLoad.current = false;
-      return;
-    }
-
-    updateUserPrefrences(debouncedPrefs);
-  }, [debouncedPrefs, updateUserPrefrences]);
+    updateUserPrefrences(prefsToSend);
+  }
+}, [debouncedPrefs]);
 
   if (!localPrefs) return null;
 

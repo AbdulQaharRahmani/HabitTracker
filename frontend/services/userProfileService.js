@@ -11,7 +11,7 @@ export const uploadProfilePicture = (file) => {
 };
 
 
-export const updateUserPrefrences = (userId, preferences) => {
+export const updateUserPrefrences = (preferences) => {
   return api.put(`/users/preference`, preferences);
 }
 
