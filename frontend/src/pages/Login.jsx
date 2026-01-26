@@ -4,6 +4,7 @@ import { MdEmail, MdLock } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import toast from "react-hot-toast";
+import useAuthStore from "../store/useAuthStore";
 
 export default function Login() {
   const [passwordType, setPasswordType] = useState("password");
@@ -11,48 +12,39 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
+    const handlePasswordVisibility = () => {
+        setPasswordType((prev) => (prev === "password" ? "text" : "password"));
+    };
+    const navigate = useNavigate();
+    const {login} = useAuthStore()
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        if (!email.trim() || !password.trim()) return toast.error("Please fill all fields!");
+        setLoading(true);
+        try {
+            const response = await api.post("/auth/login", { email, password })
+            const token = response.data.data.token
+            if(token){
+            login(token)
+            toast.success("Welcome again!");
+            navigate("/")
+            }
 
-  const handlePasswordVisibility = () => {
-    setPasswordType((prev) => (prev === "password" ? "text" : "password"));
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (!email.trim() || !password.trim())
-      return toast.error("Please fill all fields!");
-
-    setLoading(true);
-    try {
-      const response = await api.post("/auth/login", { email, password });
-      const token = response.data.data.token;
-
-      if (token) localStorage.setItem("token", token);
-
-      toast.success("Welcome again!");
-      navigate("/");
-    } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Unknown Error";
-      toast.error(`${JSON.stringify(message)}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4
-      bg-[#F0F8FF] dark:bg-gray-950 transition-colors"
-    >
-      <div
-        className="w-full max-w-md p-10 rounded-[2rem] border
-        bg-white dark:bg-gray-900
-        border-[#7B68EE]/30 dark:border-[#7B68EE]/40
-        shadow-[0_20px_50px_rgba(123,104,238,0.2),_0_-10px_30px_rgba(0,212,170,0.1)]
-        dark:shadow-[0_20px_60px_rgba(0,0,0,0.6)]
+        } catch (error) {
+            console.log(`Could not login ${error}`);
+            const message = error.response?.data?.message || error.response?.data?.error || "Unknown Error";
+            toast.error(`${JSON.stringify(message)}`)
+        } finally {
+            setLoading(false);
+        }
+    };
+    return (
+        <div
+            className="min-h-screen flex items-center justify-center p-4"
+            style={{ backgroundColor: "#F0F8FF" }}
+        >
+            <div
+                className="bg-white p-10 rounded-[2rem]  w-full max-w-md shadow-[0_20px_50px_rgba(123,104,238,0.2),_0_-10px_30px_rgba(0,212,170,0.1)] hover:shadow-[0_30px_60px_rgba(123,104,238,0.3),_0_-10px_30px_rgba(0,212,170,0.15)]
         transition-all"
       >
         {/* Header */}
