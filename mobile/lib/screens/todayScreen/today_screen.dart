@@ -229,13 +229,13 @@ class _TodayScreenState extends State<TodayScreen> {
   Widget _shimmerBox(
       {double height = 16, double width = double.infinity, BorderRadius? borderRadius}) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppTheme.shadow,
+      highlightColor: AppTheme.textWhite,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.textPrimary,
           borderRadius: borderRadius ?? BorderRadius.circular(8.r),
         ),
       ),
@@ -249,13 +249,13 @@ class _TodayScreenState extends State<TodayScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor:AppTheme.shadow,
+            highlightColor: AppTheme.textWhite,
             child: Container(
               width: 42.w,
               height: 42.w,
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 shape: BoxShape.circle,
               ),
             ),
@@ -279,13 +279,13 @@ class _TodayScreenState extends State<TodayScreen> {
           ),
           SizedBox(width: 10.w),
           Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor:AppTheme.shadow,
+            highlightColor: AppTheme.textWhite,
             child: Container(
               width: 36.w,
               height: 36.w,
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 shape: BoxShape.circle,
               ),
             ),

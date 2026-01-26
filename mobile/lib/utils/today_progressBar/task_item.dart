@@ -74,7 +74,7 @@ class TaskItem {
   });
 
   // ---------------------------------------------------------------------------
-  // FACTORY (TASK ONLY – بدون تغییر رفتار تسک)
+  // FACTORY
   // ---------------------------------------------------------------------------
 
   factory TaskItem.fromApiJson(Map<String, dynamic> json, DateTime forDate) {

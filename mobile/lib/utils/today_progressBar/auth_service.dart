@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart'; // For DateUtils if not already imported elsewhere
+import 'package:flutter/material.dart';
 
 import 'task_item.dart';
 
@@ -102,7 +102,6 @@ class ApiService {
 
         late http.Response res;
 
-        // ارسال بر اساس مقدار واقعی toggle
         if (!item.done) {
           // COMPLETE → POST
           res = await http.post(url, headers: headers, body: jsonEncode({"date": date}));
@@ -114,7 +113,7 @@ class ApiService {
         print("📥 Response: ${res.statusCode} ${res.body}");
 
         if (res.statusCode == 200 || res.statusCode == 201) {
-          item.done = !item.done; // فقط بعد از موفقیت
+          item.done = !item.done;
           return true;
         } else if (!item.done && res.statusCode == 400 && (jsonDecode(res.body)['code'] ?? '') == 'ALREADY_COMPLETED') {
           item.done = true; // Sync state if already completed
