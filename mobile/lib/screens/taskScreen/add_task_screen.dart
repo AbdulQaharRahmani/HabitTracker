@@ -56,14 +56,16 @@ class _NewTaskPageState extends State<NewTaskPage> {
       setState(() {
         _token = token;
         _categories = categories;
-        _selectedCategoryId = _categories.isNotEmpty ? _categories.first.id : null;
+        _selectedCategoryId = _categories.isNotEmpty
+            ? _categories.first.id
+            : null;
         _isTokenLoading = false;
       });
     } catch (e) {
       setState(() => _isTokenLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching categories: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error fetching categories: $e')));
     }
   }
 
@@ -99,7 +101,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       if (!mounted) return;
 
       if (res['success'] == true) {
-              Navigator.pop(context, res['data']);
+        Navigator.pop(context, res['data']);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(res['error'] ?? 'Failed to create task')),
@@ -107,9 +109,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error creating task: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error creating task: $e')));
     } finally {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -124,7 +126,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
       setState(() => _isLoading = true);
 
       // ===== Create category on server =====
-      final CategoryModel newCategory = await _categoryApi.createCategory(model);
+      final CategoryModel newCategory = await _categoryApi.createCategory(
+        model,
+      );
 
       setState(() {
         // ===== Add new category to local list =====
@@ -142,9 +146,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error creating category: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error creating category: $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -198,13 +202,13 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
-                  'Create Task',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.surface,
-                  ),
-                ),
+                        'Create Task',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.surface,
+                        ),
+                      ),
               ),
             ),
           ],
@@ -228,7 +232,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, int maxLines) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint,
+    int maxLines,
+  ) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
@@ -255,14 +263,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
         child: DropdownButton<String>(
           value: _selectedPriority,
           isExpanded: true,
-          items: _priorities.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+          items: _priorities
+              .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+              .toList(),
           onChanged: (val) => setState(() => _selectedPriority = val!),
         ),
       ),
     );
   }
-
-
 
   Widget _buildCategoryDropdown() {
     if (_categories.isEmpty) {
@@ -277,17 +285,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black.withValues(alpha: 0.06),
-        //     blurRadius: 10,
-        //     offset: const Offset(0, 4),
-        //   ),
-        // ],
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
-        ),
+
+        border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -319,11 +318,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        cat.icon,
-                        color: Colors.white,
-                        size: 18,
-                      ),
+                      child: Icon(cat.icon, color: Colors.white, size: 18),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -344,10 +339,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
               value: 'add_new',
               child: Row(
                 children: [
-                  Icon(
-                    Icons.add_circle_outline_rounded,
-                    color: Colors.blue,
-                  ),
+                  Icon(Icons.add_circle_outline_rounded, color: Colors.blue),
                   SizedBox(width: 10),
                   Text(
                     'Add new category',
