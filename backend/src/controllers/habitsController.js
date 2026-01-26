@@ -8,9 +8,10 @@ import {
 import { HabitModel } from '../models/Habit.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
 import { DateHelper } from '../utils/date.js';
-import { HabitCompletionModel } from '../models/HabitCompletion.js';
 import { CategoryModel } from '../models/Category.js';
+import { HabitCompletionModel } from '../models/habitCompletion.js';
 import { ERROR_CODES } from '../utils/constant.js';
+import { v4 as uuidv4 } from 'uuid';
 
 // Get all user habits
 export const getHabits = async (req, res) => {
@@ -107,6 +108,8 @@ export const createHabit = async (req, res) => {
     frequency,
     order: habitCount + 1,
     categoryId,
+    clientId: uuidv4(),
+    startDate: new Date(),
   });
 
   res.status(201).json({
