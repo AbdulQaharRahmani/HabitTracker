@@ -15,7 +15,7 @@ export const useTaskCardStore = create((set) => ({
   taskData: {
     title: "",
     description: "",
-    deadline: null,
+    dueDate: null,
     category: null,
   },
 
@@ -25,7 +25,7 @@ export const useTaskCardStore = create((set) => ({
       taskData: {
         title: "",
         description: "",
-        deadline: null,
+        dueDate: null,
         category: null,
       },
     }));
@@ -63,12 +63,13 @@ export const useTaskCardStore = create((set) => ({
   },
 
   addTask: async (taskPayload) => {
-    
     try {
+      const date = new Date(taskPayload.dueDate);
+
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
-        deadline: taskPayload.deadline,
+        dueDate: date.toISOString(), 
         categoryId: taskPayload.categoryId, //for backend
       };
 
@@ -83,10 +84,10 @@ export const useTaskCardStore = create((set) => ({
           tasks: [
             ...state.tasks,
             {
-              id: res.data?.data?._id || Date.now(),
+              _id: res.data.data._id,
               title: taskPayload.title,
               description: taskPayload.description,
-              deadline: taskPayload.deadline,
+              dueDate: taskPayload.dueDate,
               category: categoryName, //for UI
               done: false,
             },
