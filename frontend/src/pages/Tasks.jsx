@@ -15,7 +15,6 @@ function Tasks() {
   const ITEMS_PER_PAGE = 20;
   useEffect(() => {
     fetchTasks(ITEMS_PER_PAGE, page);
-    console.log("tasks", tasks);
   }, [page]);
 
   const { t } = useTranslation();

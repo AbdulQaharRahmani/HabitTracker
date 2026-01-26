@@ -5,7 +5,14 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "../../utils/formatDate";
 import i18n from "../../utils/i18n";
 
-export default function TaskCard({ title, categoryId, dueDate, status, _id }) {
+export default function TaskCard({
+  title,
+  categoryId,
+  dueDate,
+  description,
+  status,
+  _id,
+}) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
 
