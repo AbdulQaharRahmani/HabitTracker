@@ -56,6 +56,15 @@
   "Yesterday": "دیروز",
   "Tomorrow": "فردا",
   "No date": "تاریخ نامشخص",
+
+  "Your Progress": "روند شما",
+  "Overview of your consistency and growth.": "چشم اندازی به تمرکز و روند رشد شما.",
+  "TOTAL HABITS": "تعداد مجموعی عادت ها",
+  "CURRENT STREAK": "تداوم فعلی",
+  "COMPLETION RATE": "معادل تکمیلی",
+  "Export Data": "صدور داده",
+  "days": "روز",
+
   "This is the description part": "این بخش توضیحات است.",
 
   "Add New Task": "اضافه کردن عملیات جدید",
