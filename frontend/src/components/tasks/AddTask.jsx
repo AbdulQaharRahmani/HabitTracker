@@ -8,9 +8,10 @@ import i18n from "../../utils/i18n";
 
 export default function AddTask() {
   const { t } = useTranslation();
-  const isRTL = i18n.language === "fa"
+  const isRTL = i18n.language === "fa";
 
-  const { isModalOpen, setModalOpen, taskData, setTaskData, addTask } = useTaskCardStore();
+  const { isModalOpen, setModalOpen, taskData, setTaskData, addTask } =
+    useTaskCardStore();
 
   const deadlineItems = [
     {
@@ -95,7 +96,7 @@ export default function AddTask() {
       id: "c7",
       name: isRTL ? "یادگیری" : "Learning",
       value: isRTL ? "یادگیری" : "Learning",
-    }
+    },
   ];
 
   const HandleTaskCreation = (e) => {
@@ -129,7 +130,7 @@ export default function AddTask() {
       category: taskData.category,
       done: false,
     };
-    try{
+    try {
       addTask(newTask);
 
       setTaskData("title", "");
@@ -141,7 +142,7 @@ export default function AddTask() {
       toast.success(t("Task added successfully!"));
     } catch (error) {
       toast.error(t("Sorry! could not save new task", error));
-    } 
+    }
   };
 
   return (
@@ -190,9 +191,7 @@ export default function AddTask() {
                 <input
                   type="text"
                   id="title"
-                  placeholder={
-                    t("Enter task title")
-                  }
+                  placeholder={t("Enter task title")}
                   value={taskData.title}
                   onChange={(e) => setTaskData("title", e.target.value)}
                   className={`
@@ -209,9 +208,7 @@ export default function AddTask() {
                 <label htmlFor="description">{t("Description")}</label>
                 <textarea
                   id="description"
-                  placeholder={
-                    t("Enter task description")
-                  }
+                  placeholder={t("Enter task description")}
                   value={taskData.description}
                   onChange={(e) => setTaskData("description", e.target.value)}
                   className="
@@ -230,9 +227,7 @@ export default function AddTask() {
                 </label>
                 <Dropdown
                   items={deadlineItems}
-                  placeholder={
-                    t("Choose Deadline")
-                  }
+                  placeholder={t("Choose Deadline")}
                   value={taskData.deadline || ""}
                   getValue={(value) => setTaskData("deadline", value)}
                 />
@@ -242,9 +237,7 @@ export default function AddTask() {
                 </label>
                 <Dropdown
                   items={categoryItems}
-                  placeholder={
-                    t("Choose Category")
-                  }
+                  placeholder={t("Choose Category")}
                   value={taskData.category || ""}
                   getValue={(value) => setTaskData("category", value)}
                 />

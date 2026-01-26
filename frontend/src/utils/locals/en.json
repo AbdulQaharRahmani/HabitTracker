@@ -1,4 +1,3 @@
-
 {
   "welcome": "Welcome to React and react-i18next",
   "Settings": "Settings",
@@ -76,5 +75,7 @@
   "Deadline is required!": "Deadline is required!",
   "Category is required!": "Category is required!",
   "Task added successfully!": "Task added successfully!",
-  "Sorry! could not save new task": "Sorry! could not save new task"
+  "Sorry! could not save new task": "Sorry! could not save new task",
+  "Loading": "Loading...",
+  "You have no tasks to show": "You have no tasks to show."
 }
