@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
 
+
 class LoginController extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
 
@@ -8,7 +9,6 @@ class LoginController extends ChangeNotifier {
   final passwordController = TextEditingController();
 
   final AuthService _authService = AuthService();
-
   bool isLoading = false;
   String? errorMessage;
 
