@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 class DateSelector extends StatelessWidget {
-  final List<DateTime> weekDates;
+  final List<DateTime> dates;
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateSelected;
+  final ScrollController controller;
 
   const DateSelector({
     super.key,
-    required this.weekDates,
+    required this.dates,
     required this.selectedDate,
     required this.onDateSelected,
+    required this.controller,
   });
 
   @override
@@ -19,11 +22,12 @@ class DateSelector extends StatelessWidget {
     return SizedBox(
       height: 80.h,
       child: ListView.separated(
+        controller: controller,
         scrollDirection: Axis.horizontal,
-        itemCount: weekDates.length,
-        separatorBuilder: (_, __) =>  SizedBox(width: 8.w),
+        itemCount: dates.length,
+        separatorBuilder: (_, __) => SizedBox(width: 8.w),
         itemBuilder: (context, index) {
-          final date = weekDates[index];
+          final date = dates[index];
           final isSelected = DateUtils.isSameDay(date, selectedDate);
 
           return GestureDetector(
@@ -40,17 +44,19 @@ class DateSelector extends StatelessWidget {
                   Text(
                     DateFormat.E().format(date),
                     style: TextStyle(
-                      color: isSelected ? AppTheme.surface : AppTheme.textMuted,
-                      fontWeight: isSelected ? FontWeight.bold : null,
+                      color:
+                      isSelected ? AppTheme.surface : AppTheme.textMuted,
                     ),
                   ),
-                   SizedBox(height: 4.h),
+                  SizedBox(height: 4.h),
                   Text(
                     '${date.day}',
                     style: TextStyle(
-                      fontSize: 18.w,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? AppTheme.textWhite : AppTheme.textPrimary,
+                      color: isSelected
+                          ? AppTheme.textWhite
+                          : AppTheme.textPrimary,
                     ),
                   ),
                 ],
