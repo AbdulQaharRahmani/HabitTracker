@@ -1,4 +1,3 @@
-
 {
   "welcome": "Welcome to React and react-i18next",
   "Settings": "Settings",
@@ -49,5 +48,34 @@
   "Call Mom": "Call Mom",
   "Yesterday": "Yesterday",
   "Tomorrow": "Tomorrow",
-  "No date": "No date"
+  "No date": "No date",
+  
+  "Your Progress": "Your Progress",
+  "Overview of your consistency and growth.": "Overview of your consistency and growth.",
+  "TOTAL HABITS": "TOTAL HABITS",
+  "CURRENT STREAK": "CURRENT STREAK",
+  "COMPLETION RATE": "COMPLETION RATE",
+  "Export Data": "Export Data",
+  "days": "days",
+  "This is the description part": "This is the description part",
+
+  "Add New Task": "Add New Task",
+  "Title": "Title",
+  "Description": "Description",
+  "Deadline": "Deadline",
+  "Category": "Category",
+  "Save": "Save",
+  "Cancel": "Cancel",
+  "Enter task title": "Enter task title",
+  "Enter task description": "Enter task description",
+  "Choose Deadline": "Choose Deadline",
+  "Choose Category": "Choose Category",
+  "Title is required!": "Title is required!",
+  "Descripton is required!": "Descripton is required!",
+  "Deadline is required!": "Deadline is required!",
+  "Category is required!": "Category is required!",
+  "Task added successfully!": "Task added successfully!",
+  "Sorry! could not save new task": "Sorry! could not save new task",
+  "Loading": "Loading...",
+  "You have no tasks to show": "You have no tasks to show."
 }
