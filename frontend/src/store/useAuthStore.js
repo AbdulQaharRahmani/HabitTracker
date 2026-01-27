@@ -5,12 +5,13 @@ const useAuthStore = create(
   persist(
     (set) => ({
       token: null,
+      userId: null,
       isAuthenticated: false,
 
-      login: (token) => {
-        localStorage.setItem("token", token)
+      login: (token, id) => {
         set({
-          token: token,
+          token,
+          userId: id,
           isAuthenticated: true,
         });
       },
@@ -18,6 +19,7 @@ const useAuthStore = create(
       logout: () => {
         set({
           token: null,
+          userId: null,
           isAuthenticated: false,
         });
         localStorage.removeItem("auth-data");
