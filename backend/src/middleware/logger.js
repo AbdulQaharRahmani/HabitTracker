@@ -1,5 +1,4 @@
 import logger from '../utils/logger.js';
-import { createLog } from '../controllers/logController.js';
 
 export const logMiddleware = (req, res, next) => {
   const start = Date.now();
@@ -10,7 +9,7 @@ export const logMiddleware = (req, res, next) => {
       method: req.method,
       path: req.originalUrl,
       statusCode: res.statusCode,
-      duration: `${duration}ms`,
+      duration: duration,
       userId: req.user?._id.toString(),
       clientIp:
         req.ip ||
@@ -21,25 +20,10 @@ export const logMiddleware = (req, res, next) => {
 
     if (res.statusCode >= 500) {
       logger.error('Request failed', logData);
-      await createLog({
-        level: 'error',
-        message: 'Request failed',
-        metadata: logData,
-      });
     } else if (res.statusCode >= 400) {
       logger.warn('Request client error', logData);
-      await createLog({
-        level: 'warn',
-        message: 'Request client error',
-        metadata: logData,
-      });
     } else {
       logger.info('Request completed', logData);
-      await createLog({
-        level: 'info',
-        message: 'Request completed',
-        metadata: logData,
-      });
     }
   });
 
