@@ -79,7 +79,7 @@ export const loginUser = async (req, res) => {
     );
   }
 
-  const token = generateAccessToken(user._id);
+  const token = generateAccessToken(user);
   const refreshToken = generateRefreshToken();
   const hashedToken = hashRefreshToken(refreshToken);
 
@@ -89,9 +89,7 @@ export const loginUser = async (req, res) => {
   const existingToken = await refreshTokenModel.findOne({ userId: user._id });
 
   if (existingToken) {
-    ((existingToken.token = hashedToken),
-      (existingToken.expiresAt = expiresAt),
-      await existingToken.save());
+    await existingToken.set({token: hashedToken, expiresAt}).save()
   } else {
     await refreshTokenModel.create({
       userId: user._id,
@@ -100,11 +98,12 @@ export const loginUser = async (req, res) => {
     });
   }
 
+  const isProduction = process.env.NODE_ENV === 'production';
   // send token in cookie
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -173,7 +172,7 @@ export const googleLogin = async (req, res) => {
     await user.save();
   }
 
-  const token = generateAccessToken(user._id);
+  const token = generateAccessToken(user);
   const refreshToken = generateRefreshToken();
   const hashedToken = hashRefreshToken(refreshToken);
 
@@ -183,9 +182,7 @@ export const googleLogin = async (req, res) => {
   const existingToken = await refreshTokenModel.findOne({ userId: user._id });
 
   if (existingToken) {
-    ((existingToken.token = hashedToken),
-      (existingToken.expiresAt = expiresAt),
-      await existingToken.save());
+    await existingToken.set({token: hashedToken, expiresAt}).save()
   } else {
     await refreshTokenModel.create({
       userId: user._id,
@@ -194,13 +191,14 @@ export const googleLogin = async (req, res) => {
     });
   }
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  // send token in cookie
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
-
   res.status(200).json({
     success: true,
     message: 'Login Successfully',
@@ -226,7 +224,10 @@ export const refreshAccessToken = async (req, res) => {
 
   await refreshTokenModel.deleteOne({ token: hashedToken }); //delete previous hashed token
 
-  const accessToken = generateAccessToken(storeToken.userId);
+  const user = await UserModel.findById({_id: storeToken.userId})
+  if(!user) throw unauthorized()
+
+  const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken();
 
   await refreshTokenModel.create({
@@ -235,10 +236,12 @@ export const refreshAccessToken = async (req, res) => {
     expiresAt: storeToken.expiresAt,
   });
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  // send token in cookie
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
