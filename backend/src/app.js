@@ -7,6 +7,7 @@ import userRoutes from './routes/user.js';
 import taskRoutes from './routes/task.js';
 import logRoutes from './routes/log.js';
 import categoryRoutes from './routes/categories.js';
+import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import { logMiddleware } from './middleware/logger.js';
@@ -41,6 +42,7 @@ app.use('/api/habits', authMiddleware, habitRoutes);
 app.use('/api/tasks', authMiddleware, taskRoutes);
 app.use('/api/users', authMiddleware, userRoutes);
 app.use('/api/logs', authMiddleware, logRoutes);
+app.use('/api/offline-data', authMiddleware, syncRoutes);
 
 //#endregion
 

@@ -7,6 +7,7 @@ import { AiOutlineMail } from "react-icons/ai";
 import { SlLock } from "react-icons/sl";
 import { FaEye, FaRegEyeSlash, FaApple } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import useAuthStore from "../store/useAuthStore";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ function SignUp() {
   const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState({});
-
+   const {login} = useAuthStore()
   const signupUserHandler = async (e) => {
     e.preventDefault();
 
@@ -37,7 +38,9 @@ function SignUp() {
       });
 
       setMessage({ text: res.message, type: "success" });
-      if (res.token) localStorage.setItem("token", res.token);
+      if (res.token){
+        login(token)
+      }
       resetHandler();
       setTimeout(() => navigate("/"), 500);
     } catch (err) {
