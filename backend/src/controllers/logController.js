@@ -36,9 +36,8 @@ export const getLogs = async (req, res) => {
   }
 
   if (req.query.search) {
-    logs = logs.filter((log) =>
-      log.message.toLowerCase().includes(req.query.search)
-    );
+    const searchTerm = req.query.search.toLowerCase();
+    logs = logs.filter((log) => log.message.toLowerCase().includes(searchTerm));
   }
 
   res.status(200).json({
