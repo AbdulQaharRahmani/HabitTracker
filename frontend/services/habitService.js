@@ -11,4 +11,7 @@ export const completeHabit = async (id)=>{
 export const unCompleteHabit = async (id)=>{
    await api.delete(`/habits/${id}/complete`)
 }
-
+export const getHabitsChartData = async ()=>{
+   const response = await api.get("/habits/dashboard/chart-data")
+   return response.data.data
+}

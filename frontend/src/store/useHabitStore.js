@@ -1,7 +1,8 @@
 import { create } from "zustand"
 import api from "../../services/api"
 import toast from "react-hot-toast";
-import { completeHabit, getHabitsByDate, unCompleteHabit } from "../../services/habitService";
+import { completeHabit, getHabitsByDate, getHabitsChartData, unCompleteHabit } from "../../services/habitService";
+import { binarySearchDatePoints } from "../utils/binarySearchDatePoints"
 const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
@@ -16,7 +17,7 @@ const useHabitStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             const habits = await getHabitsByDate(get().selectedDate);
-            const completionsCount = habits.filter(habit=> habit.completed).length
+            const completionsCount = habits.filter(habit => habit.completed).length
             set({ habits, loading: false, habitCompletions: completionsCount });
         } catch (err) {
             console.log(err)
@@ -27,33 +28,33 @@ const useHabitStore = create((set, get) => ({
         }
     },
     toggleHabit: async (id) => {
-        if(get().selectedDate.toDateString() !== new Date().toDateString()){
+        if (get().selectedDate.toDateString() !== new Date().toDateString()) {
             return toast.error("You can only mark today's habit as completed or uncompleted")
         }
-       const habitToToggle = get().habits.find(habit=> habit._id === id)
+        const habitToToggle = get().habits.find(habit => habit._id === id)
+        const completionState = habitToToggle.completed
         set((state) => ({
             habits: state.habits.map((habit) =>
                 habit._id === id ? { ...habit, completed: !habit.completed } : habit
             ),
         }));
-        const completionState = habitToToggle.completed
         try {
             if (habitToToggle.completed) {
-               await unCompleteHabit(id)
-                set((state)=> ({habitCompletions: state.habitCompletions -1}))
+                await unCompleteHabit(id)
+                set((state) => ({ habitCompletions: state.habitCompletions - 1 }))
             } else {
-               await completeHabit(id)
-                set((state)=> ({habitCompletions: state.habitCompletions +1}))
+                await completeHabit(id)
+                set((state) => ({ habitCompletions: state.habitCompletions + 1 }))
 
             }
 
         } catch (err) {
             console.log(err)
             set((state) => ({
-            habits: state.habits.map((habit) =>
-                habit._id === id ? { ...habit, completed: completionState } : habit
-            ),
-        }));
+                habits: state.habits.map((habit) =>
+                    habit._id === id ? { ...habit, completed: completionState } : habit
+                ),
+            }));
 
         }
     },
@@ -180,6 +181,77 @@ const useHabitStore = create((set, get) => ({
             }
         }))
     },
+    chartData: [],
+    dailyStatistics: [],
+    monthlyStatistics: [],
+    yearlyStatistics: [],
+
+    getChartData: async () => {
+        const data = await getHabitsChartData()
+        set({ chartData: data })
+
+    },
+    getDailyStatistics: () => {
+        const date = new Date()
+        date.setDate(date.getDate() - 6)
+        const startDate = date
+        const endDate = new Date()
+        endDate.setTime(0, 0, 0, 0)
+        const startIndex = binarySearchDatePoints(get().chartData, startDate)
+        const endIndex = binarySearchDatePoints(get().chartData, endDate)
+        const dataForDays = get().chartData.slice(startIndex, endIndex)
+        const dailyStatistics = dataForDays.reduce((acc, day) => {
+            const weekday = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+            acc[weekday] = (acc[weekday] || 0) + day.completed
+            return acc
+        }, {})
+        const formattedData = Object.keys(dailyStatistics).map(key => ({
+            name: key,
+            completed: dailyStatistics[key]
+        }));
+        set({ dailyStatistics: formattedData })
+    },
+    getMonthlyStatistics: () => {
+        const date = new Date()
+        date.setMonth(date.getMonth() - 6)
+        const startDate = date
+        const endDate = new Date()
+        endDate.setTime(0, 0, 0, 0)
+        const startIndex = binarySearchDatePoints(get().chartData, startDate)
+        const endIndex = binarySearchDatePoints(get().chartData, endDate)
+        const dataForMonths = get().chartData.slice(startIndex, endIndex)
+        const monthlyStatistics = dataForMonths.reduce((acc, day) => {
+            const monthName = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short' });
+            acc[monthName] = (acc[monthName] || 0) + day.completed
+            return acc
+        }, {})
+        const formattedData = Object.keys(monthlyStatistics).map(key => ({
+            name: key,
+            completed: monthlyStatistics[key]
+        }));
+        set({ monthlyStatistics: formattedData })
+    },
+    getYearlyStatistics: () => {
+        const date = new Date()
+        date.setFullYear(date.getFullYear() - 3)
+        const startDate = date
+        const endDate = new Date()
+        endDate.setTime(0, 0, 0, 0)
+        const startIndex = binarySearchDatePoints(get().chartData, startDate)
+        const endIndex = binarySearchDatePoints(get().chartData, endDate)
+        const dataForYears = get().chartData.slice(startIndex, endIndex)
+        console.log("Years", dataForYears)
+        const yearlyStatistics = dataForYears.reduce((acc, day) => {
+            const year = day.date.split('-')[0];
+            acc[year] = (acc[year] || 0) + day.completed;
+            return acc;
+        }, {})
+        const formattedData = Object.keys(yearlyStatistics).map(key => ({
+            name: key,
+            completed: yearlyStatistics[key]
+        }));
+        set({ yearlyStatistics: formattedData })
+    }
 }))
 
 export default useHabitStore
