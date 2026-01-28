@@ -11,16 +11,18 @@ import '../screens/splashScreen/splash_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
-  static const signup = '/signup';
+
   static const login = '/login';
+  static const signup = '/signup';
   static const home = '/home';
   static const profile = '/profile';
   static const setting="/setting";
 
   static final Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
-    signup: (context) => const SignUpScreen(),
+
     login: (context) => const LoginScreen(),
+    signup: (context) => const SignUpScreen(),
     home: (context) => const HomeScreen(),
     profile: (context) => const ProfileScreen(),
     setting:(context)=> const SettingScreen(),
