@@ -1,5 +1,5 @@
 import { DateHelper } from '../utils/date.js';
-import { getDatesBetween, readLogsByDate } from '../utils/log.js';
+import { getDatesBetween, getTop, readLogsByDate } from '../utils/log.js';
 
 export const getLogs = async (req, res) => {
   const [startDate, endDate] = DateHelper.getStartAndEndOfDate(
@@ -14,6 +14,31 @@ export const getLogs = async (req, res) => {
 
   for (const date of dates) {
     logs.push(...readLogsByDate(date));
+  }
+
+  // Filtering section
+  if (req.query.level) {
+    logs = logs.filter((log) => log.level === req.query.level);
+  }
+
+  if (req.query.method) {
+    logs = logs.filter((log) => log.method === req.query.method);
+  }
+
+  if (req.query.sort) {
+    if (req.query.sort === 'newest') {
+      logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    if (req.query.sort === 'oldest') {
+      logs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    }
+  }
+
+  if (req.query.search) {
+    logs = logs.filter((log) =>
+      log.message.toLowerCase().includes(req.query.search)
+    );
   }
 
   res.status(200).json({
@@ -44,8 +69,11 @@ export const getLogStats = async (req, res) => {
     info: logs.filter((l) => l.level === 'info').length,
   };
 
+  const topRoutes = getTop(logs, 'path', 5);
+  const topUsedDevices = getTop(logs, 'userAgent', 5);
+
   res.status(200).json({
     success: true,
-    data: stats,
+    data: { stats, topRoutes, topUsedDevices },
   });
 };
