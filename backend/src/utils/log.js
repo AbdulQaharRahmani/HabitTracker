@@ -36,3 +36,17 @@ export const readLogsByDate = (date) => {
 
   return logs;
 };
+
+export const getTop = (items, key, limit = 5) => {
+  const map = {};
+
+  for (let item of items) {
+    if (!item[key]) continue;
+    map[item[key]] = (map[item[key]] || 0) + 1;
+  }
+
+  return Object.entries(map)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+};
