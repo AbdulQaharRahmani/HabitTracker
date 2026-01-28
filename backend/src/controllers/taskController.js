@@ -54,7 +54,7 @@ export const getTasks = async (req, res) => {
   const totalPages = Math.ceil(tasksTotal / limit);
 
   const tasks = await TaskModel.find({ userId: req.user._id, isDeleted: false })
-    .sort({ createdAt: -1 }) // Sort from latest to oldest
+    .sort({ dueDate: 1 }) // Sort from oldest to latest
     .skip(skip)
     .limit(limit)
     .populate('categoryId', 'name icon backgroundColor');
