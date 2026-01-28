@@ -7,7 +7,7 @@ export const logMiddleware = (req, res, next) => {
     const duration = Date.now() - start;
     const logData = {
       method: req.method,
-      path: req.originalUrl,
+      path: req.originalUrl.split('?')[0],
       statusCode: res.statusCode,
       duration: duration,
       userId: req.user?._id.toString(),
