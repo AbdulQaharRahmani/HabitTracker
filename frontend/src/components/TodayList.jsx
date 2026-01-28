@@ -13,13 +13,23 @@ const iconMap = {
 };
 
 const TodayList = () => {
-  const { habits, loading, error, fetchTodayHabits, toggleHabit } =
+  const { habits, loading, error, fetchHabitsByDate, toggleHabit } =
     useHabitStore();
 
   useEffect(() => {
-    fetchTodayHabits();
-  }, [fetchTodayHabits]);
-
+    fetchHabitsByDate();
+  }, [fetchHabitsByDate]);
+  if(habits.length === 0){
+    return(
+        <div
+        className="p-10 text-center font-medium
+        text-slate-600 dark:text-gray-400
+        transition-colors"
+      >
+        No habits for current date!
+      </div>
+    )
+  }
   if (loading)
     return (
       <div
@@ -53,11 +63,11 @@ const TodayList = () => {
           title={habit.title}
           description={habit.description}
           categoryIcon={
-            habit.category?.icon ||
+            habit.categoryId?.icon ||
             iconMap[habit.category?.name] ||
             iconMap.default
           }
-          color={habit.category?.backgroundColor || "blue"}
+          color={habit.categoryId?.backgroundColor || "blue"}
           completed={habit.completed}
           onToggleComplete={() => toggleHabit(habit._id)}
           progress={habit.completed ? 100 : 0}

@@ -2,6 +2,7 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Today.css";
+import useHabitStore from "../store/useHabitStore";
 
 const CustomHeader = ({
   date,
@@ -25,14 +26,17 @@ const CustomHeader = ({
   </div>
 );
 
-function CustomDatePicker({ selectedDate, onChange }) {
+function CustomDatePicker() {
+  const {selectedDate, setSelectedDate} = useHabitStore()
+  const handleDateChange = (date)=>{
+    setSelectedDate(date)
+  }
   return (
     <DatePicker
       selected={selectedDate}
-      onChange={onChange}
+      onChange={handleDateChange}
+      maxDate={new Date()}
       inline
-      minDate={new Date()}
-      filterDate={(date) => date.getDay() !== 6 && date.getDay() !== 0}
       calendarClassName="custom-calendar"
       renderCustomHeader={CustomHeader}
     />
