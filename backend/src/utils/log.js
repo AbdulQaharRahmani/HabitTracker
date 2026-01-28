@@ -18,23 +18,28 @@ export const getDatesBetween = (start, end) => {
 };
 
 export const readLogsByDate = (date) => {
-  const files = fs
-    .readdirSync(logsDir)
-    .filter((file) => file.startsWith(`application-${date}.log`));
+  try {
+    const files = fs
+      .readdirSync(logsDir)
+      .filter((file) => file.startsWith(`application-${date}.log`));
 
-  let logs = [];
+    let logs = [];
 
-  // maybe we have more than one log file in one day then we should loop over them
-  for (const file of files) {
-    const content = fs.readFileSync(path.join(logsDir, file), 'utf-8');
-    const lines = content.split('\n').filter(Boolean);
+    // maybe we have more than one log file in one day then we should loop over them
+    for (const file of files) {
+      const content = fs.readFileSync(path.join(logsDir, file), 'utf-8');
+      const lines = content.split('\n').filter(Boolean);
 
-    for (const line of lines) {
-      logs.push(JSON.parse(line));
+      for (const line of lines) {
+        logs.push(JSON.parse(line));
+      }
     }
-  }
 
-  return logs;
+    return logs;
+  } catch (err) {
+    console.log(err.message);
+    return [];
+  }
 };
 
 export const getTop = (items, key, limit = 5) => {
