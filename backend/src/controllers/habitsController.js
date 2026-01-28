@@ -12,6 +12,7 @@ import { CategoryModel } from '../models/Category.js';
 import { HabitCompletionModel } from '../models/habitCompletion.js';
 import { ERROR_CODES } from '../utils/constant.js';
 import { v4 as uuidv4 } from 'uuid';
+import { prepareSearchQuery } from '../utils/habit.js';
 
 // Get all user habits
 export const getHabits = async (req, res) => {
@@ -20,19 +21,16 @@ export const getHabits = async (req, res) => {
   const limit = Number(req.query.limit) || 8;
   const page = Number(req.query.page) || 1;
   const skip = (page - 1) * limit;
+  const searchTerm = req.query.searchTerm;
+  const frequency = req.query.frequency;
 
-  const habitsTotal = await HabitModel.countDocuments({
-    userId: req.user._id,
-    isDeleted: false,
-  });
+  const query = prepareSearchQuery(req.user._id, false, searchTerm, frequency);
+
+  const habitsTotal = await HabitModel.countDocuments(query);
 
   const totalPages = Math.ceil(habitsTotal / limit);
 
-  const habits = await HabitModel.findByUserAndSortByOrder(
-    req.user._id,
-    skip,
-    limit
-  );
+  const habits = await HabitModel.findByUserAndSortByOrder(skip, limit, query);
 
   res.status(200).json({
     success: true,
