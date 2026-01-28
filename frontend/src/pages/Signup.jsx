@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../server/auth.api";
+import { registerUser } from "../../services/auth.api";
 
 import { CiUser } from "react-icons/ci";
 import { AiOutlineMail } from "react-icons/ai";
@@ -11,7 +11,7 @@ import useAuthStore from "../store/useAuthStore";
 
 function SignUp() {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
@@ -22,7 +22,7 @@ function SignUp() {
   const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState({});
-   const {login} = useAuthStore()
+  const { login } = useAuthStore();
   const signupUserHandler = async (e) => {
     e.preventDefault();
 
@@ -32,14 +32,14 @@ function SignUp() {
     setLoading(true);
     try {
       const res = await registerUser({
-        fullName: fullName.trim(),
+        username: username.trim(),
         email: email.trim(),
         password: password.trim(),
       });
 
       setMessage({ text: res.message, type: "success" });
-      if (res.token){
-        login(token)
+      if (res.token) {
+        login(token);
       }
       resetHandler();
       setTimeout(() => navigate("/"), 500);
@@ -56,11 +56,11 @@ function SignUp() {
   const formValidation = () => {
     let tempErrors = {};
     let isValid = true;
-    const fullNameTrmd = fullName.trim();
+    const usernameTrmd = username.trim();
     const emailTrmd = email.trim();
     const passwordTrmd = password.trim();
-    if (!fullNameTrmd) {
-      tempErrors.fullName = "Full Name is required";
+    if (!usernameTrmd) {
+      tempErrors.username = "Full Name is required";
       isValid = false;
     }
     if (!emailTrmd) {
@@ -86,7 +86,7 @@ function SignUp() {
   };
 
   const resetHandler = () => {
-    setFullName("");
+    setUsername("");
     setEmail("");
     setPassword("");
     setChecked(false);
@@ -127,22 +127,22 @@ function SignUp() {
 
           <div
             className={`mt-1 flex w-full items-center rounded-xl border bg-zinc-100/50 px-2 focus-within:border-indigo-500  transition ${
-              errors.fullName ? "border-red-500" : "border-gray-200"
+              errors.username ? "border-red-500" : "border-gray-200"
             }`}
           >
             <CiUser
               className={`${
-                errors.fullName ? "text-red-500" : "text-gray-800"
+                errors.username ? "text-red-500" : "text-gray-800"
               }`}
               size={15}
             />
             <input
               id="full-name"
               type="text"
-              value={fullName}
+              value={username}
               onChange={(e) => {
-                setFullName(e.target.value);
-                setErrors((prev) => ({ ...prev, fullName: "" }));
+                setUsername(e.target.value);
+                setErrors((prev) => ({ ...prev, username: "" }));
               }}
               placeholder="John Doe"
               className="w-full bg-transparent px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
@@ -151,10 +151,10 @@ function SignUp() {
 
           <span
             className={`block min-h-[10px] ml-2 text-[10px] font-medium transition-opacity duration-200 ${
-              errors.fullName ? "text-red-500 opacity-100" : "opacity-0"
+              errors.username ? "text-red-500 opacity-100" : "opacity-0"
             }`}
           >
-            {errors.fullName || " "}
+            {errors.username || " "}
           </span>
         </div>
         <div className="w-full">
