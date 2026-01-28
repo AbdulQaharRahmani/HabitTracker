@@ -5,101 +5,75 @@ import { FaTimes } from "react-icons/fa";
 import Dropdown from "../Dropdown";
 import toast from "react-hot-toast";
 import i18n from "../../utils/i18n";
+import { useEffect } from "react";
 
 export default function AddTask() {
   const { t } = useTranslation();
   const isRTL = i18n.language === "fa";
 
-  const { isModalOpen, setModalOpen, taskData, setTaskData, addTask } =
-    useTaskCardStore();
+  const {
+    isModalOpen,
+    setModalOpen,
+    taskData,
+    setTaskData,
+    addTask,
+    fetchCategories,
+    categories,
+  } = useTaskCardStore();
+
+  useEffect(() => {
+    if (isModalOpen) {
+      fetchCategories();
+    }
+  }, [isModalOpen, fetchCategories]);
+
+  const weekdays = [
+    { id: "d1", name: isRTL ? "شنبه" : "Saturday", day: 0 },
+    { id: "d2", name: isRTL ? "یکشنبه" : "Sunday", day: 1 },
+    { id: "d3", name: isRTL ? "دوشنبه" : "Monday", day: 2 },
+    { id: "d4", name: isRTL ? "سه‌شنبه" : "Tuesday", day: 3 },
+    { id: "d5", name: isRTL ? "چهارشنبه" : "Wednesday", day: 4 },
+    { id: "d6", name: isRTL ? "پنج‌شنبه" : "Thursday", day: 5 },
+    { id: "d7", name: isRTL ? "جمعه" : "Friday", day: 6 },
+  ];
+
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
 
   const deadlineItems = [
     {
-      id: "d1",
+      id: "today",
       name: isRTL ? "امروز" : "Today",
-      value: isRTL ? "امروز" : "Today",
+      value: today.toISOString(),
     },
     {
-      id: "d2",
+      id: "tomorrow",
       name: isRTL ? "فردا" : "Tomorrow",
-      value: isRTL ? "فردا" : "Tomorrow",
+      value: tomorrow.toISOString(),
     },
-    {
-      id: "d3",
-      name: isRTL ? "شنبه" : "Saturday",
-      value: isRTL ? "شنبه" : "Saturday",
-    },
-    {
-      id: "d4",
-      name: isRTL ? "یکشنبه" : "Sunday",
-      value: isRTL ? "یکشنبه" : "Sunday",
-    },
-    {
-      id: "d5",
-      name: isRTL ? "دوشنبه" : "Monday",
-      value: isRTL ? "دوشنبه" : "Monday",
-    },
-    {
-      id: "d6",
-      name: isRTL ? "سه شنبه" : "Tuesday",
-      value: isRTL ? "سه شنبه" : "Tuesday",
-    },
-    {
-      id: "d7",
-      name: isRTL ? "چهارشنبه" : "Wednesday",
-      value: isRTL ? "چهارشنبه" : "Wednesday",
-    },
-    {
-      id: "d8",
-      name: isRTL ? "پنجشنبه" : "Thursday",
-      value: isRTL ? "پنجشنبه" : "Thursday",
-    },
-    {
-      id: "d9",
-      name: isRTL ? "جمعه" : "Friday",
-      value: isRTL ? "جمعه" : "Friday",
-    },
+    ...weekdays.map((w) => ({
+    id: w.id,
+    name: w.name,
+    value: getNextWeekdayDate(w.day).toISOString(),
+    })),
   ];
 
-  const categoryItems = [
-    {
-      id: "c1",
-      name: isRTL ? "صحتمندی و فیتنس" : "Health & Fitness",
-      value: isRTL ? "صحتمندی و فیتنس" : "Health & Fitness",
-    },
-    {
-      id: "c2",
-      name: isRTL ? "سلامت روحی" : "Mental Wellness",
-      value: isRTL ? "سلامت روحی" : "Mental Wellness",
-    },
-    {
-      id: "c3",
-      name: isRTL ? "فعالیتمندی" : "Productivity",
-      value: isRTL ? "فعالیتمندی" : "Productivity",
-    },
-    {
-      id: "c4",
-      name: isRTL ? "اقتصادی" : "Finance",
-      value: isRTL ? "اقتصادی" : "Finance",
-    },
-    {
-      id: "c5",
-      name: isRTL ? "اجتماعی" : "Social",
-      value: isRTL ? "اجتماعی" : "Social",
-    },
-    {
-      id: "c6",
-      name: isRTL ? "سرگرمی" : "Hobbies",
-      value: isRTL ? "سرگرمی" : "Hobbies",
-    },
-    {
-      id: "c7",
-      name: isRTL ? "یادگیری" : "Learning",
-      value: isRTL ? "یادگیری" : "Learning",
-    },
-  ];
+  function getNextWeekdayDate(targetDay) {
+    const today = new Date();
+    const day = today.getDay();
+    let diff = targetDay - day;
+    if (diff <= 0) diff += 7;
+    const nextDate = new Date(today);
+    nextDate.setDate(today.getDate() + diff);
+    nextDate.setHours(0, 0, 0, 0);
+    return nextDate;
+  }
+  
+  const selectedCategoryName =
+    categories.find((cat) => cat.value === taskData.category)?.name || "";
 
-  const HandleTaskCreation = (e) => {
+  const HandleTaskCreation = async (e) => {
     e.preventDefault();
 
     if (!taskData.title) {
@@ -112,7 +86,7 @@ export default function AddTask() {
       return;
     }
 
-    if (!taskData.deadline) {
+    if (!taskData.dueDate) {
       toast.error(t("Deadline is required!"));
       return;
     }
@@ -122,20 +96,19 @@ export default function AddTask() {
       return;
     }
 
-    const newTask = {
-      id: Date.now(),
+    const taskPayload = {
       title: taskData.title,
       description: taskData.description,
-      deadline: taskData.deadline,
-      category: taskData.category,
-      done: false,
+      dueDate: taskData.dueDate,
+      categoryId: taskData.category,
     };
+
     try {
-      addTask(newTask);
+      await addTask(taskPayload);
 
       setTaskData("title", "");
       setTaskData("description", "");
-      setTaskData("deadline", "");
+      setTaskData("dueDate", "");
       setTaskData("category", "");
 
       setModalOpen();
@@ -148,7 +121,7 @@ export default function AddTask() {
   return (
     <div>
       <button
-        className="bg-indigo-500 hover:bg-indigo-600  rounded-md px-4 py-2 text-white flex items-center justify-center shadow-md text-md transition ease-in-out duration-200"
+        className="bg-indigo-500 hover:bg-indigo-600 rounded-md px-4 py-2 text-white flex items-center justify-center shadow-md text-md transition ease-in-out duration-200"
         type="button"
         onClick={() => setModalOpen()}
       >
@@ -228,18 +201,18 @@ export default function AddTask() {
                 <Dropdown
                   items={deadlineItems}
                   placeholder={t("Choose Deadline")}
-                  value={taskData.deadline || ""}
-                  getValue={(value) => setTaskData("deadline", value)}
+                  value={taskData.dueDate || ""}
+                  getValue={(value) => setTaskData("dueDate", value)}
                 />
 
                 <label>
                   {t("Category")} <span className="text-red-600">*</span>
                 </label>
                 <Dropdown
-                  items={categoryItems}
+                  items={categories}
                   placeholder={t("Choose Category")}
-                  value={taskData.category || ""}
-                  getValue={(value) => setTaskData("category", value)}
+                  value={t(selectedCategoryName)}
+                  getValue={(id) => setTaskData("category", id)}
                 />
 
                 <div className="pt-6 flex flex-col gap-3">

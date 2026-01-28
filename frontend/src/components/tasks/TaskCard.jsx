@@ -50,15 +50,17 @@ export default function TaskCard({
         <div className="my-1">
           <div
             className={`
-              py-3 px-4 text-lg font-bold transition
-              ${
+              py-3 px-4 text-lg font-bold transition`}
+          >
+            <h3
+              className={`${
                 status === "done"
                   ? "text-gray-400 dark:text-gray-500 line-through"
                   : "text-gray-800 dark:text-gray-100"
-              }
-            `}
-          >
-            {t(title)}
+              }`}
+            >
+              {t(title)}
+            </h3>
             <div>
               <p className="text-gray-400 text-sm font-normal mt-1">
                 {t(description)}
