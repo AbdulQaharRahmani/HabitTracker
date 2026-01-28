@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart';
 import '../../app/app_theme.dart';
 import '../../utils/habits/habit.dart';
 import '../../utils/habits/habit_card.dart';
@@ -21,7 +22,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
   String _searchQuery = '';
 
   /* -------------------------------------------------------------------------- */
-  /* Reusable Styles                             */
+  /* Reusable Styles                                                            */
   /* -------------------------------------------------------------------------- */
 
   final TextStyle _linkStyle = const TextStyle(
@@ -41,7 +42,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   /* -------------------------------------------------------------------------- */
-  /* Logic Methods                                */
+  /* Logic Methods                                                              */
   /* -------------------------------------------------------------------------- */
 
   Future<String?> _getToken() async {
@@ -178,7 +179,32 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   /* -------------------------------------------------------------------------- */
-  /* UI Build                                  */
+  /* Shimmer Loading Widget                                                     */
+  /* -------------------------------------------------------------------------- */
+
+  Widget _buildShimmerLoading() {
+    return ListView.builder(
+      itemCount: 5,
+      padding: const EdgeInsets.only(bottom: 20),
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: AppTheme.border.withOpacity(0.4),
+          highlightColor: AppTheme.surface,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* UI Build                                                                   */
   /* -------------------------------------------------------------------------- */
 
   @override
@@ -269,13 +295,13 @@ class _HabitsScreenState extends State<HabitsScreen> {
 
               const SizedBox(height: 16),
 
-              // ======= Habit List =======
+              // ======= Habit List (with Shimmer or Content) =======
               Expanded(
                 child: RefreshIndicator(
                   color: AppTheme.primary,
                   onRefresh: _refreshHabits,
                   child: _isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? _buildShimmerLoading()
                       : _errorMessage != null
                       ? Center(
                     child: Column(
