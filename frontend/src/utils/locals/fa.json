@@ -87,5 +87,20 @@
   "Task added successfully!": "عمیلات با موفقیت اضافه شد",
   "Sorry! could not save new task": "خطا! عملیات ذخیره نشد",
 
-  "This is the description part": "این بخش توضیحات است."
+  "create_account": "ساخت حساب",
+  "your_journey": "سفر خود را به سوی عادات بهتر امروز شروع کنید.",
+  "full_name": "نام کامل",
+  "john_doe": "جان دو",
+  "email_address": "آدرس ایمیل",
+  "hello_example": "hello@example.com",
+  "terms_agreement": "من با",
+  "terms_of_service": "شرایط خدمات ",
+  "and": "و",
+  "privacy_policy": "سیاست حفظ حریم خصوصی موافقم",
+  "sign_up": "ثبت‌ نام",
+  "or_continue_with": "یا ادامه دهید با",
+  "google": "گوگل",
+  "apple": "اپل",
+  "already_have_account": "قبلاً حساب دارید؟",
+  "log_in": "ورود"
 }
