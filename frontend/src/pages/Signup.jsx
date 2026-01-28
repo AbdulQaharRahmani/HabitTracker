@@ -108,19 +108,19 @@ function SignUp() {
           </p>
         )}
         <h1 className="text-xl font-bold">Create Account</h1>
-        <p className="text-xs text-gray-500 max-w-xs">
+        <p className="text-xs sm:text-sm text-gray-500 max-w-xs">
           Start your journey to better habits today.
         </p>
       </div>
 
       <form
-        className="flex flex-col w-full max-w-[350px] gap-0 rounded-2xl border bg-white px-6 py-4 shadow-lg"
+        className="flex flex-col w-full max-w-[400px] gap-2 rounded-2xl border bg-white p-6 shadow-lg"
         onSubmit={signupUserHandler}
       >
         <div className="w-full">
           <label
             htmlFor="full-name"
-            className="text-xs font-medium text-gray-900"
+            className="text-xs sm:text-sm font-medium text-gray-900"
           >
             Full Name
           </label>
@@ -145,7 +145,7 @@ function SignUp() {
                 setErrors((prev) => ({ ...prev, username: "" }));
               }}
               placeholder="John Doe"
-              className="w-full bg-transparent px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              className="w-full bg-transparent px-2 py-2 text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
             />
           </div>
 
@@ -160,7 +160,7 @@ function SignUp() {
         <div className="w-full">
           <label
             htmlFor="email"
-            className="text-xs font-medium text-gray-900 mt-2"
+            className="text-xs sm:text-sm font-medium text-gray-900 mt-2"
           >
             Email Address
           </label>
@@ -182,7 +182,7 @@ function SignUp() {
                 setErrors((prev) => ({ ...prev, email: "" }));
               }}
               placeholder="hello@example.com"
-              className="w-full bg-transparent px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              className="w-full bg-transparent px-2 py-2 text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
             />
           </div>
           <span
@@ -197,7 +197,7 @@ function SignUp() {
         <div className="w-full">
           <label
             htmlFor="password"
-            className="text-xs font-medium text-gray-900 mt-2"
+            className="text-xs sm:text-sm font-medium text-gray-900 mt-2"
           >
             Password
           </label>
@@ -221,7 +221,7 @@ function SignUp() {
                 setErrors((prev) => ({ ...prev, password: "" }));
               }}
               placeholder="••••••••"
-              className="w-full bg-transparent px-2 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              className="w-full bg-transparent px-2 py-2 text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
             />
             <button type="button" onClick={() => setShowPass(!showPass)}>
               {showPass ? (
@@ -240,7 +240,7 @@ function SignUp() {
           </span>
         </div>
 
-        <div className="flex flex-col items-start  w-full mt-2">
+        <div className="w-full flex flex-col items-start">
           <label className="flex items-center cursor-pointer">
             <div className="relative">
               <input
@@ -263,7 +263,7 @@ function SignUp() {
                 )}
               </div>
             </div>
-            <span className="ml-2 text-xs text-gray-500 font-medium hover:text-indigo-500">
+            <span className="ml-2 text-xs sm:text-sm text-gray-500 font-medium hover:text-indigo-500">
               I agree to the{" "}
               <span className="text-indigo-500">Terms of Service</span> and{" "}
               <span className="text-indigo-500">Privacy Policy</span>
@@ -279,7 +279,7 @@ function SignUp() {
         </div>
 
         <button
-          className={`w-full mt-2 rounded-xl  py-2 text-xs text-white font-medium
+          className={`w-full mt-4 rounded-xl  py-2 text-xs sm:text-sm text-white font-medium
             ${
               loading
                 ? "bg-indigo-400 cursor-not-allowed"
@@ -292,7 +292,7 @@ function SignUp() {
           {loading ? "Creating account..." : " Sign Up"}
         </button>
 
-        <div className="flex items-center gap-2 w-full mt-2 text-xs">
+        <div className="w-full flex items-center gap-2 mt-2 text-xs sm:text-sm">
           <div className="h-px flex-1 bg-gray-200"></div>
           <span className="text-gray-500 whitespace-nowrap">
             Or continue with
@@ -300,20 +300,18 @@ function SignUp() {
           <div className="h-px flex-1 bg-gray-200"></div>
         </div>
 
-        <div className="flex w-full gap-2 mt-2">
-          <button className="flex-1 flex items-center justify-center gap-1 rounded-xl border py-2 text-xs font-semibold hover:bg-indigo-500 hover:text-white">
+        <div className="w-full flex gap-2">
+          <button className="text-xs sm:text-sm flex-1 flex items-center justify-center gap-1 rounded-xl border py-2  font-semibold hover:bg-indigo-500 hover:text-white">
             <FcGoogle size={15} /> Google
           </button>
-          <button className="flex-1 flex items-center justify-center gap-1 rounded-xl border py-2 text-xs font-semibold hover:bg-indigo-500 hover:text-white">
+          <button className="text-xs sm:text-sm flex-1 flex items-center justify-center gap-1 rounded-xl border py-2  font-semibold hover:bg-indigo-500 hover:text-white">
             <FaApple size={15} /> Apple
           </button>
         </div>
       </form>
 
-      <div className="flex gap-1 items-center justify-center mt-3 text-xs">
-        <p className="text-xs text-gray-500 font-medium">
-          Already have an account?
-        </p>
+      <div className="flex gap-1 items-center justify-center mt-5 text-xs sm:text-sm">
+        <p className=" text-gray-500 font-medium">Already have an account?</p>
         <Link
           to="/login"
           className="text-indigo-700 font-medium hover:underline"
