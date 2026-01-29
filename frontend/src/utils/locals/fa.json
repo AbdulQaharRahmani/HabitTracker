@@ -90,5 +90,9 @@
   "Other": "متفرقه",
   "Peach": "میوه جات",
   "Study": "درس خواندن",
-  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد"
+  "Sorry! could not save new task": "خطا! عملیات ذخیره نشد",
+  "Edit Task": "ویرایش عملیات",
+  "Save Changes": "ذخیره تفییرات",
+  "Task edited successfully!": "عملیات با موفقیت ویرایش شد!",
+  "Sorry! could not edit task": "خطا! متاسفانه عملیات ویرایش  نشده!"
 }

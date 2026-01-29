@@ -82,5 +82,9 @@
   "Other": "Other",
   "Peach": "Peach",
   "Study": "Study",
-  "You have no tasks to show": "You have no tasks to show."
+  "You have no tasks to show": "You have no tasks to show.",
+  "Edit Task": "Edit Task",
+  "Save Changes": "Save Changes",
+  "Task edited successfully!": "Task edited successfully!",
+  "Sorry! could not edit task": "Sorry! could not edit task"
 }
