@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import i18n from "../../utils/i18n";
 import { useEffect } from "react";
 
-export default function EditTask ({ taskId }) {
+export default function EditTask () {
     const { t } = useTranslation();
     const isRTL = i18n.language === "fa";
 
@@ -122,13 +122,13 @@ export default function EditTask ({ taskId }) {
           <div className="fixed inset-0 z-50 flex justify-center items-start sm:items-center bg-black/50 overflow-y-auto p-4 py-10">
             <div
               className="
-                        modal w-full md:w-1/2 max-h-full
-                        flex flex-col overflow-y-scroll
-                        rounded-xl p-4 shadow-2xl
-                        bg-white dark:bg-gray-900
-                        text-gray-900 dark:text-gray-100
-                        transition-colors
-                        "
+                modal w-full md:w-1/2 max-h-full
+                flex flex-col overflow-y-scroll
+                rounded-xl p-4 shadow-2xl
+                bg-white dark:bg-gray-900
+                text-gray-900 dark:text-gray-100
+                transition-colors
+              "
             >
               <div className="flex justify-between p-2">
                 <h2 className="font-bold">{t("Edit Task")}</h2>
@@ -155,14 +155,14 @@ export default function EditTask ({ taskId }) {
                   value={taskData.title}
                   onChange={(e) => setTaskData("title", e.target.value)}
                   className={`
-                            border-2 rounded-md p-2
-                            bg-gray-50 dark:bg-gray-800
-                            border-gray-200 dark:border-gray-700
-                            text-gray-900 dark:text-gray-100
-                            placeholder:text-sm placeholder-gray-500 dark:placeholder-gray-400
-                            focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE]
-                            outline-none transition-all
-                            `}
+                    border-2 rounded-md p-2
+                    bg-gray-50 dark:bg-gray-800
+                    border-gray-200 dark:border-gray-700
+                    text-gray-900 dark:text-gray-100
+                    placeholder:text-sm placeholder-gray-500 dark:placeholder-gray-400
+                    focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE]
+                    outline-none transition-all
+                  `}
                 />
 
                 <label htmlFor="description">{t("Description")}</label>
@@ -172,14 +172,14 @@ export default function EditTask ({ taskId }) {
                   value={taskData.description}
                   onChange={(e) => setTaskData("description", e.target.value)}
                   className="
-                            border-2 rounded-md p-2 h-[150px] resize-none
-                            bg-gray-50 dark:bg-gray-800
-                            border-gray-200 dark:border-gray-700
-                            text-gray-900 dark:text-gray-100
-                            placeholder:text-sm placeholder-gray-500 dark:placeholder-gray-400
-                            focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE]
-                            outline-none transition-all
-                            "
+                    border-2 rounded-md p-2 h-[150px] resize-none
+                    bg-gray-50 dark:bg-gray-800
+                    border-gray-200 dark:border-gray-700
+                    text-gray-900 dark:text-gray-100
+                    placeholder:text-sm placeholder-gray-500 dark:placeholder-gray-400
+                    focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE]
+                    outline-none transition-all
+                  "
                 />
 
                 <label>
@@ -206,11 +206,11 @@ export default function EditTask ({ taskId }) {
                   <button
                     type="submit"
                     className="
-                                w-full py-3.5 font-bold text-white rounded-xl
-                                shadow-lg shadow-[#7B68EE]/30
-                                hover:opacity-90 transition-all
-                                active:scale-[0.98]
-                            "
+                      w-full py-3.5 font-bold text-white rounded-xl
+                      shadow-lg shadow-[#7B68EE]/30
+                      hover:opacity-90 transition-all
+                      active:scale-[0.98]
+                    "
                     style={{ backgroundColor: "#7B68EE" }}
                   >
                     {t("Save Changes")}
@@ -220,13 +220,13 @@ export default function EditTask ({ taskId }) {
                     type="button"
                     onClick={() => closeModal()}
                     className="
-                        w-full py-3.5 font-semibold rounded-xl
-                        border-2
-                        border-gray-200 dark:border-gray-700
-                        text-gray-600 dark:text-gray-400
-                        hover:bg-gray-50 dark:hover:bg-gray-800
-                        transition-all active:scale-[0.98]
-                        "
+                      w-full py-3.5 font-semibold rounded-xl
+                      border-2
+                      border-gray-200 dark:border-gray-700
+                      text-gray-600 dark:text-gray-400
+                      hover:bg-gray-50 dark:hover:bg-gray-800
+                      transition-all active:scale-[0.98]
+                    "
                   >
                     {t("Cancel")}
                   </button>
