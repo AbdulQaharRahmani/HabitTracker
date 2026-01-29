@@ -1,8 +1,8 @@
 import { create } from "zustand"
 import api from "../../services/api"
 import toast from "react-hot-toast";
-import { completeHabit, getHabitsByDate, getHabitsChartData, unCompleteHabit } from "../../services/habitService";
-import { binarySearchDatePoints } from "../utils/binarySearchDatePoints"
+import { completeHabit, getChartData, getHabitsByDate, getHabitsChartData, unCompleteHabit } from "../../services/habitService";
+import { formatDate } from "../utils/dateFormatter";
 const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
@@ -181,77 +181,85 @@ const useHabitStore = create((set, get) => ({
             }
         }))
     },
-    chartData: [],
     dailyStatistics: [],
     monthlyStatistics: [],
     yearlyStatistics: [],
-
+    chartData: [],
     getChartData: async () => {
-        const data = await getHabitsChartData()
+        const data = await getChartData()
         set({ chartData: data })
-
     },
-    getDailyStatistics: () => {
-        const date = new Date()
-        date.setDate(date.getDate() - 6)
-        const startDate = date
-        const endDate = new Date()
-        endDate.setTime(0, 0, 0, 0)
-        const startIndex = binarySearchDatePoints(get().chartData, startDate)
-        const endIndex = binarySearchDatePoints(get().chartData, endDate)
-        const dataForDays = get().chartData.slice(startIndex, endIndex)
-        const dailyStatistics = dataForDays.reduce((acc, day) => {
+    getDailyStatistics: async () => {
+        const chartData = get().chartData
+        if (!chartData || chartData.length === 0) return
+        const firstDataDate = new Date(chartData[0].date);
+        let date = new Date();
+        date.setDate(date.getDate() - 6);
+
+        const finalStartDate = date >= firstDataDate ? date : firstDataDate;
+
+        const startDate = formatDate(finalStartDate);
+        const endDate = formatDate(new Date());
+        const daysData = await getHabitsChartData(startDate, endDate);
+        const dailyStatistics = daysData.reduce((acc, day) => {
             const weekday = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
-            acc[weekday] = (acc[weekday] || 0) + day.completed
-            return acc
-        }, {})
+            acc[weekday] = (acc[weekday] || 0) + day.completed;
+            return acc;
+        }, {});
         const formattedData = Object.keys(dailyStatistics).map(key => ({
             name: key,
             completed: dailyStatistics[key]
         }));
-        set({ dailyStatistics: formattedData })
+        set({ dailyStatistics: formattedData });
     },
-    getMonthlyStatistics: () => {
-        const date = new Date()
-        date.setMonth(date.getMonth() - 6)
-        const startDate = date
-        const endDate = new Date()
-        endDate.setTime(0, 0, 0, 0)
-        const startIndex = binarySearchDatePoints(get().chartData, startDate)
-        const endIndex = binarySearchDatePoints(get().chartData, endDate)
-        const dataForMonths = get().chartData.slice(startIndex, endIndex)
+
+    getMonthlyStatistics: async () => {
+        const chartData = get().chartData
+        if (!chartData || chartData.length === 0) return
+        const firstDataDate = new Date(chartData[0].date);
+        let date = new Date();
+        date.setMonth(date.getMonth() - 5);
+
+        const finalStartDate = date >= firstDataDate ? date : firstDataDate;
+
+        const startDate = formatDate(finalStartDate);
+        const endDate = formatDate(new Date());
+        const dataForMonths = await getHabitsChartData(startDate, endDate);
         const monthlyStatistics = dataForMonths.reduce((acc, day) => {
             const monthName = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short' });
-            acc[monthName] = (acc[monthName] || 0) + day.completed
-            return acc
-        }, {})
+            acc[monthName] = (acc[monthName] || 0) + day.completed;
+            return acc;
+        }, {});
         const formattedData = Object.keys(monthlyStatistics).map(key => ({
             name: key,
             completed: monthlyStatistics[key]
         }));
-        set({ monthlyStatistics: formattedData })
+        set({ monthlyStatistics: formattedData });
     },
-    getYearlyStatistics: () => {
-        const date = new Date()
-        date.setFullYear(date.getFullYear() - 3)
-        const startDate = date
-        const endDate = new Date()
-        endDate.setTime(0, 0, 0, 0)
-        const startIndex = binarySearchDatePoints(get().chartData, startDate)
-        const endIndex = binarySearchDatePoints(get().chartData, endDate)
-        const dataForYears = get().chartData.slice(startIndex, endIndex)
-        console.log("Years", dataForYears)
+
+    getYearlyStatistics: async () => {
+        const chartData = get().chartData
+        if (!chartData || chartData.length === 0) return
+        const firstDataDate = new Date(chartData[0].date);
+        const threeYearsAgo = new Date();
+        threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+        const finalStartDate = threeYearsAgo >= firstDataDate ? threeYearsAgo : firstDataDate;
+
+        const startDate = formatDate(finalStartDate);
+        const endDate = formatDate(new Date());
+        const dataForYears = await getHabitsChartData(startDate, endDate);
         const yearlyStatistics = dataForYears.reduce((acc, day) => {
             const year = day.date.split('-')[0];
             acc[year] = (acc[year] || 0) + day.completed;
             return acc;
-        }, {})
+        }, {});
         const formattedData = Object.keys(yearlyStatistics).map(key => ({
             name: key,
             completed: yearlyStatistics[key]
         }));
-        set({ yearlyStatistics: formattedData })
+        set({ yearlyStatistics: formattedData });
     }
+
 }))
 
 export default useHabitStore
