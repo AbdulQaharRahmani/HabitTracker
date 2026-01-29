@@ -4,6 +4,7 @@ import { useTaskCardStore } from "../../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../utils/formatDate";
 import i18n from "../../utils/i18n";
+import { CiEdit } from "react-icons/ci";
 
 export default function TaskCard({
   title,
@@ -15,6 +16,7 @@ export default function TaskCard({
 }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
+  const openEditModal = useTaskCardStore((s) => s.openEditModal);
 
   const { label, type } = formatDate(dueDate);
 
@@ -98,14 +100,30 @@ export default function TaskCard({
       </div>
 
       {/* Delete */}
-      <div className="p-4 flex items-center mx-4">
+      <div className="p-4 grid grid-rows-2 items-center mx-4">
         <button onClick={() => deleteTask(_id)}>
           <MdDeleteOutline
             size={24}
             className="
               text-gray-300 dark:text-gray-500
               hover:text-red-400 transition
+              dark:hover:text-red-400
             "
+          />
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            openEditModal(_id);
+          }}
+        >
+          <CiEdit
+            size={24}
+            className="
+                text-gray-300 dark:text-gray-500
+                hover:text-indigo-600 transition
+                dark:hover:text-indigo-600
+                "
           />
         </button>
       </div>
