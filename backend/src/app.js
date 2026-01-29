@@ -14,7 +14,7 @@ const app = express();
 //#region Normal Midlleware
 
 app.use(express.json());
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: '*', credentials: true }));
 app.use(cookieParser());
 //#endregion
 

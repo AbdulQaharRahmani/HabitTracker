@@ -79,20 +79,28 @@ export const loginUser = async (req, res) => {
     );
   }
 
-  const accessToken = generateAccessToken(user);
+  const token = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken();
   const hashedToken = hashRefreshToken(refreshToken);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
-  await refreshTokenModel.create({
-    userId: user._id,
-    token: hashedToken,
-    expiresAt: expiresAt,
-  });
+  const existingToken = await refreshTokenModel.findOne({ userId: user._id });
 
-  //send token in cookie
+  if (existingToken) {
+    ((existingToken.token = hashedToken),
+      (existingToken.expiresAt = expiresAt),
+      await existingToken.save());
+  } else {
+    await refreshTokenModel.create({
+      userId: user._id,
+      token: hashedToken,
+      expiresAt: expiresAt,
+    });
+  }
+
+  // send token in cookie
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -104,7 +112,7 @@ export const loginUser = async (req, res) => {
     success: true,
     message: 'Login Successfully',
     data: {
-      accessToken,
+      token,
       id: user._id,
       email: user.email,
       username: user.username,
@@ -165,18 +173,26 @@ export const googleLogin = async (req, res) => {
     await user.save();
   }
 
-  const accessToken = generateAccessToken(user);
+  const token = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken();
   const hashedToken = hashRefreshToken(refreshToken);
 
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7); // expired at 7 days
+  expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
-  await refreshTokenModel.create({
-    userId: user._id,
-    token: hashedToken,
-    expiresAt: expiresAt,
-  });
+  const existingToken = await refreshTokenModel.findOne({ userId: user._id });
+
+  if (existingToken) {
+    ((existingToken.token = hashedToken),
+      (existingToken.expiresAt = expiresAt),
+      await existingToken.save());
+  } else {
+    await refreshTokenModel.create({
+      userId: user._id,
+      token: hashedToken,
+      expiresAt: expiresAt,
+    });
+  }
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
@@ -189,7 +205,7 @@ export const googleLogin = async (req, res) => {
     success: true,
     message: 'Login Successfully',
     data: {
-      accessToken,
+      token,
       id: user._id,
       email: user.email,
     },
@@ -216,7 +232,7 @@ export const refreshAccessToken = async (req, res) => {
   await refreshTokenModel.create({
     userId: storeToken.userId,
     token: hashRefreshToken(refreshToken),
-    expiresAt: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000), //expired at 7 days
+    expiresAt: storeToken.expiresAt,
   });
 
   res.cookie('refreshToken', refreshToken, {
@@ -226,7 +242,7 @@ export const refreshAccessToken = async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  res.status(200).json({ accessToken: accessToken });
+  res.status(200).json({ token: accessToken });
 };
 
 export const logOutUser = async (req, res) => {
