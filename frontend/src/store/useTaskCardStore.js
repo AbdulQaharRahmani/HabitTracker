@@ -1,10 +1,13 @@
 import { create } from "zustand";
 import { getTasks } from "../../services/tasksService";
 import api from "../../services/api";
+import toast from "react-hot-toast";
 
-export const useTaskCardStore = create((set) => ({
+export const useTaskCardStore = create((set, get) => ({
   tasks: [],
   loading: false,
+  tasksLoading: false,
+  categoriesLoading: false,
   error: null,
 
   loading: false,
@@ -43,7 +46,7 @@ export const useTaskCardStore = create((set) => ({
   categories: [],
 
   fetchCategories: async () => {
-    set({ loading: true });
+    set({ categoriesLoading: true });
     try {
       const response = await api.get("/categories");
       const formatted = response.data.data.map((cat) => ({
@@ -58,7 +61,7 @@ export const useTaskCardStore = create((set) => ({
       toast.error(message);
       console.error("Failed to fetch categories", error);
     } finally {
-      set({ loading: false });
+      set({ categoriesLoading: false });
     }
   },
 
@@ -69,7 +72,7 @@ export const useTaskCardStore = create((set) => ({
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
-        dueDate: date.toISOString(), 
+        dueDate: date.toISOString(),
         categoryId: taskPayload.categoryId, //for backend
       };
 
@@ -103,15 +106,16 @@ export const useTaskCardStore = create((set) => ({
   },
 
   fetchTasks: async (limit, page) => {
-    set({ loading: true, error: null });
+    set({ tasksLoading: true, error: null });
     try {
       const response = await getTasks(limit, page);
 
       set({ tasks: response.data, loading: false });
     } catch (err) {
-      set({ error: err?.message || "An error occurred", loading: false });
+      set({ error: err?.message || "An error occurred", tasksLoading: false });
     }
   },
+
   completeTask: (id) =>
     set((state) => ({
       tasks: state.tasks.map((task) => {
@@ -125,4 +129,77 @@ export const useTaskCardStore = create((set) => ({
     set((state) => ({
       tasks: state.tasks.filter((task) => task._id !== id),
     })),
+
+  // Edit task
+
+  isEditModalOpen: false,
+  editingTaskId: null,
+
+  openEditModal: (taskId) => {
+    const task = get().tasks.find((t) => t._id === taskId);
+
+    if (!task) {
+      toast.error("Task not found for editing:", taskId);
+      return;
+    }
+
+    set({
+      isEditModalOpen: true,
+      editingTaskId: taskId,
+      taskData: {
+        title: task.title,
+        description: task.description,
+        dueDate: task.dueDate,
+        category: task.categoryId,
+      },
+    });
+  },
+
+  closeModal: () =>
+    set({
+      isEditModalOpen: false,
+      editingTaskId: null,
+      taskData: {
+        title: "",
+        description: "",
+        dueDate: null,
+        category: null,
+      },
+    }),
+
+  updateTask: async (taskId, taskPayload) => {
+    try {
+      const date = new Date(taskPayload.dueDate);
+
+      const payload = {
+        title: taskPayload.title,
+        description: taskPayload.description,
+        dueDate: date.toISOString(),
+        categoryId: taskPayload.categoryId,
+      };
+
+      await api.put(`/tasks/${taskId}`, payload);
+
+      set((state) => {
+        const categoryName =
+          state.categories.find((c) => c.id === taskPayload.categoryId)?.name ||
+          "—";
+
+        return {
+          tasks: state.tasks.map((task) =>
+            task._id === taskId
+              ? {
+                  ...task,
+                  ...taskPayload,
+                  category: categoryName,
+                }
+              : task,
+          ),
+        };
+      });
+    } catch (error) {
+      console.error("Update task failed:", error);
+      throw error;
+    }
+  },
 }));
