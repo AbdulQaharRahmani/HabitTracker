@@ -10,9 +10,6 @@ export const useTaskCardStore = create((set, get) => ({
   categoriesLoading: false,
   error: null,
 
-  loading: false,
-  error: null,
-
   isModalOpen: false,
 
   taskData: {
@@ -72,7 +69,7 @@ export const useTaskCardStore = create((set, get) => ({
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
-        dueDate: date.toISOString(),
+        dueDate: date.toISOString(), 
         categoryId: taskPayload.categoryId, //for backend
       };
 
