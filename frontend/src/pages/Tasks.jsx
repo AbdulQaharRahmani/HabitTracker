@@ -5,6 +5,7 @@ import TaskCard from "../components/tasks/TaskCard";
 import { useTaskCardStore } from "../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import i18n from "../utils/i18n";
+import EditTask from "../components/tasks/EditTask";
 
 function Tasks() {
   const { tasks, fetchTasks, loading, error } = useTaskCardStore(
@@ -23,7 +24,7 @@ function Tasks() {
     <div
       className={`
         pb-10 md:px-2 grid gap-4
-        bg-gray-50 dark:bg-gray-900
+        bg-gray-50 dark:bg-gray-950
         text-gray-900 dark:text-gray-100
         ${i18n.language === "fa" ? "rtl" : "ltr"}
       `}
@@ -46,6 +47,7 @@ function Tasks() {
           `}
         >
           <AddTask />
+          <EditTask />
         </span>
       </div>
 
