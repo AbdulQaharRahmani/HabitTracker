@@ -14,7 +14,7 @@ import useHabitStore from "../store/useHabitStore";
 
 
 export default function StatisticsChart() {
-  const { chartData, getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData } = useHabitStore()
+  const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData } = useHabitStore()
   const [activeFilter, setActiveFilter] = useState("days");
   const [title, setTitle] = useState("Activity by Month");
   const filterTerms = [
@@ -22,9 +22,13 @@ export default function StatisticsChart() {
     { id: "2", name: "Months", value: "months" },
     { id: "3", name: "Years", value: "years" },
   ];
-  useEffect(() => {
-    getChartData()
-  }, [getChartData])
+useEffect(() => {
+  const initializeData = async () => {
+    await getChartData();
+    getDailyStatistics();
+  };
+  initializeData();
+}, []);
   useEffect(() => {
     if (activeFilter === "days") {
       getDailyStatistics()
@@ -33,7 +37,7 @@ export default function StatisticsChart() {
     } else {
       getYearlyStatistics()
     }
-  }, [activeFilter, chartData, getDailyStatistics, getMonthlyStatistics, getYearlyStatistics])
+  }, [activeFilter])
   const dataToDisplay = {
     days: dailyStatistics,
     months: monthlyStatistics,
