@@ -116,14 +116,17 @@ export default function AddTask() {
     } catch (error) {
       toast.error(t("Sorry! could not save new task", error));
     }
-  };
+  }; 
 
   return (
     <div>
       <button
         className="bg-indigo-500 hover:bg-indigo-600 rounded-md px-4 py-2 text-white flex items-center justify-center shadow-md text-md transition ease-in-out duration-200"
         type="button"
-        onClick={() => setModalOpen()}
+        onClick={(e) => {
+          e.preventDefault();
+          setModalOpen(true);
+        }}
       >
         <span className="mx-2 font-normal">
           <GrAdd size={14} />
@@ -144,7 +147,9 @@ export default function AddTask() {
               "
             >
               <div className="flex justify-between p-2">
-                <h2 className="font-bold">{t("Add New Task")}</h2>
+                <h2 className="font-bold">
+                  {t("Add New Task")}
+                </h2>
                 <FaTimes
                   onClick={() => setModalOpen(false)}
                   className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
@@ -231,7 +236,10 @@ export default function AddTask() {
 
                   <button
                     type="button"
-                    onClick={() => setModalOpen(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setModalOpen(false);
+                    }}
                     className="
                       w-full py-3.5 font-semibold rounded-xl
                       border-2
