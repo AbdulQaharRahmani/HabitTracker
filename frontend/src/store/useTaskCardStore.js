@@ -136,7 +136,7 @@ export const useTaskCardStore = create((set, get) => ({
     const task = get().tasks.find((t) => t._id === taskId);
 
     if (!task) {
-      toast.error("Task not found for editing:", taskId);
+      console.log("Task not found for editing:", taskId);
       return;
     }
 
