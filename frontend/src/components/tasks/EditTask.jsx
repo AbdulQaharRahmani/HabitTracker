@@ -75,6 +75,27 @@ export default function EditTask () {
     return nextDate;
     }
 
+    const getDeadlineLabel = (dueDate) => {
+    if (!dueDate) return "";
+
+    const selected = deadlineItems.find((item) => item.value === dueDate);
+    if (selected) return selected.name;
+
+    const due = new Date(dueDate);
+      for (let item of deadlineItems) {
+        const itemDate = new Date(item.value);
+        if (
+          itemDate.getFullYear() === due.getFullYear() &&
+          itemDate.getMonth() === due.getMonth() &&
+          itemDate.getDate() === due.getDate()
+        ) {
+          return item.name;
+        }
+      }
+      return "";
+    };
+
+
     const priorityItems = [
       { name: "low", value: "low" },
       { name: "medium", value: "medium" },
@@ -151,8 +172,6 @@ export default function EditTask () {
                 />
               </div>
 
-              {/* <hr className="border-gray-200 dark:border-gray-700" /> */}
-
               <div className="flex-1 overflow-y-auto p-4">
                 <form
                   className="flex flex-col p-4 gap-2"
@@ -202,7 +221,7 @@ export default function EditTask () {
                   <Dropdown
                     items={deadlineItems}
                     placeholder={t("Choose Deadline")}
-                    value={taskData.dueDate || ""}
+                    value={getDeadlineLabel(taskData.dueDate)}
                     getValue={(value) => setTaskData("dueDate", value)}
                   />
 
