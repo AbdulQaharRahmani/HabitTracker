@@ -1,72 +1,198 @@
 import 'package:flutter/material.dart';
 import '../../app/app_theme.dart';
 
-class TaskItem {
-  final String title;
-  final String time;
-  final String category;
-  bool done;
-
-  TaskItem({
-    required this.title,
-    required this.time,
-    required this.category,
-    this.done = false,
-  });
-  // From JSON
-  factory TaskItem.fromJson(Map<String, dynamic> json) {
-    return TaskItem(
-      title: json['title'] as String,
-      time: json['time'] as String,
-      category: json['category'] as String,
-      done: json['done'] as bool? ?? false,
-    );
-  }
-  // To JSON
-  Map<String, dynamic> toJson() {
-    return {'title': title, 'time': time, 'category': category, 'done': done};
-  }
-
-  // copyWith
-  TaskItem copyWith({
-    String? title,
-    String? time,
-    String? category,
-    bool? done,
-  }) {
-    return TaskItem(
-      title: title ?? this.title,
-      time: time ?? this.time,
-      category: category ?? this.category,
-      done: done ?? this.done,
-    );
-  }
-}
-
-class TaskCategoryConfig {
+/// ---------------- Category UI Config ----------------
+class TaskCategoryUI {
   final IconData icon;
   final Color color;
 
-  const TaskCategoryConfig({required this.icon, required this.color});
+  const TaskCategoryUI({
+    required this.icon,
+    required this.color,
+  });
 }
 
-const Map<String, TaskCategoryConfig> taskCategoryMap = {
-  'Work': TaskCategoryConfig(icon: Icons.work_outline, color: Colors.blue),
-  'Study': TaskCategoryConfig(
+/// ---------------- Category Maps ----------------
+
+/// By category name (fallback-safe)
+final Map<String, TaskCategoryUI> taskCategoryMapByName = {
+  'study': const TaskCategoryUI(
     icon: Icons.school_outlined,
     color: AppTheme.primary,
   ),
-  'Sport': TaskCategoryConfig(
+  'sport': const TaskCategoryUI(
     icon: Icons.fitness_center,
     color: AppTheme.success,
   ),
-  'Health': TaskCategoryConfig(
+  'work': const TaskCategoryUI(
+    icon: Icons.work_outline,
+    color: AppTheme.warning,
+  ),
+  'health': const TaskCategoryUI(
     icon: Icons.favorite_outline,
     color: AppTheme.error,
   ),
-  'Personal': TaskCategoryConfig(
-    icon: Icons.person_outline,
-    color: AppTheme.warning,
+  'personal': TaskCategoryUI(
+    icon: Icons.task_alt,
+    color: AppTheme.primary,
   ),
-  'Other': TaskCategoryConfig(icon: Icons.task_alt, color: AppTheme.textMuted),
 };
+
+/// Default fallback
+const TaskCategoryUI defaultCategoryUI = TaskCategoryUI(
+  icon: Icons.task_alt,
+  color: AppTheme.primary,
+);
+
+/// ---------------- Task / Habit Unified UI Model ----------------
+class TaskItem {
+  /// Common
+  final String id;
+  final String title;
+  final String description;
+  final String frequency;
+  final String category;
+  final IconData icon;
+  final Color color;
+  final String sourceType; // 'task' | 'habit'
+  final DateTime createdAt;
+
+  /// UI State
+  bool done;
+
+  TaskItem({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.frequency,
+    required this.category,
+    required this.icon,
+    required this.color,
+    required this.sourceType,
+    required this.createdAt,
+    this.done = false,
+  });
+
+  // ---------------------------------------------------------------------------
+  // FACTORY
+  // ---------------------------------------------------------------------------
+
+  factory TaskItem.fromApiJson(Map<String, dynamic> json, DateTime forDate) {
+    final categoryName =
+    (json['category']?['name'] ?? 'task').toString().toLowerCase();
+
+    final ui =
+        taskCategoryMapByName[categoryName] ?? defaultCategoryUI;
+
+    return TaskItem(
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      frequency: json['frequency'] ?? 'daily',
+      category: categoryName,
+      icon: ui.icon,
+      color: ui.color,
+      sourceType: 'task',
+      createdAt:
+      DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      done: json['status'] == 'done',
+    );
+  }
+// In task.dart (your TaskItem file)
+  factory TaskItem.fromHabitJson(Map<String, dynamic> json, DateTime forDate) {
+    final categoryName = (json['category']?['name'] ?? 'habit').toString().toLowerCase();
+
+    // Assume API has 'completedDates' array or 'isCompleted' for the date
+    bool isDone = false;
+    if (json['completedDates'] != null) {
+      // Check if forDate is in completedDates (array of ISO strings or timestamps)
+      isDone = (json['completedDates'] as List).any((d) {
+        final completedDate = DateTime.tryParse(d) ?? DateTime(1970);
+        return DateUtils.isSameDay(completedDate, forDate);
+      });
+    } else if (json['isCompleted'] != null) {
+      isDone = json['isCompleted'] == true;  // Or json['status'] == 'completed'
+    } // Adjust this based on your API docs/response
+
+    return TaskItem(
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      frequency: json['frequency'] ?? 'daily',
+      category: categoryName,
+      icon: TaskItem.resolveIcon(apiIconName: json['icon'], categoryName: categoryName),
+      color: TaskItem.resolveColor(apiHexColor: json['color'], categoryName: categoryName),
+      sourceType: 'habit',
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      done: isDone,  // Key fix: Set based on API data for the date
+    );
+  }
+  // ---------------------------------------------------------------------------
+  // LOGIC
+  // ---------------------------------------------------------------------------
+
+  bool appliesToDate(DateTime date) {
+    final start = DateTime(createdAt.year, createdAt.month, createdAt.day);
+    final target = DateTime(date.year, date.month, date.day);
+    final diffDays = target.difference(start).inDays;
+
+    switch (frequency) {
+      case 'daily':
+        return diffDays >= 0;
+      case 'weekly':
+        return diffDays >= 0 && diffDays % 7 == 0;
+      case 'biweekly':
+        return diffDays >= 0 && diffDays % 14 == 0;
+      case 'every-other-day':
+        return diffDays >= 0 && diffDays % 2 == 0;
+      default:
+        return false;
+    }
+  }
+
+  void toggle() {
+    done = !done;
+  }
+
+  // ---------------------------------------------------------------------------
+  // STATIC HELPERS (Used by HabitMapper)
+  // ---------------------------------------------------------------------------
+
+  static IconData resolveIcon({
+    String? apiIconName,
+    String? categoryName,
+  }) {
+    if (apiIconName != null && apiIconName.isNotEmpty) {
+      switch (apiIconName.toLowerCase()) {
+        case 'study':
+          return Icons.school;
+        case 'sport':
+          return Icons.fitness_center;
+        case 'work':
+          return Icons.work;
+        case 'health':
+          return Icons.favorite;
+      }
+    }
+
+    final key = categoryName?.toLowerCase();
+    return taskCategoryMapByName[key]?.icon ??
+        defaultCategoryUI.icon;
+  }
+
+  static Color resolveColor({
+    String? apiHexColor,
+    String? categoryName,
+  }) {
+    if (apiHexColor != null && apiHexColor.startsWith('#')) {
+      final hex = apiHexColor.replaceAll('#', '');
+      if (hex.length == 6) {
+        return Color(int.parse('FF$hex', radix: 16));
+      }
+    }
+
+    final key = categoryName?.toLowerCase();
+    return taskCategoryMapByName[key]?.color ??
+        defaultCategoryUI.color;
+  }
+}

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'auth_manager.dart';
 
 class AuthService {
-  final String baseUrl = "https://habit-tracker-17sr.onrender.com";
+  static String baseUrl = "https://habit-tracker-17sr.onrender.com";
 
   Future<Map<String, dynamic>> loginUser({
     required String email,
@@ -23,23 +23,28 @@ class AuthService {
       print("🟢Server response: ${response.body}");
 
       if (response.statusCode == 200 && responseData['success'] == true) {
-        final prefs = await SharedPreferences.getInstance();
-
         String? tokenToSave;
-        if (responseData['data'] != null && responseData['data']['token'] != null) {
+        if (responseData['data'] != null &&
+            responseData['data']['token'] != null) {
           tokenToSave = responseData['data']['token'];
         }
 
         if (tokenToSave != null) {
-          await prefs.setString('auth_token', tokenToSave);
+          await AuthManager.saveAuthToken(tokenToSave);
           print("✅ Token saved successfully");
           return responseData;
         } else {
           print("❌ Error:Token filed not found in server response.");
-          return {"success": false, "message": "The token structure in not valid"};
+          return {
+            "success": false,
+            "message": "The token structure in not valid",
+          };
         }
       } else {
-        return {"success": false, "message": responseData['message'] ?? "Error in login"};
+        return {
+          "success": false,
+          "message": responseData['message'] ?? "Error in login",
+        };
       }
     } catch (e) {
       print("🔴 Exception error: $e");

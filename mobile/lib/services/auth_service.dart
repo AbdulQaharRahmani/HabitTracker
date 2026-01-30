@@ -20,7 +20,7 @@ class AuthService {
       url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
-        "name": name,
+        "username": name,
         "email": email,
         "password": password,
       }),
