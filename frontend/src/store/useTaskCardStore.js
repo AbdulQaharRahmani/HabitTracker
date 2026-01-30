@@ -80,7 +80,7 @@ export const useTaskCardStore = create((set, get) => ({
 
       set((state) => {
         const categoryName =
-          state.categories.find((c) => c.id === taskPayload.categoryId)?.name ||
+          state.categories.find((c) => c.id === taskPayload.category)?.name ||
           "—";
 
         return {
@@ -92,8 +92,10 @@ export const useTaskCardStore = create((set, get) => ({
               description: taskPayload.description,
               dueDate: taskPayload.dueDate,
               category: categoryName, //for UI
+              categoryId: taskPayload.categoryId, // ✅ STORE ID
+              // category: categoryName || "—", // ✅ STORE NAME
               done: false,
-              priority: taskPayload.priority
+              priority: taskPayload.priority,
             },
           ],
         };
@@ -174,33 +176,32 @@ export const useTaskCardStore = create((set, get) => ({
     try {
       const date = new Date(taskPayload.dueDate);
 
+      const { categories } = get();
+      const categoryName =
+        categories.find((c) => c.id === taskPayload.category)?.name || "—";
+
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
         dueDate: date.toISOString(),
-        categoryId: taskPayload.categoryId,
-        priority:taskPayload.priority
+        categoryId: taskPayload.category,
+        category: categoryName,
+        priority: taskPayload.priority,
       };
 
       await api.put(`/tasks/${taskId}`, payload);
 
-      set((state) => {
-        const categoryName =
-          state.categories.find((c) => c.id === taskPayload.categoryId)?.name ||
-          "—";
-
-        return {
-          tasks: state.tasks.map((task) =>
-            task._id === taskId
-              ? {
-                  ...task,
-                  ...taskPayload,
-                  category: categoryName,
-                }
-              : task,
-          ),
-        };
-      });
+      set((state) => ({
+        tasks: state.tasks.map((task) =>
+          task._id === taskId
+            ? {
+                ...task,
+                ...taskPayload,
+                category: categoryName,
+              }
+            : task,
+        ),
+      }));
     } catch (error) {
       console.error("Update task failed:", error);
       throw error;
