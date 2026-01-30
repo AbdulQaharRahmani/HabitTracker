@@ -53,9 +53,9 @@ export default function AddTask() {
       value: tomorrow.toISOString(),
     },
     ...weekdays.map((w) => ({
-    id: w.id,
-    name: w.name,
-    value: getNextWeekdayDate(w.day).toISOString(),
+      id: w.id,
+      name: w.name,
+      value: getNextWeekdayDate(w.day).toISOString(),
     })),
   ];
 
@@ -69,7 +69,27 @@ export default function AddTask() {
     nextDate.setHours(0, 0, 0, 0);
     return nextDate;
   }
-  
+
+  const getDeadlineLabel = (dueDate) => {
+    if (!dueDate) return "";
+
+    const selected = deadlineItems.find((item) => item.value === dueDate);
+    if (selected) return selected.name;
+
+    const due = new Date(dueDate);
+    for (let item of deadlineItems) {
+      const itemDate = new Date(item.value);
+      if (
+        itemDate.getFullYear() === due.getFullYear() &&
+        itemDate.getMonth() === due.getMonth() &&
+        itemDate.getDate() === due.getDate()
+      ) {
+        return item.name;
+      }
+    }
+    return "";
+  };
+
   const selectedCategoryName =
     categories.find((cat) => cat.value === taskData.category)?.name || "";
 
@@ -201,7 +221,7 @@ export default function AddTask() {
                 <Dropdown
                   items={deadlineItems}
                   placeholder={t("Choose Deadline")}
-                  value={taskData.dueDate || ""}
+                  value={getDeadlineLabel(taskData.dueDate)}
                   getValue={(value) => setTaskData("dueDate", value)}
                 />
 
