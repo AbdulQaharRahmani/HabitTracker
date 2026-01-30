@@ -17,6 +17,7 @@ export const useTaskCardStore = create((set, get) => ({
     description: "",
     dueDate: null,
     category: null,
+    priority: null,
   },
 
   setModalOpen: () => {
@@ -27,6 +28,7 @@ export const useTaskCardStore = create((set, get) => ({
         description: "",
         dueDate: null,
         category: null,
+        priority: null,
       },
     }));
   },
@@ -69,8 +71,9 @@ export const useTaskCardStore = create((set, get) => ({
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
-        dueDate: date.toISOString(), 
+        dueDate: date.toISOString(),
         categoryId: taskPayload.categoryId, //for backend
+        priority: taskPayload.priority,
       };
 
       const res = await api.post("/tasks", payload);
@@ -90,6 +93,7 @@ export const useTaskCardStore = create((set, get) => ({
               dueDate: taskPayload.dueDate,
               category: categoryName, //for UI
               done: false,
+              priority: taskPayload.priority
             },
           ],
         };
@@ -148,6 +152,7 @@ export const useTaskCardStore = create((set, get) => ({
         description: task.description,
         dueDate: task.dueDate,
         category: task.categoryId,
+        priority: task.priority,
       },
     });
   },
@@ -161,6 +166,7 @@ export const useTaskCardStore = create((set, get) => ({
         description: "",
         dueDate: null,
         category: null,
+        priority: null,
       },
     }),
 
@@ -173,6 +179,7 @@ export const useTaskCardStore = create((set, get) => ({
         description: taskPayload.description,
         dueDate: date.toISOString(),
         categoryId: taskPayload.categoryId,
+        priority:taskPayload.priority
       };
 
       await api.put(`/tasks/${taskId}`, payload);
