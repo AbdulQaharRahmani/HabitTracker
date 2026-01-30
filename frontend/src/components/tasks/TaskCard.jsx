@@ -13,6 +13,7 @@ export default function TaskCard({
   description,
   status,
   _id,
+  priority,
 }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
@@ -27,10 +28,21 @@ export default function TaskCard({
     none: "bg-gray-100/100 text-gray-500",
   };
 
+  const priorityBorder = {
+    high: "border-l-4 border-indigo-600",
+    medium: "border-l-4 border-orange-500",
+    low: "border-l-4 border-gray-300",
+  };
+
   const { t } = useTranslation();
 
   return (
-    <div className="flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8">
+    <div
+      className={`flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8 
+        ${priorityBorder[priority] ?? "border-l-4 border-gray-400"}
+      `}
+        
+    >
       <div
         className={`flex items-center justify-between border-gray-300 mx-4 px-4 pr-8 text-center ${
           i18n.language === "fa" ? "border-l pl-10" : "border-r "
@@ -120,10 +132,10 @@ export default function TaskCard({
           <CiEdit
             size={24}
             className="
-                text-gray-300 dark:text-gray-500
-                hover:text-indigo-600 transition
-                dark:hover:text-indigo-600
-                "
+              text-gray-300 dark:text-gray-500
+              hover:text-indigo-600 transition
+              dark:hover:text-indigo-600
+            "
           />
         </button>
       </div>
