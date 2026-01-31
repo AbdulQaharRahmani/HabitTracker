@@ -10,7 +10,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import mongoSanitize from 'express-mongo-sanitize';
+import mongoSanitize from '@exortek/express-mongo-sanitize';
 
 const app = express();
 
