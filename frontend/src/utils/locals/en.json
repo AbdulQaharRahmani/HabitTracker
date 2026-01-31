@@ -49,7 +49,7 @@
   "Yesterday": "Yesterday",
   "Tomorrow": "Tomorrow",
   "No date": "No date",
-  
+
   "Your Progress": "Your Progress",
   "Overview of your consistency and growth.": "Overview of your consistency and growth.",
   "TOTAL HABITS": "TOTAL HABITS",
@@ -91,5 +91,23 @@
   "Choose Task Priority": "Choose Task Priority",
   "low": "low",
   "medium": "medium",
-  "high": "high"
+  "high": "high",
+
+  "create_account": "Create Account",
+  "your_journey": "Start your journey to better habits today.",
+  "full_name": "Full Name",
+  "john_doe": "John Doe",
+  "email_address": "Email Address",
+  "hello_example": "hello@example.com",
+  "password": "Password",
+  "terms_agreement": "I agree to the",
+  "terms_of_service": "Terms of Service",
+  "and": "and",
+  "privacy_policy": "Privacy Policy",
+  "sign_up": "Sign Up",
+  "or_continue_with": "Or continue with",
+  "google": "Google",
+  "apple": "Apple",
+  "already_have_account": "Already have an account?",
+  "log_in": "Log in"
 }
