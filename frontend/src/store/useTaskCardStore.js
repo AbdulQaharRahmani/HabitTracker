@@ -73,7 +73,7 @@ export const useTaskCardStore = create((set, get) => ({
         description: taskPayload.description,
         dueDate: date.toISOString(),
         categoryId: taskPayload.categoryId, //for backend
-        priority: taskPayload.priority,
+        priority: normalizePriorityToEnglish(taskPayload.priority),
       };
 
       const res = await api.post("/tasks", payload);
@@ -92,10 +92,9 @@ export const useTaskCardStore = create((set, get) => ({
               description: taskPayload.description,
               dueDate: taskPayload.dueDate,
               category: categoryName, //for UI
-              categoryId: taskPayload.categoryId, // ✅ STORE ID
-              // category: categoryName || "—", // ✅ STORE NAME
+              categoryId: taskPayload.categoryId,
               done: false,
-              priority: taskPayload.priority,
+              priority: normalizePriorityToEnglish(taskPayload.priority),
             },
           ],
         };
@@ -186,7 +185,7 @@ export const useTaskCardStore = create((set, get) => ({
         dueDate: date.toISOString(),
         categoryId: taskPayload.category,
         category: categoryName,
-        priority: taskPayload.priority,
+        priority: normalizePriorityToEnglish(taskPayload.priority),
       };
 
       await api.put(`/tasks/${taskId}`, payload);
@@ -198,6 +197,7 @@ export const useTaskCardStore = create((set, get) => ({
                 ...task,
                 ...taskPayload,
                 category: categoryName,
+                priority: normalizePriorityToEnglish(taskPayload.priority)
               }
             : task,
         ),
@@ -208,3 +208,20 @@ export const useTaskCardStore = create((set, get) => ({
     }
   },
 }));
+
+const normalizePriorityToEnglish = (value) => {
+  switch (value) {
+    case "زیاد":
+      return "high";
+    case "متوسط":
+      return "medium";
+    case "کم":
+      return "low";
+    case "high":
+    case "medium":
+    case "low":
+      return value;
+    default:
+      return "medium";
+  }
+};
