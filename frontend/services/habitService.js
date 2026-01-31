@@ -1,6 +1,14 @@
 import api from "./api";
-
-export const getTodayHabits = async () => {
-  const response = await api.get("/habits/date");
+import {formatDate} from "../src/utils/dateFormatter"
+export const getHabitsByDate = async (date) => {
+  const formattedDate = formatDate(date)
+  const response = await api.get(`/habits/date?date=${formattedDate}`);
   return response.data.data;
 };
+export const completeHabit = async (id)=>{
+   await api.post(`/habits/${id}/complete`)
+}
+export const unCompleteHabit = async (id)=>{
+   await api.delete(`/habits/${id}/complete`)
+}
+
