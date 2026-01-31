@@ -124,10 +124,11 @@ export const getHabitsDashboard = async (req, res) => {
   });
 };
 
-// Chart Data: Build daily completion counts for given date
+// Chart Data: Build daily and monthly completion counts for given date
 export const getHabitChartData = async (req, res) => {
   const today = dayjs();
 
+  // After logs PR merged, use its getStartAndEndDate helper function here!!
   const startDate = req.query.startDate
     ? dayjs(req.query.startDate).startOf('day')
     : today.clone().subtract(29, 'day').startOf('day');
@@ -174,18 +175,10 @@ export const getHabitChartData = async (req, res) => {
     },
   ]);
 
-  // [
-  //  { _id: '2025-12-02', completed: 4 },
-  //  { _id: '2025-12-03', completed: 2 },
-  // ]
-
   const completionMap = {};
   completions.forEach((r) => {
     completionMap[r._id] = r.completed;
   });
-
-  // { '2025-12-02': 3 },
-  // { '2025-12-04': 1 },
 
   const chartData = [];
   let currentDate = startDate.clone();
@@ -200,12 +193,6 @@ export const getHabitChartData = async (req, res) => {
 
     currentDate = currentDate.add(1, 'day');
   }
-
-  // [
-  //  { date: '2025-12-02', completed: 3 },
-  //  { date: '2025-12-03', completed: 0 },  // missing day
-  //  { date: '2025-12-04', completed: 1 },
-  // ]
 
   res.status(200).json({
     success: true,
