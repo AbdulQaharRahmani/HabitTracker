@@ -98,17 +98,12 @@ export default function AddTask() {
     { name: t("medium"), value: t("medium") },
     { name: t("high"), value: t("high") },
   ];
-  
+
   const HandleTaskCreation = async (e) => {
     e.preventDefault();
 
     if (!taskData.title) {
       toast.error(t("Title is required!"));
-      return;
-    }
-
-    if (!taskData.description) {
-      toast.error(t("Descripton is required!"));
       return;
     }
 

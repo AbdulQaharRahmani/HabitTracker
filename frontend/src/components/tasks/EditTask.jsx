@@ -111,11 +111,6 @@ export default function EditTask () {
         return;
       }
 
-      if (!taskData.description) {
-        toast.error(t("Description is required!"));
-        return;
-      }
-
       if (!taskData.dueDate) {
         toast.error(t("Deadline is required!"));
         return;
