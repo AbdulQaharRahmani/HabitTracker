@@ -26,11 +26,10 @@ const limiter = rateLimit({
     return req.user ? req.user._id.toString() : req.ip;
   },
   windowMs: 15 * 60 * 1000,
-  limit: 100,
+  limit: (req) => (req.user ? 100 : 50),
   message: 'Too many requests, please try again later.',
 });
 
-// app.use('/api', limiter);
 app.use(mongoSanitize());
 
 //#endregion
