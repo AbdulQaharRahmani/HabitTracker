@@ -19,7 +19,7 @@ const color = categoryId?.backgroundColor || '#6366F1';
 
 <div className='flex justify-between w-full'>
       <div className='flex-1'>
-        <h3 className="text-xl font-semibold text-gray-500 pr-12">{title ? title : "No Title"}</h3>
+        <h3 className="text-xl font-semibold text-gray-500">{title ? title : "No Title"}</h3>
         <p className="text-sm text-gray-400">{description ? description : "No Description"}</p>
 
         <div className="flex items-center gap-4 mt-2">
