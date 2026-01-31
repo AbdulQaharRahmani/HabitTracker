@@ -5,7 +5,9 @@ import Search from "../components/Search.jsx";
 import AddHabit from "../components/AddHabit.jsx";
 import View from "../components/View.jsx";
 import HabitList from "../components/HabitList.jsx";
+import { useTranslation } from "react-i18next";
 export default function Habits() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("list");
 
@@ -14,11 +16,10 @@ export default function Habits() {
       {/* Header Section */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <Header
-          title="All Habits"
-          subtitle="Manage and track your daily routines effectively."
+          title={t("All Habits")}
+          subtitle={t("Manage and track your daily routines effectively.")}
         />
       </div>
-
       <hr className="my-4 mx-2 md:ml-6 md:mr-4 border-gray-200 dark:border-gray-700" />
 
       {/* Control Section: Search, View, AddHabit */}
@@ -34,7 +35,7 @@ export default function Habits() {
       </div>
 
       {/* Content Section: Habit list */}
-      <div className="lg:ml-6">
+      <div className="">
         <HabitList viewMode={viewMode} searchTerm={searchTerm} />
       </div>
     </div>
