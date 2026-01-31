@@ -39,9 +39,8 @@ export default function TaskCard({
   return (
     <div
       className={`flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8 
-        ${priorityBorder[priority] ?? "border-l-4 border-gray-400"}
+        ${priorityBorder[priority] ?? "-l-4 border-gray-400"}
       `}
-        
     >
       <div
         className={`flex items-center justify-between border-gray-300 mx-4 px-4 pr-8 text-center ${
