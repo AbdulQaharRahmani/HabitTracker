@@ -9,3 +9,15 @@ export const uploadProfilePicture = (file) => {
   formData.append('profilePicture', file);
   return api.post('/users/profile-picture', formData);
 };
+
+
+export const updateUserPrefrences = (preferences) => {
+  return api.put(`/users/preference`, preferences);
+}
+
+export const getUserPrefrences = () => {
+  return api.get(`/users/preference`);
+}
+
+
+
