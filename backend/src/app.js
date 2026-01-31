@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import taskRoutes from './routes/task.js';
 import categoryRoutes from './routes/categories.js';
+import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
@@ -52,6 +53,7 @@ app.use('/api/categories', authMiddleware, limiter, categoryRoutes);
 app.use('/api/habits', authMiddleware, limiter, habitRoutes);
 app.use('/api/tasks', authMiddleware, limiter, taskRoutes);
 app.use('/api/users', authMiddleware, limiter, userRoutes);
+app.use('/api/offline-data', authMiddleware, limiter, syncRoutes);
 
 //#endregion
 
