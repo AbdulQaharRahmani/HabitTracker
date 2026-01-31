@@ -194,8 +194,25 @@ export const getHabitChartData = async (req, res) => {
     currentDate = currentDate.add(1, 'day');
   }
 
+  // const monthly = buildMonthlyFromDaily(chartData);
+
+  const map = {};
+
+  chartData.forEach((item) => {
+    const monthKey = item.date.slice(0, 7);
+    map[monthKey] = (map[monthKey] || 0) + item.completed;
+  });
+
+  const monthly = Object.entries(map).map(([date, completed]) => ({
+    date,
+    completed,
+  }));
+
   res.status(200).json({
     success: true,
-    data: chartData,
+    data: {
+      daily: chartData,
+      monthly: monthly,
+    },
   });
 };
