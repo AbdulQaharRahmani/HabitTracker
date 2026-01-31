@@ -95,11 +95,10 @@ export default function EditTask () {
       return "";
     };
 
-
     const priorityItems = [
-      { name: "low", value: "low" },
-      { name: "medium", value: "medium" },
-      { name: "high", value: "high" },
+      { name: t("low"), value: t("low") },
+      { name: t("medium"), value: t("medium") },
+      { name: t("high"), value: t("high") },
     ];
 
     const HandleTaskEdition = async (e) => {

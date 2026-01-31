@@ -94,11 +94,11 @@ export default function AddTask() {
     categories.find((cat) => cat.value === taskData.category)?.name || "";
 
   const priorityItems = [
-    { name: "low", value: "low" },
-    { name: "medium", value: "medium" },
-    { name: "high", value: "high" },
+    { name: t("low"), value: t("low") },
+    { name: t("medium"), value: t("medium") },
+    { name: t("high"), value: t("high") },
   ];
-
+  
   const HandleTaskCreation = async (e) => {
     e.preventDefault();
 

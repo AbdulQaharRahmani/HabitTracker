@@ -86,5 +86,10 @@
   "Edit Task": "Edit Task",
   "Save Changes": "Save Changes",
   "Task edited successfully!": "Task edited successfully!",
-  "Sorry! could not edit task": "Sorry! could not edit task"
+  "Sorry! could not edit task": "Sorry! could not edit task",
+  "Priority": "Priority",
+  "Choose Task Priority": "Choose Task Priority",
+  "low": "low",
+  "medium": "medium",
+  "high": "high"
 }

@@ -94,5 +94,10 @@
   "Edit Task": "ویرایش عملیات",
   "Save Changes": "ذخیره تفییرات",
   "Task edited successfully!": "عملیات با موفقیت ویرایش شد!",
-  "Sorry! could not edit task": "خطا! متاسفانه عملیات ویرایش  نشده!"
+  "Sorry! could not edit task": "خطا! متاسفانه عملیات ویرایش  نشده!",
+  "Priority": "اولویت",
+  "Choose Task Priority": "اولویت عملیات را انتخاب کنید",
+  "low": "کم",
+  "medium": "متوسط",
+  "high": "زیاد"
 }
