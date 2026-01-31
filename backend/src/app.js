@@ -22,12 +22,15 @@ app.use(express.json());
 app.use(cors({ origin: '*' }));
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 min
+  keyGenerator: (req) => {
+    return req.user ? req.user._id.toString() : req.ip;
+  },
+  windowMs: 15 * 60 * 1000,
   limit: 100,
   message: 'Too many requests, please try again later.',
 });
 
-app.use('/api', limiter);
+// app.use('/api', limiter);
 app.use(mongoSanitize());
 
 //#endregion
@@ -42,14 +45,14 @@ app.get('/api/health', (req, res) => {
 
 // Public routes
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', limiter, authRoutes);
 
 // Protect routes
 
-app.use('/api/categories', authMiddleware, categoryRoutes);
-app.use('/api/habits', authMiddleware, habitRoutes);
-app.use('/api/tasks', authMiddleware, taskRoutes);
-app.use('/api/users', authMiddleware, userRoutes);
+app.use('/api/categories', authMiddleware, limiter, categoryRoutes);
+app.use('/api/habits', authMiddleware, limiter, habitRoutes);
+app.use('/api/tasks', authMiddleware, limiter, taskRoutes);
+app.use('/api/users', authMiddleware, limiter, userRoutes);
 
 //#endregion
 
