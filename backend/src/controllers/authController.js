@@ -89,7 +89,7 @@ export const loginUser = async (req, res) => {
   const existingToken = await refreshTokenModel.findOne({ userId: user._id });
 
   if (existingToken) {
-    await existingToken.set({token: hashedToken, expiresAt}).save()
+    await existingToken.set({ token: hashedToken, expiresAt }).save()
   } else {
     await refreshTokenModel.create({
       userId: user._id,
@@ -182,7 +182,7 @@ export const googleLogin = async (req, res) => {
   const existingToken = await refreshTokenModel.findOne({ userId: user._id });
 
   if (existingToken) {
-    await existingToken.set({token: hashedToken, expiresAt}).save()
+    await existingToken.set({ token: hashedToken, expiresAt }).save()
   } else {
     await refreshTokenModel.create({
       userId: user._id,
@@ -224,16 +224,19 @@ export const refreshAccessToken = async (req, res) => {
 
   await refreshTokenModel.deleteOne({ token: hashedToken }); //delete previous hashed token
 
-  const user = await UserModel.findById({_id: storeToken.userId})
-  if(!user) throw unauthorized()
+  const user = await UserModel.findById({ _id: storeToken.userId })
+  if (!user) throw unauthorized()
 
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken();
 
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
+
   await refreshTokenModel.create({
     userId: storeToken.userId,
     token: hashRefreshToken(refreshToken),
-    expiresAt: storeToken.expiresAt,
+    expiresAt: expiresAt,
   });
 
   const isProduction = process.env.NODE_ENV === 'production';
