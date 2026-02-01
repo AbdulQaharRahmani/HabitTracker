@@ -1,6 +1,6 @@
 import { FaSearch } from "react-icons/fa";
 
-export default function Search({ searchTerm, setSearchTerm }) {
+export default function Search({ searchTerm, setSearchTerm, placeholder }) {
   return (
     <div className="w-full">
       <div
@@ -18,7 +18,7 @@ export default function Search({ searchTerm, setSearchTerm }) {
 
         <input
           type="text"
-          placeholder="Search habits..."
+          placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="
