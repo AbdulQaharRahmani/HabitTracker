@@ -20,39 +20,26 @@ export default function HabitCard({
   return (
     <div
       className={`
-        relative rounded-xl bg-white shadow-sm p-4
-        ${viewMode === "grid" ? "w-full sm:max-w-sm" : "w-full"}
+        mx-auto p-4 rounded-xl bg-white shadow-sm
+        flex relative items-start gap-4 min-h-[125px]
+        flex-wrap sm:flex-nowrap
+        ${viewMode === "grid" ? "w-full max-w-xs" : "w-full"}
       `}
     >
-      <button
-        onClick={() =>
-          openEditHabitModal({
-            _id,
-            title,
-            description,
-            categoryId: categoryId?._id,
-            frequency,
-          })
-        }
-        className="absolute top-4 end-4 text-indigo-500 hover:text-indigo-600"
-      >
-        <LuPencil size={18} />
-      </button>
+      <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
 
-      {/* Content */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
-
+      <div className="flex justify-between w-full min-w-0">
+        {/* Text Content */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-600 truncate">
+          <h3 className="text-xl font-semibold text-gray-500 truncate">
             {title || "No Title"}
           </h3>
 
-          <p className="text-sm text-gray-400 line-clamp-2">
+          <p className="text-sm text-gray-400 break-words">
             {description || "No Description"}
           </p>
 
-          <div className="flex flex-wrap items-center gap-2 mt-3">
+          <div className="flex flex-wrap items-center gap-4 mt-2">
             <span
               className="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md"
               style={{ backgroundColor: bgColor, color }}
@@ -60,12 +47,29 @@ export default function HabitCard({
               {categoryId?.name || "No Category"}
             </span>
 
-            <span className="flex items-center text-xs text-gray-400">
+            <span className="flex items-center text-[12px] text-gray-400">
               {frequency || "No frequency"}
               <FaCircle className="mx-2 text-[5px]" />
-              {duration || "No duration"}
+              {duration || "No Duration"}
             </span>
           </div>
+        </div>
+
+        {/* Edit Icon */}
+        <div className="shrink-0">
+          <LuPencil
+            size={20}
+            className="text-[#6366F1] cursor-pointer"
+            onClick={() =>
+              openEditHabitModal({
+                _id,
+                title,
+                description,
+                categoryId: categoryId?._id,
+                frequency,
+              })
+            }
+          />
         </div>
       </div>
     </div>
