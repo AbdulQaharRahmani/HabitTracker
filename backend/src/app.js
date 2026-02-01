@@ -10,7 +10,7 @@ import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import mongoSanitize from '@exortek/express-mongo-sanitize';
 
 const app = express();
@@ -24,7 +24,7 @@ app.use(cors({ origin: '*' }));
 
 const limiter = rateLimit({
   keyGenerator: (req) => {
-    return req.user ? req.user._id.toString() : req.ip;
+    return req.user ? req.user._id.toString() : ipKeyGenerator(req);
   },
   windowMs: 15 * 60 * 1000,
   limit: (req) => (req.user ? 100 : 50),
