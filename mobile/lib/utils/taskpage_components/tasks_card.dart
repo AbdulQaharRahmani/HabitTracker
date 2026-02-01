@@ -127,4 +127,43 @@ class TasksCard extends StatelessWidget {
         return Colors.grey;
     }
   }
+
+  /// Skeleton loader for loading state
+  static Widget skeleton() {
+    return Card(
+      margin: const EdgeInsets.fromLTRB(21, 0, 21, 10),
+      elevation: 0,
+      color: Colors.grey.shade300,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(width: 40, height: 40, color: Colors.grey.shade400),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(height: 15, color: Colors.grey.shade400),
+                  const SizedBox(height: 4),
+                  Container(height: 12, color: Colors.grey.shade400),
+                  const SizedBox(height: 8),
+                  Container(height: 12, width: 80, color: Colors.grey.shade400),
+                ],
+              ),
+            ),
+            Column(
+              children: const [
+                Icon(Icons.radio_button_unchecked, color: Colors.grey),
+                SizedBox(height: 8),
+                Icon(Icons.edit, color: Colors.grey),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

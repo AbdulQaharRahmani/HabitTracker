@@ -63,6 +63,36 @@ class Task {
     );
   }
 
+  /// ================== COPYWITH ==================
+  Task copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? status,
+    String? priority,
+    DateTime? dueDate,
+    String? userId,
+    bool? isDeleted,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    CategoryModel? category,
+    String? categoryId,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      priority: priority ?? this.priority,
+      dueDate: dueDate ?? this.dueDate,
+      userId: userId ?? this.userId,
+      isDeleted: isDeleted ?? this.isDeleted,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
+    );
+  }
 
 
   bool get isDone => status == 'done';
