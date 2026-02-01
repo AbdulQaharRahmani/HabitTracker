@@ -43,7 +43,7 @@ export default function Habits() {
           </div>
         </div>
       </div>
-      <div className="pb-8 sm:pb-12">
+      <div className="pb-4 sm:pb-10">
         <HabitList viewMode={viewMode} searchTerm={searchTerm} />
       </div>
     </div>
