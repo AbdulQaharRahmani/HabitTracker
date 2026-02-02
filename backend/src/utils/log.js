@@ -44,14 +44,20 @@ export const readLogsByDate = (date) => {
 
 export const getTop = (items, key, limit = 5) => {
   const map = {};
+  let total = 0;
 
   for (let item of items) {
     if (!item[key]) continue;
     map[item[key]] = (map[item[key]] || 0) + 1;
+    total++;
   }
 
   return Object.entries(map)
-    .map(([name, count]) => ({ name, count }))
+    .map(([name, count]) => ({
+      name,
+      count,
+      percent: ((count / total) * 100).toFixed(1),
+    }))
     .sort((a, b) => b.count - a.count)
     .slice(0, limit);
 };
