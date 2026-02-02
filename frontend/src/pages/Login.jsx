@@ -17,7 +17,6 @@ export default function Login() {
   };
   const navigate = useNavigate();
   const { login } = useAuthStore();
-
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email.trim() || !password.trim())
@@ -25,9 +24,11 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await api.post("/auth/login", { email, password });
-      const token = response.data.data.token;
-      if (token) {
-        login(token);
+      const { token, id, username } = response.data.data;
+
+      console.log(token, id, username);
+      if (token && id) {
+        login(token, id, username);
         toast.success("Welcome again!");
         navigate("/");
       }

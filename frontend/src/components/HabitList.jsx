@@ -35,13 +35,13 @@ export default function HabitList({
       });
   }, [allhabits, searchTerm]);
 
-  // Slice for current page
+  // Slice for current page logic
   const start = (currentPage - 1) * ITEMS_PER_PAGE;
   const visibleHabits = filteredHabits.slice(start, start + ITEMS_PER_PAGE);
 
   if (loading && allhabits.length === 0) {
     return (
-      <p className="text-gray-300 text-lg font-semibold my-4 text-center">
+      <p className="text-gray-400 dark:text-gray-500 text-lg font-semibold my-4 text-center">
         Loading Habits ...
       </p>
     );
@@ -49,7 +49,7 @@ export default function HabitList({
 
   if (error) {
     return (
-      <p className="text-rose-400 text-lg font-semibold text-center my-4">
+      <p className="text-rose-400 dark:text-rose-500 text-lg font-semibold text-center my-4">
         Error: {error}
       </p>
     );
@@ -65,7 +65,7 @@ export default function HabitList({
         }
       >
         {visibleHabits.length === 0 ? (
-          <p className="text-gray-500 text-lg">
+          <p className="text-gray-500 dark:text-gray-400 text-lg">
             No habits found matching "{searchTerm}".
           </p>
         ) : (
@@ -84,12 +84,15 @@ export default function HabitList({
         )}
       </div>
 
-      <Pagination
-        currentPage={currentPage}
-        totalCount={filteredHabits.length}
-        pageSize={ITEMS_PER_PAGE}
-        onPageChange={setCurrentPage}
-      />
+      {/* Pagination component is correctly placed here */}
+      <div className="mt-8">
+        <Pagination
+          currentPage={currentPage}
+          totalCount={filteredHabits.length}
+          pageSize={ITEMS_PER_PAGE}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </>
   );
 }
