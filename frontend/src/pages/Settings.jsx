@@ -1,10 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../components/ThemeContext";
+import toast from "react-hot-toast";
+import api from "../../services/api";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Settings = () => {
   const { t } = useTranslation();
   const { isDark, setTheme } = useTheme();
+
+  // 🔹 username state
+  const [username, setUsername] = useState("");
+
+  // 🔹 password modal state
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [oldPasswordType, setOldPasswordType] = useState("password");
+  const [newPasswordType, setNewPasswordType] = useState("password");
+
+  // 🔹 save username on blur
+  const handleUsernameBlur = async () => {
+    if (!username.trim()) return;
+    try {
+      await api.patch("/users/username", { username });
+      toast.success("Username updated");
+    } catch (err) {
+      console.log(err.response?.data);
+      toast.error(err.response?.data?.message || "Could not update username");
+    }
+  };
+
+  // 🔹 change password
+  const handleChangePassword = async () => {
+    try {
+      await api.patch("/users/changePassword", {
+        oldPassword,
+        newPassword,
+      });
+      toast.success("Password changed successfully");
+      setShowPasswordModal(false);
+      setOldPassword("");
+      setNewPassword("");
+    } catch (err) {
+      console.log(err.response?.data);
+      toast.error(err.response?.data?.message || "Failed to change password");
+    }
+  };
 
   return (
     <div className="min-h-screen p-6 font-sans transition-colors duration-200 bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">
@@ -47,6 +89,9 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="User Name"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      onBlur={handleUsernameBlur}
                       className="w-full px-4 py-2 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
                     />
                   </div>
@@ -61,9 +106,99 @@ const Settings = () => {
                     />
                   </div>
                 </div>
-                <button className="px-4 py-2 text-sm font-medium transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">
+
+                {/* Change Password Button */}
+                <button
+                  onClick={() => setShowPasswordModal(true)}
+                  className="px-4 py-2 text-sm font-medium transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300"
+                >
                   {t("Change Password")}
                 </button>
+
+                {/* 🔹 Password Modal */}
+                {showPasswordModal && (
+                  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+                    <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl w-full max-w-md shadow-lg relative">
+                      <h2 className="text-xl font-bold mb-4 text-slate-800 dark:text-white">
+                        Change Password
+                      </h2>
+
+                      <div className="mb-4 relative">
+                        <label className="block mb-2 text-sm font-semibold text-slate-700 dark:text-gray-300">
+                          Old Password
+                        </label>
+                        <input
+                          type={oldPasswordType}
+                          value={oldPassword}
+                          onChange={(e) => setOldPassword(e.target.value)}
+                          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOldPasswordType(
+                              oldPasswordType === "password"
+                                ? "text"
+                                : "password",
+                            )
+                          }
+                          className="absolute right-3 top-12 -translate-y-1/2 text-gray-500 "
+                        >
+                          {oldPasswordType === "password" ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="mb-4 relative">
+                        <label className="block mb-2 text-sm font-semibold text-slate-700 dark:text-gray-300">
+                          New Password
+                        </label>
+                        <input
+                          type={newPasswordType}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setNewPasswordType(
+                              newPasswordType === "password"
+                                ? "text"
+                                : "password",
+                            )
+                          }
+                          className="absolute right-3 top-1
+                          2 -translate-y-1/2 text-gray-500"
+                        >
+                          {newPasswordType === "password" ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => setShowPasswordModal(false)}
+                          className="px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleChangePassword}
+                          className="px-4 py-2 rounded-lg bg-blue-600 text-white"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </section>
