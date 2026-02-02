@@ -69,6 +69,7 @@ class TaskApiService {
     required String priority,
     required String categoryId,
     String? token,
+    String? dueDate,
   }) async {
     final authToken = token ?? await TokenStorage.getToken();
     if (authToken == null) {
@@ -155,14 +156,27 @@ class TaskApiService {
   }) async {
     final newStatus = currentStatus == 'done' ? 'todo' : 'done';
 
+    final url = Uri.parse('$baseUrl/tasks/$taskId/status');
+    final body = jsonEncode({'status': newStatus});
+
+    // ===== DEBUG: Show exactly what we are sending to backend =====
+    debugPrint('🔹 Toggle Task Status Request');
+    debugPrint('URL: $url');
+    debugPrint('Headers: {Authorization: Bearer $token, Content-Type: application/json}');
+    debugPrint('Body: $body');
+
     final response = await http.patch(
-      Uri.parse('$baseUrl/tasks/$taskId/status'),
+      url,
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({'status': newStatus}),
+      body: body,
     );
+
+    // ===== DEBUG: Show response from backend =====
+    debugPrint('🔹 Response Status: ${response.statusCode}');
+    debugPrint('🔹 Response Body: ${response.body}');
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update task status');
