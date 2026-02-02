@@ -1,4 +1,8 @@
+import { useTranslation } from "react-i18next";
+
+
 function CircularProgress({ percent = 0 }) {
+  const { t } = useTranslation();
   const strokeWidth = 12;
   const radius = 60 - strokeWidth / 2;
   const circumference = 2 * Math.PI * radius;
@@ -73,10 +77,10 @@ function CircularProgress({ percent = 0 }) {
 
       {/* Footer */}
       <p className="font-bold text-gray-900 dark:text-gray-100">
-        Daily Goal Progress
+        {t("Daily Goal Progress")}
       </p>
       <p className="text-sm text-center text-gray-600 dark:text-gray-300">
-        Keep it up! You're almost there. Consistency is key.
+        {t("Keep it up! You're almost there. Consistency is key.")}
       </p>
     </div>
   );
