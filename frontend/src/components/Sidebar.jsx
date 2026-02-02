@@ -9,6 +9,7 @@ import {
   FaTimes,
   FaUser,
 } from "react-icons/fa";
+import { LuLogs } from "react-icons/lu";
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 
 import { NavLink } from "react-router-dom";
@@ -30,6 +31,12 @@ const dashboardItems = [
     name: "Statistics",
     icon: <FaChartLine />,
     path: "/statistics",
+  },
+  {
+    id: "logs",
+    name: "Logs",
+    icon: <LuLogs />,
+    path: "/logs",
   },
 ];
 
