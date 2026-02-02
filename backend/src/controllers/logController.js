@@ -37,7 +37,7 @@ export const getLogs = async (req, res) => {
 
   if (req.query.search) {
     const searchTerm = req.query.search.toLowerCase();
-    logs = logs.filter((log) => log.message.toLowerCase().includes(searchTerm));
+    logs = logs.filter((log) => log.path.toLowerCase().includes(searchTerm));
   }
 
   // pagination
