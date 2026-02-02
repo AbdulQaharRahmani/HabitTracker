@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { getTasks } from "../../services/tasksService";
+import { getTasks, updateTaskStatus } from "../../services/tasksService";
 
-export const useTaskCardStore = create((set) => ({
+export const useTaskCardStore = create((set, get) => ({
   tasks: [],
   loading: false,
   error: null,
@@ -50,15 +50,34 @@ export const useTaskCardStore = create((set) => ({
     } catch (err) {
       set({ error: err?.message || "An error occurred", loading: false });
     }
-  },
-  completeTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) => {
-        return task._id === id
+  },  
+
+  completeTask: async (id) => {
+    const {tasks} = get();
+    const task = tasks.find((task) => task._id === id);
+
+    if (!task)
+      return;
+
+    set({
+      tasks: tasks.map((task) =>
+        task._id === id
           ? { ...task, status: task.status === "done" ? "todo" : "done" }
-          : task;
-      }),
-    })),
+          : task,
+      ),
+    });
+
+    try{
+      await updateTaskStatus(id, task.status === "done" ? "todo" : "done");
+    } catch (err) {
+      set({
+        tasks: tasks.map((task) => 
+        task._id === id ? {...task, status: task.status} : task
+      ), 
+      error: "Failed to update task completion" 
+      });
+    }
+  },
 
   deleteTask: (id) =>
     set((state) => ({
