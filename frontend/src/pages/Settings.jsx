@@ -1,13 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../components/ThemeContext";
+import ProfilePhoto from "../components/setting/ProfilePhoto";
+import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
+import { useDebounce } from "../hooks/useDebounce";
 import toast from "react-hot-toast";
 import api from "../../services/api";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Settings = () => {
   const { t } = useTranslation();
-  const { isDark, setTheme } = useTheme();
+  const { setTheme } = useTheme();
+
+  const { preferences, fetchUserPreferences, updateUserPrefrences } =
+    useProfilePhotoStore();
+
+  const [localPrefs, setLocalPrefs] = useState(null);
+  const debouncedPrefs = useDebounce(localPrefs, 700);
+  const hasInitialized = useRef(false);
 
   // 🔹 username state
   const [username, setUsername] = useState("");
@@ -18,6 +28,34 @@ const Settings = () => {
   const [newPassword, setNewPassword] = useState("");
   const [oldPasswordType, setOldPasswordType] = useState("password");
   const [newPasswordType, setNewPasswordType] = useState("password");
+
+  useEffect(() => {
+    fetchUserPreferences();
+  }, []);
+
+  useEffect(() => {
+    if (preferences && !hasInitialized.current) {
+      const cleanInitial = Object.fromEntries(
+        Object.entries(preferences).filter(([_, v]) => v !== null),
+      );
+      setLocalPrefs(cleanInitial);
+
+      if (preferences.theme) setTheme(preferences.theme);
+      hasInitialized.current = true;
+    }
+  }, [preferences, setTheme]);
+
+  useEffect(() => {
+    if (hasInitialized.current && debouncedPrefs) {
+      const prefsToSend = { ...debouncedPrefs };
+      if (prefsToSend.timezone === null) {
+        delete prefsToSend.timezone;
+      }
+      updateUserPrefrences(prefsToSend);
+    }
+  }, [debouncedPrefs]);
+
+  if (!localPrefs) return null;
 
   // 🔹 save username on blur
   const handleUsernameBlur = async () => {
@@ -67,19 +105,7 @@ const Settings = () => {
               {t("Profile Settings")}
             </h2>
             <div className="flex flex-col md:flex-row gap-8">
-              <div className="flex flex-col items-center space-y-4">
-                <div className="overflow-hidden border-4 border-white rounded-full w-24 h-24 shadow-md dark:border-gray-800 bg-orange-100 dark:bg-gray-800">
-                  <img
-                    src="https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg"
-                    alt="Profile"
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-                <button className="px-4 py-2 text-xs font-semibold transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">
-                  {t("CHANGE PHOTO")}
-                </button>
-              </div>
-
+              <ProfilePhoto />
               <div className="flex-1 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -171,8 +197,7 @@ const Settings = () => {
                                 : "password",
                             )
                           }
-                          className="absolute right-3 top-1
-                          2 -translate-y-1/2 text-gray-500"
+                          className="absolute right-3 top-12 -translate-y-1/2 text-gray-500"
                         >
                           {newPasswordType === "password" ? (
                             <FaEyeSlash />
@@ -219,11 +244,18 @@ const Settings = () => {
                   </p>
                 </div>
                 <select
-                  value={isDark ? "dark" : "light"}
-                  onChange={(e) => setTheme(e.target.value)}
+                  value={localPrefs?.theme || "light"}
+                  onChange={(e) => {
+                    const theme = e.target.value;
+                    setTheme(theme);
+                    setLocalPrefs({
+                      ...localPrefs,
+                      theme,
+                    });
+                  }}
                   className="px-4 py-2 text-sm transition-all border outline-none
-    bg-slate-50 border-slate-200 rounded-lg min-w-[180px]
-    dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                bg-slate-50 border-slate-200 rounded-lg min-w-[180px]
+                dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
                 >
                   <option value="light">{t("Light Mode")}</option>
                   <option value="dark">{t("Dark Mode")}</option>
@@ -239,14 +271,23 @@ const Settings = () => {
                     {t("Choose the first day of your week")}.
                   </p>
                 </div>
-                <select className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
-                  <option>Saturday</option>
-                  <option>Sunday</option>
-                  <option>Monday</option>
-                  <option>Tuesday</option>
-                  <option>Wednesday</option>
-                  <option>Thursday</option>
-                  <option>Friday</option>
+                <select
+                  value={localPrefs?.weekStartDay || "saturday"}
+                  onChange={(e) =>
+                    setLocalPrefs({
+                      ...localPrefs,
+                      weekStartDay: e.target.value,
+                    })
+                  }
+                  className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                >
+                  <option value="saturday">Saturday</option>
+                  <option value="sunday">Sunday</option>
+                  <option value="monday">Monday</option>
+                  <option value="tuesday">Tuesday</option>
+                  <option value="wednesday">Wednesday</option>
+                  <option value="thursday">Thursday</option>
+                  <option value="friday">Friday</option>
                 </select>
               </div>
             </div>
@@ -267,12 +308,21 @@ const Settings = () => {
                     {t("Set a time to be reminded of your habits")}.
                   </p>
                 </div>
-                <select className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
-                  <option>08:00 AM</option>
-                  <option>09:00 AM</option>
-                  <option>10:00 AM</option>
-                  <option>11:00 AM</option>
-                  <option>12:00 PM</option>
+                <select
+                  value={localPrefs?.dailyReminderTime || "08:00"}
+                  onChange={(e) =>
+                    setLocalPrefs({
+                      ...localPrefs,
+                      dailyReminderTime: e.target.value,
+                    })
+                  }
+                  className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                >
+                  <option value="08:00">08:00 AM</option>
+                  <option value="09:00">09:00 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="12:00">12:00 PM</option>
                 </select>
               </div>
 
@@ -289,7 +339,13 @@ const Settings = () => {
                   <input
                     type="checkbox"
                     className="sr-only peer"
-                    defaultChecked
+                    checked={localPrefs?.streakAlertEnabled || false}
+                    onChange={(e) =>
+                      setLocalPrefs({
+                        ...localPrefs,
+                        streakAlertEnabled: e.target.checked,
+                      })
+                    }
                   />
                   <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:after:bg-gray-200 peer-checked:bg-blue-600"></div>
                 </label>
@@ -308,7 +364,13 @@ const Settings = () => {
                   <input
                     type="checkbox"
                     className="sr-only peer"
-                    defaultChecked
+                    checked={localPrefs?.weeklySummaryEmailEnabled || false}
+                    onChange={(e) =>
+                      setLocalPrefs({
+                        ...localPrefs,
+                        weeklySummaryEmailEnabled: e.target.checked,
+                      })
+                    }
                   />
                   <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:after:bg-gray-200 peer-checked:bg-blue-600"></div>
                 </label>
