@@ -168,7 +168,7 @@ const Sidebar = ({ children }) => {
 
                           {isOpen && (
                             <>
-                              <span className="ml-4 font-medium">
+                              <span className="ml-4 rtl:mr-3 font-medium">
                                 {t(item.name)}
                               </span>
                               {isActive && (
@@ -223,7 +223,7 @@ const Sidebar = ({ children }) => {
 
                           {isOpen && (
                             <>
-                              <span className="ml-4 font-medium">
+                              <span className="ml-4 rtl:mr-3 font-medium">
                                 {t(item.name)}
                               </span>
                               {isActive && (
