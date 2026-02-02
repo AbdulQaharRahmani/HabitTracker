@@ -1,4 +1,5 @@
 ﻿import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
 import habitRoutes from './routes/habits.js';
@@ -17,10 +18,16 @@ const app = express();
 //#region Normal Midlleware
 
 app.use(express.json());
-app.use(cors({ origin: '*' }));
 
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'https://habittracker-kwpt.onrender.com'],
+    credentials: true,
+  })
+);
+
+app.use(cookieParser());
 app.use(logMiddleware);
-
 //#endregion
 
 //#region Route Middlewares
