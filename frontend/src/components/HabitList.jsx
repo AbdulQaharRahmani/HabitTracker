@@ -1,44 +1,45 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import HabitCard from "./HabitCard";
 import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
-import api from "../../services/api";
 
-export default function HabitList({ viewMode, searchTerm }) {
+export default function HabitList({
+  viewMode,
+  searchTerm,
+  currentPage,
+  setCurrentPage,
+}) {
   const { allhabits, loading, error, fetchHabits } = useHabitStore();
-  const [page, setPage] = useState(1);
-
   const ITEMS_PER_PAGE = 10;
 
+  // Fetch all habits once
   useEffect(() => {
     fetchHabits();
   }, [fetchHabits]);
 
+  // Filter habits based on search term
   const filteredHabits = useMemo(() => {
     const term = searchTerm.toLowerCase();
+    if (!term) return allhabits;
 
     return allhabits
       .filter(
         (habit) =>
-          habit.title.toLowerCase().includes(term) ||
-          habit.description.toLowerCase().includes(term),
+          habit.title?.toLowerCase().includes(term) ||
+          habit.description?.toLowerCase().includes(term),
       )
       .sort((a, b) => {
-        const aTitleMatch = a.title.toLowerCase().includes(term);
-        const bTitleMatch = b.title.toLowerCase().includes(term);
-
-        if (aTitleMatch && !bTitleMatch) return -1;
-        if (!aTitleMatch && bTitleMatch) return 1;
-        return 0;
+        const aMatch = a.title?.toLowerCase().includes(term);
+        const bMatch = b.title?.toLowerCase().includes(term);
+        return aMatch === bMatch ? 0 : aMatch ? -1 : 1;
       });
   }, [allhabits, searchTerm]);
 
-  const effectivePage = searchTerm ? 1 : page;
-
-  const start = (effectivePage - 1) * ITEMS_PER_PAGE;
+  // Slice for current page
+  const start = (currentPage - 1) * ITEMS_PER_PAGE;
   const visibleHabits = filteredHabits.slice(start, start + ITEMS_PER_PAGE);
 
-  if (loading) {
+  if (loading && allhabits.length === 0) {
     return (
       <p className="text-gray-300 text-lg font-semibold my-4 text-center">
         Loading Habits ...
@@ -84,10 +85,10 @@ export default function HabitList({ viewMode, searchTerm }) {
       </div>
 
       <Pagination
-        currentPage={effectivePage}
+        currentPage={currentPage}
         totalCount={filteredHabits.length}
         pageSize={ITEMS_PER_PAGE}
-        onPageChange={setPage}
+        onPageChange={setCurrentPage}
       />
     </>
   );
