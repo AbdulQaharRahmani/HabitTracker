@@ -1,4 +1,5 @@
 ﻿import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
 import habitRoutes from './routes/habits.js';
@@ -17,10 +18,7 @@ const app = express();
 
 //#region Normal Midlleware
 
-app.use(helmet());
-
 app.use(express.json());
-app.use(cors({ origin: '*' }));
 
 const limiter = rateLimit({
   keyGenerator: (req) => {
@@ -31,8 +29,16 @@ const limiter = rateLimit({
   message: 'Too many requests, please try again later.',
 });
 
-app.use(mongoSanitize());
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'https://habittracker-kwpt.onrender.com'],
+    credentials: true,
+  })
+);
 
+app.use(cookieParser());
+app.use(mongoSanitize());
+app.use(helmet());
 //#endregion
 
 //#region Route Middlewares
