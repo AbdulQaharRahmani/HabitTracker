@@ -41,7 +41,7 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   Future<void> _fetchTasks({bool reset = false}) async {
-    if (_isLoading) return; // جلوگیری از fetch همزمان
+    if (_isLoading) return;
     if (reset) {
       _page = 1;
       _tasks.clear();
@@ -61,9 +61,9 @@ class _TasksScreenState extends State<TasksScreen> {
         limit: _limit,
       );
 
-      // حذف آیتم‌های تکراری قبل از اضافه کردن
-      final newTasks =
-      data.where((t) => !_tasks.any((old) => old.id == t.id)).toList();
+      final newTasks = data
+          .where((t) => !_tasks.any((old) => old.id == t.id))
+          .toList();
 
       _tasks.addAll(newTasks);
 
@@ -140,11 +140,17 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredTasks = _tasks
-        .where((t) => t.title.toLowerCase().contains(_searchController.text.toLowerCase()))
+        .where(
+          (t) => t.title.toLowerCase().contains(
+            _searchController.text.toLowerCase(),
+          ),
+        )
         .toList();
 
     final activeTasks = filteredTasks.where((t) => t.status != 'done').toList();
-    final completedTasks = filteredTasks.where((t) => t.status == 'done').toList();
+    final completedTasks = filteredTasks
+        .where((t) => t.status == 'done')
+        .toList();
 
     _sortByDueDate(activeTasks);
     _sortByDueDate(completedTasks);
@@ -169,17 +175,24 @@ class _TasksScreenState extends State<TasksScreen> {
                         children: [
                           const Text(
                             'All Tasks',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25,
+                            ),
                           ),
                           ElevatedButton(
                             style: ButtonStyle(
-                              padding: const MaterialStatePropertyAll(
+                              padding: const WidgetStatePropertyAll(
                                 EdgeInsets.only(right: 0, left: 6),
                               ),
-                              fixedSize: const MaterialStatePropertyAll(Size(105, 30)),
-                              backgroundColor: const MaterialStatePropertyAll(AppTheme.primary),
-                              elevation: const MaterialStatePropertyAll(0),
-                              shape: MaterialStatePropertyAll(
+                              fixedSize: const WidgetStatePropertyAll(
+                                Size(105, 30),
+                              ),
+                              backgroundColor: const WidgetStatePropertyAll(
+                                AppTheme.primary,
+                              ),
+                              elevation: const WidgetStatePropertyAll(0),
+                              shape: WidgetStatePropertyAll(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -188,7 +201,9 @@ class _TasksScreenState extends State<TasksScreen> {
                             onPressed: () async {
                               final newTask = await Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const NewTaskPage()),
+                                MaterialPageRoute(
+                                  builder: (_) => const NewTaskPage(),
+                                ),
                               );
                               if (newTask != null) {
                                 await _refreshTasks();
@@ -204,7 +219,10 @@ class _TasksScreenState extends State<TasksScreen> {
                               children: const [
                                 Icon(Icons.add, color: Colors.white),
                                 SizedBox(width: 5),
-                                Text('New Task', style: TextStyle(color: Colors.white)),
+                                Text(
+                                  'New Task',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ],
                             ),
                           ),
@@ -248,11 +266,17 @@ class _TasksScreenState extends State<TasksScreen> {
 
               /// ACTIVE TASKS
               if (activeTasks.isNotEmpty)
-                _buildSection(title: 'TO DO (${activeTasks.length})', tasks: activeTasks),
+                _buildSection(
+                  title: 'TO DO (${activeTasks.length})',
+                  tasks: activeTasks,
+                ),
 
               /// COMPLETED TASKS
               if (completedTasks.isNotEmpty)
-                _buildSection(title: 'Completed (${completedTasks.length})', tasks: completedTasks),
+                _buildSection(
+                  title: 'Completed (${completedTasks.length})',
+                  tasks: completedTasks,
+                ),
 
               const SliverToBoxAdapter(child: SizedBox(height: 30)),
             ],
@@ -264,23 +288,23 @@ class _TasksScreenState extends State<TasksScreen> {
 
   SliverList _buildSection({required String title, required List<Task> tasks}) {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-            (context, index) {
-          if (index == 0) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-              child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            );
-          }
-          final task = tasks[index - 1];
-          return TasksCard(
-            task: task,
-            onStatusChanged: _toggleTaskStatus,
-            onEdit: _editTask,
+      delegate: SliverChildBuilderDelegate((context, index) {
+        if (index == 0) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           );
-        },
-        childCount: tasks.length + 1,
-      ),
+        }
+        final task = tasks[index - 1];
+        return TasksCard(
+          task: task,
+          onStatusChanged: _toggleTaskStatus,
+          onEdit: _editTask,
+        );
+      }, childCount: tasks.length + 1),
     );
   }
 }

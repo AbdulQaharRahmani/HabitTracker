@@ -79,7 +79,8 @@ class TasksCard extends StatelessWidget {
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: task.category!.backgroundColor.withValues(alpha: 0.5),
+                      color: task.category!.backgroundColor.withValues(
+                          alpha: 0.5),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -146,7 +147,9 @@ class TasksCard extends StatelessWidget {
   String _formatDueDate(DateTime dueDate) {
     return '${dueDate.day.toString().padLeft(2, '0')} '
         '${_monthName(dueDate.month)} ${dueDate.year}, '
-        '${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute.toString().padLeft(2, '0')}';
+        '${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute
+        .toString()
+        .padLeft(2, '0')}';
   }
 
   String _monthName(int month) {
@@ -170,20 +173,9 @@ class TasksCard extends StatelessWidget {
   Color _dueDateColor(DateTime dueDate) {
     final now = DateTime.now();
     if (dueDate.isBefore(now)) return Colors.grey;
-    if (dueDate.difference(now).inHours <= 24) return Colors.orange;
+    if (dueDate
+        .difference(now)
+        .inHours <= 24) return Colors.orange;
     return Colors.grey[700]!;
-  }
-
-  Color _priorityColor(String priority) {
-    switch (priority.toLowerCase()) {
-      case 'high':
-        return Colors.red;
-      case 'medium':
-        return Colors.orange;
-      case 'low':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
   }
 }

@@ -342,7 +342,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: cat.backgroundColor.withOpacity(0.4),
+                          color: cat.backgroundColor.withValues(alpha:  0.4),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
