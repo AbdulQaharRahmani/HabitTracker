@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
 import TaskModal from "./TaskModal";
 
 export default function EditTask () {
@@ -11,7 +10,6 @@ export default function EditTask () {
         isEditModalOpen,
         taskData,
         editingTaskId,
-        fetchCategories,
         updateTask,
     } = useTaskCardStore();
 
