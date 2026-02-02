@@ -176,32 +176,29 @@ export const getHabitChartData = async (req, res) => {
   ]);
 
   const completionMap = {};
+
   completions.forEach((r) => {
     completionMap[r._id] = r.completed;
   });
 
   const chartData = [];
+  const map = {};
   let currentDate = startDate.clone();
 
   while (currentDate.isSameOrBefore(endDate, 'day')) {
     const dateKey = currentDate.format('YYYY-MM-DD');
+    const completed = completionMap[dateKey] || 0;
 
     chartData.push({
       date: dateKey,
-      completed: completionMap[dateKey] || 0,
+      completed: completed || 0,
     });
+
+    const monthKey = dateKey.slice(0, 7);
+    map[monthKey] = (map[monthKey] || 0) + completed;
 
     currentDate = currentDate.add(1, 'day');
   }
-
-  // const monthly = buildMonthlyFromDaily(chartData);
-
-  const map = {};
-
-  chartData.forEach((item) => {
-    const monthKey = item.date.slice(0, 7);
-    map[monthKey] = (map[monthKey] || 0) + item.completed;
-  });
 
   const monthly = Object.entries(map).map(([date, completed]) => ({
     date,
