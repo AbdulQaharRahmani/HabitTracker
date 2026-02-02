@@ -191,7 +191,7 @@ export const getHabitChartData = async (req, res) => {
 
     chartData.push({
       date: dateKey,
-      completed: completed || 0,
+      completed: completed,
     });
 
     const monthKey = dateKey.slice(0, 7);
