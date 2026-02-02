@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final String baseUrl = "https://habit-tracker-17sr.onrender.com";
@@ -9,12 +10,7 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    print("AuthService: registerUser CALLED");
-    print("Name: $name");
-    print("Email: $email");
-
     final url = Uri.parse("$baseUrl/api/auth/register");
-    print("URL: $url");
 
     final response = await http.post(
       url,
@@ -25,6 +21,17 @@ class AuthService {
         "password": password,
       }),
     );
-    return jsonDecode(response.body);
+
+    final data = jsonDecode(response.body);
+
+    if (data['success'] == true) {
+      final prefs = await SharedPreferences.getInstance();
+
+      await prefs.setString('user_name', name);
+      await prefs.setString('user_email', email);
+print('$name $email');
+    }
+
+    return data;
   }
-  }
+}
