@@ -23,10 +23,11 @@ export default function Login() {
         setLoading(true);
         try {
         const response = await api.post("/auth/login", { email, password })
-        const { token, id } = response.data.data;
-        console.log(token,id);
+        const { token, id, username } = response.data.data;
+
+        console.log(token,id,username);
         if (token && id) {
-        login(token, id);
+        login(token, id,username);
         toast.success("Welcome again!");
         navigate("/");
        }
