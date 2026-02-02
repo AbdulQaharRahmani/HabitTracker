@@ -296,7 +296,7 @@ const Settings = () => {
           {/* Notifications Section */}
           <section className="p-8 bg-white border shadow-sm rounded-2xl border-slate-200 dark:bg-gray-900 dark:border-gray-800">
             <h2 className="mb-6 text-xl font-bold text-slate-800 dark:text-white">
-              Notifications
+              {t("Notifications")}
             </h2>
             <div className="space-y-6">
               <div className="flex items-center justify-between">
