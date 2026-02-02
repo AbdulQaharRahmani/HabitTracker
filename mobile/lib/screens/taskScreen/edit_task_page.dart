@@ -22,6 +22,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
   late TextEditingController _descriptionController;
   String _priority = 'medium';
   String? _categoryId;
+  DateTime? _dueDate;
 
   final TaskApiService _taskApi = TaskApiService();
   final CategoryApiService _categoryApi = CategoryApiService();
@@ -64,6 +65,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
     );
     _priority = widget.task.priority.toLowerCase();
     _categoryId = widget.task.category?.id;
+    _dueDate = widget.task.dueDate;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadCategories();
@@ -103,6 +105,41 @@ class _EditTaskPageState extends State<EditTaskPage> {
         '${date.day.toString().padLeft(2, '0')}';
   }
 
+  Future<void> _pickDueDate() async {
+    // 1) pick date
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _dueDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate == null) return;
+
+    // 2) pick time (keep backend time if exists)
+    final initialTime = _dueDate != null
+        ? TimeOfDay(hour: _dueDate!.hour, minute: _dueDate!.minute)
+        : TimeOfDay.now();
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+    );
+
+    if (pickedTime == null) return;
+
+    // 3) combine date + time
+    setState(() {
+      _dueDate = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+    });
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -128,8 +165,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
         'description': _descriptionController.text.trim(),
         'priority': _priority,
         if (_categoryId != null) 'categoryId': _categoryId,
-        if (widget.task.dueDate != null)
-          'dueDate': _formatDate(widget.task.dueDate!),
+        if (_dueDate != null) 'dueDate': _dueDate!.toIso8601String(),
       };
 
       final updatedTask = await _taskApi.updateTask(
@@ -224,18 +260,20 @@ class _EditTaskPageState extends State<EditTaskPage> {
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
         content: const Text(
-            'Are you sure you want to delete this task? This action cannot be undone.'),
+          'Are you sure you want to delete this task? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(AppTheme.primary),
+            ),
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -244,6 +282,23 @@ class _EditTaskPageState extends State<EditTaskPage> {
     if (confirm == true) {
       _deleteTask();
     }
+  }
+
+  /// ===========================
+  /// Due Date Text Formatter
+  /// ===========================
+  String _dueDateText() {
+    if (_dueDate == null) return 'Select due date & time';
+
+    final d = _dueDate!;
+
+    final date =
+        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+    final time =
+        '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+
+    return '$date  •  $time';
   }
 
   @override
@@ -336,7 +391,13 @@ class _EditTaskPageState extends State<EditTaskPage> {
                     _buildSectionTitle('Category', Icons.category),
                     const SizedBox(height: 12),
                     _buildCategorySelector(),
-                    const SizedBox(height: 35),
+                    const SizedBox(height: 12),
+
+                    /// ===== Due Date Section =====
+                    _buildSectionTitle('Due Date', Icons.calendar_today),
+                    const SizedBox(height: 12),
+                    _dueDatePicker(),
+                    const SizedBox(height: 25),
 
                     /// ===== Action Buttons =====
                     _buildActionButtons(),
@@ -344,6 +405,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
                     //   delete button for deleting
                     _deleteTaskButton(),
+
+                    // Due date logical hook (no UI change required)
                   ],
                 ),
               ),
@@ -358,8 +421,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
       child: OutlinedButton(
         onPressed: _isSubmitting ? null : _confirmDeleteTask,
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.red,
-          side: const BorderSide(color: Colors.red),
+          foregroundColor: AppTheme.primary,
+          side: const BorderSide(color: Colors.grey),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
@@ -375,7 +438,6 @@ class _EditTaskPageState extends State<EditTaskPage> {
       ),
     );
   }
-
 
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
@@ -419,7 +481,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:  0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 5),
           ),
@@ -521,10 +583,14 @@ class _EditTaskPageState extends State<EditTaskPage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: selectedCategory.backgroundColor.withValues(alpha:  0.1),
+                  color: selectedCategory.backgroundColor.withValues(
+                    alpha: 0.1,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: selectedCategory.backgroundColor.withValues(alpha:  0.3),
+                    color: selectedCategory.backgroundColor.withValues(
+                      alpha: 0.3,
+                    ),
                     width: 1,
                   ),
                 ),
@@ -561,7 +627,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:  0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -613,7 +679,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:  0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -645,7 +711,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:  0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -775,7 +841,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:  0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -801,7 +867,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                     top: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: category.backgroundColor.withValues(alpha:  0.2),
+                    color: category.backgroundColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -849,12 +915,11 @@ class _EditTaskPageState extends State<EditTaskPage> {
           child: ElevatedButton(
             onPressed: isFormValid && !_isSubmitting ? _saveTask : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: isFormValid
-                  ? AppTheme.primary
-                  : Colors.grey[400],
-              foregroundColor: Colors.white,
+              backgroundColor: isFormValid ? Colors.grey[50] : Colors.grey[400],
+              foregroundColor: AppTheme.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
+                side: BorderSide(color: Colors.grey),
               ),
               elevation: 0,
               shadowColor: Colors.transparent,
@@ -902,14 +967,53 @@ class _EditTaskPageState extends State<EditTaskPage> {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.close, size: 18),
+                Icon(Icons.close, size: 20, color: AppTheme.primary),
                 SizedBox(width: 8),
-                Text('Cancel', style: TextStyle(fontWeight: FontWeight.w500)),
+                Text(
+                  'Cancel',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.primary,
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _dueDatePicker() {
+    return GestureDetector(
+      onTap: _pickDueDate,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.event, color: Colors.blueGrey),
+            const SizedBox(width: 12),
+            Text(
+              _dueDateText(),
+              style: TextStyle(
+                fontSize: 15,
+                color: _dueDate == null ? Colors.grey : Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
