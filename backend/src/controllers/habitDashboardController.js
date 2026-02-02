@@ -124,10 +124,11 @@ export const getHabitsDashboard = async (req, res) => {
   });
 };
 
-// Chart Data: Build daily completion counts for given date
+// Chart Data: Build daily and monthly completion counts for given date
 export const getHabitChartData = async (req, res) => {
   const today = dayjs();
 
+  // After logs PR merged, use its getStartAndEndDate helper function here!!
   const startDate = req.query.startDate
     ? dayjs(req.query.startDate).startOf('day')
     : today.clone().subtract(29, 'day').startOf('day');
@@ -174,41 +175,41 @@ export const getHabitChartData = async (req, res) => {
     },
   ]);
 
-  // [
-  //  { _id: '2025-12-02', completed: 4 },
-  //  { _id: '2025-12-03', completed: 2 },
-  // ]
-
   const completionMap = {};
+
   completions.forEach((r) => {
     completionMap[r._id] = r.completed;
   });
 
-  // { '2025-12-02': 3 },
-  // { '2025-12-04': 1 },
-
   const chartData = [];
+  const map = {};
   let currentDate = startDate.clone();
 
   while (currentDate.isSameOrBefore(endDate, 'day')) {
     const dateKey = currentDate.format('YYYY-MM-DD');
+    const completed = completionMap[dateKey] || 0;
 
     chartData.push({
       date: dateKey,
-      completed: completionMap[dateKey] || 0,
+      completed: completed,
     });
+
+    const monthKey = dateKey.slice(0, 7);
+    map[monthKey] = (map[monthKey] || 0) + completed;
 
     currentDate = currentDate.add(1, 'day');
   }
 
-  // [
-  //  { date: '2025-12-02', completed: 3 },
-  //  { date: '2025-12-03', completed: 0 },  // missing day
-  //  { date: '2025-12-04', completed: 1 },
-  // ]
+  const monthly = Object.entries(map).map(([date, completed]) => ({
+    date,
+    completed,
+  }));
 
   res.status(200).json({
     success: true,
-    data: chartData,
+    data: {
+      daily: chartData,
+      monthly: monthly,
+    },
   });
 };
