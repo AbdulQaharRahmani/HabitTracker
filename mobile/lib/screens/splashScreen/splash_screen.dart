@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/features/routes.dart';
-
-import '../../utils/login_utils/auth_manager.dart';
+import '../../services/auth_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkLoginStatus() async {
     await Future.delayed(const Duration(milliseconds: 1500));
 
-    final isLoggedIn = await AuthManager.isUserLoggedIn();
+    final isLoggedIn = await AuthManager.isLoggedIn();
 
     if (!mounted) return;
 

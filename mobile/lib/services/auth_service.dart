@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,51 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/habitScreen/add_habit.dart';
 import '../utils/today_progressBar/task_item.dart';
 
+// ============================================================================
+// AUTH MANAGER
+// ============================================================================
+class AuthManager {
+  static const String _tokenKey = 'auth_token';
+  static const String _userNameKey = 'user_name';
+  static const String _userEmailKey = 'user_email';
+
+  /// Save token after login
+  static Future<void> saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
+  }
+
+  /// Save user data after login
+  static Future<void> saveUserData(String name, String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userNameKey, name);
+    await prefs.setString(_userEmailKey, email);
+  }
+
+  /// Get token for API calls
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
+  /// Check login status
+  static Future<bool> isLoggedIn() async {
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
+  }
+
+  /// Clear auth data (logout)
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_userNameKey);
+    await prefs.remove(_userEmailKey);
+  }
+}
+
+// ============================================================================
+// API SERVICE
+// ============================================================================
 
 class ApiService {
   // ---------------------------------------------------------------------------
@@ -20,15 +66,10 @@ class ApiService {
   // TOKEN & HEADERS (Single Source of Truth)
   // ---------------------------------------------------------------------------
 
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
-  }
-
   Future<Map<String, String>> _headers({bool auth = true}) async {
     final headers = {"Content-Type": "application/json"};
     if (auth) {
-      final token = await _getToken();
+      final token = await AuthManager.getToken();
       if (token != null && token.isNotEmpty) {
         headers["Authorization"] = "Bearer $token";
       }
@@ -45,45 +86,44 @@ class ApiService {
   // ===========================================================================
   // AUTH
   // ===========================================================================
+
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
   }) async {
-    final res = await http.post(
-      Uri.parse("$_api/auth/login"),
-      headers: await _headers(auth: false),
-      body: jsonEncode({
-        "email": email,
-        "password": password,
-      }),
-    );
+    try {
+      final res = await http.post(
+        Uri.parse("$_api/auth/login"),
+        headers: await _headers(auth: false),
+        body: jsonEncode({
+          "email": email,
+          "password": password,
+        }),
+      );
 
-    final data = jsonDecode(res.body);
+      final data = jsonDecode(res.body);
 
-    if (res.statusCode == 200 && data['success'] == true) {
-      final prefs = await SharedPreferences.getInstance();
+      if (res.statusCode == 200 && data['success'] == true) {
+        final userData = data['data'];
 
-      final userData = data['data'];
+        // 🔑 Token
+        final token = userData['token'];
+        if (token != null && token.toString().isNotEmpty) {
+          await AuthManager.saveToken(token);
+        }
 
-      // 🔑 Token
-      final token = userData['token'];
-      if (token != null && token.toString().isNotEmpty) {
-        await prefs.setString('auth_token', token);
+        final name = userData['username'];
+        final userEmail = userData['email'];
+
+        if (name != null && name.toString().isNotEmpty && userEmail != null && userEmail.toString().isNotEmpty) {
+          await AuthManager.saveUserData(name, userEmail);
+        }
       }
 
-      final name = userData['username'];
-      final userEmail = userData['email'];
-
-      if (name != null && name.toString().isNotEmpty) {
-        await prefs.setString('user_name', name);
-      }
-
-      if (userEmail != null && userEmail.toString().isNotEmpty) {
-        await prefs.setString('user_email', userEmail);
-      }
+      return data;
+    } catch (e) {
+      return {'success': false, 'message': 'Login failed: $e'};
     }
-
-    return data;
   }
 
   Future<Map<String, dynamic>> register({
@@ -91,23 +131,27 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    final res = await http.post(
-      Uri.parse("$_api/auth/register"),
-      headers: await _headers(auth: false),
-      body: jsonEncode({
-        "name": name,
-        "email": email,
-        "password": password,
-      }),
-    );
+    try {
+      final res = await http.post(
+        Uri.parse("$_api/auth/register"),
+        headers: await _headers(auth: false),
+        body: jsonEncode({
+          "name": name,
+          "email": email,
+          "password": password,
+        }),
+      );
 
-    final data = jsonDecode(res.body);
+      final data = jsonDecode(res.body);
 
-    if (data['success'] == true) {
-      await login(email: email, password: password);
+      if (data['success'] == true) {
+        await login(email: email, password: password);
+      }
+
+      return data;
+    } catch (e) {
+      return {'success': false, 'message': 'Registration failed: $e'};
     }
-
-    return data;
   }
 
   // ===========================================================================
@@ -115,33 +159,45 @@ class ApiService {
   // ===========================================================================
 
   Future<Map<String, dynamic>> getUserProfile() async {
-    final res = await http.get(
-      Uri.parse("$_api/users/preference"),
-      headers: await _headers(),
-    );
+    try {
+      final res = await http.get(
+        Uri.parse("$_api/users/preference"),
+        headers: await _headers(),
+      );
 
-    return jsonDecode(res.body);
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to fetch user profile: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> getHabitsDashboard() async {
-    final res = await http.get(
-      Uri.parse("$_api/habits/dashboard"),
-      headers: await _headers(),
-    );
+    try {
+      final res = await http.get(
+        Uri.parse("$_api/habits/dashboard"),
+        headers: await _headers(),
+      );
 
-    return jsonDecode(res.body);
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to fetch habits dashboard: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> uploadProfileImage(File image) async {
-    final token = await _getToken();
+    try {
+      final token = await AuthManager.getToken();
 
-    final request =
-    http.MultipartRequest("POST", Uri.parse("$_api/users/profile-picture"));
-    request.headers["Authorization"] = "Bearer $token";
-    request.files.add(await http.MultipartFile.fromPath("image", image.path));
+      final request =
+      http.MultipartRequest("POST", Uri.parse("$_api/users/profile-picture"));
+      request.headers["Authorization"] = "Bearer $token";
+      request.files.add(await http.MultipartFile.fromPath("image", image.path));
 
-    final response = await http.Response.fromStream(await request.send());
-    return jsonDecode(response.body);
+      final response = await http.Response.fromStream(await request.send());
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to upload profile image: $e'};
+    }
   }
 
   // ===========================================================================
@@ -149,19 +205,23 @@ class ApiService {
   // ===========================================================================
 
   Future<List<TaskItem>> fetchTasks({required DateTime forDate}) async {
-    final res = await http.get(
-      Uri.parse("$_api/tasks"),
-      headers: await _headers(),
-    );
+    try {
+      final res = await http.get(
+        Uri.parse("$_api/tasks"),
+        headers: await _headers(),
+      );
 
-    final body = jsonDecode(res.body);
+      final body = jsonDecode(res.body);
 
-    if (res.statusCode == 200 && body['data'] is List) {
-      return (body['data'] as List)
-          .map((e) => TaskItem.fromApiJson(e, forDate))
-          .toList();
+      if (res.statusCode == 200 && body['data'] is List) {
+        return (body['data'] as List)
+            .map((e) => TaskItem.fromApiJson(e, forDate))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
     }
-    return [];
   }
 
   // ===========================================================================
@@ -169,33 +229,41 @@ class ApiService {
   // ===========================================================================
 
   Future<List<TaskItem>> fetchHabits({required DateTime forDate}) async {
-    final date = _formatDate(forDate);
+    try {
+      final date = _formatDate(forDate);
 
-    final res = await http.get(
-      Uri.parse("$_api/habits/date?date=$date"),
-      headers: await _headers(),
-    );
+      final res = await http.get(
+        Uri.parse("$_api/habits/date?date=$date"),
+        headers: await _headers(),
+      );
 
-    final body = jsonDecode(res.body);
+      final body = jsonDecode(res.body);
 
-    if (res.statusCode == 200 && body['data'] is List) {
-      return (body['data'] as List)
-          .map((e) => _mapHabitToTaskItem(e, forDate))
-          .toList();
+      if (res.statusCode == 200 && body['data'] is List) {
+        return (body['data'] as List)
+            .map((e) => _mapHabitToTaskItem(e, forDate))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
     }
-    return [];
   }
 
   Future<List<CategoryModel>> fetchCategories() async {
-    final res = await http.get(
-      Uri.parse("$_api/categories"),
-      headers: await _headers(),
-    );
+    try {
+      final res = await http.get(
+        Uri.parse("$_api/categories"),
+        headers: await _headers(),
+      );
 
-    final data = jsonDecode(res.body);
-    return (data['data'] as List)
-        .map((e) => CategoryModel.fromJson(e))
-        .toList();
+      final data = jsonDecode(res.body);
+      return (data['data'] as List)
+          .map((e) => CategoryModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<bool> createHabit({
@@ -204,24 +272,27 @@ class ApiService {
     required String frequency,
     required String categoryId,
   }) async {
-    final res = await http.post(
-      Uri.parse("$_api/habits"),
-      headers: await _headers(),
-      body: jsonEncode({
-        "title": title,
-        "description": description,
-        "frequency": frequency.toLowerCase(),
-        "categoryId": categoryId,
-      }),
-    );
+    try {
+      final res = await http.post(
+        Uri.parse("$_api/habits"),
+        headers: await _headers(),
+        body: jsonEncode({
+          "title": title,
+          "description": description,
+          "frequency": frequency.toLowerCase(),
+          "categoryId": categoryId,
+        }),
+      );
 
-    return res.statusCode == 200 || res.statusCode == 201;
+      return res.statusCode == 200 || res.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
   }
 
   // ===========================================================================
   // TOGGLE TASK / HABIT
   // ===========================================================================
-// در کلاس ApiService، متد setItemCompletion را اصلاح کنید:
 
   Future<bool> setItemCompletion({
     required TaskItem item,
@@ -235,10 +306,8 @@ class ApiService {
 
       try {
         final res = item.done
-            ? await http.post(url,
-            headers: headers, body: jsonEncode({"date": date}))
-            : await http.delete(url,
-            headers: headers, body: jsonEncode({"date": date}));
+            ? await http.post(url, headers: headers, body: jsonEncode({"date": date}))
+            : await http.delete(url, headers: headers, body: jsonEncode({"date": date}));
 
         if (res.statusCode == 200 || res.statusCode == 201) {
           final body = jsonDecode(res.body);
@@ -246,20 +315,17 @@ class ApiService {
         }
         return false;
       } catch (e) {
-        print("Error toggling habit: $e");
+        debugPrint("Error toggling habit: $e");
         return false;
       }
     }
 
-    // برای تسک‌ها
     try {
       final res = await http.patch(
         Uri.parse("$_api/tasks/${item.id}/status"),
         headers: headers,
         body: jsonEncode({"done": item.done}),
       );
-
-      print("Task toggle response: ${res.statusCode} - ${res.body}");
 
       if (res.statusCode == 200) {
         final body = jsonDecode(res.body);
@@ -272,18 +338,17 @@ class ApiService {
       }
       return false;
     } catch (e) {
-      print("Error toggling task: $e");
+      debugPrint("Error toggling task: $e");
       return false;
     }
   }
 
-
   // ===========================================================================
   // HABIT → TASK MAPPER
   // ===========================================================================
+
   TaskItem _mapHabitToTaskItem(
       Map<String, dynamic> json, DateTime forDate) {
-    // تشخیص category برای Habit یا Task
     final category = json['category'] ?? json['categoryId'] ?? {};
     final name = (category['name'] ?? 'other').toString();
 
@@ -291,7 +356,6 @@ class ApiService {
       id: json['_id'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      // frequency: json['frequency'] ?? 'daily', // برای Task = once
       category: name,
       icon: TaskItem.resolveIcon(
         apiIconName: category['icon']?.toString(),
@@ -309,12 +373,10 @@ class ApiService {
   }
 
   bool _isDoneForDate(Map<String, dynamic> json, DateTime date) {
-    // برای Task ساده
     if (!json.containsKey('frequency')) {
       return json['status'] == 'done';
     }
 
-    // برای Habit همان کد قبلی
     final target = DateTime(date.year, date.month, date.day);
 
     if (json['completed'] == true ||
@@ -340,4 +402,4 @@ class ApiService {
 
     return json['status'] == 'done' || json['status'] == 'completed';
   }
-  }
+}
