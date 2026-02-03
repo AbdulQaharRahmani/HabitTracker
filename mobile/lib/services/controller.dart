@@ -41,7 +41,7 @@ class LoginController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _authService.loginUser(
+      final result = await _authService.login(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );

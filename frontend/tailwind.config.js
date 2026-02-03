@@ -1,10 +1,13 @@
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,jsx}",
-  ],
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        xxs: "300px",
+        xs: "639px",
+      },
+    },
   },
   plugins: [],
 };

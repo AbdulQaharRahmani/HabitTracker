@@ -4,7 +4,7 @@ import '../../services/taskpage_api/category_api.dart';
 import '../../services/taskpage_api/tasks_api.dart';
 import '../../utils/taskpage_components/tasks_model.dart';
 import '../../utils/category/category_model.dart';
-import '../../utils/taskpage_components/token_storage.dart';
+import '../../services/token_storage.dart';
 
 class EditTaskPage extends StatefulWidget {
   final Task task;
@@ -74,7 +74,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
   Future<void> _loadCategories() async {
     try {
-      final token = await TokenStorage.getToken();
+      final token = await AuthManager.getToken();
       if (token == null) throw Exception('Token not found');
 
       final categories = await _categoryApi.fetchCategories(token: token);
@@ -152,7 +152,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
     setState(() => _isSubmitting = true);
 
-    final token = await TokenStorage.getToken();
+    final token = await AuthManager.getToken();
     if (token == null) {
       _showErrorSnackbar('Session expired. Please login again');
       setState(() => _isSubmitting = false);
@@ -228,7 +228,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
   Future<void> _deleteTask() async {
     setState(() => _isSubmitting = true);
 
-    final token = await TokenStorage.getToken();
+    final token = await AuthManager.getToken();
     if (token == null) {
       _showErrorSnackbar('Session expired. Please login again');
       setState(() => _isSubmitting = false);

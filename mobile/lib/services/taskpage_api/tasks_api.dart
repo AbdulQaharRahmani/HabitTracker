@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../../utils/taskpage_components/tasks_model.dart';
-import '../../utils/taskpage_components/token_storage.dart';
+import '../token_storage.dart';
 
 class TaskApiService {
   static const String baseUrl =
@@ -71,7 +71,7 @@ class TaskApiService {
     String? token,
     String? dueDate,
   }) async {
-    final authToken = token ?? await TokenStorage.getToken();
+    final authToken = token ?? await AuthManager.getToken();
     if (authToken == null) {
       throw Exception('Token not found');
     }

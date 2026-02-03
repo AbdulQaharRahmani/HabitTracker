@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../utils/category/category_model.dart';
-import '../../utils/taskpage_components/token_storage.dart';
+import '../token_storage.dart';
 
 class CategoryApiService {
   static const String baseUrl =
@@ -10,7 +10,7 @@ class CategoryApiService {
 
   /// Fetch all categories for the logged-in user
   Future<List<CategoryModel>> fetchCategories({String? token}) async {
-    final authToken = token ?? await TokenStorage.getToken();
+    final authToken = token ?? await AuthManager.getToken();
     if (authToken == null) {
       throw Exception('Auth token not found');
     }
@@ -35,7 +35,7 @@ class CategoryApiService {
   /// Create a new category
   Future<CategoryModel> createCategory(
       CreateCategoryModel category) async {
-    final token = await TokenStorage.getToken();
+    final token = await AuthManager.getToken();
     if (token == null) {
       throw Exception('Auth token not found');
     }

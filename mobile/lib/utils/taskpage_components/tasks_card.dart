@@ -61,9 +61,9 @@ class TasksCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  if (task.description.isNotEmpty)
+
                     Text(
-                      task.description,
+                      task.description!,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

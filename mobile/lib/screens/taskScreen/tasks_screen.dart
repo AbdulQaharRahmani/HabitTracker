@@ -3,7 +3,7 @@ import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
 import '../../app/app_theme.dart';
 import '../../services/taskpage_api/tasks_api.dart';
 import '../../utils/taskpage_components/tasks_model.dart';
-import '../../utils/taskpage_components/token_storage.dart';
+import '../../services/token_storage.dart';
 import 'edit_task_page.dart';
 import '../../utils/taskpage_components/tasks_card.dart';
 
@@ -35,7 +35,7 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   Future<void> _init() async {
-    _token = await TokenStorage.getToken();
+    _token = await AuthManager.getToken();
     if (_token == null) return;
     await _fetchTasks(reset: true);
   }
@@ -94,10 +94,6 @@ class _TasksScreenState extends State<TasksScreen> {
     final oldStatus = task.status;
     final newStatus = oldStatus == 'done' ? 'todo' : 'done';
 
-    setState(() {
-      _tasks[index] = _tasks[index].copyWith(status: newStatus);
-    });
-
     try {
       await _apiService.toggleTaskStatus(
         taskId: task.id,
@@ -105,11 +101,7 @@ class _TasksScreenState extends State<TasksScreen> {
         token: _token!,
       );
     } catch (e) {
-      setState(() {
-        _tasks[index] = _tasks[index].copyWith(status: oldStatus);
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to update task status!'),
           backgroundColor: Colors.red,

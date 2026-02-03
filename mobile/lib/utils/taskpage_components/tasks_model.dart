@@ -3,7 +3,7 @@ import '../category/category_model.dart';
 class Task {
   final String id;
   final String title;
-  final String description;
+  final String? description;
   final String status;
   final String priority;
   final DateTime? dueDate;
@@ -16,7 +16,7 @@ class Task {
   Task({
     required this.id,
     required this.title,
-    required this.description,
+     this.description,
     required this.status,
     required this.priority,
     this.dueDate,
@@ -63,36 +63,7 @@ class Task {
     );
   }
 
-  /// ================== COPYWITH ==================
-  Task copyWith({
-    String? id,
-    String? title,
-    String? description,
-    String? status,
-    String? priority,
-    DateTime? dueDate,
-    String? userId,
-    bool? isDeleted,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    CategoryModel? category,
-    String? categoryId,
-  }) {
-    return Task(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      status: status ?? this.status,
-      priority: priority ?? this.priority,
-      dueDate: dueDate ?? this.dueDate,
-      userId: userId ?? this.userId,
-      isDeleted: isDeleted ?? this.isDeleted,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      category: category ?? this.category,
-      categoryId: categoryId ?? this.categoryId,
-    );
-  }
+
 
 
   bool get isDone => status == 'done';

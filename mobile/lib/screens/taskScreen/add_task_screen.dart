@@ -3,7 +3,7 @@ import '../../app/app_theme.dart';
 import '../../services/taskpage_api/category_api.dart';
 import '../../services/taskpage_api/tasks_api.dart';
 import '../../utils/category/category_model.dart';
-import '../../utils/taskpage_components/token_storage.dart';
+import '../../services/token_storage.dart';
 import '../categoryScreen/create_category.dart';
 
 class NewTaskPage extends StatefulWidget {
@@ -47,7 +47,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
   /// Load token and fetch categories from server
   Future<void> _loadTokenAndCategories() async {
     try {
-      final token = await TokenStorage.getToken();
+      final token = await AuthManager.getToken();
       if (token == null) {
         setState(() => _isTokenLoading = false);
         return;
@@ -76,12 +76,13 @@ class _NewTaskPageState extends State<NewTaskPage> {
       );
       return;
     }
-    if (_titleController.text.isEmpty || _descController.text.isEmpty) {
+    if (_titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Title and description are required')),
+        const SnackBar(content: Text('Title is required')),
       );
       return;
     }
+
 
     setState(() => _isLoading = true);
 
