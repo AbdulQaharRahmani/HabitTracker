@@ -300,7 +300,7 @@ class _TasksScreenState extends State<TasksScreen> {
           );
         }
         final task = tasks[index - 1];
-        return TasksCard(
+        return TasksScreenCard(
           task: task,
           onStatusChanged: _toggleTaskStatus,
           onEdit: _editTask,

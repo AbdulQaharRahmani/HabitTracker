@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import '../../app/app_theme.dart';
 import 'tasks_model.dart';
 
-class TasksCard extends StatelessWidget {
+class TasksScreenCard extends StatelessWidget {
   final Task task;
   final Function(Task)? onEdit;
   final Function(Task)? onStatusChanged;
 
-  const TasksCard({
+  const TasksScreenCard({
     super.key,
     required this.task,
     this.onEdit,
