@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1f3da058-9203-446b-a536-84e9b43c0197" name="Changes" comment="The login connected with the render backend and work correctly">
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screens/profileScreen/profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/screens/profileScreen/profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/screens/todayScreen/today_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/screens/todayScreen/today_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/services/auth_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/services/profile_service.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/login/login_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/login/login_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/login_utils/auth_service.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/login_utils/controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/login_utils/controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/signUp/signup_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/signUp/signup_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/auth_service.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/task.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/task.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/task_item.dart" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/lib/utils/today_progressBar/task_item.dart" afterDir="false" />
-    </list>
+    <list default="true" id="1f3da058-9203-446b-a536-84e9b43c0197" name="Changes" comment="The login connected with the render backend and work correctly" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -63,35 +49,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Flutter.add_habit.dart.executor": "Run",
-    "Flutter.main.dart.executor": "Run",
-    "Flutter.today_screen.dart.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "com.google.services.firebase.aqiPopupShown": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "connect__today'sProgress__with__backend__FAI#216",
-    "ignore.virus.scanning.warn.message": "true",
-    "io.flutter.project.isFirstOpen": "true",
-    "io.flutter.reload.alreadyRun": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/habit_tracker/habit_tracker",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Flutter.add_habit.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Flutter.today_screen.dart.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#269 on connect__today'sProgress__with__backend__FAI#216&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;io.flutter.project.isFirstOpen&quot;: &quot;true&quot;,
+    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/habit_tracker/habit_tracker&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\habit_tracker\HabitTracker\mobile\assets" />

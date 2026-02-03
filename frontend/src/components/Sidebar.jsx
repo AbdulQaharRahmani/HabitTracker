@@ -12,6 +12,9 @@ import {
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 
 import { NavLink } from "react-router-dom";
+import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
+import useAuthStore from "../store/useAuthStore";
+import { useEffect, useState } from "react";
 
 const dashboardItems = [
   { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
@@ -41,14 +44,22 @@ const preferencesItems = [
 
 const Sidebar = ({ children }) => {
   const { t } = useTranslation();
-
+   const [preview, setPreview] = useState(null);
+    const { userProfileUrl, fetchProfilePhoto, loading } =
+      useProfilePhotoStore();
   const {
     isOpen,
     isMobileOpen,
-    toggleSidebar,
     toggleMobileSidebar,
     closeMobileSidebar,
   } = useSidebarStore();
+
+ const {userId,username} = useAuthStore((state) => state);
+
+  useEffect(() => {
+    if (!userId) return;
+    fetchProfilePhoto(userId);
+  }, [fetchProfilePhoto, userId]);
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
@@ -97,13 +108,17 @@ const Sidebar = ({ children }) => {
           >
             <div className="relative flex justify-center">
               <div className="w-[60px] h-[60px] rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
-                <FaUser size={24} className="text-white" />
+                <img
+                  src={loading && preview ? preview : userProfileUrl}
+                  alt="Profile"
+                  className="object-cover w-full h-full rounded-full"
+                />
               </div>
             </div>
 
             {isOpen && (
               <div className="w-full">
-                <h3 className="font-semibold text-lg mt-2">Ehsanullah</h3>
+                <h3 className="font-semibold text-lg mt-2">{username}</h3>
                 <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline mt-1">
                   {t("View Profile")}
                 </button>
@@ -153,7 +168,7 @@ const Sidebar = ({ children }) => {
 
                           {isOpen && (
                             <>
-                              <span className="ml-4 font-medium">
+                              <span className="ml-4 rtl:mr-3 font-medium">
                                 {t(item.name)}
                               </span>
                               {isActive && (
@@ -208,7 +223,7 @@ const Sidebar = ({ children }) => {
 
                           {isOpen && (
                             <>
-                              <span className="ml-4 font-medium">
+                              <span className="ml-4 rtl:mr-3 font-medium">
                                 {t(item.name)}
                               </span>
                               {isActive && (

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../../services/auth_service.dart';
 
-class SignUpController {
+class SignUpController extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
 
   final usernameController = TextEditingController();
@@ -10,7 +9,8 @@ class SignUpController {
   final passwordController = TextEditingController();
 
   bool isAgreeTerms = false;
-
+  bool isLoading = false;
+  String? errorMessage;
 
   final ApiService _authService = ApiService();
 
@@ -27,7 +27,7 @@ class SignUpController {
       return 'Please enter email';
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Enter a valid email ex: ali321@gmial.com';
+      return 'Enter a valid email ex: ali321@gmail.com';
     }
     return null;
   }
@@ -43,14 +43,18 @@ class SignUpController {
   }
 
   // ===== Sign Up Logic =====
-  Future<bool> signUp() async {
+  Future<bool> signUp(BuildContext context) async {
     print("SignUp started");
+
     if (formKey.currentState?.validate() != true) {
       print("Form validation failed");
       return false;
     }
+
+
     if (!isAgreeTerms) {
-      print("Terms not agreed");
+      errorMessage = 'Please agree to the terms and conditions';
+      _showErrorMessage(context, errorMessage!);
       return false;
     }
 
@@ -59,18 +63,54 @@ class SignUpController {
       email: emailController.text,
       password: passwordController.text,
     );
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
 
-    print("Server response: $result");
-    return result["success"] == true;
+    try {
+      final result = await _authService.registerUser(
+        name: usernameController.text.trim(),
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      print("Server response: $result");
+
+      if (result["success"] == true) {
+        // نمایش پیام موفقیت
+        _showSuccessMessage(context);
+        return true;
+      } else {
+        errorMessage = result["message"] ?? 'Registration failed';
+        _showErrorMessage(context, errorMessage!);
+        return false;
+      }
+    } catch (e) {
+      errorMessage = 'Connection error: $e';
+      _showErrorMessage(context, errorMessage!);
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
-
 
   void _showSuccessMessage(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text('Sign up successful!'),
         backgroundColor: Colors.green,
         duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showErrorMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
       ),
     );
   }
@@ -80,11 +120,14 @@ class SignUpController {
     emailController.clear();
     passwordController.clear();
     isAgreeTerms = false;
+    errorMessage = null;
+    notifyListeners();
   }
 
   void dispose() {
     usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();
+    super.dispose();
   }
 }

@@ -95,7 +95,7 @@ class ApiService {
       Uri.parse("$_api/auth/register"),
       headers: await _headers(auth: false),
       body: jsonEncode({
-        "username": name,
+        "name": name,
         "email": email,
         "password": password,
       }),
