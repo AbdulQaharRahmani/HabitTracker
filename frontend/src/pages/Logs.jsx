@@ -2,29 +2,43 @@ import { FaEnvelope } from "react-icons/fa"
 import Search from "../components/Search"
 import LogsTable from "../logs dashboard/LogsTable"
 import Dropdown from "../components/Dropdown"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import useLogsStore from "../store/useLogsStore"
 export default function Logs() {
-   const levels = [
-    { id: 1, name: "All levels", value: "all levels" },
-    { id: 2, name: "Error", value: "error" },
-    { id: 3, name: "Warning", value: "warning" },
-    { id: 4, name: "Info", value: "info" }
-]
-const methods = [
-    { id: 1, name: "All methods", value: "All methods" },
-    { id: 2, name: "GET", value: "GET" },
-    { id: 3, name: "POST", value: "POST" },
-    { id: 4, name: "DELETE", value: "DELETE" },
-    { id: 5, name: "PATCH", value: "PATCH" }
-];
-const dates = [
-    {id: 1, name: "Newest", value: "newest"},
-    {id: 2, name: "Oldes", value: "oldest"}
+    const levels = [
+        { id: 1, name: "All levels", value: "all levels" },
+        { id: 2, name: "Error", value: "error" },
+        { id: 3, name: "Warning", value: "warning" },
+        { id: 4, name: "Info", value: "info" }
+    ]
+    const methods = [
+        { id: 1, name: "All methods", value: "All methods" },
+        { id: 2, name: "GET", value: "GET" },
+        { id: 3, name: "POST", value: "POST" },
+        { id: 4, name: "DELETE", value: "DELETE" },
+        { id: 5, name: "PATCH", value: "PATCH" }
+    ];
+    const dates = [
+        { id: 1, name: "Newest", value: "newest" },
+        { id: 2, name: "Oldest", value: "oldest" }
 
-]
+    ]
     const [selectedLevel, setSelectedLevel] = useState("All Levels");
     const [selectedMethod, setSelectedMethod] = useState("All Methods");
     const [selectedDate, setSelectedDate] = useState("Newest");
+    const [searchTerm, setSearchTerm] = useState("")
+    const { logsData, getFilteredData } = useLogsStore()
+    const [displayData, setDisplayData] = useState(logsData);
+
+    const handleFilter = () => {
+    const filterOptions = {
+        method: selectedMethod,
+        level: selectedLevel,
+        sortOrder: selectedDate
+    };
+    const result = getFilteredData(filterOptions, searchTerm);
+    setDisplayData(result);
+};
     return (
 
         <>
@@ -43,40 +57,42 @@ const dates = [
             </div>
             <div className="p-4 flex flex-col justify-center items-center">
                 <div className="w-[350px]">
-                    <Search placeholder={"Search logs..."}/>
+                    <Search placeholder={"Search logs by route..."} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
                 </div>
                 <div className="flex p-4 flex-col w-full lg:flex-row gap-2 items-center">
-                            <span className="font-bold p-3">Level: </span>
-                            <Dropdown
-                                items={levels}
-                                value={selectedLevel}
-                                getValue={setSelectedLevel}
-                                placeholder="Select Level"
-                            />
+                    <span className="font-bold p-3">Level: </span>
+                    <Dropdown
+                        items={levels}
+                        value={selectedLevel}
+                        getValue={setSelectedLevel}
+                        placeholder="Select Level"
+                    />
 
-                            <span className="font-bold p-3">Method: </span>
-                            <Dropdown
-                                items={methods}
-                                value={selectedMethod}
-                                getValue={setSelectedMethod}
-                                placeholder="Select Method"
-                            />
+                    <span className="font-bold p-3">Method: </span>
+                    <Dropdown
+                        items={methods}
+                        value={selectedMethod}
+                        getValue={setSelectedMethod}
+                        placeholder="Select Method"
+                    />
 
-                            <span className="font-bold p-3">Sort by: </span>
-                            <Dropdown
-                                items={dates}
-                                value={selectedDate}
-                                getValue={setSelectedDate}
-                                placeholder="Sort by"
-                            />
+                    <span className="font-bold p-3">Sort by: </span>
+                    <Dropdown
+                        items={dates}
+                        value={selectedDate}
+                        getValue={setSelectedDate}
+                        placeholder="Sort by"
+                    />
 
-                            <button className="py-2 px-6 rounded-md text-white text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors">
-                                Apply Filter
-                            </button>
-                        </div>
+                    <button className="py-2 px-6 rounded-md text-white text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                    onClick={()=> handleFilter()}
+                    >
+                        Apply Filter
+                    </button>
+                </div>
             </div>
 
-           <LogsTable  />
+            <LogsTable filteredList={displayData} />
 
         </>
     )
