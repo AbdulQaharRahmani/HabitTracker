@@ -18,7 +18,7 @@ class TaskApiService {
   Future<List<Task>> fetchTasks({
     required String token,
     int page = 1,
-    int limit = 8,
+    int limit = 20,
     String? search,
   }) async {
     try {

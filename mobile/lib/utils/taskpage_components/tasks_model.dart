@@ -1,6 +1,6 @@
 import '../category/category_model.dart';
 
-class Task {
+class Task{
   final String id;
   final String title;
   final String? description;
@@ -27,6 +27,36 @@ class Task {
     this.category,
     this.categoryId,
   });
+
+  // ==============================
+  //   copyWith
+  // ==============================
+  Task copyWith({
+    String? status,
+    String? title,
+    String? description,
+    String? priority,
+    String? categoryId,
+    DateTime? dueDate,
+    CategoryModel? category,
+  }) {
+    return Task(
+      id: id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      priority: priority ?? this.priority,
+      categoryId: categoryId ?? this.categoryId,
+      dueDate: dueDate ?? this.dueDate,
+      userId: userId,
+      isDeleted: isDeleted,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      category: category ?? this.category,
+    );
+  }
+
+
 
   factory Task.fromJson(Map<String, dynamic> json) {
     CategoryModel? category;

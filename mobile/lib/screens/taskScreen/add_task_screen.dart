@@ -24,7 +24,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
   // ===== UI State =====
   bool _isLoading = false;
-  bool _isTokenLoading = true;
+  bool _isTokenLoading = true; // Used only for token fetch
   String? _token;
 
   // ===== Categories =====
@@ -82,7 +82,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
       );
       return;
     }
-
 
     setState(() => _isLoading = true);
 
@@ -171,10 +170,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isTokenLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
+    // ===== Build the entire form immediately =====
     return Scaffold(
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
@@ -191,27 +187,26 @@ class _NewTaskPageState extends State<NewTaskPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ===== Title =====
             _buildLabel('Task Title'),
             _buildTextField(_titleController, 'Enter title...', 1),
             const SizedBox(height: 20),
-
-            // ===== Description =====
             _buildLabel('Description'),
             _buildTextField(_descController, 'Enter description...', 3),
             const SizedBox(height: 20),
-
-            // ===== Priority =====
             _buildLabel('Priority'),
             _buildPriorityDropdown(),
             const SizedBox(height: 20),
-
-            // ===== Category =====
             _buildLabel('Category'),
-            _buildCategoryDropdown(),
-            const SizedBox(height: 20),
 
-            // ===== Due Date =====
+            // ===== Only category dropdown shows loading if needed =====
+            _isTokenLoading || _categories.isEmpty
+                ? const SizedBox(
+              height: 44,
+              child: Center(child: CircularProgressIndicator()),
+            )
+                : _buildCategoryDropdown(),
+
+            const SizedBox(height: 20),
             _buildLabel('Due Date'),
             GestureDetector(
               onTap: _pickDueDate,
@@ -234,8 +229,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
               ),
             ),
             const SizedBox(height: 40),
-
-            // ===== Create Button =====
             SizedBox(
               width: double.infinity,
               height: 55,
@@ -343,7 +336,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: cat.backgroundColor.withValues(alpha:  0.4),
+                          color: cat.backgroundColor.withOpacity(0.4),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),

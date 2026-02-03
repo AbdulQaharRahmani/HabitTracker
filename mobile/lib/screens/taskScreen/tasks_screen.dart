@@ -91,8 +91,13 @@ class _TasksScreenState extends State<TasksScreen> {
     final index = _tasks.indexWhere((t) => t.id == task.id);
     if (index == -1) return;
 
-    final oldStatus = task.status;
+    final oldStatus = _tasks[index].status;
     final newStatus = oldStatus == 'done' ? 'todo' : 'done';
+
+    // (Optimistic Update)
+    setState(() {
+      _tasks[index] = _tasks[index].copyWith(status: newStatus);
+    });
 
     try {
       await _apiService.toggleTaskStatus(
@@ -101,7 +106,11 @@ class _TasksScreenState extends State<TasksScreen> {
         token: _token!,
       );
     } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
+      setState(() {
+        _tasks[index] = _tasks[index].copyWith(status: oldStatus);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to update task status!'),
           backgroundColor: Colors.red,
