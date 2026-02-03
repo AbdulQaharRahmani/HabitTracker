@@ -1,4 +1,3 @@
-import DayilyConsistency from '../components/DailyConsistency'
 import Header from '../components/Header'
 import ExportData from '../components/ExportData';
 import TotalHabitsStatics from '../components/TotalHabitsStatics';
@@ -7,6 +6,7 @@ import CompletionRateStatics from '../components/CompletionRateStatics';
 import i18n from '../utils/i18n';
 import { useTranslation } from "react-i18next";
 import StatisticsChart from '../components/StatisticsChart'
+import DailyConsistency from '../components/DailyConsistency';
 
 function Statistics() {
   const { t } = useTranslation();
@@ -48,7 +48,7 @@ function Statistics() {
 
       {/* Charts */}
       <div className="space-y-2">
-        <DayilyConsistency />
+        <DailyConsistency/>
         <StatisticsChart />
       </div>
     </div>

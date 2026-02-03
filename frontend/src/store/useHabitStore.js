@@ -6,6 +6,7 @@ import { formatDate } from "../utils/dateFormatter";
 const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
+    chartData: null,
     error: null,
     habitCompletions: 0,
     selectedDate: new Date(),
@@ -258,7 +259,23 @@ const useHabitStore = create((set, get) => ({
             completed: yearlyStatistics[key]
         }));
         set({ yearlyStatistics: formattedData });
+    },
+
+getConsistencyData: async (startDate, endDate) => {
+    set({ loading: true, error: null });
+    try {
+        const result = await getHabitsChartData(startDate, endDate);
+        console.log(result);
+        if (result.success) {
+            set({ chartData: result.data.daily, loading: false });
+        } else {
+            set({ error: "Failed to load data", loading: false });
+        }
+    } catch (err) {
+        const message = err.response?.data?.message || "Failed to fetch data";
+        set({ error: message, loading: false });
     }
+}
 
 }))
 
