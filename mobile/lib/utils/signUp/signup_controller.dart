@@ -12,7 +12,7 @@ class SignUpController {
   bool isAgreeTerms = false;
 
 
-  final AuthService _authService = AuthService();
+  final ApiService _authService = ApiService();
 
   // ===== Validators =====
   String? nameValidator(String? value) {
@@ -54,7 +54,7 @@ class SignUpController {
       return false;
     }
 
-    final result = await _authService.registerUser(
+    final result = await _authService.register(
       name: usernameController.text,
       email: emailController.text,
       password: passwordController.text,

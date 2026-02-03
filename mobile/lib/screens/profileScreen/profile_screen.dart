@@ -1,11 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import '../../services/profile_service.dart';
 import '../../features/profile_model.dart';
 import '../../app/app_theme.dart';
+import '../../services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,7 +16,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final _service = ProfileService();
+  final ApiService _service = ApiService();
 
   bool _loading = true;
   String? _error;
@@ -25,33 +26,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _name = 'User';
   String _email = 'No email';
+  String _userId = '';
 
   @override
   void initState() {
     super.initState();
-    _loadLocal();
-    _fetchRemote();
+    _loadLocalUser();
+    _initData();
   }
-  Future<void> _loadLocal() async {
+
+  Future<void> _initData() async {
+    final loaded = await _loadFromCache();
+    if (!loaded) {
+      await _fetchRemote();
+    }
+  }
+
+  Future<bool> _loadFromCache() async {
     final prefs = await SharedPreferences.getInstance();
-    final storedName = prefs.getString('user_name');
-    final storedEmail = prefs.getString('user_email');
-    if (!mounted) return;
+
+    final profileJson = prefs.getString('cache_profile');
+    final dashboardJson = prefs.getString('cache_dashboard');
+
+    if (profileJson == null || dashboardJson == null) return false;
+
+    try {
+      final profileMap = jsonDecode(profileJson);
+      final dashboardMap = jsonDecode(dashboardJson);
+
+      setState(() {
+        _user = Welcome.fromJson(profileMap).userData;
+        _habits = Welcome.fromJson(dashboardMap).habitsData;
+        _loading = false;
+        _error = null;
+      });
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /* ─────────────────── LOCAL USER (NAME / EMAIL) ─────────────────── */
+
+  Future<void> _loadLocalUser() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _name = (storedName != null && storedName.isNotEmpty)
-          ? storedName
-          : 'User';
-      _email = (storedEmail != null && storedEmail.isNotEmpty)
-          ? storedEmail
-          : 'No email';
+      _name = prefs.getString('user_name') ?? 'User';
+      _email = prefs.getString('user_email') ?? 'No email';
+      _userId = prefs.getString('user_id') ?? '';
     });
   }
+
+  /* ─────────────────── REMOTE DATA (PROFILE / HABITS) ─────────────────── */
+
   Future<void> _fetchRemote() async {
     try {
       setState(() => _loading = true);
 
       final profile = await _service.getUserProfile();
       final dashboard = await _service.getHabitsDashboard();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cache_profile', jsonEncode(profile));
+      await prefs.setString('cache_dashboard', jsonEncode(dashboard));
+      await prefs.setInt(
+        'cache_time',
+        DateTime.now().millisecondsSinceEpoch,
+      );
 
       if (!profile['success'] || !dashboard['success']) {
         throw Exception();
@@ -61,22 +102,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _user = Welcome.fromJson(profile).userData;
         _habits = Welcome.fromJson(dashboard).habitsData;
         _loading = false;
+        _error = null;
       });
     } catch (_) {
       setState(() {
-        _error = 'Using local data';
+        _error = 'Failed to load profile data';
         _loading = false;
       });
     }
   }
+
+  /* ───────────────────────── LOGOUT ───────────────────────── */
 
   Future<void> _handleLogout() async {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Log Out', style: TextStyle(color: AppTheme.textPrimary)),
-        content: Text('Are you sure you want to log out?',
-            style: TextStyle(color: AppTheme.textSecondary)),
+        content: Text(
+          'Are you sure you want to log out?',
+          style: TextStyle(color: AppTheme.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -100,6 +146,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  /* ───────────────────────── UI ───────────────────────── */
+
   @override
   Widget build(BuildContext context) {
     if (_loading) return const _LoadingView();
@@ -116,25 +164,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
           slivers: [
             SliverAppBar(
               pinned: true,
-              expandedHeight: 80.h,
+              expandedHeight: 50.h,
               backgroundColor: AppTheme.surface,
               elevation: 1,
               surfaceTintColor: AppTheme.surface,
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
-                title: Text('Profile',
-                    style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary)),
+                title: Text(
+                  'Profile',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
                 expandedTitleScale: 1.2,
               ),
             ),
             SliverList(
               delegate: SliverChildListDelegate([
                 SizedBox(height: 16.h),
+
                 ProfileHeader(
-                    user: _user, name: _name, email: _email, error: _error),
+                  user: _user,
+                  name: _name,
+                  email: _email,
+                  userId: _userId,
+                  error: _error,
+                ),
+
                 SizedBox(height: 24.h),
                 StatsSection(habits: habits),
                 SizedBox(height: 32.h),
@@ -150,6 +208,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /* ───────────────────────── ACHIEVEMENTS ───────────────────────── */
+
   List<Map<String, dynamic>> _achievements(int streak) => [
     _a('Beginner', 5, FontAwesomeIcons.seedling, AppTheme.success, streak),
     _a('Dedicated', 10, FontAwesomeIcons.fire, AppTheme.warning, streak),
@@ -157,17 +217,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _a('Legend', 100, FontAwesomeIcons.crown, Colors.amber, streak),
   ];
 
-  Map<String, dynamic> _a(String t, int r, IconData i, Color c, int s) => {
-    'title': t,
-    'req': r,
-    'icon': i,
-    'color': c,
-    'gradient': [c, c.withOpacity(0.8)],
-    'unlocked': s >= r,
-  };
+  Map<String, dynamic> _a(
+      String t,
+      int r,
+      IconData i,
+      Color c,
+      int s,
+      ) =>
+      {
+        'title': t,
+        'req': r,
+        'icon': i,
+        'color': c,
+        'gradient': [c, c.withOpacity(0.8)],
+        'unlocked': s >= r,
+      };
 }
 
-/* ───────────────────────── Widgets ───────────────────────── */
+/* ───────────────────────── LOADING ───────────────────────── */
 
 class _LoadingView extends StatelessWidget {
   const _LoadingView();
@@ -180,27 +247,32 @@ class _LoadingView extends StatelessWidget {
         children: [
           CircularProgressIndicator(color: AppTheme.primary),
           SizedBox(height: 16.h),
-          Text('Loading...',
-              style: TextStyle(color: AppTheme.textMuted, fontSize: 14.sp)),
+          Text(
+            'Loading...',
+            style:
+            TextStyle(color: AppTheme.textMuted, fontSize: 14.sp),
+          ),
         ],
       ),
     ),
   );
 }
 
-/* ───────── Profile Header ───────── */
+/* ───────────────────────── PROFILE HEADER ───────────────────────── */
 
 class ProfileHeader extends StatelessWidget {
   final UserData? user;
   final String name;
   final String email;
+  final String userId;
   final String? error;
 
   const ProfileHeader({
     super.key,
-    this.user,
+    required this.user,
     required this.name,
     required this.email,
+    required this.userId,
     this.error,
   });
 
@@ -223,12 +295,20 @@ class ProfileHeader extends StatelessWidget {
                   width: 2.w,
                 ),
               ),
-              child: user?.profileImage == null
+              child: userId.isEmpty
                   ? Icon(Icons.person_rounded,
                   size: 42.w, color: AppTheme.primary)
                   : ClipOval(
-                  child: Image.network(user!.profileImage!,
-                      fit: BoxFit.cover)),
+                child: Image.network(
+                  'https://habit-tracker-17sr.onrender.com/api/users/6954d4daef0682fa6629fc75/profile-picture',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.person_rounded,
+                    size: 42.w,
+                    color: AppTheme.primary,
+                  ),
+                ),
+              ),
             ),
             Positioned(
               bottom: 0,
@@ -238,7 +318,8 @@ class ProfileHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppTheme.primary,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2.w),
+                  border:
+                  Border.all(color: Colors.white, width: 2.w),
                 ),
                 child: Icon(Icons.edit,
                     size: 12.w, color: Colors.white),
@@ -247,20 +328,27 @@ class ProfileHeader extends StatelessWidget {
           ],
         ),
         SizedBox(height: 20.h),
-        Text(name,
-            style: TextStyle(
-                fontSize: 22.sp,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary)),
+        Text(
+          name,
+          style: TextStyle(
+            fontSize: 22.sp,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textPrimary,
+          ),
+        ),
         SizedBox(height: 4.h),
-        Text(email,
-            style: TextStyle(
-                fontSize: 14.sp, color: AppTheme.textSecondary)),
+        Text(
+          email,
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: AppTheme.textSecondary,
+          ),
+        ),
         if (user?.timezone != null && user!.timezone.isNotEmpty) ...[
           SizedBox(height: 12.h),
           Container(
-            padding:
-            EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+            padding: EdgeInsets.symmetric(
+                horizontal: 12.w, vertical: 6.h),
             decoration: BoxDecoration(
               color: AppTheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20.r),
@@ -271,11 +359,14 @@ class ProfileHeader extends StatelessWidget {
                 Icon(Icons.public_rounded,
                     size: 12.w, color: AppTheme.primary),
                 SizedBox(width: 6.w),
-                Text(user!.timezone,
-                    style: TextStyle(
-                        fontSize: 12.sp,
-                        color: AppTheme.primary,
-                        fontWeight: FontWeight.w500)),
+                Text(
+                  user!.timezone,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppTheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -287,7 +378,8 @@ class ProfileHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppTheme.warningBackground,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: AppTheme.warning.withOpacity(0.2)),
+              border: Border.all(
+                  color: AppTheme.warning.withOpacity(0.2)),
             ),
             child: Row(
               children: [
@@ -295,10 +387,13 @@ class ProfileHeader extends StatelessWidget {
                     size: 16.w, color: AppTheme.warning),
                 SizedBox(width: 8.w),
                 Expanded(
-                  child: Text(error!,
-                      style: TextStyle(
-                          fontSize: 13.sp,
-                          color: AppTheme.textSecondary)),
+                  child: Text(
+                    error!,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -308,7 +403,6 @@ class ProfileHeader extends StatelessWidget {
     ),
   );
 }
-
 /* ───────── Stats ───────── */
 
 class StatsSection extends StatelessWidget {
@@ -395,10 +489,8 @@ class _StatCard extends StatelessWidget {
         ),
 
         const Spacer(),
-
-        /// 🔴 FIX اصلی overflow
         SizedBox(
-          height: 28.h, // ارتفاع ثابت برای ثبات layout
+          height: 28.h,
           child: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,

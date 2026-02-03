@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'auth_service.dart';
+import 'package:habit_tracker/services/auth_service.dart';
+
 
 class LoginController extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
@@ -7,7 +8,7 @@ class LoginController extends ChangeNotifier {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  final AuthService _authService = AuthService();
+  final ApiService _authService = ApiService();
 
   bool isLoading = false;
   String? errorMessage;
@@ -41,7 +42,7 @@ class LoginController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _authService.loginUser(
+      final result = await _authService.login(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );

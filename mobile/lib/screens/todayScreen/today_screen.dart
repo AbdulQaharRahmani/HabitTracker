@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../app/app_theme.dart';
+import '../../services/auth_service.dart';
 import '../../utils/today_progressBar/daily_grid.dart';
 import '../../utils/today_progressBar/date_selector.dart';
 import '../../utils/today_progressBar/header_section.dart';
 import '../../utils/today_progressBar/task.dart';
 import '../../utils/today_progressBar/top_bar.dart';
 import '../../utils/today_progressBar/task_item.dart';
-import '../../utils/today_progressBar/auth_service.dart';
 
 class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key});
@@ -135,13 +135,11 @@ class _TodayScreenState extends State<TodayScreen> {
       });
     }
   }
-
   Future<void> _toggleDone(TaskItem item) async {
     if (!_isToday) {
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('You can only complete habits for today'),
+          content: Text('You can only complete items for today'),
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 2),
         ),
@@ -154,20 +152,36 @@ class _TodayScreenState extends State<TodayScreen> {
     setState(() {
       item.done = !previous;
     });
-    final success = await _api.setItemCompletion(
-      item: item,
-      forDate: selectedDate,
-    );
-    if (!success && mounted ) {
-      setState(() {
-        item.done = previous;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error while updating'),
-          behavior: SnackBarBehavior.floating,
-        ),
+
+    try {
+      bool success = await _api.setItemCompletion(
+        item: item,
+        forDate: selectedDate,
       );
+
+      if (!success && mounted) {
+        setState(() {
+          item.done = previous;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error while updating'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          item.done = previous;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
