@@ -7,6 +7,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import toast from "react-hot-toast";
 import api from "../../services/api";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import useAuthStore from "../store/useAuthStore";
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -15,11 +16,13 @@ const Settings = () => {
   const { preferences, fetchUserPreferences, updateUserPrefrences } =
     useProfilePhotoStore();
 
+  const { username: authUsername, updateUsername } = useAuthStore();
+
   const [localPrefs, setLocalPrefs] = useState(null);
   const debouncedPrefs = useDebounce(localPrefs, 700);
   const hasInitialized = useRef(false);
 
-  // 🔹 username state
+  // 🔹 username state (synced with auth store)
   const [username, setUsername] = useState("");
 
   // 🔹 password modal state
@@ -33,6 +36,7 @@ const Settings = () => {
     fetchUserPreferences();
   }, []);
 
+  // 🔹 initialize preferences
   useEffect(() => {
     if (preferences && !hasInitialized.current) {
       const cleanInitial = Object.fromEntries(
@@ -45,6 +49,14 @@ const Settings = () => {
     }
   }, [preferences, setTheme]);
 
+  // 🔹 sync username from auth store
+  useEffect(() => {
+    if (authUsername) {
+      setUsername(authUsername);
+    }
+  }, [authUsername]);
+
+  // 🔹 debounced preferences update
   useEffect(() => {
     if (hasInitialized.current && debouncedPrefs) {
       const prefsToSend = { ...debouncedPrefs };
@@ -57,14 +69,16 @@ const Settings = () => {
 
   if (!localPrefs) return null;
 
-  // 🔹 save username on blur
+  // 🔹 save username
   const handleUsernameBlur = async () => {
-    if (!username.trim()) return;
+    if (!username.trim() || username === authUsername) return;
+
     try {
       await api.patch("/users/username", { username });
+
+      updateUsername(username); // 🔥 sync auth store
       toast.success("Username updated");
     } catch (err) {
-      console.log(err.response?.data);
       toast.error(err.response?.data?.message || "Could not update username");
     }
   };
@@ -81,7 +95,6 @@ const Settings = () => {
       setOldPassword("");
       setNewPassword("");
     } catch (err) {
-      console.log(err.response?.data);
       toast.error(err.response?.data?.message || "Failed to change password");
     }
   };
@@ -99,13 +112,15 @@ const Settings = () => {
         </header>
 
         <div className="space-y-6">
-          {/* Profile Settings Section */}
+          {/* Profile Settings */}
           <section className="p-8 bg-white border shadow-sm rounded-2xl border-slate-200 dark:bg-gray-900 dark:border-gray-800">
             <h2 className="mb-6 text-xl font-bold text-slate-800 dark:text-white">
               {t("Profile Settings")}
             </h2>
+
             <div className="flex flex-col md:flex-row gap-8">
               <ProfilePhoto />
+
               <div className="flex-1 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -118,46 +133,46 @@ const Settings = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       onBlur={handleUsernameBlur}
-                      className="w-full px-4 py-2 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
+                      className="w-full px-4 py-2 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </div>
+
                   <div>
                     <label className="block mb-2 text-sm font-semibold text-slate-700 dark:text-gray-300">
                       {t("Email Address")}
                     </label>
                     <input
                       type="email"
-                      placeholder="user@example.com"
-                      className="w-full px-4 py-2 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
+                      disabled
+                      className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-800"
                     />
                   </div>
                 </div>
 
-                {/* Change Password Button */}
                 <button
                   onClick={() => setShowPasswordModal(true)}
-                  className="px-4 py-2 text-sm font-medium transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300"
+                  className="px-4 py-2 text-sm font-medium transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800"
                 >
                   {t("Change Password")}
                 </button>
 
-                {/* 🔹 Password Modal */}
+                {/* Password Modal */}
                 {showPasswordModal && (
                   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-                    <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl w-full max-w-md shadow-lg relative">
-                      <h2 className="text-xl font-bold mb-4 text-slate-800 dark:text-white">
+                    <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl w-full max-w-md shadow-lg">
+                      <h2 className="text-xl font-bold mb-4">
                         Change Password
                       </h2>
 
                       <div className="mb-4 relative">
-                        <label className="block mb-2 text-sm font-semibold text-slate-700 dark:text-gray-300">
+                        <label className="block mb-2 text-sm font-semibold">
                           Old Password
                         </label>
                         <input
                           type={oldPasswordType}
                           value={oldPassword}
                           onChange={(e) => setOldPassword(e.target.value)}
-                          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                          className="w-full px-4 py-2 rounded-lg border"
                         />
                         <button
                           type="button"
@@ -168,7 +183,7 @@ const Settings = () => {
                                 : "password",
                             )
                           }
-                          className="absolute right-3 top-12 -translate-y-1/2 text-gray-500 "
+                          className="absolute right-3 top-12"
                         >
                           {oldPasswordType === "password" ? (
                             <FaEyeSlash />
@@ -179,14 +194,14 @@ const Settings = () => {
                       </div>
 
                       <div className="mb-4 relative">
-                        <label className="block mb-2 text-sm font-semibold text-slate-700 dark:text-gray-300">
+                        <label className="block mb-2 text-sm font-semibold">
                           New Password
                         </label>
                         <input
                           type={newPasswordType}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                          className="w-full px-4 py-2 rounded-lg border"
                         />
                         <button
                           type="button"
@@ -197,7 +212,7 @@ const Settings = () => {
                                 : "password",
                             )
                           }
-                          className="absolute right-3 top-12 -translate-y-1/2 text-gray-500"
+                          className="absolute right-3 top-12"
                         >
                           {newPasswordType === "password" ? (
                             <FaEyeSlash />
@@ -210,13 +225,13 @@ const Settings = () => {
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => setShowPasswordModal(false)}
-                          className="px-4 py-2 rounded-lg border border-slate-300 dark:border-gray-700"
+                          className="px-4 py-2 border rounded-lg"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={handleChangePassword}
-                          className="px-4 py-2 rounded-lg bg-blue-600 text-white"
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
                         >
                           Save
                         </button>
