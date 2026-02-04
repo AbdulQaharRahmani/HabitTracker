@@ -111,5 +111,6 @@
   "google": "گوگل",
   "apple": "اپل",
   "already_have_account": "قبلاً حساب دارید؟",
-  "log_in": "ورود"
+  "log_in": "ورود",
+  "logout":"خروج"
 }

@@ -96,5 +96,6 @@
   "google": "Google",
   "apple": "Apple",
   "already_have_account": "Already have an account?",
-  "log_in": "Log in"
+  "log_in": "Log in",
+  "logout":"Logout"
 }
