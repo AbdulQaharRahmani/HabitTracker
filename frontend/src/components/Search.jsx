@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { FaSearch } from "react-icons/fa";
 
 export default function Search({ searchTerm, setSearchTerm, placeholder }) {

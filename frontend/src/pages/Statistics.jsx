@@ -17,7 +17,7 @@ function Statistics() {
   function convertToPersianDigits(str) {
     return str.replace(/\d/g, d => persianDigits[d]);
   }
-  
+
   function formatNumber(value) {
     if (i18n.language === "fa") {
       return convertToPersianDigits(String(value));
@@ -26,27 +26,28 @@ function Statistics() {
   }
 
   return (
-    <div className="">
-      <div className={`flex justify-between my-2 items-center lg:mr-9  sm:mr-0 xxs:mr-0 xxs:ml-0 ${
-        isRTL ? "xxs:ml-7" : "xxs:ml-auto"
-      }`}>
+    <div
+      className="px-4 lg:px-9"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <Header
           title={t("Your Progress")}
           subtitle={t("Overview of your consistency and growth.")}
         />
-        <span className={`pt-9`}>
-          <ExportData />
-        </span>
+        <ExportData />
       </div>
 
-      <div className="my-4">
-        <div className="flex items-center lg:mr-9 sm:mr-0 lg:flex lg:gap-6 ml-7 md:gap-2 sm:gap-2 md:grid-rows-3 xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
-          <TotalHabitsStatics totalHabits={formatNumber(10)} />
-          <CurrentStreakStatics currentStreak={formatNumber(5)} />
-          <CompletionRateStatics completionRate={formatNumber(75)} />
-        </div>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+        <TotalHabitsStatics totalHabits={formatNumber(10)} />
+        <CurrentStreakStatics currentStreak={formatNumber(5)} />
+        <CompletionRateStatics completionRate={formatNumber(75)} />
       </div>
-      <div className="ml-7 ">
+
+      {/* Charts */}
+      <div className="space-y-2">
         <DayilyConsistency />
         <StatisticsChart />
       </div>

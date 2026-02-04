@@ -61,7 +61,7 @@ const Sidebar = ({ children }) => {
     closeMobileSidebar,
   } = useSidebarStore();
 
- const userId = useAuthStore((state) => state.userId);
+ const {userId,username} = useAuthStore((state) => state);
 
   useEffect(() => {
     if (!userId) return;
@@ -125,7 +125,7 @@ const Sidebar = ({ children }) => {
 
             {isOpen && (
               <div className="w-full">
-                <h3 className="font-semibold text-lg mt-2">Ehsanullah</h3>
+                <h3 className="font-semibold text-lg mt-2">{username}</h3>
                 <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline mt-1">
                   {t("View Profile")}
                 </button>
@@ -175,7 +175,7 @@ const Sidebar = ({ children }) => {
 
                           {isOpen && (
                             <>
-                              <span className="ml-4 font-medium">
+                              <span className="ml-4 rtl:mr-3 font-medium">
                                 {t(item.name)}
                               </span>
                               {isActive && (
@@ -230,7 +230,7 @@ const Sidebar = ({ children }) => {
 
                           {isOpen && (
                             <>
-                              <span className="ml-4 font-medium">
+                              <span className="ml-4 rtl:mr-3 font-medium">
                                 {t(item.name)}
                               </span>
                               {isActive && (
