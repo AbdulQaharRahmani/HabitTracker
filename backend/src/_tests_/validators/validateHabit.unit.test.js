@@ -35,7 +35,7 @@ vi.mock('../../utils/error.js', () => {
   return { AppError };
 });
 
-describe('createHabitValidator – UNIT (mocked express-validator)', () => {
+describe('createHabitValidator  UNIT (mocked express-validator)', () => {
   let validationResult;
   let handler;
 

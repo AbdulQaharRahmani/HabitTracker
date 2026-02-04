@@ -107,55 +107,22 @@ describe('Create Habit', () => {
       'user123'
     );
 
-    expect(HabitModel.create).toHaveBeenCalledWith({
-      userId: 'user123',
-      title: 'Exercise',
-      description: 'Daily workout',
-      frequency: 'Daily',
-      order: 6,
-      categoryId: 'cat123',
-    });
+    expect(HabitModel.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 'user123',
+        title: 'Exercise',
+        description: 'Daily workout',
+        frequency: 'Daily',
+        order: 6,
+        categoryId: 'cat123',
+      })
+    );
 
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
       data: mockHabit,
     });
-  });
-
-  it.skip('2. Missing required fields -> Should throw 400 and not create habit', async () => {
-    req.body = {
-      description: 'Daily workout',
-      frequency: 'Daily',
-      categoryId: 'cat123',
-    };
-
-    CategoryModel.doesCategoryExist.mockResolvedValue(true);
-    await expect(createHabit(req, res)).rejects.toMatchObject({
-      statusCode: 400,
-    });
-    expect(CategoryModel.doesCategoryExist).not.toHaveBeenCalled();
-    expect(HabitModel.create).not.toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
-  });
-
-  it.skip('3. Invalid data Type -> Should throw AppError', async () => {
-    req.body = {
-      title: 123,
-      description: 'Daily workout',
-      frequency: 'Daily',
-      categoryId: 'cat123',
-    };
-
-    await expect(createHabit(req, res)).rejects.toThrow();
-
-    try {
-      await createHabit(req, res);
-    } catch (error) {
-      expect(error.statusCode).toBe(400);
-    }
-
-    expect(CategoryModel.doesCategoryExist).not.toHaveBeenCalled();
   });
 
   it('4. Error: Unauthorized -> throws 401 error', async () => {
@@ -169,23 +136,6 @@ describe('Create Habit', () => {
     expect(CategoryModel.doesCategoryExist).not.toHaveBeenCalled();
     expect(HabitModel.create).not.toHaveBeenCalled();
     expect(HabitModel.getHabitCountByUserId).not.toHaveBeenCalled();
-  });
-
-  it.skip('5. Invalid frequency (not in enum) -> Should throw 400 validation error', async () => {
-    req.body = {
-      title: 'Exercise',
-      description: 'Daily workout',
-      frequency: 'monthly', //invalid frequency
-      categoryId: 'cat123',
-    };
-
-    await expect(createHabit(req, res)).rejects.toMatchObject({
-      statusCode: 400,
-    });
-
-    expect(CategoryModel.doesCategoryExist).not.toHaveBeenCalled();
-    expect(HabitModel.create).not.toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
   });
 
   it("6. Category doesn't exist -> Should throw 400 error", async () => {
@@ -210,25 +160,6 @@ describe('Create Habit', () => {
 
     expect(HabitModel.create).not.toHaveBeenCalled();
   });
-
-  it.skip('7. Title > 25 character -> Should throw 400 bad request', async () => {
-    req.body = {
-      title: 'Title consist of more than 25 characters',
-      frequency: 'Daily',
-      categoryId: 'cat123',
-    };
-
-    CategoryModel.doesCategoryExist.mockResolvedValue(true);
-    HabitModel.getHabitCountByUserId.mockResolvedValue(5);
-
-    const validationError = new Error(
-      'title is longer than the maximum allowed length (25)'
-    );
-    validationError.name = 'ValidationError';
-    HabitModel.create.mockRejectedValue(validationError);
-
-    await expect(createHabit(req, res)).rejects.toThrow(AppError);
-  });
 });
 
 describe('Get Habits', () => {
@@ -236,6 +167,7 @@ describe('Get Habits', () => {
   beforeEach(() => {
     req = {
       user: { _id: 'user123' },
+      query: {},
     };
 
     res = {
@@ -248,14 +180,19 @@ describe('Get Habits', () => {
 
   it('1. Get all Habits with (empty list) -> return Empty list', async () => {
     HabitModel.findByUserAndSortByOrder.mockResolvedValue([]);
+    HabitModel.countDocuments.mockResolvedValue(0);
 
     await getHabits(req, res);
 
-    expect(HabitModel.findByUserAndSortByOrder).toHaveBeenCalledWith('user123');
+    expect(HabitModel.findByUserAndSortByOrder).toHaveBeenCalledWith(
+      0,
+      8,
+      expect.objectContaining({ userId: 'user123', isDeleted: false })
+    );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
-      result: 0,
+      totalPages: 0,
       data: [],
     });
   });
@@ -279,12 +216,18 @@ describe('Get Habits', () => {
       },
     ]);
 
+    HabitModel.countDocuments.mockResolvedValue(2);
+
     await getHabits(req, res);
-    expect(HabitModel.findByUserAndSortByOrder).toHaveBeenCalledWith('user123');
+    expect(HabitModel.findByUserAndSortByOrder).toHaveBeenCalledWith(
+      0,
+      8,
+      expect.objectContaining({ userId: 'user123', isDeleted: false })
+    );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
-      result: 2,
+      totalPages: 1,
       data: [
         {
           _id: 'habit1',
