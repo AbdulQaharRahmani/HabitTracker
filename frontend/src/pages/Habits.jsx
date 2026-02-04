@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Header from "../components/Header.jsx";
-import DarkMode from "../components/DarkMode.jsx";
 import Search from "../components/Search.jsx";
 import AddHabit from "../components/AddHabit.jsx";
 import View from "../components/View.jsx";
@@ -11,6 +10,8 @@ export default function Habits() {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("list");
+  // NEW: Add page state
+  const [currentPage, setCurrentPage] = useState(1);
 
   return (
     <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors">
@@ -30,7 +31,13 @@ export default function Habits() {
       <div className="my-6 sm:my-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
           <div className="w-full lg:w-1/2 xl:w-2/5">
-            <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+            <Search
+              searchTerm={searchTerm}
+              setSearchTerm={(val) => {
+                setSearchTerm(val);
+                setCurrentPage(1);
+              }}
+            />
           </div>
 
           <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 sm:gap-4">
@@ -44,7 +51,12 @@ export default function Habits() {
         </div>
       </div>
       <div className="pb-4 sm:pb-10">
-        <HabitList viewMode={viewMode} searchTerm={searchTerm} />
+        <HabitList
+          viewMode={viewMode}
+          searchTerm={searchTerm}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
     </div>
   );
