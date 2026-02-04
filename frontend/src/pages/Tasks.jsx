@@ -8,15 +8,15 @@ import i18n from "../utils/i18n";
 import EditTask from "../components/tasks/EditTask";
 
 function Tasks() {
-  const { tasks, fetchTasks, loading, error } = useTaskCardStore(
-    (state) => state,
-  );
+  const { tasks, fetchTasks, loading, error, isModalOpen, isEditModalOpen } =
+    useTaskCardStore((state) => state);
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
   useEffect(() => {
     fetchTasks(ITEMS_PER_PAGE, page);
-  }, [page]);
+  }, [page, isModalOpen, isEditModalOpen]);
+
 
   const { t } = useTranslation();
 

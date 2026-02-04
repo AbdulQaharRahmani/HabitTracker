@@ -66,6 +66,7 @@ export const useTaskCardStore = create((set, get) => ({
 
   addTask: async (taskPayload) => {
     try {
+      // console.log("TASK DATA BEFORE SUBMIT 👉", taskData);
       const date = new Date(taskPayload.dueDate);
 
       const payload = {
@@ -176,15 +177,15 @@ export const useTaskCardStore = create((set, get) => ({
       const date = new Date(taskPayload.dueDate);
 
       const { categories } = get();
-      const categoryName =
-        categories.find((c) => c.id === taskPayload.category)?.name || "—";
+      // const categoryName =
+      //   categories.find((c) => c.id === taskPayload.category)?.name || "—";
 
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
         dueDate: date.toISOString(),
-        categoryId: taskPayload.category,
-        category: categoryName,
+        categoryId: taskPayload.categoryId,
+        // category: categoryName,
         priority: normalizePriorityToEnglish(taskPayload.priority),
       };
 
@@ -196,7 +197,8 @@ export const useTaskCardStore = create((set, get) => ({
             ? {
                 ...task,
                 ...taskPayload,
-                category: categoryName,
+                // category: categoryName,
+                categoryId: taskPayload.categoryId,
                 priority: normalizePriorityToEnglish(taskPayload.priority)
               }
             : task,
