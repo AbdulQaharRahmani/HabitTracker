@@ -20,6 +20,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+
   String _priority = 'medium';
   String? _categoryId;
   DateTime? _dueDate;
@@ -27,11 +28,12 @@ class _EditTaskPageState extends State<EditTaskPage> {
   final TaskApiService _taskApi = TaskApiService();
   final CategoryApiService _categoryApi = CategoryApiService();
 
+  /// Categories are loaded silently in background
   List<CategoryModel> _categories = [];
-  bool _loadingCategories = true;
+
   bool _isSubmitting = false;
 
-  // Priority data
+  // Priority definitions (UI unchanged)
   final List<Map<String, dynamic>> _priorities = [
     {
       'value': 'low',
@@ -59,54 +61,47 @@ class _EditTaskPageState extends State<EditTaskPage> {
   @override
   void initState() {
     super.initState();
+
+    /// Initialize UI instantly without any loading state
     _titleController = TextEditingController(text: widget.task.title);
-    _descriptionController = TextEditingController(
-      text: widget.task.description,
-    );
+    _descriptionController =
+        TextEditingController(text: widget.task.description);
+
     _priority = widget.task.priority.toLowerCase();
     _categoryId = widget.task.category?.id;
     _dueDate = widget.task.dueDate;
 
+    /// Fetch categories after first frame (non-blocking)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadCategories();
+      _loadCategoriesInBackground();
     });
   }
 
-  Future<void> _loadCategories() async {
+  /// Fetch categories silently without blocking UI
+  Future<void> _loadCategoriesInBackground() async {
     try {
       final token = await AuthManager.getToken();
-      if (token == null) throw Exception('Token not found');
+      if (token == null) return;
 
       final categories = await _categoryApi.fetchCategories(token: token);
-
       if (!mounted) return;
+
       setState(() {
         _categories = categories;
-        _loadingCategories = false;
 
-        if (_categoryId == null && _categories.isNotEmpty) {
-          _categoryId = _categories[0].id;
-        } else if (_categoryId != null &&
+        /// Ensure selected category is still valid
+        if (_categoryId != null &&
             !_categories.any((c) => c.id == _categoryId)) {
-          _categoryId = _categories.isNotEmpty ? _categories[0].id : null;
+          _categoryId = _categories.isNotEmpty ? _categories.first.id : null;
         }
       });
-    } catch (e) {
-      setState(() {
-        _loadingCategories = false;
-      });
-      _showErrorSnackbar('Failed to load categories');
+    } catch (_) {
+      /// Failure is ignored to prevent UI interruption
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.year.toString().padLeft(4, '0')}-'
-        '${date.month.toString().padLeft(2, '0')}-'
-        '${date.day.toString().padLeft(2, '0')}';
-  }
-
+  /// Pick due date and time
   Future<void> _pickDueDate() async {
-    // 1) pick date
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: _dueDate ?? DateTime.now(),
@@ -116,7 +111,6 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
     if (pickedDate == null) return;
 
-    // 2) pick time (keep backend time if exists)
     final initialTime = _dueDate != null
         ? TimeOfDay(hour: _dueDate!.hour, minute: _dueDate!.minute)
         : TimeOfDay.now();
@@ -128,7 +122,6 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
     if (pickedTime == null) return;
 
-    // 3) combine date + time
     setState(() {
       _dueDate = DateTime(
         pickedDate.year,
@@ -147,6 +140,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
     super.dispose();
   }
 
+  /// Save updated task (backend unchanged)
   Future<void> _saveTask() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -176,55 +170,17 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
       if (!mounted) return;
 
-      _showSuccessSnackbar('Task updated successfully!');
+      _showSuccessSnackbar('Task updated successfully');
+      await Future.delayed(const Duration(milliseconds: 700));
 
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      if (!mounted) return;
       Navigator.pop(context, updatedTask);
-    } catch (e, stackTrace) {
+    } catch (_) {
       setState(() => _isSubmitting = false);
-      debugPrint('StackTrace: $stackTrace');
-      _showErrorSnackbar('Failed to update task. Please try again.');
+      _showErrorSnackbar('Failed to update task');
     }
   }
 
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: Colors.redAccent,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
+  /// Delete task
   Future<void> _deleteTask() async {
     setState(() => _isSubmitting = true);
 
@@ -237,23 +193,19 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
     try {
       await _taskApi.deleteTask(widget.task.id, token);
-
       if (!mounted) return;
 
       _showSuccessSnackbar('Task deleted successfully');
-
       await Future.delayed(const Duration(milliseconds: 500));
 
       Navigator.pop(context, 'deleted');
-    } catch (e) {
+    } catch (_) {
       setState(() => _isSubmitting = false);
       _showErrorSnackbar('Failed to delete task');
     }
   }
 
-  /// ===========================
-  /// AlertDialog for deleting
-  /// ===========================
+  /// Delete confirmation dialog
   Future<void> _confirmDeleteTask() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -284,21 +236,36 @@ class _EditTaskPageState extends State<EditTaskPage> {
     }
   }
 
-  /// ===========================
-  /// Due Date Text Formatter
-  /// ===========================
+  /// Snackbar helpers
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  /// Due date display text
   String _dueDateText() {
     if (_dueDate == null) return 'Select due date & time';
 
     final d = _dueDate!;
-
-    final date =
-        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-
-    final time =
-        '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
-
-    return '$date  •  $time';
+    return
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}'
+          '  •  '
+          '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -328,36 +295,9 @@ class _EditTaskPageState extends State<EditTaskPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          if (_isSubmitting)
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: isDark ? Colors.white : Colors.blue,
-                ),
-              ),
-            ),
-        ],
+
       ),
-      body: _loadingCategories
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text(
-                    'Loading categories...',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            )
-          : Form(
+      body:  Form(
               key: _formKey,
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
