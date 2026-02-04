@@ -6,22 +6,28 @@ import habitRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import taskRoutes from './routes/task.js';
+import logRoutes from './routes/log.js';
 import categoryRoutes from './routes/categories.js';
 import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
+import { logMiddleware } from './middleware/logger.js';
+
 const app = express();
 
 //#region Normal Midlleware
 
 app.use(express.json());
+
 app.use(
   cors({
     origin: ['http://localhost:5173', 'https://habittracker-kwpt.onrender.com'],
     credentials: true,
   })
 );
+
 app.use(cookieParser());
+app.use(logMiddleware);
 //#endregion
 
 //#region Route Middlewares
@@ -42,6 +48,7 @@ app.use('/api/categories', authMiddleware, categoryRoutes);
 app.use('/api/habits', authMiddleware, habitRoutes);
 app.use('/api/tasks', authMiddleware, taskRoutes);
 app.use('/api/users', authMiddleware, userRoutes);
+app.use('/api/logs', authMiddleware, logRoutes);
 app.use('/api/offline-data', authMiddleware, syncRoutes);
 
 //#endregion
