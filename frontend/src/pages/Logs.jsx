@@ -4,28 +4,30 @@ import LogsTable from "../logs dashboard/LogsTable"
 import Dropdown from "../components/Dropdown"
 import { useState } from "react"
 import useLogsStore from "../store/useLogsStore"
+import { useTranslation } from "react-i18next"
 export default function Logs() {
+    const {t} = useTranslation()
     const levels = [
-        { id: 1, name: "All levels", value: "all levels" },
-        { id: 2, name: "Error", value: "error" },
-        { id: 3, name: "Warning", value: "warning" },
-        { id: 4, name: "Info", value: "info" }
+        { id: 1, name: t("All levels"), value: "all levels" },
+        { id: 2, name: t("Error"), value: "error" },
+        { id: 3, name: t("Warn"), value: "warning" },
+        { id: 4, name: t("Info"), value: "info" }
     ]
     const methods = [
-        { id: 1, name: "All methods", value: "All methods" },
-        { id: 2, name: "GET", value: "GET" },
-        { id: 3, name: "POST", value: "POST" },
-        { id: 4, name: "DELETE", value: "DELETE" },
-        { id: 5, name: "PATCH", value: "PATCH" }
+        { id: 1, name: t("All methods"), value: "All methods" },
+        { id: 2, name: t("GET"), value: "GET" },
+        { id: 3, name: t("POST"), value: "POST" },
+        { id: 4, name: t("DELETE"), value: "DELETE" },
+        { id: 5, name: t("PATCH"), value: "PATCH" }
     ];
     const dates = [
-        { id: 1, name: "Newest", value: "newest" },
-        { id: 2, name: "Oldest", value: "oldest" }
+        { id: 1, name: t("Newest"), value: "newest" },
+        { id: 2, name: t("Oldest"), value: "oldest" }
 
     ]
-    const [selectedLevel, setSelectedLevel] = useState("All Levels");
-    const [selectedMethod, setSelectedMethod] = useState("All Methods");
-    const [selectedDate, setSelectedDate] = useState("Newest");
+    const [selectedLevel, setSelectedLevel] = useState(t("All Levels"));
+    const [selectedMethod, setSelectedMethod] = useState(t("All Methods"));
+    const [selectedDate, setSelectedDate] = useState(t("Newest"));
     const [searchTerm, setSearchTerm] = useState("")
     const { logsData, getFilteredData } = useLogsStore()
     const [displayData, setDisplayData] = useState(logsData);
@@ -44,23 +46,23 @@ export default function Logs() {
         <>
             {/* header  */}
             <div className="flex md:justify-between justify-center gap-5 flex-wrap flex-1 p-10">
-                <h1 className="font-bold text-xl">Log Management & Analytics Dashboard</h1>
+                <h1 className="font-bold text-xl">{t("Log Management & Analytics Dashboard")}</h1>
 
                 <div className="flex items-center gap-3">
-                    <span className="font-bold">Admin</span>
+                    <span className="font-bold">{t("Admin")}</span>
                     <span className="text-2xl text-gray-300">|</span>
                     <button className="py-1 px-4 rounded-md text-white bg-indigo-600">
-                        Logout
+                        {t("Logout")}
                     </button>
                     <FaEnvelope className="text-indigo-600 cursor-pointer" size={20} />
                 </div>
             </div>
             <div className="p-4 flex flex-col justify-center items-center">
                 <div className="w-[350px]">
-                    <Search placeholder={"Search logs by route..."} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                    <Search placeholder={t("Search logs by route")} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
                 </div>
                 <div className="flex p-4 flex-col w-full lg:flex-row gap-2 items-center">
-                    <span className="font-bold p-3">Level: </span>
+                    <span className="font-bold p-3">{t("Level")}: </span>
                     <Dropdown
                         items={levels}
                         value={selectedLevel}
@@ -68,7 +70,7 @@ export default function Logs() {
                         placeholder="Select Level"
                     />
 
-                    <span className="font-bold p-3">Method: </span>
+                    <span className="font-bold p-3">{t("Method")}: </span>
                     <Dropdown
                         items={methods}
                         value={selectedMethod}
@@ -76,7 +78,7 @@ export default function Logs() {
                         placeholder="Select Method"
                     />
 
-                    <span className="font-bold p-3">Sort by: </span>
+                    <span className="font-bold p-3">{t("Sort by")}: </span>
                     <Dropdown
                         items={dates}
                         value={selectedDate}
@@ -87,7 +89,7 @@ export default function Logs() {
                     <button className="py-2 px-6 rounded-md text-white text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors"
                     onClick={()=> handleFilter()}
                     >
-                        Apply Filter
+                       {t("Apply filter")}
                     </button>
                 </div>
             </div>

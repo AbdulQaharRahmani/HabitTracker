@@ -1,10 +1,12 @@
+import { useTranslation } from "react-i18next";
 
 export default function LogTable({filteredList}) {
+const {t} = useTranslation()
 if(filteredList.length === 0){
   return(
     <>
    <div className="flex justify-center items-center w-full">
-      <span className="font-bold text-xl">Not Found!</span>
+      <span className="font-bold text-xl">{t("Not Found!")}</span>
    </div>
     </>
   )
@@ -14,14 +16,14 @@ if(filteredList.length === 0){
       <table className="w-full text-left border-collapse bg-white dark:bg-gray-900">
         <thead>
           <tr className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs uppercase">
-            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">Timestamp</th>
-            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">Level</th>
-            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">Method</th>
-            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">Route</th>
-            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">Status</th>
-            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">User</th>
-            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">Duration</th>
-            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">IP Address</th>
+            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">{t("Timestamp")}</th>
+            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">{t("Level")}</th>
+            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">{t("Method")}</th>
+            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">{t("Route")}</th>
+            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">{t("Status")}</th>
+            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">{t('User')}</th>
+            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">{t("Duration")}</th>
+            <th className="px-4 py-3 font-bold border-b dark:border-gray-700">{t("IP Address")}</th>
           </tr>
         </thead>
 
