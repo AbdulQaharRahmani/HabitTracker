@@ -127,5 +127,7 @@
   "DELETE": "DELETE",
   "GET": "GET",
   "Newest": "جدیدترین",
-  "Oldest": "قدیمی‌ترین"
+  "Oldest": "قدیمی‌ترین",
+  "Loading logs": "در حال بارگذاری لاگ ها..."
+
 }

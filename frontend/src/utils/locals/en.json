@@ -122,7 +122,8 @@
   "User": "User",
   "Duration": "Duration",
   "IP Address": "IP Address",
-  "Not Found": "Not Found!"
+  "Not Found": "Not Found!",
+  "Loading logs": "Loading logs..."
 
 
 }

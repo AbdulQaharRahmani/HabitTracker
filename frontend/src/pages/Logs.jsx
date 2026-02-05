@@ -100,7 +100,7 @@ export default function Logs() {
                     </button>
                 </div>
             </div>
-
+            {}
             <LogsTable filteredList={displayData} />
 
         </>

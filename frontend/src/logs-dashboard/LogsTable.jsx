@@ -1,7 +1,19 @@
 import { useTranslation } from "react-i18next";
+import useLogsStore from "../store/useLogsStore";
 
 export default function LogTable({filteredList}) {
 const {t} = useTranslation()
+const {loading} = useLogsStore()
+if(loading) {
+  return (
+    <div className="w-full py-20 flex justify-center items-center">
+      <div className="flex flex-col items-center gap-2">
+        <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-500 font-medium">{t("Loading logs")}</p>
+      </div>
+    </div>
+  );
+}
 if(filteredList.length === 0){
   return(
     <>

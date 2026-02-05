@@ -2,12 +2,16 @@ import { create } from "zustand";
 import { fetchLogsData } from "../../services/logsService";
 const useLogsStore = create((set, get) => ({
   logsData: [],
+  loading: false,
   getLogsData: async () => {
+     set({loading :true})
     try {
       const data = await fetchLogsData()
       set({ logsData: data })
     } catch (error) {
       console.log(error)
+    }finally{
+      set({loading: false})
     }
   },
  getFilteredData: (filters, searchTerm) => {
