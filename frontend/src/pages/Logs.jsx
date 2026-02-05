@@ -1,6 +1,6 @@
 import { FaEnvelope } from "react-icons/fa"
 import Search from "../components/Search"
-import LogsTable from "../logs dashboard/LogsTable"
+import LogsTable from "../logs-dashboard/LogsTable"
 import Dropdown from "../components/Dropdown"
 import { useState } from "react"
 import useLogsStore from "../store/useLogsStore"
