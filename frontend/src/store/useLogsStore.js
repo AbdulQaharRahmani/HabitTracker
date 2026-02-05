@@ -3,6 +3,7 @@ import { fetchLogsData } from "../../services/logsService";
 const useLogsStore = create((set, get) => ({
   logsData: [],
   loading: false,
+  error: null,
   getLogsData: async () => {
      set({loading :true})
     try {
@@ -10,6 +11,9 @@ const useLogsStore = create((set, get) => ({
       set({ logsData: data })
     } catch (error) {
       console.log(error)
+      const errorMessage = error.response?.data?.message || error.message || "Server Error";
+      set({ error: errorMessage, loading: false, logsData: [] });
+
     }finally{
       set({loading: false})
     }

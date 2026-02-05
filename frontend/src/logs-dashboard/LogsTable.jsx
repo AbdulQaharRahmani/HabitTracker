@@ -3,7 +3,14 @@ import useLogsStore from "../store/useLogsStore";
 
 export default function LogTable({filteredList}) {
 const {t} = useTranslation()
-const {loading} = useLogsStore()
+const {loading, error} = useLogsStore()
+if(error){
+  return(
+    <div className="w-full flex justify-center font-bold text-red-600">
+        {error}
+    </div>
+  )
+}
 if(loading) {
   return (
     <div className="w-full py-20 flex justify-center items-center">
