@@ -79,7 +79,7 @@ useEffect(() => {
 
   if (loading) return (
     <div className="w-full h-48 flex items-center justify-center bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800">
-      <div className="animate-pulse text-slate-400 text-sm font-medium">Loading Habits...</div>
+      <div className="animate-pulse text-slate-400 text-sm font-medium">Loading Habits..</div>
     </div>
   );
 
