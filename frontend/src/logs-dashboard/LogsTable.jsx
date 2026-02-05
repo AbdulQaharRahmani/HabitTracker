@@ -28,8 +28,8 @@ if(filteredList.length === 0){
         </thead>
 
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-          {filteredList.map((log) => (
-            <tr key={log.id} className="text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          {filteredList.map((log, index) => (
+            <tr key={index} className="text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
               <td className="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">{log.timestamp}</td>
               <td className="px-4 py-3">
                 <span className={`px-2 py-1 rounded text-[10px] font-bold ${log.level === 'ERROR' ? 'bg-red-100 text-red-600' :
@@ -39,13 +39,13 @@ if(filteredList.length === 0){
                 </span>
               </td>
               <td className="px-4 py-3 font-medium">{log.method}</td>
-              <td className="px-4 py-3 text-indigo-600 dark:text-indigo-400">{log.route}</td>
-              <td className={`px-4 py-3 font-bold ${log.status >= 400 ? 'text-red-500' : 'text-green-500'}`}>
-                {log.status}
+              <td className="px-4 py-3 text-indigo-600 dark:text-indigo-400">{log.path}</td>
+              <td className={`px-4 py-3 font-bold ${log.statusCode >= 400 ? 'text-red-500' : 'text-green-500'}`}>
+                {log.statusCode}
               </td>
-              <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{log.user}</td>
+              <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{log.userId}</td>
               <td className="px-4 py-3 text-gray-400">{log.duration}ms</td>
-              <td className="px-4 py-3 text-gray-400 font-mono">{log.ip}</td>
+              <td className="px-4 py-3 text-gray-400 font-mono">{log.clientIp}</td>
             </tr>
           ))}
         </tbody>

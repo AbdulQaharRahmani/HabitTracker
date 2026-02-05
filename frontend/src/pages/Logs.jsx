@@ -2,11 +2,11 @@ import { FaEnvelope } from "react-icons/fa"
 import Search from "../components/Search"
 import LogsTable from "../logs-dashboard/LogsTable"
 import Dropdown from "../components/Dropdown"
-import { useState } from "react"
+import { useEffect, useEffectEvent, useState } from "react"
 import useLogsStore from "../store/useLogsStore"
 import { useTranslation } from "react-i18next"
 export default function Logs() {
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const levels = [
         { id: 1, name: t("All levels"), value: "all levels" },
         { id: 2, name: t("Error"), value: "error" },
@@ -14,7 +14,7 @@ export default function Logs() {
         { id: 4, name: t("Info"), value: "info" }
     ]
     const methods = [
-        { id: 1, name: t("All methods"), value: "All methods" },
+        { id: 1, name: t("All methods"), value: "all methods" },
         { id: 2, name: t("GET"), value: "GET" },
         { id: 3, name: t("POST"), value: "POST" },
         { id: 4, name: t("DELETE"), value: "DELETE" },
@@ -25,22 +25,29 @@ export default function Logs() {
         { id: 2, name: t("Oldest"), value: "oldest" }
 
     ]
-    const [selectedLevel, setSelectedLevel] = useState(t("All Levels"));
-    const [selectedMethod, setSelectedMethod] = useState(t("All Methods"));
-    const [selectedDate, setSelectedDate] = useState(t("Newest"));
+    const [selectedLevel, setSelectedLevel] = useState("all Levels");
+    const [selectedMethod, setSelectedMethod] = useState("all Methods");
+    const [selectedDate, setSelectedDate] = useState("oldest");
     const [searchTerm, setSearchTerm] = useState("")
-    const { logsData, getFilteredData } = useLogsStore()
-    const [displayData, setDisplayData] = useState(logsData);
+    const [displayData, setDisplayData] = useState([]);
+    const { logsData, getFilteredData, getLogsData } = useLogsStore()
 
+    useEffect(() => {
+        getLogsData()
+    }, [getLogsData])
+
+    useEffect(() => {
+        setDisplayData(logsData)
+    }, [logsData])
     const handleFilter = () => {
-    const filterOptions = {
-        method: selectedMethod,
-        level: selectedLevel,
-        sortOrder: selectedDate
+        const filterOptions = {
+            method: selectedMethod,
+            level: selectedLevel,
+            sortOrder: selectedDate
+        };
+        const result = getFilteredData(filterOptions, searchTerm);
+        setDisplayData(result);
     };
-    const result = getFilteredData(filterOptions, searchTerm);
-    setDisplayData(result);
-};
     return (
 
         <>
@@ -87,9 +94,9 @@ export default function Logs() {
                     />
 
                     <button className="py-2 px-6 rounded-md text-white text-sm bg-indigo-600 hover:bg-indigo-700 transition-colors"
-                    onClick={()=> handleFilter()}
+                        onClick={() => handleFilter()}
                     >
-                       {t("Apply filter")}
+                        {t("Apply filter")}
                     </button>
                 </div>
             </div>
