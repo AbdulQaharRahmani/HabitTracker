@@ -242,14 +242,14 @@ const Sidebar = ({ children }) => {
           )}
         </nav>
 
-       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+       <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
           <button
           onClick={
             ()=>{
               logout();
               closeMobileSidebar();
             }}
-          className={`w-full flex items-center rounded-lg p-3 transition-all duration-200 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 ${!isOpen ? "justify-center": "justify-start"}`}>
+          className={`w-full flex items-center rounded-lg p-3 transition-all duration-200 text-red-600 dark:text-red-400 hover:bg-red-50 hover:translate-x-1 dark:hover:bg-red-900/20 ${!isOpen ? "justify-center": "justify-start"}`}>
             <span className={`${!isOpen ? "text-xl": "text-lg"}`}>
               <FaSignOutAlt/>
             </span>
