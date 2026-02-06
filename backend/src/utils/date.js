@@ -55,9 +55,40 @@ export class DateHelper {
     return [start, end];
   }
 
+  static getStartAndEndOfDate(startDate, endDate) {
+    const today = dayjs();
+
+    const start = startDate
+      ? dayjs(startDate).startOf('day')
+      : today.startOf('day');
+
+    const end = endDate ? dayjs(endDate).endOf('day') : today.endOf('day');
+
+    if (!start.isValid() || !end.isValid()) {
+      throw new AppError(
+        'Invalid date format',
+        400,
+        ERROR_CODES.INVALID_DATE_FORMAT
+      );
+    }
+
+    if (start.isAfter(end)) {
+      throw new AppError(
+        'Start date cannot be after end date',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+        'dateRange'
+      );
+    }
+
+    return [start.toDate(), end.toDate()];
+  }
+
   static validateDateRange(date) {
     const today = dayjs().startOf('day');
-    const selectedDate = (date ? dayjs(date, 'YYYY-MM-DD', true) : dayjs()).startOf('day');
+    const selectedDate = (
+      date ? dayjs(date, 'YYYY-MM-DD', true) : dayjs()
+    ).startOf('day');
 
     if (date && !selectedDate.isValid())
       throw new AppError(
