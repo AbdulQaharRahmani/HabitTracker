@@ -6,7 +6,7 @@ import { formatDate } from "../utils/dateFormatter";
 const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
-    chartData: null,
+    consistencyData: null,
     error: null,
     habitCompletions: 0,
     selectedDate: new Date(),
@@ -267,7 +267,7 @@ getConsistencyData: async (startDate, endDate) => {
         const result = await getHabitsChartData(startDate, endDate);
         console.log(result);
         if (result.success) {
-            set({ chartData: result.data.daily, loading: false });
+            set({ consistencyData: result.data.daily, loading: false });
         } else {
             set({ error: "Failed to load data", loading: false });
         }

@@ -3,7 +3,7 @@ import useHabitStore from "../store/useHabitStore";
 import { useTranslation } from "react-i18next";
 
 const DailyConsistency = () => {
-  const { chartData, loading, error, getConsistencyData } = useHabitStore();
+  const { consistencyData, loading, error, getConsistencyData } = useHabitStore();
   const { t } = useTranslation();
 const dates = useMemo(() => {
     const end = new Date();
@@ -31,9 +31,9 @@ useEffect(() => {
   };
 
   const { weeks, monthsLabels } = useMemo(() => {
-    if (!chartData) return { weeks: [], monthsLabels: [] };
+    if (!consistencyData) return { weeks: [], monthsLabels: [] };
 
- const dataToProcess = chartData?.daily || chartData;
+ const dataToProcess = consistencyData?.daily || consistencyData;
 
   if (!dataToProcess || !Array.isArray(dataToProcess)) {
     return { weeks: [], monthsLabels: [] };
@@ -75,7 +75,7 @@ useEffect(() => {
     }
 
     return { weeks: weeksArr, monthsLabels: tempMonths };
-  }, [chartData]);
+  }, [consistencyData]);
 
   if (loading) return (
     <div className="w-full h-48 flex items-center justify-center bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800">
