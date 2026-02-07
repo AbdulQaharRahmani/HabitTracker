@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import DayilyConsistency from '../components/DailyConsistency'
 import Header from '../components/Header'
 import ExportData from '../components/ExportData';
@@ -7,10 +8,27 @@ import CompletionRateStatics from '../components/CompletionRateStatics';
 import i18n from '../utils/i18n';
 import { useTranslation } from "react-i18next";
 import StatisticsChart from '../components/StatisticsChart'
+import {useStatisticsStore} from '../store/useStatisticsStore';
 
 function Statistics() {
   const { t } = useTranslation();
   const isRTL = i18n.language === "fa";
+
+  const {
+    totalHabits,
+    currentStreak,
+    completionRate,
+    fetchStatistics,
+    loading,
+    error,
+  } = useStatisticsStore(state=>state);
+
+
+  useEffect(()=>{
+     fetchStatistics();
+  },[fetchStatistics])
+
+
 
   const persianDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
 
@@ -25,6 +43,16 @@ function Statistics() {
     return String(value);
   }
 
+  if(loading){
+    return (
+     <div className="text-center text-gray-500 ">{t("Loading")}</div>
+    )
+  }
+  if(error){
+    return (
+      <div className="text-center text-red-500">{error}</div>
+    )
+  }
   return (
     <div
       className="px-4 lg:px-9"
@@ -39,11 +67,12 @@ function Statistics() {
         <ExportData />
       </div>
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
-        <TotalHabitsStatics totalHabits={formatNumber(10)} />
-        <CurrentStreakStatics currentStreak={formatNumber(5)} />
-        <CompletionRateStatics completionRate={formatNumber(75)} />
+      <div className="my-4">
+        <div className="flex items-center lg:mr-9 sm:mr-0 lg:flex lg:gap-6 ml-7 md:gap-2 sm:gap-2 md:grid-rows-3 xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
+          <TotalHabitsStatics totalHabits={formatNumber(totalHabits)} />
+          <CurrentStreakStatics currentStreak={formatNumber(currentStreak)} />
+          <CompletionRateStatics completionRate={formatNumber(completionRate)} />
+        </div>
       </div>
 
       {/* Charts */}

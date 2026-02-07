@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 import '../../utils/login/header_card_login.dart';
 import '../../utils/login/login_card.dart';
-import '../../utils/login_utils/controller.dart';
+import '../../services/controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

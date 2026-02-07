@@ -111,5 +111,9 @@
   "google": "گوگل",
   "apple": "اپل",
   "already_have_account": "قبلاً حساب دارید؟",
-  "log_in": "ورود"
+  "log_in": "ورود",
+
+  "NO_HABITS_YET": "هنوز هیچ عادتی اضافه نشده",
+  "NO_ACTIVE_STREAK_YET": "هنوز هیچ استریکی فعال نیست",
+  "NO_HABITS_COMPLETED_YET": "هنوز هیچ عادتی تکمیل نشده"
 }
