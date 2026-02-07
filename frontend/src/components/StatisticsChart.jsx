@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import {
+import {useTranslation} from "react-i18next"
+ import {
   AreaChart,
   Area,
   XAxis,
@@ -12,13 +13,14 @@ import Dropdown from "./Dropdown";
 import useHabitStore from "../store/useHabitStore";
 
 export default function StatisticsChart() {
-  const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData } = useHabitStore()
+    const {t} = useTranslation()
+  const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData, loading, error } = useHabitStore()
   const [activeFilter, setActiveFilter] = useState("days");
-  const [title, setTitle] = useState("Activity by Month");
+  const [title, setTitle] = useState(t("Activity by days"));
   const filterTerms = [
-    { id: "1", name: "Days", value: "days" },
-    { id: "2", name: "Months", value: "months" },
-    { id: "3", name: "Years", value: "years" },
+    { id: "1", name: t("Days"), value: "days" },
+    { id: "2", name: t("Months"), value: "months" },
+    { id: "3", name: t("Years"), value: "years" },
   ];
 useEffect(() => {
   const initializeData = async () => {
@@ -55,13 +57,18 @@ useEffect(() => {
             value={activeFilter}
             getValue={(selected) => {
               setActiveFilter(selected);
-              setTitle(`Activity by ${selected}`);
+              setTitle(t(`Activity by ${selected}`));
             }}
           />
         </div>
       </div>
+      {
 
-      {/* Chart */}
+       loading || error ? (
+        <div className={loading? "w-full flex justify-center items-center text-gray-400" : "w-full flex justify-center items-center text-red-900"}>
+           {loading ? "Loading chart data..." : error}
+        </div>
+       ) :
       <div className="w-full h-[300px] md:h-[400px]">
         <ResponsiveContainer
           width="100%"
@@ -120,6 +127,7 @@ useEffect(() => {
           </AreaChart>
         </ResponsiveContainer>
       </div>
+      }
     </>
   );
 }
