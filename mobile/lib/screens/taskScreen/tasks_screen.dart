@@ -178,7 +178,9 @@ class _TasksScreenState extends State<TasksScreen> {
   Future<void> _applyFilters({bool reset = false}) async {
     if (_token == null) return;
 
-    setState(() => _isLoading = true);
+    final showLoading = reset && _tasks.isEmpty;
+
+    if (showLoading) setState(() => _isLoading = true);
 
     try {
       final data = await _apiService.fetchTasks(
@@ -200,31 +202,36 @@ class _TasksScreenState extends State<TasksScreen> {
         if (!reset) _page++;
       });
     } finally {
-      setState(() => _isLoading = false);
+      if (showLoading) setState(() => _isLoading = false);
     }
   }
+
   List<Task> get _filteredTasks {
     return _tasks.where((task) {
       // دسته‌بندی
       final matchCategory =
           selectedCategoryId == null || task.categoryId == selectedCategoryId;
       // سرچ
-      final matchSearch = _searchTerm.isEmpty ||
+      final matchSearch =
+          _searchTerm.isEmpty ||
           task.title.toLowerCase().contains(_searchTerm.toLowerCase()) ||
-          (task.description?.toLowerCase().contains(_searchTerm.toLowerCase()) ??
+          (task.description?.toLowerCase().contains(
+                _searchTerm.toLowerCase(),
+              ) ??
               false);
       return matchCategory && matchSearch;
     }).toList();
   }
 
-
   @override
   Widget build(BuildContext context) {
     // تغییرات جدید: استفاده از _filteredTasks به جای _tasks
-    final todoTasks =
-    _filteredTasks.where((task) => task.status != 'done').toList();
-    final completedTasks =
-    _filteredTasks.where((task) => task.status == 'done').toList();
+    final todoTasks = _filteredTasks
+        .where((task) => task.status != 'done')
+        .toList();
+    final completedTasks = _filteredTasks
+        .where((task) => task.status == 'done')
+        .toList();
 
     _sortByDueDate(todoTasks);
     _sortByDueDate(completedTasks);
@@ -383,11 +390,11 @@ class _TasksScreenState extends State<TasksScreen> {
               if (_isLoading && _tasks.isNotEmpty)
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                        (_, __) => const TasksCardShimmer(), // تغییرات جدید: استفاده از shimmer
+                    (_, __) =>
+                        const TasksCardShimmer(), // تغییرات جدید: استفاده از shimmer
                     childCount: 1, // یا هر تعداد که حس پر بودن لیست را بدهد
                   ),
                 ),
-
 
               const SliverToBoxAdapter(child: SizedBox(height: 30)),
             ],
@@ -412,10 +419,10 @@ class _TasksScreenState extends State<TasksScreen> {
 
         final task = tasks[index - 1];
         return TasksScreenCard(
-          task: task,
-          onStatusChanged: _toggleTaskStatus,
-          onEdit: _editTask,
-        );
+            task: task,
+            onStatusChanged: _toggleTaskStatus,
+            onEdit: _editTask,
+            );
       }, childCount: tasks.length + 1),
     );
   }
