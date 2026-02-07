@@ -6,6 +6,7 @@ import { formatDate } from "../utils/dateFormatter";
 const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
+    consistencyData: null,
     error: null,
     habitCompletions: 0,
     selectedDate: new Date(),
@@ -226,7 +227,7 @@ const useHabitStore = create((set, get) => ({
         const finalStart = start >= firstDataDate ? start : firstDataDate;
 
         const response = await getHabitsChartData(formatDate(finalStart), formatDate(new Date()));
-        const rawData = isMonthly ? (response.monthly || []) : (response.daily || []);
+        const rawData = isMonthly ? (response.data.monthly || []) : (response.data.daily || []);
 
         const formatted = get().formatStatstics(rawData, mode);
 
@@ -235,7 +236,24 @@ const useHabitStore = create((set, get) => ({
 
     getDailyStatistics: () => get().getStatistics('daily'),
     getMonthlyStatistics: () => get().getStatistics('monthly'),
-    getYearlyStatistics: () => get().getStatistics('yearly')
+    getYearlyStatistics: () => get().getStatistics('yearly'),
+
+getConsistencyData: async (startDate, endDate) => {
+    set({ loading: true, error: null });
+    try {
+        const result = await getHabitsChartData(startDate, endDate);
+        console.log(result);
+        if (result.success) {
+            set({ consistencyData: result.data.daily, loading: false });
+        } else {
+            set({ error: "Failed to load data", loading: false });
+        }
+    } catch (err) {
+        const message = err.response?.data?.message || "Failed to fetch data";
+        set({ error: message, loading: false });
+    }
+}
+
 }))
 
 export default useHabitStore
