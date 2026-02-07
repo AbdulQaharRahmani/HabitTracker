@@ -22,6 +22,27 @@ vi.mock('jsonwebtoken', () => ({
   },
 }));
 
+vi.mock('mongoose', () => ({
+  default: {
+    startSession: vi.fn(() => ({
+      startTransaction: vi.fn(),
+      commitTransaction: vi.fn(),
+      abortTransaction: vi.fn(),
+      endSession: vi.fn(),
+    })),
+  },
+}));
+
+vi.mock('../models/Category.js', () => ({
+  CategoryModel: {
+    insertMany: vi.fn(),
+  },
+}));
+
+vi.mock('../utils/defaultCategories.js', () => ({
+  getDefaultCategories: vi.fn(() => []),
+}));
+
 import { registerUser, loginUser } from '../controllers/authController.js';
 import { UserModel } from '../models/User';
 import { AppError } from '../utils/error';
@@ -47,7 +68,7 @@ describe('Auth Controller - unit tests', () => {
 
     await expect(async () => registerUser(req, res)).rejects.toThrow(AppError);
     await expect(async () => registerUser(req, res)).rejects.toThrow(
-      'Email exists already'
+      'Email already exists'
     );
   });
 
@@ -66,10 +87,12 @@ describe('Auth Controller - unit tests', () => {
 
     UserModel.exists.mockResolvedValue(false);
     bcrypt.hash.mockResolvedValue('abcd1234');
-    UserModel.create.mockResolvedValue({
-      _id: 'user123',
-      email: req.body.email,
-    });
+    UserModel.create.mockResolvedValue([
+      {
+        _id: 'user123',
+        email: req.body.email,
+      },
+    ]);
 
     await registerUser(req, res);
 
@@ -167,11 +190,13 @@ describe('Auth Controller - unit tests', () => {
 
       UserModel.exists.mockResolvedValue(false);
       bcrypt.hash.mockResolvedValue('hashed_password');
-      UserModel.create.mockResolvedValue({
-        _id: 'user123',
-        email: 'test@example.com',
-        password: 'hashed_password',
-      });
+      UserModel.create.mockResolvedValue([
+        {
+          _id: 'user123',
+          email: 'test@example.com',
+          password: 'hashed_password',
+        },
+      ]);
 
       await registerUser(req, res);
 
@@ -199,10 +224,12 @@ describe('Auth Controller - unit tests', () => {
 
       UserModel.exists.mockResolvedValue(false);
       bcrypt.hash.mockResolvedValue('hashed_password');
-      UserModel.create.mockResolvedValue({
-        _id: 'user123',
-        email: 'test@example.com',
-      });
+      UserModel.create.mockResolvedValue([
+        {
+          _id: 'user123',
+          email: 'test@example.com',
+        },
+      ]);
 
       await registerUser(req, res);
 
@@ -350,7 +377,9 @@ describe('Auth Controller - unit tests', () => {
 
       UserModel.exists.mockResolvedValue(false);
       bcrypt.hash.mockResolvedValue('hashed');
-      UserModel.create.mockResolvedValue({ _id: 'user123', email: longEmail });
+      UserModel.create.mockResolvedValue([
+        { _id: 'user123', email: longEmail },
+      ]);
 
       await expect(registerUser(req, res)).resolves.not.toThrow();
     });
