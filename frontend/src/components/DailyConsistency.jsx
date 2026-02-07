@@ -90,7 +90,7 @@ useEffect(() => {
   );
 
   return (
-    <div className="w-full max-w-5xl p-6 rounded-3xl border bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-sm transition-all">
+    <div className="w-full max-w-full p-6 rounded-3xl border bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-sm transition-all">
       {/* Header & Legend */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h2 className="text-lg font-bold text-slate-800 dark:text-gray-100">{t("Consistency")}</h2>
