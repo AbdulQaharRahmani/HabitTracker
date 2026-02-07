@@ -3,6 +3,7 @@ import api from "../../services/api"
 import toast from "react-hot-toast";
 import { completeHabit, getChartData, getHabitsByDate, getHabitsChartData, unCompleteHabit } from "../../services/habitService";
 import { formatDate } from "../utils/dateFormatter";
+import { formatStatstics } from "../utils/formatStatistics";
 const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
@@ -182,24 +183,7 @@ const useHabitStore = create((set, get) => ({
             }
         }))
     },
-    formatStatstics: (data, mode) => {
-        const stats = data.reduce((acc, item) => {
-            const dateObj = new Date(item.date + 'T00:00:00');
-            let key;
 
-            if (mode === 'daily') key = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-            else if (mode === 'monthly') key = dateObj.toLocaleDateString('en-US', { month: 'short' });
-            else if (mode === 'yearly') key = item.date.split('-')[0];
-
-            acc[key] = (acc[key] || 0) + item.completed;
-            return acc;
-        }, {});
-
-        return Object.keys(stats).map(name => ({
-            name,
-            completed: stats[name]
-        }));
-    },
 
     chartData: [],
     dailyStatistics: [],
@@ -229,7 +213,7 @@ const useHabitStore = create((set, get) => ({
         const response = await getHabitsChartData(formatDate(finalStart), formatDate(new Date()));
         const rawData = isMonthly ? (response.data.monthly || []) : (response.data.daily || []);
 
-        const formatted = get().formatStatstics(rawData, mode);
+        const formatted = formatStatstics(rawData, mode);
 
         set({ [`${mode}Statistics`]: formatted });
     },
