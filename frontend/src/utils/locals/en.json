@@ -101,5 +101,12 @@
 
   "NO_HABITS_YET": "No habits added yet",
   "NO_ACTIVE_STREAK_YET": "No active streak yet",
-  "NO_HABITS_COMPLETED_YET": "No habits completed yet"
+  "NO_HABITS_COMPLETED_YET": "No habits completed yet",
+  "Activity by months": "Activity by Months",
+  "Activity by days": "Activity by Days",
+  "Activity by years": "Activity by Years",
+  "Days": "Days",
+  "Months": "Months",
+  "Years": "Years"
+
 }

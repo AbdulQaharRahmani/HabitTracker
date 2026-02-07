@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import {
+import {useTranslation} from "react-i18next"
+ import {
   AreaChart,
   Area,
   XAxis,
@@ -12,13 +13,14 @@ import Dropdown from "./Dropdown";
 import useHabitStore from "../store/useHabitStore";
 
 export default function StatisticsChart() {
+    const {t} = useTranslation()
   const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData, loading, error } = useHabitStore()
   const [activeFilter, setActiveFilter] = useState("days");
-  const [title, setTitle] = useState("Activity by Days");
+  const [title, setTitle] = useState(t("Activity by days"));
   const filterTerms = [
-    { id: "1", name: "Days", value: "days" },
-    { id: "2", name: "Months", value: "months" },
-    { id: "3", name: "Years", value: "years" },
+    { id: "1", name: t("Days"), value: "days" },
+    { id: "2", name: t("Months"), value: "months" },
+    { id: "3", name: t("Years"), value: "years" },
   ];
 useEffect(() => {
   const initializeData = async () => {
@@ -55,7 +57,7 @@ useEffect(() => {
             value={activeFilter}
             getValue={(selected) => {
               setActiveFilter(selected);
-              setTitle(`Activity by ${selected}`);
+              setTitle(t(`Activity by ${selected}`));
             }}
           />
         </div>
