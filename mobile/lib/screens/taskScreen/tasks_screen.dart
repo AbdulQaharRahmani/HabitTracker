@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
 import '../../app/app_theme.dart';
+import '../../services/taskpage_api/category_api.dart';
 import '../../services/taskpage_api/tasks_api.dart';
+import '../../utils/category/category_model.dart';
 import '../../utils/taskpage_components/task_shimer.dart';
 import '../../utils/taskpage_components/tasks_model.dart';
 import '../../services/token_storage.dart';
@@ -20,6 +23,13 @@ class _TasksScreenState extends State<TasksScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
+  /// UI filter state
+  bool isActiveTab = true;
+  String? selectedCategoryId;
+
+  /// Backend filter params
+  String _searchTerm = '';
+
   final List<Task> _tasks = [];
   bool _isLoading = false;
   bool _hasMore = true;
@@ -28,18 +38,69 @@ class _TasksScreenState extends State<TasksScreen> {
   int _page = 1;
   final int _limit = 20;
   String? _token;
+  Timer? _searchTimer;
+
+  final CategoryApiService _categoryApi = CategoryApiService();
+  List<CategoryModel> _categories = [];
 
   @override
   void initState() {
     super.initState();
     _init();
     _scrollController.addListener(_onScroll);
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    _scrollController.dispose();
+    _searchTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    // Cancel previous timer
+    _searchTimer?.cancel();
+
+    // Start a new timer
+    _searchTimer = Timer(const Duration(milliseconds: 500), () {
+      if (_searchController.text != _searchTerm) {
+        _searchTerm = _searchController.text;
+        _applyFilters(reset: true);
+      }
+    });
   }
 
   Future<void> _init() async {
-    _token = await AuthManager.getToken();
-    if (_token == null) return;
-    await _fetchTasks(reset: true);
+    try {
+      _token = await AuthManager.getToken();
+      if (_token == null) return;
+
+      // Load categories and initial tasks
+      await Future.wait([
+        _loadCategories(),
+        _fetchTasks(reset: true),
+      ]);
+    } catch (e) {
+      print('❌ Error initializing: $e');
+      setState(() {
+        _errorMessage = 'Failed to load data';
+      });
+    }
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      if (_token == null) return;
+      final categories = await _categoryApi.fetchCategories(token: _token!);
+      setState(() {
+        _categories = categories;
+      });
+    } catch (e) {
+      print('❌ Error loading categories: $e');
+    }
   }
 
   Future<void> _fetchTasks({bool reset = false}) async {
@@ -63,18 +124,25 @@ class _TasksScreenState extends State<TasksScreen> {
         token: _token!,
         page: _page,
         limit: _limit,
+        searchTerm: _searchTerm.isNotEmpty ? _searchTerm : null,
+        status: isActiveTab ? 'todo' : 'done',
+        categoryId: selectedCategoryId,
       );
 
       final newTasks = data
           .where((t) => !_tasks.any((old) => old.id == t.id))
           .toList();
 
-      _tasks.addAll(newTasks);
-
-      if (data.length < _limit) _hasMore = false;
-      _page++;
-    } catch (_) {
-      _errorMessage = 'Failed to load tasks. Please try again.';
+      setState(() {
+        _tasks.addAll(newTasks);
+        if (data.length < _limit) _hasMore = false;
+        _page++;
+      });
+    } catch (e) {
+      print('❌ Error fetching tasks: $e');
+      setState(() {
+        _errorMessage = 'Failed to load tasks. Please try again.';
+      });
     } finally {
       setState(() {
         _isLoading = false;
@@ -108,6 +176,12 @@ class _TasksScreenState extends State<TasksScreen> {
         currentStatus: oldStatus,
         token: _token!,
       );
+
+      // If filtering by status, update the list
+      if ((isActiveTab && newStatus == 'done') ||
+          (!isActiveTab && newStatus == 'todo')) {
+        await _applyFilters(reset: true);
+      }
     } catch (_) {
       setState(() {
         _tasks[index] = _tasks[index].copyWith(status: oldStatus);
@@ -127,10 +201,22 @@ class _TasksScreenState extends State<TasksScreen> {
       context,
       MaterialPageRoute(builder: (_) => EditTaskPage(task: task)),
     );
-    if (result != null) await _fetchTasks(reset: true);
+    if (result != null) await _applyFilters(reset: true);
   }
 
-  Future<void> _refreshTasks() async => await _fetchTasks(reset: true);
+  Future<void> _refreshTasks() async {
+    // Reset all filters
+    _searchController.clear();
+    _searchTerm = '';
+    selectedCategoryId = null;
+    isActiveTab = true;
+
+    // Reload categories and tasks
+    await Future.wait([
+      _loadCategories(),
+      _fetchTasks(reset: true),
+    ]);
+  }
 
   void _sortByDueDate(List<Task> tasks) {
     tasks.sort((a, b) {
@@ -141,21 +227,58 @@ class _TasksScreenState extends State<TasksScreen> {
     });
   }
 
+  Future<void> _applyFilters({bool reset = false}) async {
+    if (_token == null) return;
+
+    setState(() {
+      _isLoading = true;
+      if (reset) {
+        _page = 1;
+        _tasks.clear();
+        _hasMore = true;
+      }
+    });
+
+    try {
+      final data = await _apiService.fetchTasks(
+        token: _token!,
+        page: reset ? 1 : _page,
+        limit: _limit,
+        searchTerm: _searchTerm.isNotEmpty ? _searchTerm : null,
+        status: isActiveTab ? 'todo' : 'done',
+        categoryId: selectedCategoryId,
+      );
+
+      setState(() {
+        if (reset) {
+          _tasks.clear();
+        }
+        _tasks.addAll(data);
+        if (data.length < _limit) _hasMore = false;
+        if (!reset) _page++;
+      });
+    } catch (e) {
+      print('❌ Error applying filters: $e');
+      setState(() {
+        _errorMessage = 'Failed to filter tasks';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filteredTasks = _tasks
-        .where((t) => t.title.toLowerCase().contains(
-      _searchController.text.toLowerCase(),
-    ))
-        .toList();
+    // Filter tasks based on status
+    final displayedTasks = _tasks.where((task) {
+      if (isActiveTab) {
+        return task.status != 'done';
+      } else {
+        return task.status == 'done';
+      }
+    }).toList();
 
-    final activeTasks =
-    filteredTasks.where((t) => t.status != 'done').toList();
-    final completedTasks =
-    filteredTasks.where((t) => t.status == 'done').toList();
-
-    _sortByDueDate(activeTasks);
-    _sortByDueDate(completedTasks);
+    _sortByDueDate(displayedTasks);
 
     return SafeArea(
       child: Scaffold(
@@ -165,14 +288,14 @@ class _TasksScreenState extends State<TasksScreen> {
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
-
-              /// HEADER (UNCHANGED)
+              /// HEADER
               SliverToBoxAdapter(
                 child: Container(
                   color: AppTheme.background,
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
+                      // HEADER ROW
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Row(
@@ -193,12 +316,10 @@ class _TasksScreenState extends State<TasksScreen> {
                                 fixedSize: const WidgetStatePropertyAll(
                                   Size(105, 30),
                                 ),
-                                backgroundColor:
-                                const WidgetStatePropertyAll(
+                                backgroundColor: const WidgetStatePropertyAll(
                                   AppTheme.primary,
                                 ),
-                                elevation:
-                                const WidgetStatePropertyAll(0),
+                                elevation: const WidgetStatePropertyAll(0),
                                 shape: WidgetStatePropertyAll(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -217,7 +338,8 @@ class _TasksScreenState extends State<TasksScreen> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
-                                          'Task created successfully!'),
+                                        'Task created successfully!',
+                                      ),
                                       backgroundColor: Colors.green,
                                     ),
                                   );
@@ -229,8 +351,7 @@ class _TasksScreenState extends State<TasksScreen> {
                                   SizedBox(width: 5),
                                   Text(
                                     'New Task',
-                                    style:
-                                    TextStyle(color: Colors.white),
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ],
                               ),
@@ -239,7 +360,7 @@ class _TasksScreenState extends State<TasksScreen> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      /// Search (UNCHANGED)
+                      // SEARCH FIELD
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Container(
@@ -257,69 +378,134 @@ class _TasksScreenState extends State<TasksScreen> {
                                 child: TextField(
                                   controller: _searchController,
                                   decoration: const InputDecoration(
-                                    hintText: 'search tasks .....',
+                                    hintText: 'Search tasks .....',
                                     border: InputBorder.none,
                                   ),
-                                  onChanged: (_) => setState(() {}),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-
-
+                      const SizedBox(height: 15),
+                      // TAB BAR
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: _buildCustomTabBar(),
+                      ),
+                      const SizedBox(height: 15),
+                      // CATEGORY FILTERS
+                      _buildCategoryFilters(),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
               ),
-
-              /// SHIMMER (INITIAL LOAD ONLY)
+      
+              /// SHIMMER LOADING
               if (_isLoading && _tasks.isEmpty)
                 SliverList(
-
                   delegate: SliverChildBuilderDelegate(
-                        (context, index) =>
-                    const TasksCardShimmer(),
-                    childCount: 6,
+                        (context, index) => const TasksCardShimmer(),
+                    childCount: 3,
                   ),
                 ),
-
-              /// ERROR TEXT (NO UI CHANGE)
-              if (!_isLoading &&
-                  _tasks.isEmpty &&
-                  _errorMessage != null)
+      
+              /// ERROR MESSAGE
+              if (_errorMessage != null && !_isLoading && _tasks.isEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 60),
                     child: Center(
                       child: Text(
                         _errorMessage!,
-                        style:
-                        const TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ),
                   ),
                 ),
-
-              /// ACTIVE TASKS
-              if (activeTasks.isNotEmpty)
-                _buildSection(
-                  title: 'TO DO (${activeTasks.length})',
-                  tasks: activeTasks,
+      
+              /// NO TASKS MESSAGE
+              if (!_isLoading && displayedTasks.isEmpty && _errorMessage == null)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 60),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            isActiveTab
+                                ? Icons.check_circle_outline
+                                : Icons.incomplete_circle,
+                            size: 60,
+                            color: Colors.grey[300],
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            selectedCategoryId == null
+                                ? isActiveTab
+                                ? 'No active tasks'
+                                : 'No completed tasks'
+                                : 'No tasks found for this category',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-
-              /// COMPLETED TASKS
-              if (completedTasks.isNotEmpty)
-                _buildSection(
-                  title:
-                  'Completed (${completedTasks.length})',
-                  tasks: completedTasks,
+      
+              /// TASKS LIST
+              if (displayedTasks.isNotEmpty)
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                      if (index == 0) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 10
+                          ),
+                          child: Text(
+                            isActiveTab
+                                ? 'TO DO (${displayedTasks.length})'
+                                : 'Completed (${displayedTasks.length})',
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        );
+                      }
+      
+                      final task = displayedTasks[index - 1];
+                      return TasksScreenCard(
+                        task: task,
+                        onStatusChanged: _toggleTaskStatus,
+                        onEdit: _editTask,
+                      );
+                    },
+                    childCount: displayedTasks.length + 1,
+                  ),
                 ),
-
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 30),
-              ),
+      
+              /// LOAD MORE INDICATOR
+              if (_isLoading && _tasks.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+      
+              const SliverToBoxAdapter(child: SizedBox(height: 30)),
             ],
           ),
         ),
@@ -327,37 +513,81 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
-  SliverList _buildSection({
-    required String title,
-    required List<Task> tasks,
-  }) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-            (context, index) {
-          if (index == 0) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 30,
-                vertical: 10,
-              ),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            );
-          }
+  Widget _buildCategoryFilters() {
+    return SizedBox(
+      height: 50,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        itemCount: _categories.length + 1,
+        itemBuilder: (context, index) {
+          final bool isAll = index == 0;
+          final category = isAll ? null : _categories[index - 1];
+          final bool isSelected = selectedCategoryId == (category?.id);
 
-          final task = tasks[index - 1];
-          return TasksScreenCard(
-            task: task,
-            onStatusChanged: _toggleTaskStatus,
-            onEdit: _editTask,
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: FilterChip(
+              showCheckmark: false,
+              label: Text(isAll ? 'All' : category!.name),
+              selected: isSelected,
+              onSelected: (_) {
+                setState(() {
+                  selectedCategoryId = category?.id;
+                });
+                _applyFilters(reset: true);
+              },
+              selectedColor: const Color(0xFF5D5FEF),
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+              ),
+            ),
           );
         },
-        childCount: tasks.length + 1,
+      ),
+    );
+  }
+
+  Widget _buildCustomTabBar() {
+    return Container(
+      height: 45,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        children: [
+          _buildTabButton("Active", true),
+          _buildTabButton("Completed", false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(String title, bool isLeft) {
+    final bool selected = isActiveTab == isLeft;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          if (isActiveTab != isLeft) {
+            setState(() => isActiveTab = isLeft);
+            _applyFilters(reset: true);
+          }
+        },
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: selected ? Colors.black : Colors.grey[600],
+            ),
+          ),
+        ),
       ),
     );
   }

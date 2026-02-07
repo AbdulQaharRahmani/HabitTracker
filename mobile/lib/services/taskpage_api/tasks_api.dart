@@ -19,11 +19,13 @@ class TaskApiService {
     required String token,
     int page = 1,
     int limit = 20,
-    String? search,
+    String? searchTerm,
+    required String status,
+    String? categoryId,
   }) async {
     try {
       final uri = Uri.parse(
-        '$baseUrl/tasks?limit=$limit&page=$page${search != null ? '&search=$search' : ''}',
+        '$baseUrl/tasks?limit=$limit&page=$page${searchTerm != null ? '&search=$searchTerm' : ''}',
       );
 
       final response = await http
@@ -203,4 +205,41 @@ class TaskApiService {
       throw Exception('Failed to delete task');
     }
   }
+  // filter tasks and fetch filter tasks
+  Future<List<Task>> fetchFilteredTasks({
+    required String token,
+    String? searchTerm,
+    String? status,
+    String? categoryId,
+    String? dueDate,
+  }) async {
+    final query = <String, String>{};
+
+    if (searchTerm != null && searchTerm.isNotEmpty) {
+      query['searchTerm'] = searchTerm;
+    }
+    if (status != null) query['status'] = status;
+    if (categoryId != null) query['categoryId'] = categoryId;
+    if (dueDate != null) query['dueDate'] = dueDate;
+
+    final uri = Uri.parse('$baseUrl/tasks/filter')
+        .replace(queryParameters: query);
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final List list = body['data'] ?? [];
+      return list.map((e) => Task.fromJson(e)).toList();
+    }
+
+    throw Exception('Failed to filter tasks');
+  }
+
 }
