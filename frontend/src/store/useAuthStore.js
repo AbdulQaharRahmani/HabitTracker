@@ -6,32 +6,42 @@ const useAuthStore = create(
     (set) => ({
       token: null,
       userId: null,
+      username: null,
       isAuthenticated: false,
-      username:null,
 
-      login: (token, id,username) => {
+      // 🔹 login
+      login: (token, id, username) => {
         set({
           token,
           userId: id,
-          isAuthenticated: true,
           username,
+          isAuthenticated: true,
         });
       },
 
+      // 🔹 update username (used by Settings)
+      updateUsername: (username) => {
+        set((state) => ({
+          ...state,
+          username,
+        }));
+      },
+
+      // 🔹 logout
       logout: () => {
         set({
           token: null,
           userId: null,
+          username: null,
           isAuthenticated: false,
-          username:null,
         });
         localStorage.removeItem("auth-data");
       },
     }),
     {
       name: "auth-data",
-    }
-  )
+    },
+  ),
 );
 
 export default useAuthStore;

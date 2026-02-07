@@ -4,47 +4,100 @@ import { useTheme } from "../components/ThemeContext";
 import ProfilePhoto from "../components/setting/ProfilePhoto";
 import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
 import { useDebounce } from "../hooks/useDebounce";
+import toast from "react-hot-toast";
+import api from "../../services/api";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import useAuthStore from "../store/useAuthStore";
 
 const Settings = () => {
-   const { t } = useTranslation();
+  const { t } = useTranslation();
   const { setTheme } = useTheme();
 
-  const {
-    preferences,
-    fetchUserPreferences,
-    updateUserPrefrences
-  } = useProfilePhotoStore();
+  const { preferences, fetchUserPreferences, updateUserPrefrences } =
+    useProfilePhotoStore();
 
-const [localPrefs, setLocalPrefs] = useState(null);
+  const { username: authUsername, updateUsername } = useAuthStore();
+
+  const [localPrefs, setLocalPrefs] = useState(null);
   const debouncedPrefs = useDebounce(localPrefs, 700);
   const hasInitialized = useRef(false);
+
+  // 🔹 username state (synced with auth store)
+  const [username, setUsername] = useState("");
+
+  // 🔹 password modal state
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [oldPasswordType, setOldPasswordType] = useState("password");
+  const [newPasswordType, setNewPasswordType] = useState("password");
+
   useEffect(() => {
     fetchUserPreferences();
   }, []);
 
-useEffect(() => {
-  if (preferences && !hasInitialized.current) {
-    const cleanInitial = Object.fromEntries(
-      Object.entries(preferences).filter(([_, v]) => v !== null)
-    );
-    setLocalPrefs(cleanInitial);
+  // 🔹 initialize preferences
+  useEffect(() => {
+    if (preferences && !hasInitialized.current) {
+      const cleanInitial = Object.fromEntries(
+        Object.entries(preferences).filter(([_, v]) => v !== null),
+      );
+      setLocalPrefs(cleanInitial);
 
-    if (preferences.theme) setTheme(preferences.theme);
-    hasInitialized.current = true;
-  }
-}, [preferences, setTheme]);
-
-useEffect(() => {
-  if (hasInitialized.current && debouncedPrefs) {
-    const prefsToSend = { ...debouncedPrefs };
-    if (prefsToSend.timezone === null) {
-      delete prefsToSend.timezone;
+      if (preferences.theme) setTheme(preferences.theme);
+      hasInitialized.current = true;
     }
-    updateUserPrefrences(prefsToSend);
-  }
-}, [debouncedPrefs]);
+  }, [preferences, setTheme]);
+
+  // 🔹 sync username from auth store
+  useEffect(() => {
+    if (authUsername) {
+      setUsername(authUsername);
+    }
+  }, [authUsername]);
+
+  // 🔹 debounced preferences update
+  useEffect(() => {
+    if (hasInitialized.current && debouncedPrefs) {
+      const prefsToSend = { ...debouncedPrefs };
+      if (prefsToSend.timezone === null) {
+        delete prefsToSend.timezone;
+      }
+      updateUserPrefrences(prefsToSend);
+    }
+  }, [debouncedPrefs]);
 
   if (!localPrefs) return null;
+
+  // 🔹 save username
+  const handleUsernameBlur = async () => {
+    if (!username.trim() || username === authUsername) return;
+
+    try {
+      await api.patch("/users/username", { username });
+
+      updateUsername(username); // 🔥 sync auth store
+      toast.success("Username updated");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Could not update username");
+    }
+  };
+
+  // 🔹 change password
+  const handleChangePassword = async () => {
+    try {
+      await api.patch("/users/changePassword", {
+        oldPassword,
+        newPassword,
+      });
+      toast.success("Password changed successfully");
+      setShowPasswordModal(false);
+      setOldPassword("");
+      setNewPassword("");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to change password");
+    }
+  };
 
   return (
     <div className="min-h-screen p-6 font-sans transition-colors duration-200 bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">
@@ -59,13 +112,15 @@ useEffect(() => {
         </header>
 
         <div className="space-y-6">
-          {/* Profile Settings Section */}
+          {/* Profile Settings */}
           <section className="p-8 bg-white border shadow-sm rounded-2xl border-slate-200 dark:bg-gray-900 dark:border-gray-800">
             <h2 className="mb-6 text-xl font-bold text-slate-800 dark:text-white">
               {t("Profile Settings")}
             </h2>
+
             <div className="flex flex-col md:flex-row gap-8">
-              <ProfilePhoto/>
+              <ProfilePhoto />
+
               <div className="flex-1 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -75,23 +130,115 @@ useEffect(() => {
                     <input
                       type="text"
                       placeholder="User Name"
-                      className="w-full px-4 py-2 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      onBlur={handleUsernameBlur}
+                      className="w-full px-4 py-2 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </div>
+
                   <div>
                     <label className="block mb-2 text-sm font-semibold text-slate-700 dark:text-gray-300">
                       {t("Email Address")}
                     </label>
                     <input
                       type="email"
-                      placeholder="user@example.com"
-                      className="w-full px-4 py-2 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
+                      disabled
+                      className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-800"
                     />
                   </div>
                 </div>
-                <button className="px-4 py-2 text-sm font-medium transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300">
+
+                <button
+                  onClick={() => setShowPasswordModal(true)}
+                  className="px-4 py-2 text-sm font-medium transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                >
                   {t("Change Password")}
                 </button>
+
+                {/* Password Modal */}
+                {showPasswordModal && (
+                  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+                    <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl w-full max-w-md shadow-lg">
+                      <h2 className="text-xl font-bold mb-4">
+                        Change Password
+                      </h2>
+
+                      <div className="mb-4 relative">
+                        <label className="block mb-2 text-sm font-semibold">
+                          Old Password
+                        </label>
+                        <input
+                          type={oldPasswordType}
+                          value={oldPassword}
+                          onChange={(e) => setOldPassword(e.target.value)}
+                          className="w-full px-4 py-2 rounded-lg border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOldPasswordType(
+                              oldPasswordType === "password"
+                                ? "text"
+                                : "password",
+                            )
+                          }
+                          className="absolute right-3 top-12"
+                        >
+                          {oldPasswordType === "password" ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="mb-4 relative">
+                        <label className="block mb-2 text-sm font-semibold">
+                          New Password
+                        </label>
+                        <input
+                          type={newPasswordType}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="w-full px-4 py-2 rounded-lg border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setNewPasswordType(
+                              newPasswordType === "password"
+                                ? "text"
+                                : "password",
+                            )
+                          }
+                          className="absolute right-3 top-12"
+                        >
+                          {newPasswordType === "password" ? (
+                            <FaEyeSlash />
+                          ) : (
+                            <FaEye />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => setShowPasswordModal(false)}
+                          className="px-4 py-2 border rounded-lg"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleChangePassword}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </section>
@@ -118,7 +265,7 @@ useEffect(() => {
                     setTheme(theme);
                     setLocalPrefs({
                       ...localPrefs,
-                      theme
+                      theme,
                     });
                   }}
                   className="px-4 py-2 text-sm transition-all border outline-none
@@ -141,13 +288,14 @@ useEffect(() => {
                 </div>
                 <select
                   value={localPrefs?.weekStartDay || "saturday"}
-                    onChange={(e) =>
-                      setLocalPrefs({
-                        ...localPrefs,
-                        weekStartDay: e.target.value
-                      })
-                    }
-                  className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+                  onChange={(e) =>
+                    setLocalPrefs({
+                      ...localPrefs,
+                      weekStartDay: e.target.value,
+                    })
+                  }
+                  className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                >
                   <option value="saturday">Saturday</option>
                   <option value="sunday">Sunday</option>
                   <option value="monday">Monday</option>
@@ -180,10 +328,11 @@ useEffect(() => {
                   onChange={(e) =>
                     setLocalPrefs({
                       ...localPrefs,
-                      dailyReminderTime: e.target.value
+                      dailyReminderTime: e.target.value,
                     })
                   }
-                  className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+                  className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+                >
                   <option value="08:00">08:00 AM</option>
                   <option value="09:00">09:00 AM</option>
                   <option value="10:00">10:00 AM</option>
@@ -209,7 +358,7 @@ useEffect(() => {
                     onChange={(e) =>
                       setLocalPrefs({
                         ...localPrefs,
-                        streakAlertEnabled: e.target.checked
+                        streakAlertEnabled: e.target.checked,
                       })
                     }
                   />
@@ -230,14 +379,14 @@ useEffect(() => {
                   <input
                     type="checkbox"
                     className="sr-only peer"
-                  checked={localPrefs?.weeklySummaryEmailEnabled || false}
-                  onChange={(e) =>
-                    setLocalPrefs({
-                      ...localPrefs,
-                      weeklySummaryEmailEnabled: e.target.checked
-                    })
-                  }
-                 />
+                    checked={localPrefs?.weeklySummaryEmailEnabled || false}
+                    onChange={(e) =>
+                      setLocalPrefs({
+                        ...localPrefs,
+                        weeklySummaryEmailEnabled: e.target.checked,
+                      })
+                    }
+                  />
                   <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:after:bg-gray-200 peer-checked:bg-blue-600"></div>
                 </label>
               </div>
