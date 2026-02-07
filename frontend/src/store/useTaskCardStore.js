@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getTasks, updateTaskStatus } from "../../services/tasksService";
+import api from "../../services/api";
 
 export const useTaskCardStore = create((set, get) => ({
   tasks: [],
@@ -50,14 +51,13 @@ export const useTaskCardStore = create((set, get) => ({
     } catch (err) {
       set({ error: err?.message || "An error occurred", loading: false });
     }
-  },  
+  },
 
   completeTask: async (id) => {
-    const {tasks} = get();
+    const { tasks } = get();
     const task = tasks.find((task) => task._id === id);
 
-    if (!task)
-      return;
+    if (!task) return;
 
     set({
       tasks: tasks.map((task) =>
@@ -67,20 +67,34 @@ export const useTaskCardStore = create((set, get) => ({
       ),
     });
 
-    try{
+    try {
       await updateTaskStatus(id, task.status === "done" ? "todo" : "done");
     } catch (err) {
       set({
-        tasks: tasks.map((task) => 
-        task._id === id ? {...task, status: task.status} : task
-      ), 
-      error: "Failed to update task completion" 
+        tasks: tasks.map((task) =>
+          task._id === id ? { ...task, status: task.status } : task,
+        ),
+        error: "Failed to update task completion",
       });
     }
   },
 
-  deleteTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task._id !== id),
-    })),
+  deleteTask: async (id) => {
+    try {
+      const task = get().tasks.find((t) => t._id === id);
+      if (!task) console.log("Sorry! task is not found");
+
+      await api.delete(`/tasks/${id}`);
+
+      set((state) => ({
+        tasks: state.tasks.filter((task) => task._id !== id),
+      }));
+    } catch (error) {
+      console.error(
+        "Sorry! task deletion failed:",
+        error.response?.data || error.message,
+      );
+    }
+  },
+
 }));
