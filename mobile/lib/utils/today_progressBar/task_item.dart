@@ -50,7 +50,7 @@ class TaskItem {
   final String id;
   final String title;
   final String description;
-  final String frequency;
+  final String? frequency;
   final String category;
   final IconData icon;
   final Color color;
@@ -64,7 +64,7 @@ class TaskItem {
     required this.id,
     required this.title,
     required this.description,
-    required this.frequency,
+     this.frequency,
     required this.category,
     required this.icon,
     required this.color,

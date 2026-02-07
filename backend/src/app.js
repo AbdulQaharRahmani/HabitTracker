@@ -6,6 +6,7 @@ import habitRoutes from './routes/habits.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import taskRoutes from './routes/task.js';
+import logRoutes from './routes/log.js';
 import categoryRoutes from './routes/categories.js';
 import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -13,6 +14,7 @@ import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import mongoSanitize from '@exortek/express-mongo-sanitize';
+import { logMiddleware } from './middleware/logger.js';
 
 const app = express();
 
@@ -39,6 +41,7 @@ app.use(
 app.use(cookieParser());
 app.use(mongoSanitize());
 app.use(helmet());
+app.use(logMiddleware);
 //#endregion
 
 //#region Route Middlewares
@@ -60,6 +63,7 @@ app.use('/api/habits', authMiddleware, limiter, habitRoutes);
 app.use('/api/tasks', authMiddleware, limiter, taskRoutes);
 app.use('/api/users', authMiddleware, limiter, userRoutes);
 app.use('/api/offline-data', authMiddleware, limiter, syncRoutes);
+app.use('/api/logs', authMiddleware, limiter, logRoutes);
 
 //#endregion
 

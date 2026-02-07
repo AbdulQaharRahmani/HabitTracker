@@ -83,7 +83,7 @@ class TaskCard extends StatelessWidget {
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        item.frequency,
+                        item.frequency ?? '',
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: AppTheme.textMuted,

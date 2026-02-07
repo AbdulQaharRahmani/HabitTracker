@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../app/app_theme.dart';
+import '../../services/auth_service.dart';
 import '../../utils/today_progressBar/daily_grid.dart';
 import '../../utils/today_progressBar/date_selector.dart';
 import '../../utils/today_progressBar/header_section.dart';
 import '../../utils/today_progressBar/task.dart';
 import '../../utils/today_progressBar/top_bar.dart';
 import '../../utils/today_progressBar/task_item.dart';
-import '../../utils/today_progressBar/auth_service.dart';
+
 
 class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key});
@@ -18,7 +19,7 @@ class TodayScreen extends StatefulWidget {
 }
 
 class _TodayScreenState extends State<TodayScreen> {
-  final ApiService _api = ApiService();
+  final AuthService _api = AuthService();
   bool get _isToday {
     final now = DateTime.now();
     return DateUtils.isSameDay(selectedDate, now);
@@ -104,8 +105,11 @@ class _TodayScreenState extends State<TodayScreen> {
       final tasks = await _api.fetchTasks(forDate: selectedDate);
       final habits = await _api.fetchHabits(forDate: selectedDate);
 
+
       final itemsTasks = tasks.where((t) => t.appliesToDate(date)).toList();
-      final itemsHabits = habits.where((h) => h.appliesToDate(date)).toList();
+      // final itemsHabits = habits.where((h) => h.appliesToDate(date)).toList();
+      final itemsHabits = habits;
+
 
       final Map<String, List<TaskItem>> taskSections = {};
       for (final t in itemsTasks) {

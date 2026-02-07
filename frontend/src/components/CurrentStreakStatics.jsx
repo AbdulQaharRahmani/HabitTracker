@@ -29,12 +29,25 @@ export default function CurrentStreakStatics({ currentStreak }) {
             {t("CURRENT STREAK")}
           </p>
         </span>
-        <div className="text-gray-800 dark:text-gray-100 font-bold text-[2.5rem] mt-4">
+        {currentStreak == 0 || currentStreak == '۰'? (
+        <p className="mt-4 text-sm text-gray-400 dark:text-gray-300">
+         {t("NO_ACTIVE_STREAK_YET")}
+        </p>
+      ) : (
+        <div className="mt-4 text-[2.5rem] font-bold text-gray-800 dark:text-gray-100">
+          {currentStreak}
+          <span className="mx-2 text-[1rem] font-normal text-gray-400 dark:text-gray-300">
+            {t("days")}
+          </span>
+        </div>
+      )}
+
+        {/* <div className="text-gray-800 dark:text-gray-100 font-bold text-[2.5rem] mt-4">
           {currentStreak}
           <span className="text-gray-400 dark:text-gray-100 mx-2 font-normal text-[1rem] ">
             {t("days")}
           </span>
-        </div>
+        </div> */}
       </div>
     </div>
   );
