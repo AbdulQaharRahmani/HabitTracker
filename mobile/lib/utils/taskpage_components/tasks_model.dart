@@ -1,25 +1,28 @@
 import '../category/category_model.dart';
 
-class Task{
+class Task {
   final String id;
   final String title;
   final String? description;
   final String status;
   final String priority;
   final DateTime? dueDate;
+  final DateTime? completedAt; // ✅ ADD THIS
   final String userId;
   final bool isDeleted;
   final DateTime createdAt;
   final DateTime updatedAt;
   final CategoryModel? category;
   final String? categoryId;
+
   Task({
     required this.id,
     required this.title,
-     this.description,
+    this.description,
     required this.status,
     required this.priority,
     this.dueDate,
+    this.completedAt,
     required this.userId,
     required this.isDeleted,
     required this.createdAt,
@@ -29,7 +32,7 @@ class Task{
   });
 
   // ==============================
-  //   copyWith
+  //   copyWith (safe & complete)
   // ==============================
   Task copyWith({
     String? status,
@@ -38,6 +41,7 @@ class Task{
     String? priority,
     String? categoryId,
     DateTime? dueDate,
+    DateTime? completedAt,
     CategoryModel? category,
   }) {
     return Task(
@@ -48,6 +52,7 @@ class Task{
       priority: priority ?? this.priority,
       categoryId: categoryId ?? this.categoryId,
       dueDate: dueDate ?? this.dueDate,
+      completedAt: completedAt, // ⚠️ intentional override
       userId: userId,
       isDeleted: isDeleted,
       createdAt: createdAt,
@@ -56,8 +61,9 @@ class Task{
     );
   }
 
-
-
+  // ==============================
+  //   fromJson (backend-safe)
+  // ==============================
   factory Task.fromJson(Map<String, dynamic> json) {
     CategoryModel? category;
     String? categoryId;
@@ -67,18 +73,21 @@ class Task{
         category = CategoryModel.fromJson(json['categoryId']);
         categoryId = category.id;
       } else if (json['categoryId'] is String) {
-        categoryId = json['categoryId'] as String;
+        categoryId = json['categoryId'];
       }
     }
 
     return Task(
       id: json['_id'] ?? '',
       title: json['title'] ?? '',
-      description: json['description'] ?? '',
+      description: json['description'],
       status: json['status'] ?? 'todo',
       priority: json['priority'] ?? 'medium',
-      dueDate: json['dueDate'] != null
-          ? DateTime.tryParse(json['dueDate'])
+      dueDate:
+      json['dueDate'] != null ? DateTime.tryParse(json['dueDate']) : null,
+      completedAt:
+      json['completedAt'] != null
+          ? DateTime.tryParse(json['completedAt'])
           : null,
       userId: json['userId'] ?? '',
       isDeleted: json['isDeleted'] ?? false,
@@ -93,8 +102,8 @@ class Task{
     );
   }
 
-
-
-
+  // ==============================
+  //   Helpers
+  // ==============================
   bool get isDone => status == 'done';
 }

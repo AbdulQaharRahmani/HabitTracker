@@ -20,7 +20,7 @@ class TaskApiService {
     int page = 1,
     int limit = 20,
     String? searchTerm,
-    required String status,
+     String? status,
     String? categoryId,
   }) async {
     try {
