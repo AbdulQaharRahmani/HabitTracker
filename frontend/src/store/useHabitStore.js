@@ -181,85 +181,61 @@ const useHabitStore = create((set, get) => ({
             }
         }))
     },
+    formatStatstics: (data, mode) => {
+        const stats = data.reduce((acc, item) => {
+            const dateObj = new Date(item.date + 'T00:00:00');
+            let key;
+
+            if (mode === 'daily') key = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+            else if (mode === 'monthly') key = dateObj.toLocaleDateString('en-US', { month: 'short' });
+            else if (mode === 'yearly') key = item.date.split('-')[0];
+
+            acc[key] = (acc[key] || 0) + item.completed;
+            return acc;
+        }, {});
+
+        return Object.keys(stats).map(name => ({
+            name,
+            completed: stats[name]
+        }));
+    },
+
+    chartData: [],
     dailyStatistics: [],
     monthlyStatistics: [],
     yearlyStatistics: [],
-    chartData: [],
+
     getChartData: async () => {
-        const data = await getChartData()
-        set({ chartData: data })
-    },
-    getDailyStatistics: async () => {
-        const chartData = get().chartData
-        if (!chartData || chartData.length === 0) return
-        const firstDataDate = new Date(chartData[0].date);
-        let date = new Date();
-        date.setDate(date.getDate() - 6);
-
-        const finalStartDate = date >= firstDataDate ? date : firstDataDate;
-
-        const startDate = formatDate(finalStartDate);
-        const endDate = formatDate(new Date());
-        const daysData = await getHabitsChartData(startDate, endDate);
-        const dailyStatistics = daysData.reduce((acc, day) => {
-            const weekday = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
-            acc[weekday] = (acc[weekday] || 0) + day.completed;
-            return acc;
-        }, {});
-        const formattedData = Object.keys(dailyStatistics).map(key => ({
-            name: key,
-            completed: dailyStatistics[key]
-        }));
-        set({ dailyStatistics: formattedData });
+        const data = await getChartData();
+        set({ chartData: data });
     },
 
-    getMonthlyStatistics: async () => {
-        const chartData = get().chartData
-        if (!chartData || chartData.length === 0) return
-        const firstDataDate = new Date(chartData[0].date);
-        let date = new Date();
-        date.setMonth(date.getMonth() - 5);
+    getStatistics: async (mode) => {
+        const { chartData } = get();
+        const isMonthly = mode === 'monthly';
 
-        const finalStartDate = date >= firstDataDate ? date : firstDataDate;
+        const source = isMonthly ? chartData?.monthly : chartData?.daily;
+        if (!source || source.length === 0) return;
 
-        const startDate = formatDate(finalStartDate);
-        const endDate = formatDate(new Date());
-        const dataForMonths = await getHabitsChartData(startDate, endDate);
-        const monthlyStatistics = dataForMonths.reduce((acc, day) => {
-            const monthName = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short' });
-            acc[monthName] = (acc[monthName] || 0) + day.completed;
-            return acc;
-        }, {});
-        const formattedData = Object.keys(monthlyStatistics).map(key => ({
-            name: key,
-            completed: monthlyStatistics[key]
-        }));
-        set({ monthlyStatistics: formattedData });
+        const start = new Date();
+        if (mode === 'daily') start.setDate(start.getDate() - 6);
+        else if (mode === 'monthly') start.setMonth(start.getMonth() - 5);
+        else if (mode === 'yearly') start.setFullYear(start.getFullYear() - 3);
+
+        const firstDataDate = new Date(source[0].date);
+        const finalStart = start >= firstDataDate ? start : firstDataDate;
+
+        const response = await getHabitsChartData(formatDate(finalStart), formatDate(new Date()));
+        const rawData = isMonthly ? (response.monthly || []) : (response.daily || []);
+
+        const formatted = get().formatStatstics(rawData, mode);
+
+        set({ [`${mode}Statistics`]: formatted });
     },
 
-    getYearlyStatistics: async () => {
-        const chartData = get().chartData
-        if (!chartData || chartData.length === 0) return
-        const firstDataDate = new Date(chartData[0].date);
-        const threeYearsAgo = new Date();
-        threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
-        const finalStartDate = threeYearsAgo >= firstDataDate ? threeYearsAgo : firstDataDate;
-
-        const startDate = formatDate(finalStartDate);
-        const endDate = formatDate(new Date());
-        const dataForYears = await getHabitsChartData(startDate, endDate);
-        const yearlyStatistics = dataForYears.reduce((acc, day) => {
-            const year = day.date.split('-')[0];
-            acc[year] = (acc[year] || 0) + day.completed;
-            return acc;
-        }, {});
-        const formattedData = Object.keys(yearlyStatistics).map(key => ({
-            name: key,
-            completed: yearlyStatistics[key]
-        }));
-        set({ yearlyStatistics: formattedData });
-    }
-
+    getDailyStatistics: () => get().getStatistics('daily'),
+    getMonthlyStatistics: () => get().getStatistics('monthly'),
+    getYearlyStatistics: () => get().getStatistics('yearly')
 }))
 
 export default useHabitStore

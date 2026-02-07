@@ -16,7 +16,7 @@ import useHabitStore from "../store/useHabitStore";
 export default function StatisticsChart() {
   const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData } = useHabitStore()
   const [activeFilter, setActiveFilter] = useState("days");
-  const [title, setTitle] = useState("Activity by Month");
+  const [title, setTitle] = useState("Activity by Days");
   const filterTerms = [
     { id: "1", name: "Days", value: "days" },
     { id: "2", name: "Months", value: "months" },
