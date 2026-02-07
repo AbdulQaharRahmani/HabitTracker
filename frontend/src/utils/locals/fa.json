@@ -112,5 +112,9 @@
   "apple": "اپل",
   "already_have_account": "قبلاً حساب دارید؟",
   "log_in": "ورود",
-  "logout":"خروج"
+  "logout":"خروج",
+
+  "NO_HABITS_YET": "هنوز هیچ عادتی اضافه نشده",
+  "NO_ACTIVE_STREAK_YET": "هنوز هیچ استریکی فعال نیست",
+  "NO_HABITS_COMPLETED_YET": "هنوز هیچ عادتی تکمیل نشده"
 }
