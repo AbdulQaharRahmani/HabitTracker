@@ -196,6 +196,7 @@ const useHabitStore = create((set, get) => ({
     },
 
     getStatistics: async (mode) => {
+        set({loading: true})
         const { chartData } = get();
         const isMonthly = mode === 'monthly';
 
@@ -209,13 +210,18 @@ const useHabitStore = create((set, get) => ({
 
         const firstDataDate = new Date(source[0].date);
         const finalStart = start >= firstDataDate ? start : firstDataDate;
-
+        try{
         const response = await getHabitsChartData(formatDate(finalStart), formatDate(new Date()));
         const rawData = isMonthly ? (response.data.monthly || []) : (response.data.daily || []);
-
         const formatted = formatStatstics(rawData, mode);
-
         set({ [`${mode}Statistics`]: formatted });
+        }catch(error){
+        const message = err.response?.data?.message || "Failed to fetch data";
+        set({error:message})
+        }finally{
+            set({loading:false})
+        }
+
     },
 
     getDailyStatistics: () => get().getStatistics('daily'),

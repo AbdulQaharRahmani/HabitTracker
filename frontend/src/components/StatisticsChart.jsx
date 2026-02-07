@@ -12,7 +12,7 @@ import Dropdown from "./Dropdown";
 import useHabitStore from "../store/useHabitStore";
 
 export default function StatisticsChart() {
-  const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData } = useHabitStore()
+  const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData, loading, error } = useHabitStore()
   const [activeFilter, setActiveFilter] = useState("days");
   const [title, setTitle] = useState("Activity by Days");
   const filterTerms = [
@@ -60,8 +60,13 @@ useEffect(() => {
           />
         </div>
       </div>
+      {
 
-      {/* Chart */}
+       loading || error ? (
+        <div className={loading? "w-full flex justify-center items-center text-gray-400" : "w-full flex justify-center items-center text-red-900"}>
+           {loading ? "Loading chart data..." : error}
+        </div>
+       ) :
       <div className="w-full h-[300px] md:h-[400px]">
         <ResponsiveContainer
           width="100%"
@@ -120,6 +125,7 @@ useEffect(() => {
           </AreaChart>
         </ResponsiveContainer>
       </div>
+      }
     </>
   );
 }
