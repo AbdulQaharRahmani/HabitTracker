@@ -203,17 +203,31 @@ class _TasksScreenState extends State<TasksScreen> {
       setState(() => _isLoading = false);
     }
   }
+  List<Task> get _filteredTasks {
+    return _tasks.where((task) {
+      // دسته‌بندی
+      final matchCategory =
+          selectedCategoryId == null || task.categoryId == selectedCategoryId;
+      // سرچ
+      final matchSearch = _searchTerm.isEmpty ||
+          task.title.toLowerCase().contains(_searchTerm.toLowerCase()) ||
+          (task.description?.toLowerCase().contains(_searchTerm.toLowerCase()) ??
+              false);
+      return matchCategory && matchSearch;
+    }).toList();
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    final todoTasks = _tasks.where((task) => task.status != 'done').toList();
-    final completedTasks = _tasks
-        .where((task) => task.status == 'done')
-        .toList();
+    // تغییرات جدید: استفاده از _filteredTasks به جای _tasks
+    final todoTasks =
+    _filteredTasks.where((task) => task.status != 'done').toList();
+    final completedTasks =
+    _filteredTasks.where((task) => task.status == 'done').toList();
 
     _sortByDueDate(todoTasks);
     _sortByDueDate(completedTasks);
-
     return SafeArea(
       child: Scaffold(
         backgroundColor: AppTheme.background,
@@ -367,12 +381,13 @@ class _TasksScreenState extends State<TasksScreen> {
                 _buildTaskList('Completed', completedTasks),
 
               if (_isLoading && _tasks.isNotEmpty)
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Center(child: CircularProgressIndicator()),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (_, __) => const TasksCardShimmer(), // تغییرات جدید: استفاده از shimmer
+                    childCount: 1, // یا هر تعداد که حس پر بودن لیست را بدهد
                   ),
                 ),
+
 
               const SliverToBoxAdapter(child: SizedBox(height: 30)),
             ],
