@@ -186,7 +186,7 @@ const useHabitStore = create((set, get) => ({
 
 
     chartData: [],
-    dailyStatistics: [],
+    weeklyStatistics: [],
     monthlyStatistics: [],
     yearlyStatistics: [],
 
@@ -198,21 +198,18 @@ const useHabitStore = create((set, get) => ({
     getStatistics: async (mode) => {
         set({loading: true})
         const { chartData } = get();
-        const isMonthly = mode === 'monthly';
+        const isYearly = mode === 'yearly';
 
-        const source = isMonthly ? chartData?.monthly : chartData?.daily;
+        const source = isYearly ? chartData?.monthly : chartData?.daily;
         if (!source || source.length === 0) return;
 
         const start = new Date();
-        if (mode === 'daily') start.setDate(start.getDate() - 6);
-        else if (mode === 'monthly') start.setMonth(start.getMonth() - 5);
-        else if (mode === 'yearly') start.setFullYear(start.getFullYear() - 3);
-
-        const firstDataDate = new Date(source[0].date);
-        const finalStart = start >= firstDataDate ? start : firstDataDate;
+        if (mode === 'weekly') start.setDate(start.getDate() - 6);
+        else if (mode === 'monthly') start.setDate(start.getDate() - 30);
+        else if (mode === 'yearly') start.setMonth(start.getMonth() - 12);
         try{
-        const response = await getHabitsChartData(formatDate(finalStart), formatDate(new Date()));
-        const rawData = isMonthly ? (response.data.monthly || []) : (response.data.daily || []);
+        const response = await getHabitsChartData(formatDate(start), formatDate(new Date()));
+        const rawData = isYearly ? (response.data.monthly || []) : (response.data.daily || []);
         const formatted = formatStatstics(rawData, mode);
         set({ [`${mode}Statistics`]: formatted });
         }catch(error){
@@ -224,7 +221,7 @@ const useHabitStore = create((set, get) => ({
 
     },
 
-    getDailyStatistics: () => get().getStatistics('daily'),
+    getWeeklyStatistics: () => get().getStatistics('weekly'),
     getMonthlyStatistics: () => get().getStatistics('monthly'),
     getYearlyStatistics: () => get().getStatistics('yearly'),
 

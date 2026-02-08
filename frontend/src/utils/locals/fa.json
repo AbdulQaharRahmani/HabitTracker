@@ -118,10 +118,10 @@
   "NO_HABITS_YET": "هنوز هیچ عادتی اضافه نشده",
   "NO_ACTIVE_STREAK_YET": "هنوز هیچ استریکی فعال نیست",
   "NO_HABITS_COMPLETED_YET": "هنوز هیچ عادتی تکمیل نشده",
-    "Activity by months": "فعالیت بر اساس ماه ها",
-  "Activity by days": "فعالیت بر اساس روز ها",
-  "Activity by years": "فعالیت بر اساس سال ها",
-    "Days": "روزها",
-  "Months": "ماه ها",
-  "Years": "سال ها"
+  "monthly Activity": "فعالیت ماهانه",
+  "weekly Activity": "فعالیت هفته وار",
+  "yearly Activity": " فعالیت سالانه",
+  "Weekly": "هفته وار",
+  "Monthly": "ماهانه",
+  "Yearly": "سالانه"
 }
