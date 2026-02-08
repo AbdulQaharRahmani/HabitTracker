@@ -208,10 +208,8 @@ class _TasksScreenState extends State<TasksScreen> {
 
   List<Task> get _filteredTasks {
     return _tasks.where((task) {
-      // دسته‌بندی
       final matchCategory =
           selectedCategoryId == null || task.categoryId == selectedCategoryId;
-      // سرچ
       final matchSearch =
           _searchTerm.isEmpty ||
           task.title.toLowerCase().contains(_searchTerm.toLowerCase()) ||
@@ -225,7 +223,6 @@ class _TasksScreenState extends State<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // تغییرات جدید: استفاده از _filteredTasks به جای _tasks
     final todoTasks = _filteredTasks
         .where((task) => task.status != 'done')
         .toList();
@@ -335,8 +332,6 @@ class _TasksScreenState extends State<TasksScreen> {
                                     vertical: 6,
                                   ),
                                   child: const Row(
-                                    // crossAxisAlignment: CrossAxisAlignment.center,
-                                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Icon(Icons.add, color: Colors.white),
                                       SizedBox(width: 5),
@@ -391,8 +386,8 @@ class _TasksScreenState extends State<TasksScreen> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (_, __) =>
-                        const TasksCardShimmer(), // تغییرات جدید: استفاده از shimmer
-                    childCount: 1, // یا هر تعداد که حس پر بودن لیست را بدهد
+                        const TasksCardShimmer(),
+                    childCount: 1,
                   ),
                 ),
 

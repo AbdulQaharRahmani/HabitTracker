@@ -7,7 +7,7 @@ class Task {
   final String status;
   final String priority;
   final DateTime? dueDate;
-  final DateTime? completedAt; // ✅ ADD THIS
+  final DateTime? completedAt;
   final String userId;
   final bool isDeleted;
   final DateTime createdAt;
@@ -52,7 +52,7 @@ class Task {
       priority: priority ?? this.priority,
       categoryId: categoryId ?? this.categoryId,
       dueDate: dueDate ?? this.dueDate,
-      completedAt: completedAt, // ⚠️ intentional override
+      completedAt: completedAt,
       userId: userId,
       isDeleted: isDeleted,
       createdAt: createdAt,
