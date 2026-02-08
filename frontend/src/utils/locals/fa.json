@@ -33,7 +33,6 @@
   "Thursday": "پنجشنبه",
   "Friday": "جمعه",
 
-
   "Notifications": "اعلان‌ها",
   "Daily Reminder": "یادآوری روزانه",
   "Set a time to be reminded of your habits": "زمانی را برای یادآوری عادت‌های خود تنظیم کنید",
@@ -91,18 +90,18 @@
   "create_account": "ساخت حساب",
   "your_journey": "سفر خود را به سوی عادات بهتر امروز شروع کنید.",
   "full_name": "نام کامل",
-  "Today's Habits":"عادات امروز",
-  "Track your daily goals and build consistency.":"اهداف روزانه خود را پیگیری کنید و ثبات ایجاد کنید",
+  "Today's Habits": "عادات امروز",
+  "Track your daily goals and build consistency.": "اهداف روزانه خود را پیگیری کنید و ثبات ایجاد کنید",
   "Search habits...": "جستجوی عادت ها..",
-  "All Habits":"تمام عادات",
-  "Manage and track your daily routines effectively.":"عادت‌های روزانهٔ خود را به‌صورت مؤثر مدیریت و پیگیری کنید",
+  "All Habits": "تمام عادات",
+  "Manage and track your daily routines effectively.": "عادت‌های روزانهٔ خود را به‌صورت مؤثر مدیریت و پیگیری کنید",
   "john_doe": "جان دو",
-  "Daily Goal Progress":"پیشرفت هدف روزانه",
-  "Keep it up! You're almost there. Consistency is key.":"ادامه بده! چیزی نمانده. ثبات کلید موفقیت است",
+  "Daily Goal Progress": "پیشرفت هدف روزانه",
+  "Keep it up! You're almost there. Consistency is key.": "ادامه بده! چیزی نمانده. ثبات کلید موفقیت است",
   "email_address": "آدرس ایمیل",
   "hello_example": "hello@example.com",
   "terms_agreement": "من با",
-  "Activity by Month":"فعالیت ماهانه",
+  "Activity by Month": "فعالیت ماهانه",
   "terms_of_service": "شرایط خدمات ",
   "and": "و",
   "privacy_policy": "سیاست حفظ حریم خصوصی موافقم",
@@ -111,5 +110,7 @@
   "google": "گوگل",
   "apple": "اپل",
   "already_have_account": "قبلاً حساب دارید؟",
-  "log_in": "ورود"
+  "log_in": "ورود",
+  "Old Password": "رمز عبور قدیمی",
+  "New Password": "رمز عبور جدید"
 }
