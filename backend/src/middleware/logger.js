@@ -12,9 +12,11 @@ export const logMiddleware = (req, res, next) => {
       duration: duration,
       userId: req.user?._id.toString(),
       clientIp:
-        req.ip ||
-        req.headers['x-forwarded-for'] ||
-        req.connection.remoteAddress,
+        req.ip === '::1'
+          ? '127.0.0.1'
+          : req.ip ||
+            req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress,
       userAgent: req.headers['user-agent'],
     };
 
