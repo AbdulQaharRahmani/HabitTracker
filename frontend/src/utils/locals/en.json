@@ -123,7 +123,12 @@
   "Duration": "Duration",
   "IP Address": "IP Address",
   "Not Found": "Not Found!",
-  "Loading logs": "Loading logs..."
+  "Loading logs": "Loading logs...",
 
 
+  "logout":"Logout",
+
+  "NO_HABITS_YET": "No habits added yet",
+  "NO_ACTIVE_STREAK_YET": "No active streak yet",
+  "NO_HABITS_COMPLETED_YET": "No habits completed yet"
 }

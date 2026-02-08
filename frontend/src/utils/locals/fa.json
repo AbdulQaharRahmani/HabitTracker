@@ -54,6 +54,8 @@
   "No date": "تاریخ نامشخص",
   "Loading": "درحال بارگذاری...",
   "You have no tasks to show": "وظیفه‌ای برای نمایش وجود ندارد.",
+  "Consistency": "استمرار",
+
   "Your Progress": "روند شما",
   "Overview of your consistency and growth.": "چشم اندازی به تمرکز و روند رشد شما.",
   "TOTAL HABITS": "تعداد مجموعی عادت ها",
@@ -128,6 +130,11 @@
   "GET": "GET",
   "Newest": "جدیدترین",
   "Oldest": "قدیمی‌ترین",
-  "Loading logs": "در حال بارگذاری لاگ ها..."
+  "Loading logs": "در حال بارگذاری لاگ ها...",
 
+  "logout":"خروج",
+
+  "NO_HABITS_YET": "هنوز هیچ عادتی اضافه نشده",
+  "NO_ACTIVE_STREAK_YET": "هنوز هیچ استریکی فعال نیست",
+  "NO_HABITS_COMPLETED_YET": "هنوز هیچ عادتی تکمیل نشده"
 }
