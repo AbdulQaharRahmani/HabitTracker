@@ -107,6 +107,7 @@
   "yearly Activity": "Yearly Activity",
   "Weekly": "Weekly",
   "Monthly": "Monthly",
-  "Yearly": "Yearly"
+  "Yearly": "Yearly",
+  "loading_chart": "Loading chart data..."
 
 }
