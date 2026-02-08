@@ -52,6 +52,7 @@ const Sidebar = ({ children }) => {
     isOpen,
     isMobileOpen,
     toggleMobileSidebar,
+    toggleSidebar,
     closeMobileSidebar,
   } = useSidebarStore();
 
@@ -62,14 +63,16 @@ const Sidebar = ({ children }) => {
     fetchProfilePhoto(userId);
   }, [fetchProfilePhoto, userId]);
 
+
+
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* Mobile Toggle Button */}
       <button
         className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-indigo-600 text-white shadow-lg"
-        onClick={toggleMobileSidebar}
+        onClick={()=> toggleMobileSidebar()}
       >
-        {isMobileOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+        {isMobileOpen ? <FaTimes size={15} /> : <FaBars size={15} />}
       </button>
 
       {/* Mobile Overlay */}
@@ -82,24 +85,33 @@ const Sidebar = ({ children }) => {
 
       {/* Sidebar */}
       <aside
-        className={`
-          fixed top-0 left-0 md:relative
-          h-screen
-          bg-white dark:bg-gray-900
-          text-gray-800 dark:text-gray-100
-          transition-all duration-300 ease-in-out
-          z-40
-          ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-          ${isOpen ? "w-64" : "w-20"}
-          flex flex-col
-          shadow-xl
-          border-r border-gray-200 dark:border-gray-700
-          overflow-y-auto
-        `}
+  className={`
+    fixed top-0 left-0 md:relative
+    h-screen
+    bg-white dark:bg-gray-900
+    text-gray-800 dark:text-gray-100
+    transition-all duration-300 ease-in-out
+    z-40
+    ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
+    ${isOpen ? "md:w-64 w-64" : "md:w-20 w-64"}
+    flex flex-col
+    shadow-xl
+    border-r border-gray-200 dark:border-gray-700
+    overflow-y-auto
+  `}
       >
         {/* Profile */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+
+         <div className="hidden md:flex justify-end mb-2">
+            <button
+              onClick={() => toggleSidebar()}
+              className="p-2 rounded-lg text-gray-100 bg-indigo-500 hover:bg-indigo-600 hover:text-white dark:text-white dark:hover:bg-indigo-800"
+            >
+              {isOpen ? <FaTimes  size={12}/> : <FaBars  size={12}/>}
+            </button>
+         </div>
+
           <div
             className={`flex ${
               isOpen
