@@ -80,3 +80,11 @@ export const habitIdValidator = [
     .isMongoId() //Check validates MongoDB id format
     .withMessage('Invalid habitId'),
 ];
+
+export const HabitCompletionValidator = [
+  body('date')
+    .notEmpty()
+    .withMessage('Date must be provided')
+    .isISO8601() // Check valid date format (YYYY-MM-DD)
+    .withMessage('Date must be in YYYY-MM-DD format'),
+];
