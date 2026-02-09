@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getTasks, updateTaskStatus } from "../../services/tasksService";
+import { deleteTask, getTasks, updateTaskStatus } from "../../services/tasksService";
 import api from "../../services/api";
 
 export const useTaskCardStore = create((set, get) => ({
@@ -84,7 +84,7 @@ export const useTaskCardStore = create((set, get) => ({
       const task = get().tasks.find((t) => t._id === id);
       if (!task) console.log("Sorry! task is not found");
 
-      await api.delete(`/tasks/${id}`);
+      await deleteTask(id)
 
       set((state) => ({
         tasks: state.tasks.filter((task) => task._id !== id),
@@ -94,6 +94,7 @@ export const useTaskCardStore = create((set, get) => ({
         "Sorry! task deletion failed:",
         error.response?.data || error.message,
       );
+      set({ error: "Failed to delete task" });
     }
   },
 
