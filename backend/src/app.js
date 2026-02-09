@@ -40,7 +40,12 @@ app.use(
 
 app.use(cookieParser());
 app.use(mongoSanitize());
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
 app.use(logMiddleware);
 //#endregion
 
