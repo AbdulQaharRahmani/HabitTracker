@@ -18,10 +18,16 @@ const useLogsStore = create((set, get) => ({
       set({loading: false})
     }
   },
- getFilteredData: (filters, searchTerm) => {
+getSearchResult: (searchTerm, dataToSearch) => {
+  if (!searchTerm) return get().logsData;
+  const lowerCaseSearchTerm = searchTerm.toLowerCase();
+  return dataToSearch.filter((log) => {
+    return log.path?.toLowerCase().includes(lowerCaseSearchTerm);
+  });
+},
+ getFilteredData: (filters) => {
     const { method, level, sortOrder } = filters;
     const logsData = get().logsData || [];
-    const lowerSearch = searchTerm?.toLowerCase() || "";
     const normalizedMethod = method?.toLowerCase();
     const normalizedLevel = level?.toLowerCase();
 
@@ -35,12 +41,7 @@ const useLogsStore = create((set, get) => ({
                 ? log.level?.toLowerCase() === normalizedLevel
                 : true;
 
-            const logPath = log.path || log.route || "";
-            const matchRoute = lowerSearch
-                ? logPath.toLowerCase().includes(lowerSearch)
-                : true;
-
-            return matchMethod && matchLevel && matchRoute;
+            return matchMethod && matchLevel;
         })
         .sort((a, b) => {
             const timeA = a.timestamp || "";

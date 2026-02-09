@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 export default function Logs() {
     const { t } = useTranslation();
-    const { logsData, getFilteredData, getLogsData } = useLogsStore();
+    const { logsData, getFilteredData, getLogsData, getSearchResult } = useLogsStore();
 
     const levels = useMemo(() => [
         { id: 1, name: t("All levels"), value: "all levels" },
@@ -34,25 +34,35 @@ export default function Logs() {
     const [selectedMethod, setSelectedMethod] = useState("all methods");
     const [selectedDate, setSelectedDate] = useState("oldest");
     const [searchTerm, setSearchTerm] = useState("");
-    const [displayData, setDisplayData] = useState([]);
-
+    const [filteredData, setFilteredData] = useState([])
+   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
     useEffect(() => {
         getLogsData();
     }, [getLogsData]);
 
     useEffect(() => {
-        setDisplayData(logsData);
+        setFilteredData(logsData);
     }, [logsData]);
 
+    useEffect(()=>{
+      const handler =  setTimeout(()=> {
+        setDebouncedSearchTerm(searchTerm)
+      }, 500)
+      return () => clearTimeout(handler)
+    }, [searchTerm])
     const handleFilter = () => {
         const filterOptions = {
             method: selectedMethod,
             level: selectedLevel,
             sortOrder: selectedDate
         };
-        const result = getFilteredData(filterOptions, searchTerm);
-        setDisplayData(result);
+        const result = getFilteredData(filterOptions);
+        setFilteredData(result);
     };
+const displayData = useMemo(()=>{
+    return getSearchResult(debouncedSearchTerm, filteredData)
+}, [debouncedSearchTerm, filteredData, getSearchResult])
+
 
     return (
         // Header
