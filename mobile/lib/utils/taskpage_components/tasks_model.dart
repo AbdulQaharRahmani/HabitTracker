@@ -83,11 +83,11 @@ class Task {
       description: json['description'],
       status: json['status'] ?? 'todo',
       priority: json['priority'] ?? 'medium',
-      dueDate:
-      json['dueDate'] != null ? DateTime.tryParse(json['dueDate']) : null,
-      completedAt:
-      json['completedAt'] != null
-          ? DateTime.tryParse(json['completedAt'])
+      dueDate: json['dueDate'] != null
+          ? DateTime.tryParse(json['dueDate'])?.toLocal()
+          : null,
+      completedAt: json['completedAt'] != null
+          ? DateTime.tryParse(json['completedAt'])?.toLocal()
           : null,
       userId: json['userId'] ?? '',
       isDeleted: json['isDeleted'] ?? false,

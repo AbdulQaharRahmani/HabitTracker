@@ -71,7 +71,7 @@ class TaskApiService {
     required String priority,
     required String categoryId,
     String? token,
-    String? dueDate,
+    DateTime? dueDate,
   }) async {
     final authToken = token ?? await AuthManager.getToken();
     if (authToken == null) {
@@ -84,7 +84,10 @@ class TaskApiService {
       'status': status,
       'priority': priority,
       'categoryId': categoryId,
+      if (dueDate != null) 'dueDate': formatDueDate(dueDate),
     };
+    debugPrint('📤 Create Task Payload: ${jsonEncode(payload)}');
+
 
     final response = await http
         .post(
@@ -240,6 +243,18 @@ class TaskApiService {
     }
 
     throw Exception('Failed to filter tasks');
+  }
+  String formatDueDate(DateTime date) {
+    final utc = date.toUtc();
+
+    return
+      '${utc.year.toString().padLeft(4, '0')}-'
+          '${utc.month.toString().padLeft(2, '0')}-'
+          '${utc.day.toString().padLeft(2, '0')}T'
+          '${utc.hour.toString().padLeft(2, '0')}:'
+          '${utc.minute.toString().padLeft(2, '0')}:'
+          '${utc.second.toString().padLeft(2, '0')}.'
+          '${utc.millisecond.toString().padLeft(3, '0')}Z';
   }
 
 }
