@@ -1,23 +1,24 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 const useSidebarStore = create((set) => ({
+  screenMode: "desktop",
   isOpen: true,
-  isMobileOpen: true,
+
+  setScreenMode: (mode) =>
+    set((state) => ({
+      screenMode: mode,
+      isOpen: mode === "desktop" ? state.isOpen : false,
+    })),
 
   toggleSidebar: () =>
     set((state) => ({
       isOpen: !state.isOpen,
-      isMobileOpen: !state.isOpen
     })),
 
-  toggleMobileSidebar: () =>
-    set((state) => ({
-      isMobileOpen: !state.isMobileOpen,
-      isOpen: !state.isMobileOpen
-    })),
-
-  closeMobileSidebar: () => set({ isMobileOpen: false, isOpen: false }),
+  closeSidebar: () =>
+    set({
+      isOpen: false,
+    }),
 }));
-
 
 export default useSidebarStore;
