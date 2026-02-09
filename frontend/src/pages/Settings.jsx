@@ -156,7 +156,7 @@ const Settings = () => {
                       {/* Old Password */}
                       <div className="mb-4 relative">
                         <label className="block mb-2 text-sm font-semibold">
-                          {t("Old Password")}
+                          {t("Old_Password")}
                         </label>
                         <input
                           type={oldPasswordType}
@@ -186,7 +186,7 @@ const Settings = () => {
                       {/* New Password */}
                       <div className="mb-4 relative">
                         <label className="block mb-2 text-sm font-semibold">
-                          {t("New Password")}
+                          {t("New_Password")}
                         </label>
                         <input
                           type={newPasswordType}
