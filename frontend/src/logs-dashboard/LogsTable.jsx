@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import useLogsStore from "../store/useLogsStore";
 import { FaExclamationTriangle, FaSearch } from "react-icons/fa";
-
+import {formatDate} from "../utils/dateFormatter"
 export default function LogTable({ filteredList }) {
   const { t } = useTranslation();
   const { loading, error } = useLogsStore();
@@ -55,7 +55,7 @@ export default function LogTable({ filteredList }) {
           {filteredList.map((log, index) => (
             <tr key={index} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-5 py-3.5 font-mono text-[13px] text-gray-400 whitespace-nowrap">
-                {log.timestamp}
+                {formatDate(new Date(log.timestamp))}
               </td>
               <td className="px-5 py-3.5">
                 <span className={`inline-flex px-2 py-0.5 rounded text-[12px] font-bold tracking-wide capitalize
