@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import useSidebarStore from "../store/useSidebarStore";
+import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 
 import {
   FaCalendarDay,
@@ -7,132 +8,121 @@ import {
   FaCog,
   FaBars,
   FaTimes,
-  FaUser,
-  FaSignOutAlt
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 
-import { NavLink } from "react-router-dom";
+import useSidebarStore from "../store/useSidebarStore";
 import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
 import useAuthStore from "../store/useAuthStore";
-import { useEffect, useState } from "react";
 
 const dashboardItems = [
   { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
   { id: "habits", name: "Habits", icon: <HiOutlineFire />, path: "/habits" },
-  {
-    id: "tasks",
-    name: "Tasks",
-    icon: <HiOutlineClipboardList />,
-    path: "/tasks",
-  },
-  {
-    id: "statistics",
-    name: "Statistics",
-    icon: <FaChartLine />,
-    path: "/statistics",
-  },
+  { id: "tasks", name: "Tasks", icon: <HiOutlineClipboardList />, path: "/tasks" },
+  { id: "statistics", name: "Statistics", icon: <FaChartLine />, path: "/statistics" },
 ];
 
 const preferencesItems = [
-  {
-    id: "settings",
-    name: "Settings",
-    icon: <FaCog />,
-    path: "/settings",
-  },
+  { id: "settings", name: "Settings", icon: <FaCog />, path: "/settings" },
 ];
 
 const Sidebar = ({ children }) => {
   const { t } = useTranslation();
-   const [preview, setPreview] = useState(null);
-    const { userProfileUrl, fetchProfilePhoto, loading } =
-      useProfilePhotoStore();
+  const [preview, setPreview] = useState(null);
+
+  const { userProfileUrl, fetchProfilePhoto, loading } =
+    useProfilePhotoStore();
+  const { userId, username, logout } = useAuthStore();
   const {
     isOpen,
-    isMobileOpen,
-    toggleMobileSidebar,
+    screenMode,
     toggleSidebar,
-    closeMobileSidebar,
+    closeSidebar,
+    setScreenMode,
   } = useSidebarStore();
 
- const {userId,username,logout} = useAuthStore((state) => state);
-
+  /* --- Profile photo --- */
   useEffect(() => {
     if (!userId) return;
     fetchProfilePhoto(userId);
-  }, [fetchProfilePhoto, userId]);
+  }, [userId, fetchProfilePhoto]);
+
+  /* --- Screen resize sync --- */
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setScreenMode("mobile");
+      } else {
+        setScreenMode("desktop");
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setScreenMode]);
 
 
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      {/* Mobile Toggle Button */}
+      {/* --- Mobile Toggle Button --- */}
       <button
         className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-indigo-600 text-white shadow-lg"
-        onClick={()=> toggleMobileSidebar()}
+        onClick={toggleSidebar}
       >
-        {isMobileOpen ? <FaTimes size={15} /> : <FaBars size={15} />}
+        {isOpen ? <FaTimes size={16} /> : <FaBars size={16} />}
       </button>
 
-      {/* Mobile Overlay */}
-      {isMobileOpen && (
+      {/* --- Mobile Overlay ---*/}
+      {screenMode === "mobile" && isOpen && (
         <div
           className="md:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={closeMobileSidebar}
+          onClick={closeSidebar}
         />
       )}
 
-      {/* Sidebar */}
+      {/* --- Sidebar ---*/}
       <aside
-  className={`
-    fixed top-0 left-0 md:relative
-    h-screen
-    bg-white dark:bg-gray-900
-    text-gray-800 dark:text-gray-100
-    transition-all duration-300 ease-in-out
-    z-40
-    ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
-    ${isOpen ? "md:w-64 w-64" : "md:w-20 w-64"}
-    flex flex-col
-    shadow-xl
-    border-r border-gray-200 dark:border-gray-700
-    overflow-y-auto
-  `}
+        className={`
+          fixed top-0 left-0 md:relative h-screen z-40
+          bg-white dark:bg-gray-900
+          transition-all duration-300 ease-in-out
+          ${screenMode === "mobile" && !isOpen ? "-translate-x-full" : "translate-x-0"}
+          ${isOpen ? "md:w-64 w-64" : "md:w-20 w-64"}
+          flex flex-col shadow-xl border-r border-gray-200 dark:border-gray-700
+        `}
       >
-        {/* Profile */}
+        {/* --- Profile --- */}
         <div className="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+          {/* Desktop Toggle */}
+          <div className="hidden md:flex justify-end mb-4">
 
-         <div className="hidden md:flex justify-end mb-2">
+
+
             <button
-              onClick={() => toggleSidebar()}
-              className="p-2 rounded-lg text-gray-100 bg-indigo-500 hover:bg-indigo-600 hover:text-white dark:text-white dark:hover:bg-indigo-800"
+              onClick={toggleSidebar}
+              className="p-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600"
             >
-              {isOpen ? <FaTimes  size={12}/> : <FaBars  size={12}/>}
+              {isOpen ? <FaTimes size={12} /> : <FaBars size={12} />}
             </button>
-         </div>
+          </div>
 
-          <div
-            className={`flex ${
-              isOpen
-                ? "flex-col text-center space-y-1"
-                : "flex-col items-center"
-            }`}
-          >
-            <div className="relative flex justify-center">
-              <div className="w-[60px] h-[60px] rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
-                <img
-                  src={loading && preview ? preview : userProfileUrl}
-                  alt="Profile"
-                  className="object-cover w-full h-full rounded-full"
-                />
-              </div>
+          <div className={`flex ${isOpen ? "flex-col text-center space-y-2" : "flex-col items-center"}`}>
+           <div className="relative flex justify-center">
+               <div className="flex justify-center items-center mx-auto w-[60px] h-[60px] rounded-full overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 border border-gray-300">
+              <img
+                src={loading && preview ? preview : userProfileUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
             </div>
 
             {isOpen && (
-              <div className="w-full">
+              <div>
                 <h3 className="font-semibold text-lg mt-2">{username}</h3>
-                <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline mt-1">
+                <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
                   {t("View Profile")}
                 </button>
               </div>
@@ -140,144 +130,83 @@ const Sidebar = ({ children }) => {
           </div>
         </div>
 
-        {/* Navigation */}
+        {/* --- Navigation ---*/}
         <nav className="flex-1 p-4 overflow-y-auto">
           {isOpen && (
-            <div className="mb-6">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500 dark:text-gray-400">
+            <>
+              <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500">
                 {t("DASHBOARD")}
               </h4>
-
               <ul className="space-y-1">
                 {dashboardItems.map((item) => (
                   <li key={item.id}>
                     <NavLink
                       to={item.path}
                       end={item.path === "/"}
-                      onClick={closeMobileSidebar}
+                      onClick={() => screenMode === "mobile" && closeSidebar()}
                       className={({ isActive }) =>
-                        `
-                        w-full flex items-center rounded-lg p-3 transition-all duration-200
-                        ${
+                        `flex items-center p-3 rounded-lg transition ${
                           isActive
-                            ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:translate-x-1"
-                        }
-                        ${!isOpen ? "justify-center" : "justify-start"}
-                      `
+                            ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
+                            : "text-gray-600 hover:bg-gray-100"
+                        }`
                       }
                     >
-                      {({ isActive }) => (
-                        <>
-                          <span
-                            className={`${!isOpen ? "text-xl" : "text-lg"} ${
-                              isActive
-                                ? "text-indigo-600 dark:text-indigo-400"
-                                : "text-gray-500 dark:text-gray-400"
-                            }`}
-                          >
-                            {item.icon}
-                          </span>
-
-                          {isOpen && (
-                            <>
-                              <span className="ml-4 rtl:mr-3 font-medium">
-                                {t(item.name)}
-                              </span>
-                              {isActive && (
-                                <div className="ml-auto w-2 h-2 bg-indigo-600 rounded-full" />
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
+                      <span className="text-lg">{item.icon}</span>
+                      <span className="ml-4 font-medium">{t(item.name)}</span>
                     </NavLink>
                   </li>
                 ))}
               </ul>
-            </div>
+            </>
           )}
 
           {isOpen && (
-            <div>
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500 dark:text-gray-400">
+            <>
+              <h4 className="text-xs font-semibold uppercase tracking-wider mt-6 mb-3 px-3 text-gray-500">
                 {t("Preferences")}
               </h4>
-
               <ul className="space-y-1">
                 {preferencesItems.map((item) => (
                   <li key={item.id}>
                     <NavLink
                       to={item.path}
-                      onClick={closeMobileSidebar}
+                      onClick={() => screenMode === "mobile" && closeSidebar()}
                       className={({ isActive }) =>
-                        `
-                        w-full flex items-center rounded-lg p-3 transition-all duration-200
-                        ${
+                        `flex items-center p-3 rounded-lg transition ${
                           isActive
-                            ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:translate-x-1"
-                        }
-                        ${!isOpen ? "justify-center" : "justify-start"}
-                      `
+                            ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
+                            : "text-gray-600 hover:bg-gray-100"
+                        }`
                       }
                     >
-                      {({ isActive }) => (
-                        <>
-                          <span
-                            className={`${!isOpen ? "text-xl" : "text-lg"} ${
-                              isActive
-                                ? "text-indigo-600 dark:text-indigo-400"
-                                : "text-gray-500 dark:text-gray-400"
-                            }`}
-                          >
-                            {item.icon}
-                          </span>
-
-                          {isOpen && (
-                            <>
-                              <span className="ml-4 rtl:mr-3 font-medium">
-                                {t(item.name)}
-                              </span>
-                              {isActive && (
-                                <div className="ml-auto w-2 h-2 bg-indigo-600 rounded-full" />
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
+                      <span className="text-lg">{item.icon}</span>
+                      <span className="ml-4 font-medium">{t(item.name)}</span>
                     </NavLink>
                   </li>
                 ))}
               </ul>
-            </div>
+            </>
           )}
         </nav>
 
-       <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+        {/*--- Logout --- */}
+        <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
           <button
-          onClick={
-            ()=>{
+            onClick={() => {
               logout();
-              closeMobileSidebar();
+              closeSidebar();
             }}
-          className={`w-full flex items-center rounded-lg p-3 transition-all duration-200 text-red-600 dark:text-red-400 hover:bg-red-50 hover:translate-x-1 dark:hover:bg-red-900/20 ${!isOpen ? "justify-center": "justify-start"}`}>
-            <span className={`${!isOpen ? "text-xl": "text-lg"}`}>
-              <FaSignOutAlt/>
-            </span>
-            {
-              isOpen && (
-                <span className="ml-4 rtl:mr-3 font-medium">
-                  {t("logout")}
-                </span>
-              )
-            }
+            className="w-full flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50"
+          >
+            <FaSignOutAlt />
+            {isOpen && <span className="ml-4 font-medium">{t("logout")}</span>}
           </button>
-       </div>
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 bg-gray-100 dark:bg-gray-950 overflow-y-auto h-screen">
+      {/* --- Main Content --- */}
+      <main className="flex-1 overflow-y-auto h-screen">
         <div className="p-4 md:p-6">{children}</div>
       </main>
     </div>
