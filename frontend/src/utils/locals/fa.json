@@ -110,5 +110,7 @@
   "google": "گوگل",
   "apple": "اپل",
   "already_have_account": "قبلاً حساب دارید؟",
-  "log_in": "ورود"
+  "log_in": "ورود",
+  "Old Password": "رمز عبور قدیمی",
+  "New Password": "رمز عبور جدید"
 }
