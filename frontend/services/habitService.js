@@ -14,8 +14,9 @@ export const unCompleteHabit = (id, data) =>
 
 export const getHabitsChartData = async (startDate, endDate) => {
    const response = await api.get(`/habits/dashboard/chart-data?startDate=${startDate}&endDate=${endDate}`)
-   return response.data.data
+   return response.data;
 }
+
 export const getChartData = async () => {
    const response = await api.get(`/habits/dashboard/chart-data`)
    return response.data.data

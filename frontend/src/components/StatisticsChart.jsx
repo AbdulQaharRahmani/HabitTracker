@@ -11,8 +11,6 @@ import {
 import Dropdown from "./Dropdown";
 import useHabitStore from "../store/useHabitStore";
 
-
-
 export default function StatisticsChart() {
   const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData } = useHabitStore()
   const [activeFilter, setActiveFilter] = useState("days");
