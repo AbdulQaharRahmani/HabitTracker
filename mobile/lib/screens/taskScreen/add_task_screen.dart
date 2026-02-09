@@ -7,7 +7,8 @@ import '../../services/token_storage.dart';
 import '../categoryScreen/create_category.dart';
 
 class NewTaskPage extends StatefulWidget {
-  const NewTaskPage({super.key});
+  final String? defaultCategoryId;
+  const NewTaskPage({super.key, this.defaultCategoryId});
 
   @override
   State<NewTaskPage> createState() => _NewTaskPageState();
@@ -38,9 +39,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
   // ===== Due Date =====
   DateTime? _selectedDueDate;
 
+
   @override
   void initState() {
     super.initState();
+    _selectedCategoryId = widget.defaultCategoryId;
     _loadTokenAndCategories();
   }
 
@@ -57,7 +60,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       setState(() {
         _token = token;
         _categories = categories;
-        _selectedCategoryId = _categories.isNotEmpty ? _categories.first.id : null;
+        _selectedCategoryId = widget.defaultCategoryId ?? (_categories.isNotEmpty ? _categories.first.id : null);
         _isTokenLoading = false;
       });
     } catch (e) {

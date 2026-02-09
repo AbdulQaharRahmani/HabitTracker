@@ -311,7 +311,8 @@ class _TasksScreenState extends State<TasksScreen> {
                                   final newTask = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const NewTaskPage(),
+                                      builder: (_) => NewTaskPage(defaultCategoryId:selectedCategoryId,),
+
                                     ),
                                   );
                                   if (newTask != null) {
