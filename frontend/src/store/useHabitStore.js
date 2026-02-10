@@ -9,6 +9,7 @@ import {
   unCompleteHabit,
 } from "../../services/habitService";
 import { formatDate } from "../utils/dateFormatter";
+import { formatStatstics } from "../utils/formatStatistics";
 const useHabitStore = create((set, get) => ({
   searchTerm: "",
   isSearching: false,
