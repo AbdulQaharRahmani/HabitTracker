@@ -1,14 +1,15 @@
 import TodayList from "../components/TodayList";
-import CustomDatePicker from "./CustomDatePicker";
+import CustomDatePicker from "../components/CustomDatePicker";
 import CircularProgress from "./../components/habits/CircularProgress";
 import useHabitStore from "../store/useHabitStore";
 import { useTranslation } from "react-i18next";
 
 function Today() {
-  const {habitCompletions, habits} = useHabitStore()
+  const { habitCompletions, habits } = useHabitStore();
   const allHabits = habits.length;
   const { t } = useTranslation();
-  const completionPercentage = allHabits > 0 ? Math.round((habitCompletions/allHabits * 100)): 0
+  const completionPercentage =
+    allHabits > 0 ? Math.round((habitCompletions / allHabits) * 100) : 0;
   return (
     <div className="p-8 min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       {/* Header */}

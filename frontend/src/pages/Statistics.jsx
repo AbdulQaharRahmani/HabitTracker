@@ -8,6 +8,7 @@ import CompletionRateStatics from '../components/CompletionRateStatics';
 import i18n from '../utils/i18n';
 import { useTranslation } from "react-i18next";
 import StatisticsChart from '../components/StatisticsChart'
+import DailyConsistency from '../components/DailyConsistency';
 import {useStatisticsStore} from '../store/useStatisticsStore';
 
 function Statistics() {
@@ -68,7 +69,7 @@ function Statistics() {
       </div>
 
       <div className="my-4">
-        <div className="flex items-center lg:mr-9 sm:mr-0 lg:flex lg:gap-6 ml-7 md:gap-2 sm:gap-2 md:grid-rows-3 xxs:grid xxs:grid-rows-3 xxs:gap-4 xxs:ml-7">
+        <div className="flex items-center sm:mr-0 lg:flex lg:gap-6  md:gap-2 sm:gap-2 md:grid-rows-3 xxs:grid xxs:grid-rows-3 xxs:gap-4">
           <TotalHabitsStatics totalHabits={formatNumber(totalHabits)} />
           <CurrentStreakStatics currentStreak={formatNumber(currentStreak)} />
           <CompletionRateStatics completionRate={formatNumber(completionRate)} />
@@ -77,7 +78,7 @@ function Statistics() {
 
       {/* Charts */}
       <div className="space-y-2">
-        <DayilyConsistency />
+        <DailyConsistency/>
         <StatisticsChart />
       </div>
     </div>
