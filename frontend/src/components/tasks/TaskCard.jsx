@@ -3,109 +3,61 @@ import { MdDeleteOutline } from "react-icons/md";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../utils/formatDate";
-import i18n from "../../utils/i18n";
 
-export default function TaskCard({
-  title,
-  categoryId,
-  dueDate,
-  description,
-  status,
-  _id,
-}) {
+export default function TaskCard({ title, categoryId, dueDate, description, status, _id }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
-
   const { label, type } = formatDate(dueDate);
-
-  const dueStyles = {
-    today: "bg-orange-100/70 text-orange-500",
-    yesterday: "bg-red-100/70 text-red-500",
-    tomorrow: "bg-blue-100/70 text-blue-600",
-    none: "bg-gray-100/100 text-gray-500",
-  };
-
   const { t } = useTranslation();
 
+  const dueStyles = {
+    today: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+    yesterday: "bg-red-500/10 text-red-600 dark:text-red-400",
+    tomorrow: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    none: "bg-gray-100 dark:bg-gray-700/30 text-gray-500 dark:text-gray-400",
+  };
+
   return (
-    <div className="flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8">
-      <div
-        className={`flex items-center justify-between border-gray-300 mx-4 px-4 pr-8 text-center ${
-          i18n.language === "fa" ? "border-l pl-10" : "border-r "
-        }`}
-      >
-        <button onClick={() => completeTask(_id)}>
+    <div className={`group bg-white dark:bg-gray-800 rounded-lg p-2.5 transition-all duration-150 border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-xs ${status === "done" ? "opacity-80" : ""}`}>
+      <div className="flex items-start gap-2">
+        <button
+          onClick={() => completeTask(_id)}
+          className="mt-0.5 flex-shrink-0"
+          aria-label={status === "done" ? t("Mark as incomplete") : t("Mark as complete")}
+        >
           {status === "done" ? (
-            <FaCheckCircle size={20} className="text-green-400" />
+            <FaCheckCircle size={14} className="text-green-500" />
           ) : (
-            <FaRegCircle
-              size={20}
-              className="text-gray-300 hover:text-green-400 transiton ease-in duration-100"
-            />
+            <FaRegCircle size={14} className="text-gray-300 hover:text-green-500 transition-colors" />
           )}
         </button>
-      </div>
 
-      <div className="grid grid-cols-2 justify-between items-start flex-1 md:justify-start md:grid-cols-[2fr_1fr]">
-        <div className="my-1">
-          <div
-            className={`
-              py-3 px-4 text-lg font-bold transition
-              ${
-                status === "done"
-                  ? "text-gray-400 dark:text-gray-500 line-through"
-                  : "text-gray-800 dark:text-gray-100"
-              }
-            `}
-          >
-            {t(title)}
-            <div>
-              <p className="text-gray-400 text-sm font-normal mt-1">
-                {t(description)}
-              </p>
-            </div>
+        <div className="flex-grow min-w-0">
+          <div className="flex justify-between items-start gap-2">
+            <h4 className={`text-sm font-medium leading-snug ${status === "done" ? "line-through text-gray-400" : "text-gray-700 dark:text-gray-200"}`}>
+              {t(title)}
+            </h4>
+            <button
+              onClick={() => deleteTask(_id)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+              aria-label={t("Delete task")}
+            >
+              <MdDeleteOutline size={14} className="text-gray-400 hover:text-red-500 transition-colors" />
+            </button>
           </div>
 
-          <div className="flex flex-rows-2 items-center">
-            {/* Deadline */}
-            <div
-              className={`
-                block rounded-lg mb-2 mx-4 py-1 px-3
-                bg-indigo-100 dark:bg-indigo-900/40 ${dueStyles[type]}
-               `}
-            >
-              <p
-                className="
-                  flex gap-2 text-[0.8rem] font-semibold
+          {description && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
+              {t(description)}
+            </p>
+          )}
 
-                "
-              >
-                <FaCircle size={6} className="mt-2" />
-                <span>
-                  {t("Due")}: {t(label)}
-                </span>
-              </p>
-            </div>
-            <div
-              className={`py-2 text-[0.8rem] text-[${categoryId.backgroundColor}] dark:text-gray-500 ‍`}
-            >
-              {t(categoryId.name)}
+          <div className="mt-2 flex items-center justify-between">
+            <div className={`rounded-md py-0.5 px-1.5 text-[0.65rem] font-medium ${dueStyles[type]}`}>
+              {t(label)}
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Delete */}
-      <div className="p-4 flex items-center mx-4">
-        <button onClick={() => deleteTask(_id)}>
-          <MdDeleteOutline
-            size={24}
-            className="
-              text-gray-300 dark:text-gray-500
-              hover:text-red-400 transition
-            "
-          />
-        </button>
       </div>
     </div>
   );
