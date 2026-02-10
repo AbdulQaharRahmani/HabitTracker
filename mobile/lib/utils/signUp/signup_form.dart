@@ -18,6 +18,12 @@ class _SignupFormState extends State<SignupForm> {
   bool hidePassword = true;
 
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -36,6 +42,7 @@ class _SignupFormState extends State<SignupForm> {
                 icon: Icons.person_outline,
                 keyboardType: TextInputType.name,
                 obsecureText: false,
+                validator: controller.nameValidator,
               ),
 
               SizedBox(height: 10.h),
@@ -48,6 +55,7 @@ class _SignupFormState extends State<SignupForm> {
                 icon: Icons.email_outlined,
                 obsecureText: false,
                 keyboardType: TextInputType.emailAddress,
+                validator: controller.emailValidator,
               ),
 
               SizedBox(height: 10.h),
@@ -60,86 +68,116 @@ class _SignupFormState extends State<SignupForm> {
                 obsecureText: hidePassword,
                 icon: Icons.lock_outline,
                 keyboardType: TextInputType.visiblePassword,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    hidePassword ? Icons.visibility_off : Icons.visibility,
-                    size: 18.sp,
-                  ),
-                  onPressed: () {
-                    setState(() => hidePassword = !hidePassword);
-                  },
-                ),
+                validator: controller.passwordValidator,
               ),
 
               SizedBox(height: 14.h),
+
               /// agree terms
-               Row(
-                  children: [
-                    Checkbox(
-                      value: controller.isAgreeTerms,
-                      onChanged: (value) {
-                        setState(() {
-                          controller.isAgreeTerms = value!;
-                        });
+              Row(
+                children: [
+                  Checkbox(
+                    value: controller.isAgreeTerms,
+                    onChanged: (value) {
+                      setState(() {
+                        controller.isAgreeTerms = value!;
+                      });
+                    },
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+
+                        print('Terms and conditions tapped');
                       },
-                    ),
-                    Expanded(
                       child: RichText(
                         text: TextSpan(
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: AppTheme.textSecondary,
+                          ),
                           children: [
-                            const TextSpan(text: "I agree to the "),
+                            TextSpan(text: "I agree to the "),
                             TextSpan(
                               text: "Terms of Service",
-                              style: const TextStyle(color: AppTheme.primary),
+                              style: TextStyle(
+                                color: AppTheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            const TextSpan(text: " and "),
+                            TextSpan(text: " and "),
                             TextSpan(
                               text: "Privacy Policy",
-                              style: const TextStyle(color: AppTheme.primary),
+                              style: TextStyle(
+                                color: AppTheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+
               SizedBox(height: 14.h),
+
               /// Sign up button
-              LayoutBuilder(
-                builder: (context, constraints) {
+              ListenableBuilder(
+                listenable: controller,
+                builder: (context, _) {
                   return SizedBox(
-                    width: constraints.maxWidth,
+                    width: double.infinity,
                     height: 48.h,
                     child: ElevatedButton(
-                      onPressed: () async {
-
-                        final ok = await controller.signUp();
-                        if (!mounted) return;
-                        if (ok) {
-                          Navigator.pushNamed(context, AppRoutes.home);
-                        }
-                      },
+                      onPressed: controller.isLoading
+                          ? null
+                          : () async {
+                              final ok = await controller.signUp(context);
+                              if (ok && mounted) {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRoutes.home,
+                                );
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.r),
                         ),
                       ),
-                      child: const Text(
-                        'Create Account',
-                        style: TextStyle(color: AppTheme.textWhite),
-                      ),
+                      child: controller.isLoading
+                          ? SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              'Create Account',
+                              style: TextStyle(
+                                color: AppTheme.textWhite,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   );
                 },
               ),
 
               SizedBox(height: 22.h),
+
               /// Divider
               Row(
                 children: [
-                  Expanded(child: Divider(thickness: .6)),
+                  Expanded(
+                    child: Divider(thickness: 0.6, color: Colors.grey[300]),
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10.w),
                     child: Text(
@@ -150,9 +188,12 @@ class _SignupFormState extends State<SignupForm> {
                       ),
                     ),
                   ),
-                  Expanded(child: Divider(thickness: .6)),
+                  Expanded(
+                    child: Divider(thickness: 0.6, color: Colors.grey[300]),
+                  ),
                 ],
               ),
+
               SizedBox(height: 18.h),
             ],
           ),

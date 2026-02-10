@@ -133,7 +133,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
 // Method for getting token from cache
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+    return prefs.getString('jwt_token');
   }
 
   Future<void> _fetchCategories() async {

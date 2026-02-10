@@ -1,151 +1,141 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'habit.dart';
 
-class HabitCard extends StatefulWidget {
-  const HabitCard({super.key});
+class HabitCard extends StatelessWidget {
+  final Habit habit;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  @override
-  State<HabitCard> createState() => _HabitCardState();
-}
-
-class _HabitCardState extends State<HabitCard> {
-  final List<Habit> _habits = [
-    Habit(
-      title: 'Running',
-      description: 'Running to the mountains',
-      category: 'Health'.toUpperCase(),
-      color: Colors.blue,
-      icon: Icons.directions_run,
-      frequency: 'Daily',
-      timeInMinutes: 30,
-    ),
-    Habit(
-      title: 'Footsall',
-      description: 'Go to gym ',
-      category: 'Study'.toUpperCase(),
-      color: Colors.green,
-      icon: Icons.menu_book,
-      frequency: 'Weekly',
-      timeInMinutes: 60,
-
-    ),
-    Habit(
-      title: 'Club',
-      description: 'Go to club',
-      category: 'Study'.toUpperCase(),
-      color: Colors.deepOrange,
-      icon: Icons.menu_book,
-      frequency: 'monthly',
-      timeInMinutes: 60,
-
-    ),
-  ];
+  const HabitCard({
+    super.key,
+    required this.habit,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: _habits.length,
-      itemBuilder: (context, index) {
-        final habit = _habits[index];
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+    final Color color = habit.getColor();
+    final IconData icon = habit.getIcon();
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6.r,
+            offset: Offset(0, 2.h),
           ),
-          color:Color(0xFFFFFFFF),
-          elevation: 0,
-          margin: EdgeInsets.only(bottom: 15),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(8,4, 5, 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ===== ICON =====
+          Container(
+            width: 48.r,
+            height: 48.r,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 26.sp,
+            ),
+          ),
+
+          SizedBox(width: 16.w),
+
+          // ===== CONTENT =====
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ======  Icon section ======
-                Container(
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.only(bottom: 30),
-                  decoration: BoxDecoration(
-                    color: habit.color.withAlpha(51),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Icon(habit.icon, size: 30, color: habit.color),
-                ),
-                // const SizedBox(
-                //   width: 5,
-                // ),
-
-                // ====== Information section of habit  ======
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal:10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          habit.title,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        // SizedBox(height:3),
-                        Text(habit.description,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                          color: Colors.grey, fontSize: 13,
-
-                        ),),
-                        SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal:6, vertical: 4),
-                                decoration:BoxDecoration(
-                                      color: habit.color.withAlpha(51),
-                                  borderRadius: BorderRadius.circular(5)
-                                ),
-                                child: Text(
-                                  '${habit.category}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                    // backgroundColor: habit.color.withAlpha(51),
-                                    color: habit.color,
-                                  ),
-                                ),
-                              ),
-
-                            const SizedBox(width: 2),
-                            Text(
-                              '${habit.frequency} ',
-                              style: TextStyle(fontSize: 11.5,color: Colors.grey),
-                            ),
-                            Text(' ● ',style: TextStyle(
-                              color: Colors.green[200]
-                            ),),
-                            Text(
-                              '${habit.timeInMinutes} min',
-                              style: TextStyle(fontSize: 11.5,color: Colors.grey,),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                Text(
+                  habit.title,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF111827),
                   ),
                 ),
+                SizedBox(height: 4.h),
+                Text(
+                  habit.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: const Color(0xFF6B7280),
+                  ),
+                ),
+                SizedBox(height: 8.h),
 
-                // ======  Action buttons ======
-                Column(
+                Row(
                   children: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
-                    IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+                    // ===== CATEGORY TAG =====
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Text(
+                        habit.category.name.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+
+                    // ===== META TEXT =====
+                    Text(
+                      habit.formatFrequency(),
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: const Color(0xFF9CA3AF),
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-        );
-      },
+
+          // ===== ACTIONS =====
+          Column(
+            children: [
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.edit, size: 20.sp),
+                color: Colors.grey.shade400,
+                onPressed: onEdit,
+              ),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.delete, size: 20.sp),
+                color: Colors.red.shade400,
+                onPressed: onDelete,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

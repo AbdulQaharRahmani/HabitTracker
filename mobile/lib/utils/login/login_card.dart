@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/features/routes.dart';
 import '../../app/app_theme.dart';
-import '../login_utils/controller.dart';
+import '../../services/controller.dart';
 
 class LoginCard extends StatefulWidget {
   final LoginController controller;

@@ -3,64 +3,64 @@
 @tailwind utilities;
 
 :root {
-    font-family: 'Tinos', serif;
+  font-family: "Tinos", serif;
 
-    --color-primary: #6366F1;
-    --color-primary-hover: #EEF4FF;
+  --color-primary: #6366f1;
+  --color-primary-hover: #eef4ff;
 
-    /* Secondary colors */
-    --color-light-green: #66C78A;
-    --color-light-green-hover: #F6FEF9;
+  /* Secondary colors */
+  --color-light-green: #66c78a;
+  --color-light-green-hover: #f6fef9;
 
-    --color-dark-green: #0D9488;
-    --color-dark-green-hover: #EDFDF6;
+  --color-dark-green: #0d9488;
+  --color-dark-green-hover: #edfdf6;
 
-    --color-purple: #9333EA;
-    --color-purple-hover: #FBF4FF;
+  --color-purple: #9333ea;
+  --color-purple-hover: #fbf4ff;
 
-    --color-orange: #D97706;
-    --color-orange-hover: #FFF7EC;
+  --color-orange: #d97706;
+  --color-orange-hover: #fff7ec;
 
-    --color-red: #E53D62;
-    --color-red-hover: #FEF1F4;
+  --color-red: #e53d62;
+  --color-red-hover: #fef1f4;
 
-    /* Gray colors */
-    --color-gray-first: #9fa6b1;
-    --color-gray-second: #6B7280;
+  /* Gray colors */
+  --color-gray-first: #9fa6b1;
+  --color-gray-second: #6b7280;
 
-    --color-bg: #f3f4f6;
-    --color-text-black: #1F2937;
-    /* text-gray-800 */
-    --color-text-gray: #7e8189;
-    --color-text-light-gray: #E2E4E8;
-    background-color: #F9FAFB;
+  --color-bg: #f3f4f6;
+  --color-text-black: #1f2937;
+  /* text-gray-800 */
+  --color-text-gray: #7e8189;
+  --color-text-light-gray: #e2e4e8;
+  background-color: #f9fafb;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    display: block;
-    box-sizing: border-box;
-    min-width: 320px;
-    min-height: 100vh;
-    font-family: 'Tinos', serif;
-    background-color: #F9FAFB;
+  margin: 0;
+  padding: 0;
+  display: block;
+  box-sizing: border-box;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: "Tinos", serif;
+  background-color: #f9fafb;
 }
 
-.sidebar-bg{
-    background-color: #fff;
+.sidebar-bg {
+  background-color: #fff;
 }
 
-.text-black{
-    color: var(--color-text-black)
+.text-black {
+  color: var(--color-text-black);
 }
 
-.text-gray{
-    color: var(--color-text-gray);
+.text-gray {
+  color: var(--color-text-gray);
 }
 
-.bg-white{
-    background-color: #ffffff;
+.bg-white {
+  background-color: #ffffff;
 }
 
 .rtl {
@@ -71,4 +71,27 @@ body {
 .ltr {
   direction: ltr;
   text-align: left;
+}
+
+input:-webkit-autofill {
+  background-color: transparent !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+input:-webkit-autofill {
+  background-color: transparent !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
 }
