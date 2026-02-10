@@ -1,0 +1,28 @@
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
+
+const TIME_LIMIT = 15 * 60 * 1000;
+
+// Rate limiter for public routes
+export const publicLimiter = rateLimit({
+  windowMs: TIME_LIMIT,
+  max: 20,
+  keyGenerator: (req) => {
+    const ip = req.ip || ipKeyGenerator(req);
+    console.log('Limiter sees IP:', ip);
+    return ip;
+  },
+  message: 'Too many authentication attempts, try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for private routes
+export const privateLimiter = rateLimit({
+  windowMs: TIME_LIMIT,
+  max: 1500,
+  keyGenerator: (req) =>
+    req.user ? req.user._id.toString() : ipKeyGenerator(req),
+  message: 'Too many requests.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
