@@ -1,6 +1,5 @@
-import { AppError, notFound } from '../utils/error.js';
+import { AppError, notFound, unauthorized } from '../utils/error.js';
 import { UserModel } from '../models/User.js';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { ERROR_CODES } from '../utils/constant.js';
 import crypto from 'crypto';
@@ -8,6 +7,12 @@ import { verifyGoogleToken } from '../utils/googleOAuth.js';
 import mongoose from 'mongoose';
 import { CategoryModel } from '../models/Category.js';
 import { getDefaultCategories } from '../utils/defaultCategories.js';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  hashRefreshToken,
+} from '../utils/jwt.js';
+import { refreshTokenModel } from '../models/RefreshToken.js';
 
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -74,11 +79,33 @@ export const loginUser = async (req, res) => {
     );
   }
 
-  const token = jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
-  );
+  const token = generateAccessToken(user);
+  const refreshToken = generateRefreshToken();
+  const hashedToken = hashRefreshToken(refreshToken);
+
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
+
+  const existingToken = await refreshTokenModel.findOne({ userId: user._id });
+
+  if (existingToken) {
+    await existingToken.set({ token: hashedToken, expiresAt }).save()
+  } else {
+    await refreshTokenModel.create({
+      userId: user._id,
+      token: hashedToken,
+      expiresAt: expiresAt,
+    });
+  }
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  // send token in cookie
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   res.status(200).json({
     success: true,
@@ -145,12 +172,33 @@ export const googleLogin = async (req, res) => {
     await user.save();
   }
 
-  const token = jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
-  );
+  const token = generateAccessToken(user);
+  const refreshToken = generateRefreshToken();
+  const hashedToken = hashRefreshToken(refreshToken);
 
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
+
+  const existingToken = await refreshTokenModel.findOne({ userId: user._id });
+
+  if (existingToken) {
+    await existingToken.set({ token: hashedToken, expiresAt }).save()
+  } else {
+    await refreshTokenModel.create({
+      userId: user._id,
+      token: hashedToken,
+      expiresAt: expiresAt,
+    });
+  }
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  // send token in cookie
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
   res.status(200).json({
     success: true,
     message: 'Login Successfully',
@@ -160,4 +208,56 @@ export const googleLogin = async (req, res) => {
       email: user.email,
     },
   });
+};
+
+export const refreshAccessToken = async (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token) throw unauthorized();
+
+  const hashedToken = hashRefreshToken(token);
+  const storeToken = await refreshTokenModel.findOne({ token: hashedToken });
+
+  if (!storeToken) throw notFound('Token');
+
+  if (storeToken.expiresAt <= new Date())
+    throw new AppError('Refresh token expired', 403, ERROR_CODES.FORBIDDEN);
+
+  await refreshTokenModel.deleteOne({ token: hashedToken }); //delete previous hashed token
+
+  const user = await UserModel.findById({ _id: storeToken.userId })
+  if (!user) throw unauthorized()
+
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken();
+
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
+
+  await refreshTokenModel.create({
+    userId: storeToken.userId,
+    token: hashRefreshToken(refreshToken),
+    expiresAt: expiresAt,
+  });
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  // send token in cookie
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.status(200).json({ token: accessToken });
+};
+
+export const logOutUser = async (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token) throw notFound('Token');
+
+  const hashed = hashRefreshToken(token);
+  await refreshTokenModel.deleteOne({ token: hashed });
+
+  res.clearCookie('refreshToken');
+  res.status(200).json({ success: true, message: 'Logout successfully' });
 };

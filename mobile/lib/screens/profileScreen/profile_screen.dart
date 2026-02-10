@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:habit_tracker/services/token_storage.dart';
 import '../../app/app_theme.dart';
+import '../../features/routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -37,7 +39,10 @@ class ProfileScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppTheme.primary,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppTheme.background, width: 2.w),
+                      border: Border.all(
+                        color: AppTheme.background,
+                        width: 2.w,
+                      ),
                     ),
                     child: Icon(
                       Icons.camera_alt,
@@ -70,7 +75,10 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 4.h,
+                  ),
                   decoration: BoxDecoration(
                     color: AppTheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20.r),
@@ -106,10 +114,18 @@ class ProfileScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildStat('Total Habits', '12', Icons.list_alt),
-                  _buildStat('Current Streak', '7', Icons.local_fire_department,
-                      color: Colors.orange),
-                  _buildStat('Completed', '95%', Icons.check_circle,
-                      color: Colors.green),
+                  _buildStat(
+                    'Current Streak',
+                    '7',
+                    Icons.local_fire_department,
+                    color: Colors.orange,
+                  ),
+                  _buildStat(
+                    'Completed',
+                    '95%',
+                    Icons.check_circle,
+                    color: Colors.green,
+                  ),
                 ],
               ),
             ),
@@ -137,11 +153,11 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Weekly Progress',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
+                        style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
-                            fontWeight: FontWeight.bold, fontSize: 16.sp),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                            ),
                       ),
                       Text(
                         '86%',
@@ -198,11 +214,11 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Achievements',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
+                        style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
-                            fontWeight: FontWeight.bold, fontSize: 16.sp),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                            ),
                       ),
                       Text(
                         '3/8',
@@ -261,12 +277,18 @@ class ProfileScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () {},
+                  onPressed: () async {
+                    await AuthManager.logout();
+
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamedAndRemoveUntil(
+                      AppRoutes.login,
+                          (route) => false,
+                    );
+                  },
+
                 icon: Icon(Icons.logout, size: 20.sp),
-                label: Text(
-                  'Logout',
-                  style: TextStyle(fontSize: 16.sp),
-                ),
+                label: Text('Logout', style: TextStyle(fontSize: 16.sp)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.red,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
@@ -277,6 +299,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             SizedBox(height: 24.h),
           ],
         ),
@@ -284,8 +307,12 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStat(String label, String value, IconData icon,
-      {Color color = AppTheme.primary}) {
+  Widget _buildStat(
+    String label,
+    String value,
+    IconData icon, {
+    Color color = AppTheme.primary,
+  }) {
     return Column(
       children: [
         Container(
@@ -294,11 +321,7 @@ class ProfileScreen extends StatelessWidget {
             color: color.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            icon,
-            size: 24.r,
-            color: color,
-          ),
+          child: Icon(icon, size: 24.r, color: color),
         ),
         SizedBox(height: 8.h),
         Text(
@@ -312,10 +335,7 @@ class ProfileScreen extends StatelessWidget {
         SizedBox(height: 4.h),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: AppTheme.textMuted,
-          ),
+          style: TextStyle(fontSize: 12.sp, color: AppTheme.textMuted),
         ),
       ],
     );
@@ -332,11 +352,7 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 30.r,
-            color: unlocked ? color : Colors.grey[400],
-          ),
+          Icon(icon, size: 30.r, color: unlocked ? color : Colors.grey[400]),
           SizedBox(height: 8.h),
           Text(
             title,
@@ -349,11 +365,7 @@ class ProfileScreen extends StatelessWidget {
             maxLines: 2,
           ),
           if (!unlocked)
-            Icon(
-              Icons.lock_outline,
-              size: 12.r,
-              color: Colors.grey,
-            ),
+            Icon(Icons.lock_outline, size: 12.r, color: Colors.grey),
         ],
       ),
     );

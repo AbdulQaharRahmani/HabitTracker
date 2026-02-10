@@ -8,8 +8,6 @@ const UserSchema = new mongoose.Schema({
   },
   googleId: {
     type: String,
-    unique: true,
-    sparse: true, // googleId unique if present, otherwise multiple users can have no googleId
     default: null,
   },
   username: {
@@ -29,6 +27,20 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  lastTimeSync: {
+    type: Date,
+    default: null,
+  },
 });
+
+UserSchema.index(
+  { googleId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      googleId: { $ne: null },
+    },
+  }
+);
 
 export const UserModel = mongoose.model('User', UserSchema);

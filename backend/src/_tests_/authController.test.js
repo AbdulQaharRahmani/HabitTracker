@@ -74,7 +74,7 @@ describe('Auth Controller - unit tests', () => {
     await registerUser(req, res);
 
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenLastCalledWith({
+    expect(res.json).toHaveBeenCalledWith({
       success: true,
       message: 'User registered successfully',
     });
@@ -149,6 +149,210 @@ describe('Auth Controller - unit tests', () => {
         id: 'id123',
         email: req.body.email,
       },
+    });
+  });
+
+  describe('Auth Controller - Security Tests', () => {
+    it('6. Password is not returned in the response', async () => {
+      const req = {
+        body: {
+          email: 'test@example.com',
+          password: 'password123',
+        },
+      };
+      const res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      UserModel.exists.mockResolvedValue(false);
+      bcrypt.hash.mockResolvedValue('hashed_password');
+      UserModel.create.mockResolvedValue({
+        _id: 'user123',
+        email: 'test@example.com',
+        password: 'hashed_password',
+      });
+
+      await registerUser(req, res);
+
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: 'User registered successfully',
+      });
+
+      const responseCall = res.json.mock.calls[0][0];
+      expect(responseCall).not.toHaveProperty('password');
+      expect(responseCall).not.toHaveProperty('user');
+    });
+
+    it('7. Bcrypt.hash is called with the correct password', async () => {
+      const req = {
+        body: {
+          email: 'test@example.com',
+          password: 'CorrectPasswrod123',
+        },
+      };
+      const res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      UserModel.exists.mockResolvedValue(false);
+      bcrypt.hash.mockResolvedValue('hashed_password');
+      UserModel.create.mockResolvedValue({
+        _id: 'user123',
+        email: 'test@example.com',
+      });
+
+      await registerUser(req, res);
+
+      expect(bcrypt.hash).toHaveBeenCalledWith('CorrectPasswrod123', 12);
+    });
+
+    it('8. bcrypt.hash throws an error -> AppError is thrown', async () => {
+      const req = {
+        body: {
+          email: 'test@example.com',
+          password: 'password123',
+        },
+      };
+      const res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      UserModel.exists.mockResolvedValue(false);
+      bcrypt.hash.mockRejectedValue(new Error('Hashing failed'));
+
+      await expect(registerUser(req, res)).rejects.toThrow();
+      expect(UserModel.create).not.toHaveBeenCalled();
+    });
+
+    it('9. UserModel.create throws a database error -> AppError is thrown', async () => {
+      const req = {
+        body: {
+          email: 'test@example.com',
+          password: 'password123',
+        },
+      };
+      const res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      UserModel.exists.mockResolvedValue(false);
+      bcrypt.hash.mockResolvedValue('hashed_password');
+      UserModel.create.mockRejectedValue(
+        new Error('Database connection failed')
+      );
+
+      await expect(registerUser(req, res)).rejects.toThrow();
+    });
+  });
+
+  describe('Login Security Tests', () => {
+    it('10. bcrypt.compare is called with correct arguments', async () => {
+      const req = {
+        body: {
+          email: 'test@example.com',
+          password: 'plainPassword',
+        },
+      };
+      const res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      const mockUser = {
+        _id: 'user123',
+        email: 'test@example.com',
+        password: 'hashed_password_from_db',
+      };
+
+      UserModel.findOne.mockResolvedValue(mockUser);
+      bcrypt.compare.mockResolvedValue(true);
+      jwt.sign.mockReturnValue('jwt_token');
+
+      await loginUser(req, res);
+
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        'plainPassword',
+        'hashed_password_from_db'
+      );
+    });
+
+    it('11. jwt.sign is called with correct payload and secret', async () => {
+      const req = {
+        body: {
+          email: 'test@example.com',
+          password: 'password123',
+        },
+      };
+      const res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      const mockUser = {
+        _id: 'user123',
+        email: 'test@example.com',
+        password: 'hashed_password',
+      };
+
+      UserModel.findOne.mockResolvedValue(mockUser);
+      bcrypt.compare.mockResolvedValue(true);
+      jwt.sign.mockReturnValue('jwt_token');
+      process.env.JWT_SECRET = 'test_secret_key';
+      process.env.JWT_EXPIRES_IN = '1h';
+
+      await loginUser(req, res);
+
+      expect(jwt.sign).toHaveBeenCalledWith(
+        {
+          id: 'user123',
+          email: 'test@example.com',
+        },
+        'test_secret_key',
+        { expiresIn: '1h' }
+      );
+    });
+
+    it('12. bcrypt.compare throws an error -> AppError is thrown', async () => {
+      const req = {
+        body: {
+          email: 'test@example.com',
+          password: 'password123',
+        },
+      };
+      const res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      const mockUser = {
+        _id: 'user123',
+        email: 'test@example.com',
+        password: 'hashed_password',
+      };
+
+      UserModel.findOne.mockResolvedValue(mockUser);
+      bcrypt.compare.mockRejectedValue(new Error('Comparison failed'));
+
+      await expect(loginUser(req, res)).rejects.toThrow();
+
+      expect(jwt.sign).not.toHaveBeenCalled();
+    });
+
+    it('Should handle extremely long email addresses', async () => {
+      const longEmail = 'a'.repeat(100) + '@test.com';
+      const req = { body: { email: longEmail, password: 'password123' } };
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() };
+
+      UserModel.exists.mockResolvedValue(false);
+      bcrypt.hash.mockResolvedValue('hashed');
+      UserModel.create.mockResolvedValue({ _id: 'user123', email: longEmail });
+
+      await expect(registerUser(req, res)).resolves.not.toThrow();
     });
   });
 });

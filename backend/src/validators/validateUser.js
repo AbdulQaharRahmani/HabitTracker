@@ -46,6 +46,17 @@ export const changePasswordValidator = [
     .trim(),
 ];
 
+export const updateUsernameValidator = [
+  body('username')
+    .notEmpty()
+    .withMessage('Username is required')
+    .isString()
+    .withMessage('Username must be a string')
+    .isLength({ max: 25 })
+    .withMessage('The username length should be less than 25 letter')
+    .trim(),
+];
+
 export const updateUserPreferenceValidator = [
   body('weekStartDay')
     .optional()

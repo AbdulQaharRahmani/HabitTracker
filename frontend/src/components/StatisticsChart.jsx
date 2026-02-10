@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -9,52 +9,38 @@ import {
   CartesianGrid,
 } from "recharts";
 import Dropdown from "./Dropdown";
-
-const months = [
-  { name: "Jan", completed: 70 },
-  { name: "Feb", completed: 20 },
-  { name: "Mar", completed: 30 },
-  { name: "Apr", completed: 40 },
-  { name: "May", completed: 40 },
-  { name: "Jun", completed: 10 },
-  { name: "Jul", completed: 20 },
-  { name: "Aug", completed: 22 },
-  { name: "Sep", completed: 50 },
-  { name: "Oct", completed: 12 },
-  { name: "Nov", completed: 15 },
-  { name: "Dec", completed: 20 },
-];
-
-const days = [
-  { name: "Sat", completed: 2 },
-  { name: "Sun", completed: 5 },
-  { name: "Mon", completed: 2 },
-  { name: "Tue", completed: 1 },
-  { name: "Wed", completed: 3 },
-  { name: "Thu", completed: 4 },
-  { name: "Fri", completed: 2 },
-];
-
-const years = [
-  { name: "2024", completed: 1500 },
-  { name: "2023", completed: 1000 },
-  { name: "2025", completed: 900 },
-  { name: "2026", completed: 20 },
-];
-
-const filterTerms = [
-  { id: "1", name: "Days", value: "days" },
-  { id: "2", name: "Months", value: "months" },
-  { id: "3", name: "Years", value: "years" },
-];
-
-const dataMap = { days, months, years };
+import useHabitStore from "../store/useHabitStore";
 
 export default function StatisticsChart() {
-  const [chartData, setChartData] = useState(months);
-  const [activeFilter, setActiveFilter] = useState("months");
+  const { getDailyStatistics, dailyStatistics, monthlyStatistics, yearlyStatistics, getMonthlyStatistics, getYearlyStatistics, getChartData } = useHabitStore()
+  const [activeFilter, setActiveFilter] = useState("days");
   const [title, setTitle] = useState("Activity by Month");
-
+  const filterTerms = [
+    { id: "1", name: "Days", value: "days" },
+    { id: "2", name: "Months", value: "months" },
+    { id: "3", name: "Years", value: "years" },
+  ];
+useEffect(() => {
+  const initializeData = async () => {
+    await getChartData();
+    getDailyStatistics();
+  };
+  initializeData();
+}, []);
+  useEffect(() => {
+    if (activeFilter === "days") {
+      getDailyStatistics()
+    } else if (activeFilter === "months") {
+      getMonthlyStatistics()
+    } else {
+      getYearlyStatistics()
+    }
+  }, [activeFilter])
+  const dataToDisplay = {
+    days: dailyStatistics,
+    months: monthlyStatistics,
+    years: yearlyStatistics
+  }[activeFilter] || [];
   return (
     <>
       {/* Header */}
@@ -69,7 +55,6 @@ export default function StatisticsChart() {
             value={activeFilter}
             getValue={(selected) => {
               setActiveFilter(selected);
-              setChartData(dataMap[selected]);
               setTitle(`Activity by ${selected}`);
             }}
           />
@@ -89,7 +74,7 @@ export default function StatisticsChart() {
           "
         >
           <AreaChart
-            data={chartData}
+            data={dataToDisplay}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
             <CartesianGrid

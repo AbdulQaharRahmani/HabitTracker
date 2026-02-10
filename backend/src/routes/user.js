@@ -3,12 +3,14 @@ import { upload } from '../middleware/upload.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   changePassword,
+  updateUsername,
   getUserPreference,
   updateUserPreference,
 } from '../controllers/userController.js';
 import { validate } from '../middleware/validate.js';
 import {
   changePasswordValidator,
+  updateUsernameValidator,
   updateUserPreferenceValidator,
 } from '../validators/validateUser.js';
 import {
@@ -32,6 +34,12 @@ router.patch(
   asyncHandler(changePassword)
 );
 
+router.patch(
+  '/username',
+  updateUsernameValidator,
+  validate,
+  asyncHandler(updateUsername)
+);
 router
   .route('/preference')
   .get(asyncHandler(getUserPreference))
