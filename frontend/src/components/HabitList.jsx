@@ -41,7 +41,7 @@ export default function HabitList({ viewMode }) {
           className={
             viewMode === "grid"
               ? "grid grid-cols-1 lg:grid-cols-3 lg:ml-6 sm:grid-cols-2 md:grid-cols-1 md:ml-[2.25rem] gap-6 justify-items-start"
-              : "my-6 space-y-4 ml-[1.35rem]"
+              : "my-6 space-y-4 ml-[0rem]"
           }
         >
           {allhabits.length === 0 ? (

@@ -21,72 +21,72 @@ export default function HabitCard({
   const deleteHabit = useHabitStore((state) => state.deleteHabit);
   const { t } = useTranslation();
 
-return (
-  <div
-    className={`
-      mx-auto p-4 rounded-xl bg-white shadow-sm
-      flex flex-col sm:flex-row gap-4
-      min-h-[125px] w-full
-      ${viewMode === "grid" ? "sm:max-w-xs" : ""}
-    `}
-  >
-    {/* Icon */}
-    <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
+  return (
+    <div
+      className={`
+        mx-auto p-4 rounded-xl bg-white shadow-sm
+        flex relative items-start gap-4 min-h-[125px]
+        flex-wrap sm:flex-nowrap
+        ${viewMode === "grid" ? "w-full max-w-xs" : "w-full"}
+      `}
+    >
+      <HabitCardIcon Icon={Icon} color={color} bgColor={bgColor} />
 
-    {/* Content + Actions */}
-    <div className="flex flex-col sm:flex-row justify-between w-full min-w-0 gap-4">
+      <div className="flex justify-between w-full min-w-0">
+        {/* Text Content */}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-xl font-semibold text-gray-500 truncate">
+            {title || "No Title"}
+          </h3>
 
-      {/* Text Content */}
-      <div className="flex-1 min-w-0">
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-500 truncate">
-          {title || "No Title"}
-        </h3>
+          <p className="text-sm text-gray-400 break-words">
+            {description || "No Description"}
+          </p>
 
-        <p className="text-sm text-gray-400 break-words">
-          {description || "No Description"}
-        </p>
+          <div className="flex flex-wrap items-center gap-4 mt-2">
+            <span
+              className="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md"
+              style={{ backgroundColor: bgColor, color }}
+            >
+              {categoryId?.name || "No Category"}
+            </span>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2">
-          <span
-            className="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md"
-            style={{ backgroundColor: bgColor, color }}
-          >
-            {categoryId?.name || "No Category"}
-          </span>
+            <span className="flex items-center text-[12px] text-gray-400">
+              {frequency || "No frequency"}
+              <FaCircle className="mx-2 text-[5px]" />
+              {duration || "No Duration"}
+            </span>
+          </div>
+        </div>
 
-          <span className="flex items-center text-[12px] text-gray-400">
-            {frequency || "No frequency"}
-            <FaCircle className="mx-2 text-[5px]" />
-            {duration || "No Duration"}
-          </span>
+           <div className="p-4 flex items-center mx-4">
+
+       </div>
+        <div className="flex sm:flex-col items-center gap-3 shrink-0 self-end sm:self-start">
+          <LuPencil
+            size={20}
+            className="text-[#6366F1] cursor-pointer"
+            onClick={() =>
+              openEditHabitModal({
+                _id,
+                title,
+                description,
+                categoryId: categoryId?._id,
+                frequency,
+              })
+            }
+          />
+          <button onClick={() => deleteHabit(_id,t)}>
+            <MdDeleteOutline
+              size={20}
+              className="
+                text-[#6366F1] dark:text-gray-500
+                hover:text-red-400 transition
+              "
+            />
+          </button>
         </div>
       </div>
-
-      {/* Actions */}
-      <div className="flex sm:flex-col items-center gap-3 shrink-0 self-end sm:self-start">
-        <LuPencil
-          size={20}
-          className="text-[#6366F1] cursor-pointer"
-          onClick={() =>
-            openEditHabitModal({
-              _id,
-              title,
-              description,
-              categoryId: categoryId?._id,
-              frequency,
-            })
-          }
-        />
-
-        <button onClick={() => deleteHabit(_id, t)}>
-          <MdDeleteOutline
-            size={20}
-            className="text-[#6366F1] hover:text-red-400 transition"
-          />
-        </button>
-      </div>
     </div>
-  </div>
-);
-
+  );
 }
