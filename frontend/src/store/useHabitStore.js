@@ -13,6 +13,7 @@ const useHabitStore = create((set, get) => ({
   searchTerm: "",
   isSearching: false,
   habits: [],
+  totalCount: 0,
   loading: false,
   consistencyData: null,
   error: null,
@@ -58,6 +59,30 @@ const useHabitStore = create((set, get) => ({
     } catch (err) {
       set({
         error: err.response?.data?.message || "Failed to search habits",
+        loading: false,
+      });
+    }
+  },
+  fetchHabitsPage: async (page = 1, limit = 10) => {
+    set({ loading: true, error: null });
+    try {
+      const { searchTerm, selectedDate } = get();
+      const params = { page, limit };
+
+      if (searchTerm) params.searchTerm = searchTerm;
+      if (selectedDate) params.date = selectedDate.toISOString().split("T")[0];
+
+      const response = await api.get("/habits", { params });
+      const data = response.data;
+
+      set({
+        habits: data.data || [],
+        totalCount: (data.totalPages || 1) * limit,
+        loading: false,
+      });
+    } catch (err) {
+      set({
+        error: err.response?.data?.message || "Failed to fetch habits",
         loading: false,
       });
     }
