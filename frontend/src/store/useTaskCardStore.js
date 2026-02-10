@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { deleteTask, getTasks, updateTaskStatus } from "../../services/tasksService";
 import api from "../../services/api";
+import toast from "react-hot-toast";
+import { useTransition } from "react";
 
 export const useTaskCardStore = create((set, get) => ({
   tasks: [],
@@ -79,7 +81,7 @@ export const useTaskCardStore = create((set, get) => ({
     }
   },
 
-  deleteTask: async (id) => {
+  deleteTask: async (id, t) => {
     try {
       const task = get().tasks.find((t) => t._id === id);
       if (!task) console.log("Sorry! task is not found");
@@ -89,11 +91,15 @@ export const useTaskCardStore = create((set, get) => ({
       set((state) => ({
         tasks: state.tasks.filter((task) => task._id !== id),
       }));
+
+      toast.success(t("Task deleted successfully!"))
+      
     } catch (error) {
       console.error(
         "Sorry! task deletion failed:",
         error.response?.data || error.message,
       );
+      toast.error(t("Failed to delete task"))
       set({ error: "Failed to delete task" });
     }
   },

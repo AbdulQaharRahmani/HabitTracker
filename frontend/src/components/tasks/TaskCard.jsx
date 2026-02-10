@@ -97,7 +97,7 @@ export default function TaskCard({
 
       {/* Delete */}
       <div className="p-4 flex items-center mx-4">
-        <button onClick={() => deleteTask(_id)}>
+        <button onClick={() => deleteTask(_id, t)}>
           <MdDeleteOutline
             size={24}
             className="
