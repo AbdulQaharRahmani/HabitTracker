@@ -136,5 +136,13 @@
 
   "NO_HABITS_YET": "هنوز هیچ عادتی اضافه نشده",
   "NO_ACTIVE_STREAK_YET": "هنوز هیچ استریکی فعال نیست",
-  "NO_HABITS_COMPLETED_YET": "هنوز هیچ عادتی تکمیل نشده"
+  "NO_HABITS_COMPLETED_YET": "هنوز هیچ عادتی تکمیل نشده",
+  "monthly Activity": "فعالیت ماهانه",
+  "weekly Activity": "فعالیت هفته وار",
+  "yearly Activity": " فعالیت سالانه",
+  "Weekly": "هفته وار",
+  "Monthly": "ماهانه",
+  "Yearly": "سالانه",
+    "loading_chart": "در حال بارگذاری اطلاعات نمودار..."
+
 }
