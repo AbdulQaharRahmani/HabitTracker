@@ -232,10 +232,10 @@ class _TasksScreenState extends State<TasksScreen> {
 
     _sortByDueDate(todoTasks);
     _sortByDueDate(completedTasks);
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppTheme.background,
-        body: RefreshIndicator(
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: RefreshIndicator(
           onRefresh: _refreshTasks,
           child: CustomScrollView(
             controller: _scrollController,

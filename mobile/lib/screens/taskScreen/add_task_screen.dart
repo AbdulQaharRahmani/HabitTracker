@@ -224,7 +224,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   _selectedDueDate != null
-                      ? '${_selectedDueDate!.year}-${_selectedDueDate!.month}-${_selectedDueDate!.day} '
+                      ? '${_selectedDueDate!.year}-${_selectedDueDate!.month.toString().padLeft(2,'0')}-${_selectedDueDate!.day.toString().padLeft(2,'0')} '
                       '${_selectedDueDate!.hour.toString().padLeft(2,'0')}:${_selectedDueDate!.minute.toString().padLeft(2,'0')}'
                       : 'Select due date & time',
                   style: const TextStyle(color: Colors.black87),

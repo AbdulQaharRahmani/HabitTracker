@@ -62,7 +62,7 @@ class TaskApiService {
   }
 
   /// ===============================
-  /// Add new task (safe & fast)
+  /// Add new task
   /// ===============================
   Future<Map<String, dynamic>> addTask({
     required String title,
@@ -85,8 +85,11 @@ class TaskApiService {
       'priority': priority,
       'categoryId': categoryId,
       if (dueDate != null) 'dueDate': formatDueDate(dueDate),
+
     };
+
     debugPrint('📤 Create Task Payload: ${jsonEncode(payload)}');
+
 
 
     final response = await http
@@ -101,7 +104,7 @@ class TaskApiService {
         .timeout(_timeoutDuration);
 
     final body = jsonDecode(response.body);
-
+    debugPrint('📤 body of response from backend : ${body}');
     if (response.statusCode == 200 || response.statusCode == 201) {
       return {
         'success': true,
@@ -112,7 +115,10 @@ class TaskApiService {
     return {
       'success': false,
       'error': body['message'] ?? 'Failed to create task',
+
+
     };
+
   }
 
   /// ===============================
@@ -190,7 +196,7 @@ class TaskApiService {
 
 
   /// ===============================
-  /// Delete task (safe)
+  /// Delete task
   /// ===============================
   Future<void> deleteTask(String taskId, String token) async {
     final response = await http
