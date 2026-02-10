@@ -13,7 +13,7 @@ export default function Logs() {
     const levels = useMemo(() => [
         { id: 1, name: t("All levels"), value: "all levels" },
         { id: 2, name: t("Error"), value: "error" },
-        { id: 3, name: t("Warn"), value: "warning" },
+        { id: 3, name: t("Warn"), value: "warn" },
         { id: 4, name: t("Info"), value: "info" }
     ], [t]);
 
@@ -32,7 +32,7 @@ export default function Logs() {
 
     const [selectedLevel, setSelectedLevel] = useState("all levels");
     const [selectedMethod, setSelectedMethod] = useState("all methods");
-    const [selectedDate, setSelectedDate] = useState("oldest");
+    const [selectedDate, setSelectedDate] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredData, setFilteredData] = useState([])
    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")

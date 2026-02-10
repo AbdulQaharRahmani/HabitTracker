@@ -60,8 +60,8 @@ export default function LogTable({ filteredList }) {
               <td className="px-5 py-3.5">
                 <span className={`inline-flex px-2 py-0.5 rounded text-[12px] font-bold tracking-wide capitalize
                  ${
-                    log.level === 'Error' ? 'bg-red-50 text-red-600' :
-                    log.level === 'Warn' ? 'bg-amber-50 text-amber-600' :
+                    log.level === 'error' ? 'bg-red-50 text-red-600' :
+                    log.level === 'warn' ? 'bg-amber-50 text-amber-600' :
                     'bg-blue-50 text-blue-600'
                   }`}>
                   {log.level}
