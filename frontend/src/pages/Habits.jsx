@@ -1,17 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Header from "../components/Header.jsx";
 import Search from "../components/Search.jsx";
 import AddHabit from "../components/AddHabit.jsx";
 import View from "../components/View.jsx";
 import HabitList from "../components/HabitList.jsx";
 import { useTranslation } from "react-i18next";
+import useHabitStore from "../store/useHabitStore.js";
 
 export default function Habits() {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("list");
   // NEW: Add page state
   const [currentPage, setCurrentPage] = useState(1);
+
+  const {
+    habits,
+    loading,
+    searchTerm,
+    setSearchTerm,
+    searchHabits,
+    fetchHabitsByDate,
+    selectedDate,
+  } = useHabitStore();
+
+  const debounceRef = useRef(null);
+
+  useEffect(() => {
+    fetchHabitsByDate(selectedDate);
+  }, [selectedDate]);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      searchHabits();
+    }, 400);
+  };
+  useEffect(() => {
+    return () => clearTimeout(debounceRef.current);
+  }, []);
 
   return (
     <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors">
@@ -33,10 +62,7 @@ export default function Habits() {
           <div className="w-full lg:w-1/2 xl:w-2/5">
             <Search
               searchTerm={searchTerm}
-              setSearchTerm={(val) => {
-                setSearchTerm(val);
-                setCurrentPage(1);
-              }}
+              handleSearchChange={handleSearchChange}
             />
           </div>
 
@@ -53,7 +79,6 @@ export default function Habits() {
       <div className="pb-4 sm:pb-10">
         <HabitList
           viewMode={viewMode}
-          searchTerm={searchTerm}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
         />

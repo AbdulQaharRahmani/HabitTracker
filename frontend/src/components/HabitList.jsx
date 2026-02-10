@@ -1,45 +1,16 @@
-import { useEffect, useMemo } from "react";
 import HabitCard from "./HabitCard";
 import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
 
-export default function HabitList({
-  viewMode,
-  searchTerm,
-  currentPage,
-  setCurrentPage,
-}) {
-  const { allhabits, loading, error, fetchHabits } = useHabitStore();
+export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
+  const { habits, loading, error } = useHabitStore();
   const ITEMS_PER_PAGE = 10;
 
-  // Fetch all habits once
-  useEffect(() => {
-    fetchHabits();
-  }, [fetchHabits]);
-
-  // Filter habits based on search term
-  const filteredHabits = useMemo(() => {
-    const term = searchTerm.toLowerCase();
-    if (!term) return allhabits;
-
-    return allhabits
-      .filter(
-        (habit) =>
-          habit.title?.toLowerCase().includes(term) ||
-          habit.description?.toLowerCase().includes(term),
-      )
-      .sort((a, b) => {
-        const aMatch = a.title?.toLowerCase().includes(term);
-        const bMatch = b.title?.toLowerCase().includes(term);
-        return aMatch === bMatch ? 0 : aMatch ? -1 : 1;
-      });
-  }, [allhabits, searchTerm]);
-
-  // Slice for current page logic
+  // Frontend pagination only (backend already filtered)
   const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  const visibleHabits = filteredHabits.slice(start, start + ITEMS_PER_PAGE);
+  const visibleHabits = habits.slice(start, start + ITEMS_PER_PAGE);
 
-  if (loading && allhabits.length === 0) {
+  if (loading && habits.length === 0) {
     return (
       <p className="text-gray-400 dark:text-gray-500 text-lg font-semibold my-4 text-center">
         Loading Habits ...
@@ -66,7 +37,7 @@ export default function HabitList({
       >
         {visibleHabits.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400 text-lg">
-            No habits found matching "{searchTerm}".
+            No habits found.
           </p>
         ) : (
           visibleHabits.map((habit) => (
@@ -84,11 +55,10 @@ export default function HabitList({
         )}
       </div>
 
-      {/* Pagination component is correctly placed here */}
       <div className="mt-8">
         <Pagination
           currentPage={currentPage}
-          totalCount={filteredHabits.length}
+          totalCount={habits.length}
           pageSize={ITEMS_PER_PAGE}
           onPageChange={setCurrentPage}
         />
