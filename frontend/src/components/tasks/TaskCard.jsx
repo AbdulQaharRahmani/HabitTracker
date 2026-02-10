@@ -34,7 +34,7 @@ export default function TaskCard({ title, categoryId, dueDate, description, stat
 
         <div className="flex-grow min-w-0">
           <div className="flex justify-between items-start gap-2">
-            <h4 className={`text-sm font-medium leading-snug ${status === "done" ? "line-through text-gray-400" : "text-gray-700 dark:text-gray-200"}`}>
+            <h4 className={`text-sm font-bold leading-snug ${status === "done" ? "line-through text-gray-400" : "text-gray-700 dark:text-gray-200"}`}>
               {t(title)}
             </h4>
             <button
@@ -53,7 +53,7 @@ export default function TaskCard({ title, categoryId, dueDate, description, stat
           )}
 
           <div className="mt-2 flex items-center justify-between">
-            <div className={`rounded-md py-0.5 px-1.5 text-[0.65rem] font-medium ${dueStyles[type]}`}>
+            <div className={`rounded-md py-0.5 px-1.5 text-[0.65rem] font-med ${dueStyles[type]}`}>
               {t(label)}
             </div>
           </div>
