@@ -4,101 +4,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/app_theme.dart';
-import '../../features/add_habit_model.dart';
 import '../../utils/category/category_model.dart';
+import '../../utils/habits/habit.dart';
 
-class AddHabitDialog {
-  static Future<void> show(
-      BuildContext context, {
-        required void Function(HabitData data) onSubmit,
-        bool barrierDismissible = true,
-      }) async {
-    final maxWidth = MediaQuery.of(context).size.width * 0.92;
-    final dialogWidth = maxWidth > 420 ? 420.0 : maxWidth;
+class EditHabitPage extends StatefulWidget {
+  final Habit habit;
 
-    await showDialog(
-      context: context,
-      barrierDismissible: barrierDismissible,
-      builder: (_) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        backgroundColor: Colors.transparent,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: dialogWidth,
-              maxHeight: MediaQuery.of(context).size.height * 0.86,
-            ),
-            child: Material(
-              borderRadius: BorderRadius.circular(14.r),
-              elevation: 14,
-              color: AppTheme.surface,
-              shadowColor: AppTheme.shadow,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                    decoration: BoxDecoration(
-                      color: AppTheme.inputBackground,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
-                      border: Border(
-                        bottom: BorderSide(color: AppTheme.border, width: 0.5),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Add New Habit',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Body
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
-                      child: _AddHabitForm(
-                        onSubmit: (data) {
-                          onSubmit(data);
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _AddHabitForm extends StatefulWidget {
-  final void Function(HabitData data) onSubmit;
-
-  const _AddHabitForm({
-    required this.onSubmit,
-  });
+  const EditHabitPage({super.key, required this.habit});
 
   @override
-  State<_AddHabitForm> createState() => _AddHabitFormState();
+  State<EditHabitPage> createState() => _EditHabitPageState();
 }
 
-class _AddHabitFormState extends State<_AddHabitForm> {
+class _EditHabitPageState extends State<EditHabitPage> {
   final _formKey = GlobalKey<FormState>();
-  final _titleCtl = TextEditingController();
-  final _descCtl = TextEditingController();
+  late TextEditingController _titleCtl;
+  late TextEditingController _descCtl;
 
   final _frequencies = ['Daily', 'Weekly', 'Monthly'];
 
@@ -106,14 +27,23 @@ class _AddHabitFormState extends State<_AddHabitForm> {
   bool _isLoadingCategories = true;
   String? _errorMessage;
 
-  String _frequency = 'Daily';
+  late String _frequency;
   CategoryModel? _selectedCategory;
   bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
+    _titleCtl = TextEditingController(text: widget.habit.title);
+    _descCtl = TextEditingController(text: widget.habit.description);
+    _frequency = _capitalizeFirst(widget.habit.frequency);
+    _selectedCategory = widget.habit.category;
     _fetchCategories();
+  }
+
+  String _capitalizeFirst(String s) {
+    if (s.isEmpty) return s;
+    return s[0].toUpperCase() + s.substring(1);
   }
 
   Future<String?> _getToken() async {
@@ -131,7 +61,6 @@ class _AddHabitFormState extends State<_AddHabitForm> {
 
     try {
       final token = await _getToken();
-      print("🚀 Fetching Categories with Token: ${token != null ? 'Present' : 'NULL'}");
 
       if (token == null) {
         setState(() {
@@ -149,26 +78,31 @@ class _AddHabitFormState extends State<_AddHabitForm> {
         },
       ).timeout(const Duration(seconds: 30));
 
-      print("📥 Server Response Code: ${response.statusCode}");
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedData = jsonDecode(response.body);
         final List<dynamic> categoriesJson = decodedData['data'];
 
         setState(() {
           _categories = categoriesJson.map((item) => CategoryModel.fromJson(item)).toList();
-          if (_categories.isNotEmpty) _selectedCategory = _categories.first;
+           if (_selectedCategory != null) {
+            final existing = _categories.firstWhere(
+                  (cat) => cat.id == _selectedCategory!.id,
+              orElse: () => _selectedCategory!,
+            );
+            if (!_categories.contains(existing)) {
+              _categories.add(existing);
+            }
+            _selectedCategory = existing;
+          }
           _isLoadingCategories = false;
         });
       } else {
-        print("❌ Server Error Body: ${response.body}");
         setState(() {
           _errorMessage = "Server Error: ${response.statusCode}";
           _isLoadingCategories = false;
         });
       }
     } catch (e) {
-      print("❌ Connection Exception: $e");
       setState(() {
         _errorMessage = "Error with connecting to network";
         _isLoadingCategories = false;
@@ -176,12 +110,12 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     }
   }
 
-  void _submit() async {
+  Future<void> _updateHabit() async {
     if (!_formKey.currentState!.validate() || _selectedCategory == null) return;
 
     setState(() => _isSubmitting = true);
 
-    final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits');
+    final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits/${widget.habit.id}');
 
     try {
       final token = await _getToken();
@@ -192,7 +126,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
         return;
       }
 
-      final response = await http.post(
+      final response = await http.put(
         url,
         headers: {
           'Authorization': 'Bearer $token',
@@ -206,21 +140,14 @@ class _AddHabitFormState extends State<_AddHabitForm> {
         }),
       ).timeout(const Duration(seconds: 20));
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        widget.onSubmit(HabitData(
-          title: _titleCtl.text,
-          description: _descCtl.text,
-          frequency: _frequency,
-          category: _selectedCategory!.name,
-        ));
-        _showSnackBar("Habit added successfully!", isSuccess: true);
-        Navigator.pop(context);
+      if (response.statusCode == 200) {
+        _showSnackBar("Habit updated successfully!", isSuccess: true);
+        Navigator.pop(context, true);
       } else {
-        print("❌ Submit Error Body: ${response.body}");
-        _showSnackBar("Not registered: ${response.statusCode}");
+        _showSnackBar("Failed to update: ${response.statusCode}");
       }
     } catch (e) {
-      _showSnackBar("connection error");
+      _showSnackBar("Connection error");
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -359,95 +286,118 @@ class _AddHabitFormState extends State<_AddHabitForm> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Title
-          Text('Title', style: _labelStyle()),
-          SizedBox(height: 8.h),
-          TextFormField(
-            controller: _titleCtl,
-            decoration: _fieldDecoration(hint: 'Enter habit title...'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Please enter a title' : null,
-            textInputAction: TextInputAction.next,
-          ),
-          SizedBox(height: 14.h),
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        title: const Text('Edit Habit'),
+        backgroundColor: AppTheme.surface,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
 
-          // Description
-          Text('Description', style: _labelStyle()),
-          SizedBox(height: 8.h),
-          TextFormField(
-            controller: _descCtl,
-            minLines: 3,
-            maxLines: 6,
-            decoration: _fieldDecoration(hint: 'Enter habit description...'),
-            keyboardType: TextInputType.multiline,
-          ),
-          SizedBox(height: 14.h),
-
-          // Frequency
-          Text('Frequency', style: _labelStyle()),
-          SizedBox(height: 8.h),
-          DropdownButtonFormField<String>(
-            initialValue: _frequency,
-            decoration: _fieldDecoration(),
-            items: _frequencies
-                .map((f) => DropdownMenuItem(value: f, child: Text(f)))
-                .toList(),
-            onChanged: (v) {
-              if (v == null) return;
-              setState(() => _frequency = v);
-            },
-          ),
-          SizedBox(height: 14.h),
-
-          Text('Category', style: _labelStyle()),
-          SizedBox(height: 8.h),
-          _buildCategoryDropdown(),
-          SizedBox(height: 20.h),
-
-          // Save button
-          SizedBox(
-            height: 50.h,
-            child: ElevatedButton(
-              onPressed: _isSubmitting || _isLoadingCategories ? null : _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                foregroundColor: AppTheme.textWhite,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Title
+              Text('Title', style: _labelStyle()),
+              SizedBox(height: 8.h),
+              TextFormField(
+                controller: _titleCtl,
+                decoration: _fieldDecoration(hint: 'Enter habit title...'),
+                validator: (v) => v == null || v.trim().isEmpty ? 'Please enter a title' : null,
+                textInputAction: TextInputAction.next,
               ),
-              child: _isSubmitting
-                  ? SizedBox(
-                width: 14.w,
-                height: 14.h,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.w,
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              SizedBox(height: 14.h),
+
+              // Description
+              Text('Description', style: _labelStyle()),
+              SizedBox(height: 8.h),
+              TextFormField(
+                controller: _descCtl,
+                minLines: 3,
+                maxLines: 6,
+                decoration: _fieldDecoration(hint: 'Enter habit description...'),
+                keyboardType: TextInputType.multiline,
+              ),
+              SizedBox(height: 14.h),
+
+              // Frequency
+              Text('Frequency', style: _labelStyle()),
+              SizedBox(height: 8.h),
+              DropdownButtonFormField<String>(
+                value: _frequency,
+                decoration: _fieldDecoration(),
+                items: _frequencies
+                    .map((f) => DropdownMenuItem(value: f, child: Text(f)))
+                    .toList(),
+                onChanged: (v) {
+                  if (v == null) return;
+                  setState(() => _frequency = v);
+                },
+              ),
+              SizedBox(height: 14.h),
+
+              // Category
+              Text('Category', style: _labelStyle()),
+              SizedBox(height: 8.h),
+              _buildCategoryDropdown(),
+              SizedBox(height: 30.h),
+
+              // Update button
+              SizedBox(
+                height: 50.h,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting || _isLoadingCategories ? null : _updateHabit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: AppTheme.textWhite,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: _isSubmitting
+                      ? SizedBox(
+                    width: 14.w,
+                    height: 14.h,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.w,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                      : Text('Update Habit', style: TextStyle(fontSize: 14.sp)),
                 ),
-              )
-                  : Text('Save', style: TextStyle(fontSize: 14.sp)),
-            ),
-          ),
+              ),
 
-          SizedBox(height: 8.h),
+              SizedBox(height: 16.h),
 
-          // Cancel
-          TextButton(
-            onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: AppTheme.textSecondary,
-              padding: EdgeInsets.zero,
-            ),
-            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+              // Cancel button
+              SizedBox(
+                height: 50.h,
+                child: TextButton(
+                  onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppTheme.textSecondary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                  ),
+                  child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

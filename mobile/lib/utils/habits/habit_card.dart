@@ -16,8 +16,9 @@ class HabitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color color = habit.getColor();
-    final IconData icon = habit.getIcon();
+
+    final Color color = habit.category.backgroundColor;
+    final IconData icon = habit.category.icon;
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
@@ -57,7 +58,9 @@ class HabitCard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
+                // TITLE
                 Text(
                   habit.title,
                   style: TextStyle(
@@ -65,11 +68,15 @@ class HabitCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF111827),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4.h),
+
+                // DESCRIPTION
                 Text(
                   habit.description,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12.sp,
@@ -78,13 +85,19 @@ class HabitCard extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
 
-                Row(
+                // ===== TAGS ROW =====
+                Wrap(
+                  spacing: 8.w,
+                  runSpacing: 4.h,
                   children: [
-                    // ===== CATEGORY TAG =====
+                    // CATEGORY TAG
                     Container(
+                      constraints: BoxConstraints(
+                        maxWidth: 120.w,
+                      ),
                       padding: EdgeInsets.symmetric(
                         horizontal: 8.w,
-                        vertical: 3.h,
+                        vertical: 4.h,
                       ),
                       decoration: BoxDecoration(
                         color: color.withOpacity(0.15),
@@ -97,18 +110,60 @@ class HabitCard extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: color,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    SizedBox(width: 8.w),
 
-                    // ===== META TEXT =====
-                    Text(
-                      habit.formatFrequency(),
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: const Color(0xFF9CA3AF),
+                    // FREQUENCY BADGE
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Text(
+                        habit.formatFrequency(),
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: const Color(0xFF6B7280),
+                        ),
                       ),
                     ),
+
+                    if (habit.currentStreak > 0)
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 4.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.local_fire_department,
+                              size: 12.sp,
+                              color: Colors.orange,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              '${habit.currentStreak}',
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -117,19 +172,29 @@ class HabitCard extends StatelessWidget {
 
           // ===== ACTIONS =====
           Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
-                icon: Icon(Icons.edit, size: 20.sp),
-                color: Colors.grey.shade400,
+                constraints: BoxConstraints(
+                  minWidth: 32.w,
+                  minHeight: 32.h,
+                ),
+                icon: Icon(Icons.edit, size: 18.sp),
+                color: Colors.grey.shade600,
                 onPressed: onEdit,
               ),
+              SizedBox(height: 4.h),
               IconButton(
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
-                icon: Icon(Icons.delete, size: 20.sp),
-                color: Colors.red.shade400,
+                constraints: BoxConstraints(
+                  minWidth: 32.w,
+                  minHeight: 32.h,
+                ),
+                icon: Icon(Icons.delete_outline, size: 18.sp),
+                color: Colors.red.shade500,
                 onPressed: onDelete,
               ),
             ],
