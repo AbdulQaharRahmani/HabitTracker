@@ -10,7 +10,7 @@ export const completeHabit = (id, data) =>
   api.post(`/habits/${id}/complete`, data)
 
 export const unCompleteHabit = (id, data) =>
-   api.post(`/habits/${id}/uncomplete`, data)
+   api.delete(`/habits/${id}/uncomplete`, data)
 
 export const getHabitsChartData = async (startDate, endDate) => {
    const response = await api.get(`/habits/dashboard/chart-data?startDate=${startDate}&endDate=${endDate}`)
