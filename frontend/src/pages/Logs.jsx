@@ -1,4 +1,4 @@
-import { FaEnvelope, FaUserCircle } from "react-icons/fa";
+import { FaEnvelope, FaUserCircle, FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import Search from "../components/Search";
 import LogsTable from "../logs-dashboard/LogsTable";
 import Dropdown from "../components/Dropdown";
@@ -6,9 +6,12 @@ import { useEffect, useState, useMemo } from "react";
 import useLogsStore from "../store/useLogsStore";
 import { useTranslation } from "react-i18next";
 
+
 export default function Logs() {
-    const { t } = useTranslation();
-    const { logsData, getFilteredData, getLogsData, getSearchResult } = useLogsStore();
+    const { t , i18n} = useTranslation();
+    const isRtl = i18n.dir() === "rtl";
+
+    const { logsData, getFilteredData, getLogsData, getSearchResult, currentPage, totalPages, getNextPage,getPrevPage, loading } = useLogsStore();
 
     const levels = useMemo(() => [
         { id: 1, name: t("All levels"), value: "all levels" },
@@ -41,8 +44,8 @@ export default function Logs() {
     sortOrder: "newest"
 });
     useEffect(() => {
-        getLogsData();
-    }, [getLogsData]);
+        getLogsData(currentPage, 10);
+    }, [currentPage]);
 
     useEffect(()=>{
       const handler =  setTimeout(()=> {
@@ -62,6 +65,8 @@ const displayData = useMemo(()=>{
     return getSearchResult(debouncedSearchTerm, filtered)
 }, [debouncedSearchTerm,logsData, appliedFilters, getSearchResult, getFilteredData])
 
+// format numbers to persain
+const getPersianNumber = (num) => new Intl.NumberFormat(i18n.language).format(num);
 
     return (
         // Header
@@ -152,6 +157,13 @@ const displayData = useMemo(()=>{
                 {/* Table Container */}
                 <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
                     <LogsTable filteredList={displayData} />
+                </div>
+                <div className="flex justify-between">
+                    <span className="font-bold text-xl">{t("page")} {getPersianNumber(currentPage)} {t("of")} {getPersianNumber(totalPages || 1)}</span>
+                    <div className="flex gap-4">
+                     <button className="bg-indigo-300 p-3 rounded-[50%] text-white text-xl" onClick={()=> getPrevPage()} disabled={loading ||currentPage <= 1}><FaArrowLeft className={isRtl? "rotate-180": ""}></FaArrowLeft></button>
+                     <button className="bg-indigo-300 p-3 rounded-[50%] text-white text-xl" disabled={loading ||currentPage>= totalPages}onClick={()=> getNextPage()}><FaArrowRight className={isRtl? "rotate-180": ""}></FaArrowRight></button>
+                     </div>
                 </div>
             </main>
         </div>

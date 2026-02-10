@@ -103,7 +103,7 @@
   "Search logs by route": "Search logs by route...",
   "Level": "Level",
   "Method" : "Method",
-  "Sort by": "Sort by",
+  "Sort order": "Sort order",
   "Apply filter": "Apply filter",
   "All levels": "All levels",
   "Error" :"Error",
@@ -136,6 +136,8 @@
   "Weekly": "Weekly",
   "Monthly": "Monthly",
   "Yearly": "Yearly",
-  "loading_chart": "Loading chart data..."
+  "loading_chart": "Loading chart data...",
+      "page": "Page",
+    "of": "of"
 
 }
