@@ -161,8 +161,8 @@ const getPersianNumber = (num) => new Intl.NumberFormat(i18n.language).format(nu
                 <div className="flex justify-between">
                     <span className="font-bold text-xl">{t("page")} {getPersianNumber(currentPage)} {t("of")} {getPersianNumber(totalPages || 1)}</span>
                     <div className="flex gap-4">
-                     <button className="bg-indigo-300 p-3 rounded-[50%] text-white text-xl" onClick={()=> getPrevPage()} disabled={loading ||currentPage <= 1}><FaArrowLeft className={isRtl? "rotate-180": ""}></FaArrowLeft></button>
-                     <button className="bg-indigo-300 p-3 rounded-[50%] text-white text-xl" disabled={loading ||currentPage>= totalPages}onClick={()=> getNextPage()}><FaArrowRight className={isRtl? "rotate-180": ""}></FaArrowRight></button>
+                     <button className="bg-indigo-300 p-3 rounded-[50%] text-white text-xl hover:bg-indigo-500 transition-bg" onClick={()=> getPrevPage()} disabled={loading ||currentPage <= 1}><FaArrowLeft className={isRtl? "rotate-180": ""}></FaArrowLeft></button>
+                     <button className="bg-indigo-300 p-3 rounded-[50%] text-white text-xl  hover:bg-indigo-500 transition-bg" disabled={loading ||currentPage>= totalPages}onClick={()=> getNextPage()}><FaArrowRight className={isRtl? "rotate-180": ""}></FaArrowRight></button>
                      </div>
                 </div>
             </main>
