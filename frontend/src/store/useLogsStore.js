@@ -19,7 +19,7 @@ const useLogsStore = create((set, get) => ({
     }
   },
 getSearchResult: (searchTerm, dataToSearch) => {
-  if (!searchTerm) return get().logsData;
+  if (!searchTerm) return dataToSearch;
   const lowerCaseSearchTerm = searchTerm.toLowerCase();
   return dataToSearch.filter((log) => {
     return log.path?.toLowerCase().includes(lowerCaseSearchTerm);

@@ -34,15 +34,15 @@ export default function Logs() {
     const [selectedMethod, setSelectedMethod] = useState("all methods");
     const [selectedDate, setSelectedDate] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
-    const [filteredData, setFilteredData] = useState([])
    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
+   const [appliedFilters, setAppliedFilters] = useState({
+    level: "all levels",
+    method: "all methods",
+    sortOrder: "newest"
+});
     useEffect(() => {
         getLogsData();
     }, [getLogsData]);
-
-    useEffect(() => {
-        setFilteredData(logsData);
-    }, [logsData]);
 
     useEffect(()=>{
       const handler =  setTimeout(()=> {
@@ -51,17 +51,16 @@ export default function Logs() {
       return () => clearTimeout(handler)
     }, [searchTerm])
     const handleFilter = () => {
-        const filterOptions = {
-            method: selectedMethod,
-            level: selectedLevel,
-            sortOrder: selectedDate
-        };
-        const result = getFilteredData(filterOptions);
-        setFilteredData(result);
+       setAppliedFilters({
+        level: selectedLevel,
+        method: selectedMethod,
+        sortOrder: selectedDate
+       })
     };
 const displayData = useMemo(()=>{
-    return getSearchResult(debouncedSearchTerm, filteredData)
-}, [debouncedSearchTerm, filteredData, getSearchResult])
+    const filtered = getFilteredData(appliedFilters)
+    return getSearchResult(debouncedSearchTerm, filtered)
+}, [debouncedSearchTerm,logsData, appliedFilters, getSearchResult, getFilteredData])
 
 
     return (
