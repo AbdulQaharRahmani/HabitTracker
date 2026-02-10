@@ -101,5 +101,13 @@
 
   "NO_HABITS_YET": "No habits added yet",
   "NO_ACTIVE_STREAK_YET": "No active streak yet",
-  "NO_HABITS_COMPLETED_YET": "No habits completed yet"
+  "NO_HABITS_COMPLETED_YET": "No habits completed yet",
+  "monthly Activity": "Monthly Activity",
+  "weekly Activity": "Weekly Activity",
+  "yearly Activity": "Yearly Activity",
+  "Weekly": "Weekly",
+  "Monthly": "Monthly",
+  "Yearly": "Yearly",
+  "loading_chart": "Loading chart data..."
+
 }

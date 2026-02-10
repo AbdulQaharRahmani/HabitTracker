@@ -3,6 +3,7 @@ import api from "../../services/api"
 import toast from "react-hot-toast";
 import { completeHabit, getChartData, getHabitsByDate, getHabitsChartData, unCompleteHabit } from "../../services/habitService";
 import { formatDate } from "../utils/dateFormatter";
+import { formatStatstics } from "../utils/formatStatistics";
 const useHabitStore = create((set, get) => ({
     habits: [],
     loading: false,
@@ -192,84 +193,47 @@ const useHabitStore = create((set, get) => ({
             }
         }))
     },
-    dailyStatistics: [],
+
+
+    chartData: [],
+    weeklyStatistics: [],
     monthlyStatistics: [],
     yearlyStatistics: [],
-    chartData: [],
+
     getChartData: async () => {
-        const data = await getChartData()
-        set({ chartData: data })
-    },
-    getDailyStatistics: async () => {
-        const chartData = get().chartData
-        if (!chartData || chartData.length === 0) return
-        const firstDataDate = new Date(chartData[0].date);
-        let date = new Date();
-        date.setDate(date.getDate() - 6);
-
-        const finalStartDate = date >= firstDataDate ? date : firstDataDate;
-
-        const startDate = formatDate(finalStartDate);
-        const endDate = formatDate(new Date());
-        const daysData = await getHabitsChartData(startDate, endDate);
-        const dailyStatistics = daysData.reduce((acc, day) => {
-            const weekday = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' });
-            acc[weekday] = (acc[weekday] || 0) + day.completed;
-            return acc;
-        }, {});
-        const formattedData = Object.keys(dailyStatistics).map(key => ({
-            name: key,
-            completed: dailyStatistics[key]
-        }));
-        set({ dailyStatistics: formattedData });
+        const data = await getChartData();
+        set({ chartData: data });
     },
 
-    getMonthlyStatistics: async () => {
-        const chartData = get().chartData
-        if (!chartData || chartData.length === 0) return
-        const firstDataDate = new Date(chartData[0].date);
-        let date = new Date();
-        date.setMonth(date.getMonth() - 5);
+    getStatistics: async (mode) => {
+        set({loading: true})
+        const { chartData } = get();
+        const isYearly = mode === 'yearly';
 
-        const finalStartDate = date >= firstDataDate ? date : firstDataDate;
+        const source = isYearly ? chartData?.monthly : chartData?.daily;
+        if (!source || source.length === 0) return;
 
-        const startDate = formatDate(finalStartDate);
-        const endDate = formatDate(new Date());
-        const dataForMonths = await getHabitsChartData(startDate, endDate);
-        const monthlyStatistics = dataForMonths.reduce((acc, day) => {
-            const monthName = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short' });
-            acc[monthName] = (acc[monthName] || 0) + day.completed;
-            return acc;
-        }, {});
-        const formattedData = Object.keys(monthlyStatistics).map(key => ({
-            name: key,
-            completed: monthlyStatistics[key]
-        }));
-        set({ monthlyStatistics: formattedData });
+        const start = new Date();
+        if (mode === 'weekly') start.setDate(start.getDate() - 6);
+        else if (mode === 'monthly') start.setDate(start.getDate() - 30);
+        else if (mode === 'yearly') start.setMonth(start.getMonth() - 12);
+        try{
+        const response = await getHabitsChartData(formatDate(start), formatDate(new Date()));
+        const rawData = isYearly ? (response.data.monthly || []) : (response.data.daily || []);
+        const formatted = formatStatstics(rawData, mode);
+        set({ [`${mode}Statistics`]: formatted });
+        }catch(error){
+        const message = err.response?.data?.message || "Failed to fetch data";
+        set({error:message})
+        }finally{
+            set({loading:false})
+        }
+
     },
 
-    getYearlyStatistics: async () => {
-        const chartData = get().chartData
-        if (!chartData || chartData.length === 0) return
-        const firstDataDate = new Date(chartData[0].date);
-        const threeYearsAgo = new Date();
-        threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
-        const finalStartDate = threeYearsAgo >= firstDataDate ? threeYearsAgo : firstDataDate;
-
-        const startDate = formatDate(finalStartDate);
-        const endDate = formatDate(new Date());
-        const dataForYears = await getHabitsChartData(startDate, endDate);
-        const yearlyStatistics = dataForYears.reduce((acc, day) => {
-            const year = day.date.split('-')[0];
-            acc[year] = (acc[year] || 0) + day.completed;
-            return acc;
-        }, {});
-        const formattedData = Object.keys(yearlyStatistics).map(key => ({
-            name: key,
-            completed: yearlyStatistics[key]
-        }));
-        set({ yearlyStatistics: formattedData });
-    },
+    getWeeklyStatistics: () => get().getStatistics('weekly'),
+    getMonthlyStatistics: () => get().getStatistics('monthly'),
+    getYearlyStatistics: () => get().getStatistics('yearly'),
 
 getConsistencyData: async (startDate, endDate) => {
     set({ loading: true, error: null });
