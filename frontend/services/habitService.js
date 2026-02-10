@@ -5,16 +5,18 @@ export const getHabitsByDate = async (date) => {
    const response = await api.get(`/habits/date?date=${formattedDate}`);
    return response.data.data;
 };
-export const completeHabit = async (id) => {
-   await api.post(`/habits/${id}/complete`)
-}
-export const unCompleteHabit = async (id) => {
-   await api.delete(`/habits/${id}/complete`)
-}
+
+export const completeHabit = (id, data) =>
+  api.post(`/habits/${id}/complete`, data)
+
+export const unCompleteHabit = (id, data) =>
+   api.delete(`/habits/${id}/complete`, {data})
+
 export const getHabitsChartData = async (startDate, endDate) => {
    const response = await api.get(`/habits/dashboard/chart-data?startDate=${startDate}&endDate=${endDate}`)
-   return response.data.data
+   return response.data;
 }
+
 export const getChartData = async () => {
    const response = await api.get(`/habits/dashboard/chart-data`)
    return response.data.data

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { HiChevronDown, HiCheck } from "react-icons/hi";
 import useClickOutside from "../hooks/useClickOutside";
 
-export default function Dropdown({ items, value, getValue, placeholder }) {
+export default function Dropdown({ items, value, getValue,displayValue, placeholder }) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const handleDropdownVisibility = () => setDropdownOpen(!isDropdownOpen);
@@ -22,7 +22,7 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
           type="text"
           placeholder={placeholder}
           readOnly
-          value={value}
+          value={displayValue || value}
           onClick={handleDropdownVisibility}
           className="
             w-full cursor-pointer rounded-xl border
@@ -35,7 +35,7 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
             outline-none capitalize
           "
         />
-        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none transition-transform">
+        <div className="absolute inset-y-0 end-0 flex items-center px-4 pointer-events-none transition-transform">
           <HiChevronDown
             size={21}
             className={`text-[#7B68EE] dark:text-[#7B68EE] transition-transform duration-200 ${
@@ -69,10 +69,10 @@ export default function Dropdown({ items, value, getValue, placeholder }) {
                 hover:text-[#7B68EE] dark:hover:text-[#7B68EE]
               "
             >
-              <span className="font-medium pl-4">{item.name}</span>
+              <span className="font-medium ps-4">{item.name}</span>
               <HiCheck
                 size={18}
-                className="opacity-0 group-hover:opacity-100 text-[#7B68EE] dark:text-[#7B68EE] ml-auto transition-opacity"
+                className="opacity-0 group-hover:opacity-100 text-[#7B68EE] dark:text-[#7B68EE] ms-auto transition-opacity"
               />
             </li>
           ))}

@@ -58,6 +58,7 @@
   "No date": "تاریخ نامشخص",
   "Loading": "درحال بارگذاری...",
   "You have no tasks to show": "وظیفه‌ای برای نمایش وجود ندارد.",
+  "Consistency": "استمرار",
 
   "Your Progress": "روند شما",
   "Overview of your consistency and growth.": "چشم اندازی به تمرکز و روند رشد شما.",
@@ -111,11 +112,22 @@
   "apple": "اپل",
   "already_have_account": "قبلاً حساب دارید؟",
   "log_in": "ورود",
-
+  "Old_Password": "رمز عبور قدیمی",
+  "New_Password": "رمز عبور جدید",
+  "logout": "خروج",
   "NO_HABITS_YET": "هنوز هیچ عادتی اضافه نشده",
   "NO_ACTIVE_STREAK_YET": "هنوز هیچ استریکی فعال نیست",
   "NO_HABITS_COMPLETED_YET": "هنوز هیچ عادتی تکمیل نشده",
 
   "Task deleted successfully!": "عملیات موفقانه حذف شد!",
-  "Failed to delete task": "عملیات حذف نشد"
+  "Failed to delete task": "عملیات حذف نشد",
+  
+  "monthly Activity": "فعالیت ماهانه",
+  "weekly Activity": "فعالیت هفته وار",
+  "yearly Activity": " فعالیت سالانه",
+  "Weekly": "هفته وار",
+  "Monthly": "ماهانه",
+  "Yearly": "سالانه",
+    "loading_chart": "در حال بارگذاری اطلاعات نمودار..."
+
 }

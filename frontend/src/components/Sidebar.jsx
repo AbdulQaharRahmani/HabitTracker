@@ -8,6 +8,7 @@ import {
   FaBars,
   FaTimes,
   FaUser,
+  FaSignOutAlt
 } from "react-icons/fa";
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 
@@ -54,7 +55,7 @@ const Sidebar = ({ children }) => {
     closeMobileSidebar,
   } = useSidebarStore();
 
- const {userId,username} = useAuthStore((state) => state);
+ const {userId,username,logout} = useAuthStore((state) => state);
 
   useEffect(() => {
     if (!userId) return;
@@ -240,6 +241,27 @@ const Sidebar = ({ children }) => {
             </div>
           )}
         </nav>
+
+       <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+          <button
+          onClick={
+            ()=>{
+              logout();
+              closeMobileSidebar();
+            }}
+          className={`w-full flex items-center rounded-lg p-3 transition-all duration-200 text-red-600 dark:text-red-400 hover:bg-red-50 hover:translate-x-1 dark:hover:bg-red-900/20 ${!isOpen ? "justify-center": "justify-start"}`}>
+            <span className={`${!isOpen ? "text-xl": "text-lg"}`}>
+              <FaSignOutAlt/>
+            </span>
+            {
+              isOpen && (
+                <span className="ml-4 rtl:mr-3 font-medium">
+                  {t("logout")}
+                </span>
+              )
+            }
+          </button>
+       </div>
       </aside>
 
       {/* Main Content */}

@@ -13,6 +13,7 @@ import {
 import {
   createHabitValidator,
   getHabitsByDateValidator,
+  HabitCompletionValidator,
   habitIdValidator,
   updateHabitValidator,
 } from '../validators/validateHabit.js';
@@ -35,12 +36,14 @@ router.get(
 router.post(
   '/:id/complete',
   habitIdValidator,
+  HabitCompletionValidator,
   validate,
   asyncHandler(completeHabit)
 );
 router.delete(
   '/:id/complete',
   habitIdValidator,
+  HabitCompletionValidator,
   validate,
   asyncHandler(uncompleteHabit)
 );

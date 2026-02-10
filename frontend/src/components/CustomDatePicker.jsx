@@ -1,7 +1,7 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "./Today.css";
+import "../pages/Today.css";
 import useHabitStore from "../store/useHabitStore";
 
 const CustomHeader = ({
@@ -27,10 +27,10 @@ const CustomHeader = ({
 );
 
 function CustomDatePicker() {
-  const {selectedDate, setSelectedDate} = useHabitStore()
-  const handleDateChange = (date)=>{
-    setSelectedDate(date)
-  }
+  const { selectedDate, setSelectedDate } = useHabitStore();
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
   return (
     <DatePicker
       selected={selectedDate}
