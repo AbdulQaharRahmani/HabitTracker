@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -7,6 +8,7 @@ import '../../app/app_theme.dart';
 import '../../utils/habits/habit.dart';
 import '../../utils/habits/habit_card.dart';
 import 'add_habit.dart';
+import 'edit_habit_screen.dart';
 
 class HabitsScreen extends StatefulWidget {
   const HabitsScreen({super.key});
@@ -20,6 +22,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   /* -------------------------------------------------------------------------- */
   /* Reusable Styles                                                            */
@@ -39,6 +42,12 @@ class _HabitsScreenState extends State<HabitsScreen> {
   void initState() {
     super.initState();
     _fetchHabits();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   /* -------------------------------------------------------------------------- */
@@ -150,21 +159,21 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   Future<void> _editHabit(Habit habit) async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Habit'),
-        content: const Text('Edit feature will be implemented soon'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK', style: _linkStyle),
-          ),
-        ],
-      ),
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => EditHabitPage(habit: habit)),
     );
-  }
 
+    if (result == true) {
+      await _refreshHabits();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Habit updated successfully!'),
+          backgroundColor: AppTheme.success,
+        ),
+      );
+    }
+  }
   Future<void> _refreshHabits() async {
     await _fetchHabits();
   }
@@ -212,158 +221,201 @@ class _HabitsScreenState extends State<HabitsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              // ======= Header =======
-              const Text(
-                "My Habits",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Manage and track your daily routines effectively.',
-                style: _descriptionStyle,
-              ),
-              const SizedBox(height: 20),
-
-              // ======= Search + New Habit Button =======
-              Row(
+        child: Column(
+          children: [
+            // HEADER SECTION
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    flex: 5,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        hintText: 'Search....',
-                        hintStyle: const TextStyle(color: AppTheme.textMuted),
-                        prefixIcon: const Icon(Icons.search, color: AppTheme.textMuted),
-                        fillColor: AppTheme.inputBackground,
-                        filled: true,
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: const BorderSide(color: AppTheme.primary, width: 1),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value;
-                        });
-                      },
+                  const Text(
+                    "My Habits",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Manage and track your daily routines effectively.',
+                    style: _descriptionStyle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            // SEARCH AND BUTTON SECTION
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Row(
+                children: [
                   Expanded(
-                    flex: 3,
-                    child: SizedBox(
-                      height: 48,
-                      child: FloatingActionButton.extended(
+                    child: Container(
+                      height: 48.h,
+                      decoration: BoxDecoration(
+                        color: AppTheme.inputBackground,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 12.w),
+                          const Icon(Icons.search, color: AppTheme.textMuted),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              decoration: const InputDecoration(
+                                hintText: 'Search habits...',
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(color: AppTheme.textMuted),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _searchQuery = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  SizedBox(
+                    height: 48.h,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        AddHabitDialog.show(
+                          context,
+                          onSubmit: (data) {
+                            _refreshHabits();
+                          },
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        onPressed: () {
-                          AddHabitDialog.show(
-                            context,
-                            onSubmit: (data) {
-                              _refreshHabits();
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.add, color: AppTheme.textWhite),
-                        label: const Text(
-                          'New Habit',
-                          style: TextStyle(color: AppTheme.textWhite, fontWeight: FontWeight.w600),
-                        ),
-                        elevation: 0,
-                        backgroundColor: AppTheme.primary,
+                      ),
+                      icon: const Icon(Icons.add, size: 20, color: Colors.white),
+                      label: const Text(
+                        'New',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
                 ],
               ),
+            ),
 
-              const SizedBox(height: 16),
+            SizedBox(height: 16.h),
 
-              // ======= Habit List (with Shimmer or Content) =======
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppTheme.primary,
-                  onRefresh: _refreshHabits,
-                  child: _isLoading
-                      ? _buildShimmerLoading()
-                      : _errorMessage != null
-                      ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(_errorMessage!, style: const TextStyle(color: AppTheme.textSecondary)),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _refreshHabits,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
-                      : _filteredHabits.isEmpty
-                      ? Center(
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.inbox_outlined, size: 60, color: AppTheme.textMuted),
-                          const SizedBox(height: 16),
-                          Text(
-                            _searchQuery.isNotEmpty
-                                ? 'No habits found for "$_searchQuery"'
-                                : 'No habits found',
-                            style: _descriptionStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          if (_searchQuery.isNotEmpty)
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  _searchQuery = '';
-                                });
-                              },
-                              child: Text('Clear search', style: _linkStyle),
-                            ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    itemCount: _filteredHabits.length,
-                    itemBuilder: (context, index) {
-                      final habit = _filteredHabits[index];
-                      return HabitCard(
-                        habit: habit,
-                        onEdit: () => _editHabit(habit),
-                        onDelete: () => _deleteHabit(habit.id, index),
-                      );
-                    },
-                  ),
-                ),
+            // HABITS LIST SECTION
+            Expanded(
+              child: RefreshIndicator(
+                color: AppTheme.primary,
+                onRefresh: _refreshHabits,
+                child: _buildHabitsList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHabitsList() {
+    if (_isLoading) {
+      return _buildShimmerLoading();
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                _errorMessage!,
+                style: const TextStyle(color: AppTheme.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20.h),
+              ElevatedButton(
+                onPressed: _refreshHabits,
+                child: const Text('Try Again'),
               ),
             ],
           ),
         ),
+      );
+    }
+
+    if (_filteredHabits.isEmpty) {
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.all(40.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.inbox_outlined,
+                size: 80.w,
+                color: AppTheme.textMuted,
+              ),
+              SizedBox(height: 20.h),
+              Text(
+                _searchQuery.isNotEmpty
+                    ? 'No habits found for "$_searchQuery"'
+                    : 'No habits found',
+                style: _descriptionStyle,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 12.h),
+              if (_searchQuery.isNotEmpty)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _searchQuery = '';
+                      _searchController.clear();
+                    });
+                  },
+                  child: Text(
+                    'Clear search',
+                    style: _linkStyle,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.only(
+        bottom: 20.h,
+        top: 10.h,
+        left: 20.w,
+        right: 20.w,
       ),
+      itemCount: _filteredHabits.length,
+      itemBuilder: (context, index) {
+        final habit = _filteredHabits[index];
+        return HabitCard(
+          habit: habit,
+          onEdit: () => _editHabit(habit),
+          onDelete: () => _deleteHabit(habit.id, index),
+        );
+      },
     );
   }
 }
