@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import api from "../../services/api"
 import toast from "react-hot-toast";
-import { completeHabit, getChartData, getHabitsByDate, getHabitsChartData, unCompleteHabit } from "../../services/habitService";
+import { completeHabit, deleteHabitApi, getChartData, getHabitsByDate, getHabitsChartData, unCompleteHabit } from "../../services/habitService";
 import { formatDate } from "../utils/dateFormatter";
 import { formatStatstics } from "../utils/formatStatistics";
 const useHabitStore = create((set, get) => ({
@@ -248,8 +248,32 @@ getConsistencyData: async (startDate, endDate) => {
     } catch (err) {
         const message = err.response?.data?.message || "Failed to fetch data";
         set({ error: message, loading: false });
+        }
+    },
+
+deleteHabit: async (id,t) => {
+  try {
+    const habit = get().allhabits.find((h) => h._id === id);
+    if (!habit) {
+      console.warn("Habit not found in state");
+      return;
     }
-}
+
+     await deleteHabitApi(id);
+
+    set((state) => ({
+      allhabits: state.allhabits.filter((h) => h._id !== id),
+    }));
+       toast.success(t("habit deleted successfully!"))
+  } catch (error) {
+    toast.error(t("Faild to delete habit!"))
+    console.error(
+      "Delete habit failed:",
+      error.response?.data || error.message
+    );
+    set({ error: "Failed to delete habit" });
+  }
+},
 
 }))
 

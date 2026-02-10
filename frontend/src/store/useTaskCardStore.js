@@ -5,7 +5,6 @@ export const useTaskCardStore = create((set, get) => ({
   tasks: [],
   loading: false,
   error: null,
-
   isModalOpen: false,
 
   taskData: {
@@ -50,7 +49,7 @@ export const useTaskCardStore = create((set, get) => ({
     } catch (err) {
       set({ error: err?.message || "An error occurred", loading: false });
     }
-  },  
+  },
 
   completeTask: async (id) => {
     const {tasks} = get();
@@ -71,10 +70,10 @@ export const useTaskCardStore = create((set, get) => ({
       await updateTaskStatus(id, task.status === "done" ? "todo" : "done");
     } catch (err) {
       set({
-        tasks: tasks.map((task) => 
+        tasks: tasks.map((task) =>
         task._id === id ? {...task, status: task.status} : task
-      ), 
-      error: "Failed to update task completion" 
+      ),
+      error: "Failed to update task completion"
       });
     }
   },
