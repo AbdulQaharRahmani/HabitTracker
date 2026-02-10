@@ -97,8 +97,9 @@
   "apple": "Apple",
   "already_have_account": "Already have an account?",
   "log_in": "Log in",
-  "logout":"Logout",
-
+  "logout": "Logout",
+  "Old_Password": "Old Password",
+  "New_Password": "New Password",
   "NO_HABITS_YET": "No habits added yet",
   "NO_ACTIVE_STREAK_YET": "No active streak yet",
   "NO_HABITS_COMPLETED_YET": "No habits completed yet",
