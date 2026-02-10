@@ -14,11 +14,9 @@ export default function Habits() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const {
-    habits,
-    loading,
     searchTerm,
     setSearchTerm,
-    searchHabits,
+    fetchHabitsPage,
     fetchHabitsByDate,
     selectedDate,
   } = useHabitStore();
@@ -28,16 +26,20 @@ export default function Habits() {
   useEffect(() => {
     fetchHabitsByDate(selectedDate);
   }, [selectedDate]);
+  const ITEMS_PER_PAGE = 10;
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
+
     setSearchTerm(value);
+    setCurrentPage(1); // ✅ reset pagination
 
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      searchHabits();
+      fetchHabitsPage(1, ITEMS_PER_PAGE); // ✅ unified fetch
     }, 400);
   };
+
   useEffect(() => {
     return () => clearTimeout(debounceRef.current);
   }, []);

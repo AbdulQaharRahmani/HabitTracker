@@ -28,9 +28,12 @@ const useHabitStore = create((set, get) => ({
     }
   },
   setSearchTerm: (term) => {
-    set({ searchTerm: term });
-    set({ isSearching: !!term.trim() });
+    set({
+      searchTerm: term,
+      isSearching: !!term.trim(),
+    });
   },
+
   searchHabits: async () => {
     const { searchTerm, selectedDate } = get();
 
@@ -76,9 +79,11 @@ const useHabitStore = create((set, get) => ({
       const response = await api.get("/habits", { params });
       const data = response.data;
 
+      const totalPages = data.totalPages || 1;
+
       set({
         habits: data.data || [],
-        totalCount: (data.totalPages || 1) * limit,
+        totalCount: totalPages * limit,
         loading: false,
       });
     } catch (err) {
