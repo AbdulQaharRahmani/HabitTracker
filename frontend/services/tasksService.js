@@ -26,3 +26,15 @@ export const updateTaskStatus = async (id, status) => {
   }
 };
 
+export const deleteTask = async (taskId) => {
+   try {
+     const response = await api.delete(`/tasks/${taskId}`);
+     return response.data;
+   } catch (error) {
+     console.error(
+       "Delete task failed:",
+       error.response?.data || error.message,
+     );
+     throw error;
+   }
+}
