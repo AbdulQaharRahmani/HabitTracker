@@ -95,20 +95,9 @@ const Sidebar = ({ children }) => {
       >
         {/* --- Profile --- */}
         <div className="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
-          {/* Desktop Toggle */}
-          <div className="hidden md:flex justify-end mb-4">
 
 
-
-            <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600"
-            >
-              {isOpen ? <FaTimes size={12} /> : <FaBars size={12} />}
-            </button>
-          </div>
-
-          <div className={`flex ${isOpen ? "flex-col text-center space-y-2" : "flex-col items-center"}`}>
+          <div className={`flex ${isOpen ? "flex-col text-center space-y-2" : "flex-col items-center mb-10"}`}>
            <div className="relative flex justify-center">
                <div className="flex justify-center items-center mx-auto w-[60px] h-[60px] rounded-full overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 border border-gray-300">
               <img
@@ -132,18 +121,21 @@ const Sidebar = ({ children }) => {
 
         {/* --- Navigation ---*/}
         <nav className="flex-1 p-4 overflow-y-auto">
-          {isOpen && (
-            <>
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500">
-                {t("DASHBOARD")}
-              </h4>
+
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500">
+              {isOpen && (t("DASHBOARD"))}
+            </h4>
+
               <ul className="space-y-1">
                 {dashboardItems.map((item) => (
                   <li key={item.id}>
                     <NavLink
                       to={item.path}
                       end={item.path === "/"}
-                      onClick={() => screenMode === "mobile" && closeSidebar()}
+                      onClick={() =>{
+                        if (!isOpen) toggleSidebar();
+                        screenMode === "mobile" && closeSidebar();
+                      }}
                       className={({ isActive }) =>
                         `flex items-center p-3 rounded-lg transition ${
                           isActive
@@ -153,25 +145,27 @@ const Sidebar = ({ children }) => {
                       }
                     >
                       <span className="text-lg">{item.icon}</span>
+                      {isOpen && (
                       <span className="ml-4 font-medium">{t(item.name)}</span>
+                       )}
                     </NavLink>
                   </li>
                 ))}
               </ul>
-            </>
-          )}
 
-          {isOpen && (
-            <>
               <h4 className="text-xs font-semibold uppercase tracking-wider mt-6 mb-3 px-3 text-gray-500">
-                {t("Preferences")}
+                 {isOpen && (t("Preferences"))}
               </h4>
+
               <ul className="space-y-1">
                 {preferencesItems.map((item) => (
                   <li key={item.id}>
                     <NavLink
                       to={item.path}
-                      onClick={() => screenMode === "mobile" && closeSidebar()}
+                      onClick={() => {
+                        if (!isOpen) toggleSidebar();
+                        screenMode === "mobile" && closeSidebar();
+                      }}
                       className={({ isActive }) =>
                         `flex items-center p-3 rounded-lg transition ${
                           isActive
@@ -181,13 +175,13 @@ const Sidebar = ({ children }) => {
                       }
                     >
                       <span className="text-lg">{item.icon}</span>
+                       {isOpen && (
                       <span className="ml-4 font-medium">{t(item.name)}</span>
+                       )}
                     </NavLink>
                   </li>
                 ))}
               </ul>
-            </>
-          )}
         </nav>
 
         {/*--- Logout --- */}
@@ -207,6 +201,15 @@ const Sidebar = ({ children }) => {
 
       {/* --- Main Content --- */}
       <main className="flex-1 overflow-y-auto h-screen">
+         {/* Desktop Toggle */}
+          <div className="hidden md:flex justify-start mx-4 mt-4">
+            <button
+              onClick={toggleSidebar}
+              className="p-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600"
+            >
+              {isOpen ? <FaTimes size={12} /> : <FaBars size={12} />}
+            </button>
+          </div>
         <div className="p-4 md:p-6">{children}</div>
       </main>
     </div>
