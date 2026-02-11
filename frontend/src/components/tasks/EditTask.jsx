@@ -40,13 +40,12 @@ export default function EditTask () {
         return;
       }
 
-
       const taskPayload = {
         title: taskData.title,
         description: taskData.description,
         dueDate: taskData.dueDate,
-        categoryId: taskData.category,
-        priority: taskData.priority
+        categoryId: taskData.category,  
+        priority: taskData.priority,
       };
 
       try {

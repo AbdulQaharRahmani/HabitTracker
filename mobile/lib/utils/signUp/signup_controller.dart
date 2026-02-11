@@ -63,7 +63,7 @@ class SignUpController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _authService.registerUser(
+      final result = await _authService.register(
         name: usernameController.text.trim(),
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
@@ -72,8 +72,7 @@ class SignUpController extends ChangeNotifier {
       print("Server response: $result");
 
       if (result["success"] == true) {
-        // نمایش پیام موفقیت
-        _showSuccessMessage(context);
+            _showSuccessMessage(context);
         return true;
       } else {
         errorMessage = result["message"] ?? 'Registration failed';

@@ -36,6 +36,11 @@ export default function TaskCard({
 
   const { t } = useTranslation();
 
+  const normalizedCategoryId =
+    typeof categoryId === "object" ? categoryId._id : categoryId;
+ const categories = useTaskCardStore((s) => s.categories);
+ const category = categories.find((c) => c.id === normalizedCategoryId);
+
   return (
     <div
       className={`flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8 
@@ -102,9 +107,10 @@ export default function TaskCard({
               </p>
             </div>
             <div
-              className={`py-2 text-[0.8rem] text-[${categoryId.backgroundColor}] dark:text-gray-500 ‍`}
+              className="py-2 text-[0.8rem]"
+              style={{ color: category?.color ?? "#999" }}
             >
-              {t(categoryId.name)}
+              {t(category?.name)}
             </div>
           </div>
         </div>

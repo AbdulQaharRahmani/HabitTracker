@@ -17,6 +17,10 @@ function Tasks() {
     fetchTasks(ITEMS_PER_PAGE, page);
   }, [page, isModalOpen, isEditModalOpen]);
 
+  const fetchCategories = useTaskCardStore((s) => s.fetchCategories);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const { t } = useTranslation();
 
