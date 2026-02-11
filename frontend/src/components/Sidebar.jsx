@@ -65,12 +65,15 @@ const Sidebar = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* --- Mobile Toggle Button --- */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-full bg-indigo-600 text-white shadow-lg"
+      {
+         screenMode ==="mobile" && ( <button
+        className={`md:hidden fixed top-4  z-50 p-2 rounded-full bg-indigo-600 text-white shadow-lg ${isOpen ? "absolute left-60" : "left-4"}`}
         onClick={toggleSidebar}
       >
          {isOpen ? <FiChevronLeft size={16} /> : <FiChevronRight size={16} />}
-      </button>
+      </button>)
+      }
+
 
       {/* --- Mobile Overlay ---*/}
       {screenMode === "mobile" && isOpen && (
