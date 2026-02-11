@@ -62,7 +62,6 @@ const Sidebar = ({ children }) => {
   }, [setScreenMode]);
 
 
-
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* --- Mobile Toggle Button --- */}
@@ -144,7 +143,7 @@ const Sidebar = ({ children }) => {
                       to={item.path}
                       end={item.path === "/"}
                       onClick={() =>{
-                        if (!isOpen) toggleSidebar();
+
                         screenMode === "mobile" && closeSidebar();
                       }}
                       className={({ isActive }) =>
@@ -174,7 +173,6 @@ const Sidebar = ({ children }) => {
                     <NavLink
                       to={item.path}
                       onClick={() => {
-                        if (!isOpen) toggleSidebar();
                         screenMode === "mobile" && closeSidebar();
                       }}
                       className={({ isActive }) =>
