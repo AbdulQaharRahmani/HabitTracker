@@ -130,7 +130,7 @@ const Sidebar = ({ children }) => {
         </div>
 
         {/* --- Navigation ---*/}
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav className="flex-1 py-4 px-3 overflow-y-auto">
 
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500">
               {isOpen && (t("DASHBOARD"))}
@@ -194,7 +194,7 @@ const Sidebar = ({ children }) => {
         </nav>
 
         {/*--- Logout --- */}
-        <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+        <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={() => {
               logout();
