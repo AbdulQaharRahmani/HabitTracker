@@ -1,11 +1,11 @@
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 
-const TIME_LIMIT = 15 * 60 * 1000;
+const TIME_LIMIT = 1 * 60 * 1000;
 
 // Rate limiter for public routes
 export const publicLimiter = rateLimit({
   windowMs: TIME_LIMIT,
-  max: 20,
+  max: 50,
   keyGenerator: (req) => {
     const ip = req.ip || ipKeyGenerator(req);
     console.log('Limiter IP:', ip); // log on render to check IP of unauthenticated users for security
@@ -19,7 +19,7 @@ export const publicLimiter = rateLimit({
 // Rate limiter for private routes
 export const privateLimiter = rateLimit({
   windowMs: TIME_LIMIT,
-  max: 1000,
+  max: 70,
   keyGenerator: (req) =>
     req.user ? req.user._id.toString() : ipKeyGenerator(req),
   message: 'Too many requests.',
