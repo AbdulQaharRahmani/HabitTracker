@@ -20,7 +20,7 @@ export default function LogTable({ filteredList }) {
       <div className="w-full py-24 flex justify-center items-center bg-white dark:bg-gray-900 rounded-2xl">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-[3px] border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">{t("Loading...")}</p>
+          <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">{t("Loading logs")}</p>
         </div>
       </div>
     );
