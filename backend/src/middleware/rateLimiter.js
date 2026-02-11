@@ -19,7 +19,7 @@ export const publicLimiter = rateLimit({
 // Rate limiter for private routes
 export const privateLimiter = rateLimit({
   windowMs: TIME_LIMIT,
-  max: 1500,
+  max: 1000,
   keyGenerator: (req) =>
     req.user ? req.user._id.toString() : ipKeyGenerator(req),
   message: 'Too many requests.',
