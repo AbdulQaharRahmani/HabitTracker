@@ -66,14 +66,13 @@ export const useTaskCardStore = create((set, get) => ({
 
   addTask: async (taskPayload) => {
     try {
-      // console.log("TASK DATA BEFORE SUBMIT 👉", taskData);
       const date = new Date(taskPayload.dueDate);
 
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
         dueDate: date.toISOString(),
-        categoryId: taskPayload.categoryId, //for backend
+        categoryId: taskPayload.categoryId,
         priority: normalizePriorityToEnglish(taskPayload.priority),
       };
 
@@ -100,7 +99,6 @@ export const useTaskCardStore = create((set, get) => ({
           ],
         };
       });
-
       return res.data;
     } catch (error) {
       console.error("Add task failed:", error.response?.data || error.message);
@@ -112,20 +110,25 @@ export const useTaskCardStore = create((set, get) => ({
     set({ tasksLoading: true, error: null });
     try {
       const response = await getTasks(limit, page);
-
       set({ tasks: response.data, loading: false });
     } catch (err) {
-      set({ error: err?.message || "An error occurred", tasksLoading: false });
+      set({
+        error: err?.message || "An error occurred",
+        tasksLoading: false,
+      });
     }
   },
 
   completeTask: (id) =>
     set((state) => ({
-      tasks: state.tasks.map((task) => {
-        return task._id === id
-          ? { ...task, status: task.status === "done" ? "todo" : "done" }
-          : task;
-      }),
+      tasks: state.tasks.map((task) =>
+        task._id === id
+          ? {
+              ...task,
+              status: task.status === "done" ? "todo" : "done",
+            }
+          : task,
+      ),
     })),
 
   deleteTask: (id) =>
@@ -138,13 +141,23 @@ export const useTaskCardStore = create((set, get) => ({
   isEditModalOpen: false,
   editingTaskId: null,
 
-  openEditModal: (taskId) => {
+  openEditModal: async (taskId) => {
     const task = get().tasks.find((t) => t._id === taskId);
-
     if (!task) {
       console.log("Task not found for editing:", taskId);
       return;
     }
+
+    const { categories, fetchCategories } = get();
+    if (categories.length === 0) {
+      await fetchCategories();
+    }
+
+    const rawCategory = task.categoryId;
+    const categoryId =
+      typeof rawCategory === "string"
+        ? rawCategory
+        : (rawCategory?._id ?? null);
 
     set({
       isEditModalOpen: true,
@@ -153,7 +166,7 @@ export const useTaskCardStore = create((set, get) => ({
         title: task.title,
         description: task.description,
         dueDate: task.dueDate,
-        category: task.categoryId,
+        category: categoryId,
         priority: task.priority,
       },
     });
@@ -173,19 +186,17 @@ export const useTaskCardStore = create((set, get) => ({
     }),
 
   updateTask: async (taskId, taskPayload) => {
+
     try {
       const date = new Date(taskPayload.dueDate);
 
-      const { categories } = get();
-      // const categoryName =
-      //   categories.find((c) => c.id === taskPayload.category)?.name || "—";
+      const categoryId = taskPayload.categoryId;
 
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
         dueDate: date.toISOString(),
         categoryId: taskPayload.categoryId,
-        // category: categoryName,
         priority: normalizePriorityToEnglish(taskPayload.priority),
       };
 
@@ -197,9 +208,8 @@ export const useTaskCardStore = create((set, get) => ({
             ? {
                 ...task,
                 ...taskPayload,
-                // category: categoryName,
-                categoryId: taskPayload.categoryId,
-                priority: normalizePriorityToEnglish(taskPayload.priority)
+                category : categoryId,
+                priority: normalizePriorityToEnglish(taskPayload.priority),
               }
             : task,
         ),
@@ -227,4 +237,3 @@ const normalizePriorityToEnglish = (value) => {
       return "medium";
   }
 };
-
