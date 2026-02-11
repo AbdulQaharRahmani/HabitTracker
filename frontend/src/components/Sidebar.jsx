@@ -53,6 +53,7 @@ const Sidebar = ({ children }) => {
     isMobileOpen,
     toggleMobileSidebar,
     closeMobileSidebar,
+    toggleSidebar,
   } = useSidebarStore();
 
  const {userId,username,logout} = useAuthStore((state) => state);
@@ -61,6 +62,25 @@ const Sidebar = ({ children }) => {
     if (!userId) return;
     fetchProfilePhoto(userId);
   }, [fetchProfilePhoto, userId]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        toggleSidebar(); 
+      }
+
+      if (e.key === "Escape") {
+        if (isMobileOpen) closeMobileSidebar();
+        else if (isOpen) toggleSidebar();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, isMobileOpen, toggleSidebar, closeMobileSidebar]);
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
