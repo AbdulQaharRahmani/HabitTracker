@@ -21,7 +21,15 @@ export const updateTaskStatus = async (id, status) => {
     const message =
       error?.response?.data?.message ||
       error?.message ||
+<<<<<<< HEAD
       "Failed to update task status";
     throw new Error(message);
   }
 };
+=======
+      "Failed to update task completion";
+    console.log(message);
+  }
+};
+
+>>>>>>> 7dc6c04b30a3ae29033f49319cbf5456d97b28a5

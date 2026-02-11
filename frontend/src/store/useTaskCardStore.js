@@ -119,17 +119,32 @@ export const useTaskCardStore = create((set, get) => ({
     }
   },
 
-  completeTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
+  completeTask: async (id) => {
+    const {tasks} = get();
+    const task = tasks.find((task) => task._id === id);
+
+    if (!task)
+      return;
+
+    set({
+      tasks: tasks.map((task) =>
         task._id === id
-          ? {
-              ...task,
-              status: task.status === "done" ? "todo" : "done",
-            }
+          ? { ...task, status: task.status === "done" ? "todo" : "done" }
           : task,
       ),
-    })),
+    });
+
+    try{
+      await updateTaskStatus(id, task.status === "done" ? "todo" : "done");
+    } catch (err) {
+      set({
+        tasks: tasks.map((task) => 
+        task._id === id ? {...task, status: task.status} : task
+      ), 
+      error: "Failed to update task completion" 
+      });
+    }
+  },
 
   deleteTask: (id) =>
     set((state) => ({
