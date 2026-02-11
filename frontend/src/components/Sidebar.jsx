@@ -6,11 +6,10 @@ import {
   FaCalendarDay,
   FaChartLine,
   FaCog,
-  FaBars,
-  FaTimes,
   FaSignOutAlt,
 } from "react-icons/fa";
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 import useSidebarStore from "../store/useSidebarStore";
 import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
@@ -68,10 +67,10 @@ const Sidebar = ({ children }) => {
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* --- Mobile Toggle Button --- */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-indigo-600 text-white shadow-lg"
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-full bg-indigo-600 text-white shadow-lg"
         onClick={toggleSidebar}
       >
-        {isOpen ? <FaTimes size={16} /> : <FaBars size={16} />}
+         {isOpen ? <FiChevronLeft size={16} /> : <FiChevronRight size={16} />}
       </button>
 
       {/* --- Mobile Overlay ---*/}
@@ -87,17 +86,29 @@ const Sidebar = ({ children }) => {
         className={`
           fixed top-0 left-0 md:relative h-screen z-40
           bg-white dark:bg-gray-900
-          transition-all duration-300 ease-in-out
+          transition-all duration-300 ease-in-out position-relative
           ${screenMode === "mobile" && !isOpen ? "-translate-x-full" : "translate-x-0"}
+          ${screenMode === "desktop" ? "pt-10" : ""}
+
           ${isOpen ? "md:w-64 w-64" : "md:w-20 w-64"}
           flex flex-col shadow-xl border-r border-gray-200 dark:border-gray-700
         `}
       >
+         {/* Desktop Toggle */}
+      <div className="hidden md:flex justify-end mt-5 mr-[-12px] absolute top-0 right-0">
+        <button
+          onClick={toggleSidebar}
+          className="p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600"
+        >
+          {isOpen ? <FiChevronLeft size={16} /> : <FiChevronRight size={16} />}
+        </button>
+      </div>
+
         {/* --- Profile --- */}
         <div className="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
 
 
-          <div className={`flex ${isOpen ? "flex-col text-center space-y-2" : "flex-col items-center mb-10"}`}>
+          <div className={`flex mt-5 ${isOpen ? " flex-col text-center space-y-2" : "flex-col items-center mb-10"}`}>
            <div className="relative flex justify-center">
                <div className="flex justify-center items-center mx-auto w-[60px] h-[60px] rounded-full overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 border border-gray-300">
               <img
@@ -201,15 +212,8 @@ const Sidebar = ({ children }) => {
 
       {/* --- Main Content --- */}
       <main className="flex-1 overflow-y-auto h-screen">
-         {/* Desktop Toggle */}
-          <div className="hidden md:flex justify-start mx-4 mt-4">
-            <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600"
-            >
-              {isOpen ? <FaTimes size={12} /> : <FaBars size={12} />}
-            </button>
-          </div>
+
+
         <div className="p-4 md:p-6">{children}</div>
       </main>
     </div>
