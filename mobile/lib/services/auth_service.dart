@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 
 import '../screens/habitScreen/add_habit.dart';
+import '../utils/profile/profile_model.dart';
 import '../utils/today_progressBar/task_item.dart';
 
 
@@ -130,17 +131,22 @@ class AuthService {
       return {'success': false, 'message': 'Failed to fetch user profile: $e'};
     }
   }
-
-  Future<Map<String, dynamic>> getHabitsDashboard() async {
+  Future<Welcome> fetchHabitsDashboard() async {
     try {
+      final headers = await _headers();
       final res = await http.get(
         Uri.parse("$_api/habits/dashboard"),
-        headers: await _headers(),
+        headers: headers,
       );
 
-      return jsonDecode(res.body);
+      if (res.statusCode == 200) {
+        final welcome = welcomeFromJson(res.body);
+        return welcome;
+      } else {
+        throw Exception('Failed to load dashboard: ${res.statusCode}');
+      }
     } catch (e) {
-      return {'success': false, 'message': 'Failed to fetch habits dashboard: $e'};
+      rethrow;
     }
   }
 
@@ -363,5 +369,47 @@ class AuthService {
     }
 
     return json['status'] == 'done' || json['status'] == 'completed';
+  }
+}
+// ===========================================================================
+// DISPLAY NAME (Single Source of Truth)
+// ===========================================================================
+Future<String> getDisplayName() async {
+  try {
+    final authService = AuthService();
+    final profileRes = await authService.getUserProfile();
+
+    if (profileRes['success'] == true) {
+      final data = profileRes['data'];
+
+      final username = data?['username']?.toString();
+      if (username != null && username.trim().isNotEmpty) {
+        return username;
+      }
+
+      final email = data?['email']?.toString();
+      if (email != null && email.contains('@')) {
+        return email.split('@').first;
+      }
+    }
+
+    // 2️⃣ از SharedPreferences
+    final storedUser = await AuthManager.getUserData();
+    if (storedUser != null) {
+      final name = storedUser['name'];
+      if (name != null && name.isNotEmpty) {
+        return name;
+      }
+
+      final email = storedUser['email'];
+      if (email != null && email.contains('@')) {
+        return email.split('@').first;
+      }
+    }
+
+    // 3️⃣ fallback
+    return 'Habit Tracker User';
+  } catch (e) {
+    return 'Habit Tracker User';
   }
 }
