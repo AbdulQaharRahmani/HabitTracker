@@ -44,7 +44,12 @@ app.use((req, res, next) => {
   req.params = sanitizeKeys(req.params);
   next();
 });
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
 app.use(logMiddleware);
 //#endregion
 

@@ -7,7 +7,8 @@ import '../../services/token_storage.dart';
 import '../categoryScreen/create_category.dart';
 
 class NewTaskPage extends StatefulWidget {
-  const NewTaskPage({super.key});
+  final String? defaultCategoryId;
+  const NewTaskPage({super.key, this.defaultCategoryId});
 
   @override
   State<NewTaskPage> createState() => _NewTaskPageState();
@@ -38,9 +39,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
   // ===== Due Date =====
   DateTime? _selectedDueDate;
 
+
   @override
   void initState() {
     super.initState();
+    _selectedCategoryId = widget.defaultCategoryId;
     _loadTokenAndCategories();
   }
 
@@ -57,7 +60,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       setState(() {
         _token = token;
         _categories = categories;
-        _selectedCategoryId = _categories.isNotEmpty ? _categories.first.id : null;
+        _selectedCategoryId = widget.defaultCategoryId ?? (_categories.isNotEmpty ? _categories.first.id : null);
         _isTokenLoading = false;
       });
     } catch (e) {
@@ -93,7 +96,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
         priority: _selectedPriority,
         categoryId: _selectedCategoryId!,
         token: _token,
-        dueDate: _selectedDueDate?.toIso8601String(),
+        dueDate: _selectedDueDate
       );
 
       if (!mounted) return;
@@ -221,7 +224,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   _selectedDueDate != null
-                      ? '${_selectedDueDate!.day}/${_selectedDueDate!.month}/${_selectedDueDate!.year} '
+                      ? '${_selectedDueDate!.year}-${_selectedDueDate!.month.toString().padLeft(2,'0')}-${_selectedDueDate!.day.toString().padLeft(2,'0')} '
                       '${_selectedDueDate!.hour.toString().padLeft(2,'0')}:${_selectedDueDate!.minute.toString().padLeft(2,'0')}'
                       : 'Select due date & time',
                   style: const TextStyle(color: Colors.black87),

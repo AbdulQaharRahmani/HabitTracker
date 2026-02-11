@@ -145,8 +145,8 @@ class TasksScreenCard extends StatelessWidget {
 
   // ===== Helper Methods =====
   String _formatDueDate(DateTime dueDate) {
-    return '${dueDate.day.toString().padLeft(2, '0')} '
-        '${_monthName(dueDate.month)} ${dueDate.year}, '
+    return '${dueDate.year.toString().padLeft(2, '0')} '
+        '${_monthName(dueDate.month)} ${dueDate.day}, '
         '${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute
         .toString()
         .padLeft(2, '0')}';
