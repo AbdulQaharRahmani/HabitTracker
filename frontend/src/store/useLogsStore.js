@@ -42,7 +42,12 @@ const useLogsStore = create((set, get) => ({
         set({ currentPage: currentPage - 1 });
     },
     topDevices: [],
-    logsStats: [],
+    logsStats: {
+        error: 0,
+        info:0,
+        total: 0,
+        warn: 0
+    },
     mostUsedRoutes: [],
     getLogsStatistics: async () => {
         set({ loading: true })
