@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { fetchLogs } from "../../services/logsService";
+import { fetchLogs, fetchLogsStats } from "../../services/logsService";
 
 const useLogsStore = create((set, get) => ({
     logsData: [],
@@ -17,14 +17,14 @@ const useLogsStore = create((set, get) => ({
                 totalPages: data.totalPages,
             });
         } catch (error) {
-              const message = err.response?.data?.message || "Failed to fetch data";
+            const message = err.response?.data?.message || "Failed to fetch data";
             set({
                 error: message,
                 logsData: []
             });
         }
-        finally{
-          set({loading: false})
+        finally {
+            set({ loading: false })
         }
     },
 
@@ -40,6 +40,32 @@ const useLogsStore = create((set, get) => ({
         const { currentPage, loading } = get();
         if (loading || currentPage <= 1) return;
         set({ currentPage: currentPage - 1 });
+    },
+    topDevices: [],
+    logsStats: [],
+    mostUsedRoutes: [],
+    getLogsStatistics: async () => {
+        set({ loading: true })
+        try {
+            let data = await fetchLogsStats()
+            set({
+                topDevices: data.topDevices,
+                logsStats: data.stats,
+                mostUsedRoutes: data.topRoutes
+            })
+            console.log(data)
+        } catch (error) {
+            const message = err.response?.data?.message || "Failed to fetch data";
+            set({
+                error: message,
+                topDevices: [],
+                logsStats: [],
+                mostUsedRoutes: [],
+            });
+        }
+        finally {
+            set({ loading: false })
+        }
     }
 }));
 
