@@ -7,11 +7,11 @@ import {
 } from '../utils/error.js';
 import { HabitModel } from '../models/Habit.js';
 import { isHabitForSelectedDay } from '../utils/habitFrequency.js';
-import { DateHelper } from '../utils/date.js';
 import { CategoryModel } from '../models/Category.js';
 import { HabitCompletionModel } from '../models/habitCompletion.js';
 import { ERROR_CODES } from '../utils/constant.js';
 import { v4 as uuidv4 } from 'uuid';
+import { DateHelper } from '../utils/date.js';
 import { prepareSearchQuery } from '../utils/habit.js';
 
 // Get all user habits
@@ -251,6 +251,10 @@ export const reorderHabits = async (req, res) => {
 export const completeHabit = async (req, res) => {
   if (!req.user) throw unauthorized();
 
+  const { date } = req.body;
+
+  const selectedDate = DateHelper.validateDateRange(date);
+
   const habit = await HabitModel.findById(req.params.id);
 
   if (!habit) throw notFound('Habit');
@@ -263,8 +267,26 @@ export const completeHabit = async (req, res) => {
       ERROR_CODES.FORBIDDEN
     );
 
-  // Validate if habit is completed for the same day
-  if (await HabitCompletionModel.isAlreadyCompleted(req.params.id))
+  if (habit.isDeleted)
+    throw new AppError(
+      'Habit is already deleted',
+      400,
+      ERROR_CODES.RESOURCE_ALREADY_REMOVED
+    );
+
+  //Check if date is before habit created date
+  const createdAt = dayjs(habit.createdAt).startOf('day');
+  if (selectedDate.isBefore(createdAt, 'day'))
+    throw new AppError(
+      'You cannot modify habits before their creation date',
+      400,
+      ERROR_CODES.VALIDATION_ERROR
+    );
+
+  //Validate if habit is completed for the same day
+  if (
+    await HabitCompletionModel.isAlreadyCompleted(req.params.id, selectedDate)
+  )
     throw new AppError(
       'Habit is already completed',
       400,
@@ -274,6 +296,7 @@ export const completeHabit = async (req, res) => {
   const habitCompletion = await HabitCompletionModel.create({
     habitId: habit._id,
     userId: req.user._id,
+    date: selectedDate,
   });
 
   res.status(201).json({
@@ -286,6 +309,10 @@ export const completeHabit = async (req, res) => {
 export const uncompleteHabit = async (req, res) => {
   if (!req.user) throw unauthorized();
 
+  const { date } = req.body;
+
+  const selectedDate = DateHelper.validateDateRange(date);
+
   const habit = await HabitModel.findById(req.params.id);
 
   if (!habit) throw notFound('Habit');
@@ -298,11 +325,25 @@ export const uncompleteHabit = async (req, res) => {
       ERROR_CODES.FORBIDDEN
     );
 
-  const [startOfToday, endOfToday] = DateHelper.getStartAndEndOfToday();
+  if (habit.isDeleted)
+    throw new AppError(
+      'Habit is already deleted',
+      400,
+      ERROR_CODES.RESOURCE_ALREADY_REMOVED
+    );
+
+  const createdAt = dayjs(habit.createdAt).startOf('day');
+  //Check if date is before habit created date
+  if (selectedDate.isBefore(createdAt, 'day'))
+    throw new AppError(
+      'You cannot modify habits before their creation date',
+      400,
+      ERROR_CODES.VALIDATION_ERROR
+    );
 
   const habitCompletion = await HabitCompletionModel.findOneAndDelete({
     habitId: habit._id,
-    date: { $gte: startOfToday, $lte: endOfToday },
+    date: selectedDate,
   });
 
   if (!habitCompletion) throw notFound('HabitCompletion');
