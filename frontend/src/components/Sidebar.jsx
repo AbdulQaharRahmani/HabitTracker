@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import useSidebarStore from "../store/useSidebarStore";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
@@ -61,6 +63,26 @@ const Sidebar = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [setScreenMode]);
 
+
+   useHotkeys(
+    "ctrl+b, meta+b",
+    (e) => {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  );
+
+  useHotkeys(
+    "esc",
+    (e) => {
+      e.preventDefault();
+      if (isMobileOpen) {
+        closeMobileSidebar();
+      } else if (isOpen) {
+        toggleSidebar();
+      }
+    }
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
