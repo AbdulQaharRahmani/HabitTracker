@@ -18,7 +18,7 @@ import DarkMode from "./components/DarkMode";
 import { Toaster } from "react-hot-toast";
 import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import Logs from "./pages/Logs";
 function App() {
   return (
     <>
@@ -59,6 +59,7 @@ function App() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/logs" element={<Logs />} />
         </Route>
         </Route>
         <Route path="*" element={<>not found</>} />
