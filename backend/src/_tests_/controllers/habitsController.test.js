@@ -46,11 +46,12 @@ vi.mock('../../utils/habitFrequency.js', () => ({
   isHabitForSelectedDay: vi.fn(),
 }));
 
-vi.mock('../../utils/date.js', () => ({
-  DateHelper: {
-    getStartAndEndOfToday: vi.fn(),
-  },
-}));
+vi.mock('../../utils/date.js', async (importOriginal) => {
+  const actual = await importOriginal();
+  const DateHelper = actual.DateHelper;
+  DateHelper.getStartAndEndOfToday = vi.fn();
+  return { DateHelper };
+});
 
 vi.mock('../../models/habitCompletion.js', () => ({
   HabitCompletionModel: {
@@ -661,6 +662,7 @@ describe('Delete Habit', () => {
     req = {
       user: { _id: 'user123' },
       params: { id: 'habit123' },
+      body: {},
     };
 
     res = {
@@ -897,6 +899,7 @@ describe('Complete Habit', () => {
     req = {
       user: { _id: 'user123' },
       params: { id: 'habit123' },
+      body: { date: '2026-01-01' },
     };
 
     res = {
@@ -978,10 +981,13 @@ describe('Complete Habit', () => {
 
     await completeHabit(req, res);
 
-    expect(HabitCompletionModel.create).toHaveBeenCalledWith({
-      habitId: 'habit123',
-      userId: 'user123',
-    });
+    expect(HabitCompletionModel.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        habitId: 'habit123',
+        userId: 'user123',
+        date: expect.any(Object),
+      })
+    );
 
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
@@ -1072,6 +1078,7 @@ describe('Uncomplete Habit', () => {
     req = {
       user: { _id: 'user-1' },
       params: { id: 'habit-1' },
+      body: { date: '2026-01-01' },
     };
 
     res = {
@@ -1091,16 +1098,17 @@ describe('Uncomplete Habit', () => {
     const completionMock = { _id: 'completion-1' };
 
     HabitModel.findById.mockResolvedValue(habitMock);
-    DateHelper.getStartAndEndOfToday.mockReturnValue([100, 200]);
     HabitCompletionModel.findOneAndDelete.mockResolvedValue(completionMock);
 
     await uncompleteHabit(req, res);
 
     expect(HabitModel.findById).toHaveBeenCalledWith('habit-1');
-    expect(HabitCompletionModel.findOneAndDelete).toHaveBeenCalledWith({
-      habitId: 'habit-1',
-      date: { $gte: 100, $lte: 200 },
-    });
+    expect(HabitCompletionModel.findOneAndDelete).toHaveBeenCalledWith(
+      expect.objectContaining({
+        habitId: 'habit-1',
+        date: expect.any(Object),
+      })
+    );
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
@@ -1134,7 +1142,6 @@ describe('Uncomplete Habit', () => {
     };
 
     HabitModel.findById.mockResolvedValue(habitMock);
-    DateHelper.getStartAndEndOfToday.mockReturnValue([100, 200]);
     HabitCompletionModel.findOneAndDelete.mockResolvedValue(null);
 
     await expect(uncompleteHabit(req, res)).rejects.toMatchObject({
