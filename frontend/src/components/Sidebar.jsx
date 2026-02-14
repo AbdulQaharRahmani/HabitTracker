@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import useSidebarStore from "../store/useSidebarStore";
+import { useHotkeys } from "react-hotkeys-hook";
 
 import {
   FaCalendarDay,
@@ -45,8 +46,8 @@ const preferencesItems = [
 
 const Sidebar = ({ children }) => {
   const { t } = useTranslation();
-   const [preview, setPreview] = useState(null);
-    const { userProfileUrl, fetchProfilePhoto, loading } =
+  const [preview, setPreview] = useState(null);
+  const { userProfileUrl, fetchProfilePhoto, loading } =
       useProfilePhotoStore();
   const {
     isOpen,
@@ -63,24 +64,25 @@ const Sidebar = ({ children }) => {
     fetchProfilePhoto(userId);
   }, [fetchProfilePhoto, userId]);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "b") {
-        e.preventDefault();
-        toggleSidebar(); 
-      }
+   useHotkeys(
+    "ctrl+b, meta+b",
+    (e) => {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  );
 
-      if (e.key === "Escape") {
-        if (isMobileOpen) closeMobileSidebar();
-        else if (isOpen) toggleSidebar();
+  useHotkeys(
+    "esc",
+    (e) => {
+      e.preventDefault();
+      if (isMobileOpen) {
+        closeMobileSidebar();
+      } else if (isOpen) {
+        toggleSidebar();
       }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, isMobileOpen, toggleSidebar, closeMobileSidebar]);
+    }
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">

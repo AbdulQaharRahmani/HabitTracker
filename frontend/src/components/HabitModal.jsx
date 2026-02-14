@@ -1,9 +1,10 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import useHabitStore from "../store/useHabitStore";
 import Dropdown from "./Dropdown";
 import { FaTimes } from "react-icons/fa";
 import SearchableDropdown from "./SearchableDropdown";
 import toast from "react-hot-toast";
+import { useHotkeys } from "react-hotkeys-hook"
 
 const frequencyItems = [
     { id: "f1", name: "Daily", value: "daily" },
@@ -36,7 +37,37 @@ export default function HabitModal() {
     }
   }, [isModalOpen, fetchCategories]);
 
-  const handleHabitDataSubmission = useCallback(
+  const formRef = useRef(null);
+
+
+  useHotkeys(
+    "ctrl+s, meta+s",
+    (e) => {
+      e.preventDefault();
+      if (formRef.current) {
+        formRef.current.dispatchEvent(
+          new Event("submit", { cancelable: true })
+        );
+      }
+      toast.success("Form saved!")
+    },
+    { enabled: isModalOpen }
+  );
+
+  useHotkeys("ctrl+n, meta+n", (e) => {
+    e.preventDefault();
+    setModalOpen(true);
+  });
+
+  useHotkeys(
+    "esc",
+    () => {
+      setModalOpen(false);
+    },
+    { enabled: isModalOpen }
+  );
+
+ const handleHabitDataSubmission = useCallback(
     async (e) => {
       e?.preventDefault();
 
@@ -45,32 +76,10 @@ export default function HabitModal() {
       }
       await submitHabit(habitData, isEditingMode, currentHabitID);
       fetchHabits();
+      setModalOpen(false)
     },
-    [habitData, isEditingMode, currentHabitID, submitHabit, fetchHabits],
+    [habitData, isEditingMode, currentHabitID, submitHabit, fetchHabits, setModalOpen]
   );
-
-  useEffect(() => {
-    if (!isModalOpen) return;
-
-    const handelkeyDown = async (e) => {
-      if (e.key === "Escape") {
-        setModalOpen(false);
-      }
-
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        await handleHabitDataSubmission(e);
-      }
-    };
-
-    window.addEventListener("keydown", handelkeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handelkeyDown);
-    };
-  }, [isModalOpen, setModalOpen, handleHabitDataSubmission]);
-
-  
 
   const handleAddCategory = async (name, color) => {
     await addUserCategory(name, color);
