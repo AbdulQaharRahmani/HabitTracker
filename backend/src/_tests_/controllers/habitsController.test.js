@@ -138,7 +138,7 @@ describe('Create Habit', () => {
     expect(HabitModel.getHabitCountByUserId).not.toHaveBeenCalled();
   });
 
-  it("6. Category doesn't exist -> Should throw 400 error", async () => {
+  it("6. Category doesn't exist -> Should throw 404 error", async () => {
     req.body = {
       title: 'Exercise',
       description: 'Daily workout',
@@ -988,6 +988,42 @@ describe('Complete Habit', () => {
       success: true,
       data: completion,
     });
+  });
+
+  it('5b. Should not allow completing for dates more than 7 days in the past', async () => {
+    const habit = {
+      _id: 'habit123',
+      isOwner: vi.fn().mockReturnValue(true),
+    };
+
+    HabitModel.findById.mockResolvedValue(habit);
+
+    // System time is mocked to 2026-01-01.
+    req.body = { date: '2025-12-24' };
+
+    await expect(completeHabit(req, res)).rejects.toMatchObject({
+      status: 400,
+    });
+
+    expect(HabitCompletionModel.create).not.toHaveBeenCalled();
+  });
+
+  it('5c. Should not allow completing for future dates', async () => {
+    const habit = {
+      _id: 'habit123',
+      isOwner: vi.fn().mockReturnValue(true),
+    };
+
+    HabitModel.findById.mockResolvedValue(habit);
+
+    // System time is mocked to 2026-01-01. I am using a future date.
+    req.body = { date: '2026-01-02' };
+
+    await expect(completeHabit(req, res)).rejects.toMatchObject({
+      status: 400,
+    });
+
+    expect(HabitCompletionModel.create).not.toHaveBeenCalled();
   });
 
   it('6. Database error during findById -> propagates', async () => {
