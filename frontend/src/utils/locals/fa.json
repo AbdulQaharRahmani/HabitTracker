@@ -153,6 +153,7 @@
      "Logs Statistics": "آمار لاگ ها",
      "Top Routes": "  پراستفاده ترین مسیرها ",
      "Sessions": "نشست",
-  "Calls": "فراخوانی"
+  "Calls": "فراخوانی",
+  "Loading statistics": "در حال بارگذاری آمار لاگ ها..."
 
 }

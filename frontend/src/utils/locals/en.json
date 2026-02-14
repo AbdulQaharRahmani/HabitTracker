@@ -147,6 +147,8 @@
      "Logs Statistics": "Logs Statistics",
      "Top Routes": "Top Routes",
      "Sessions": "Sessions",
-  "Calls": "Calls"
+  "Calls": "Calls"  ,
+    "Loading statistics": "Loading Statistics..."
+
 
 }
