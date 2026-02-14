@@ -121,8 +121,8 @@ export default function Logs() {
           </div>
         </div>
       </header>
-
       <main className="flex flex-col lg:flex-row gap-8 p-8 max-w-[1600px] mx-auto w-full">
+
 
         <div className="flex-1 space-y-8 min-w-0">
 
@@ -136,7 +136,7 @@ export default function Logs() {
               />
             </div>
 
-            <div className="flex flex-col lg:flex-row w-full gap-6 items-end justify-center">
+            <div className="grid lg:grid-cols-2 w-full gap-6 items-end justify-center">
               <div className="w-full lg:flex-1 space-y-2.5">
                 <label className="font-bold text-md text-gray-700 dark:text-gray-500 block px-1">{t("Level")}</label>
                 <Dropdown

@@ -3,6 +3,7 @@ import { useEffect } from "react"
 import TopDevices from "./TopDevicesCard"
 import useLogsStore from "../store/useLogsStore"
 import LogsStatsCard from "./LogsStatsCard"
+import TopRoutesCard from "./TopRoutesCard"
 export default function LogsStatistics() {
     const { getLogsStatistics } = useLogsStore()
     useEffect(() => {
@@ -12,6 +13,7 @@ export default function LogsStatistics() {
         <div className="flex flex-col gap-3">
             <TopDevices />
             <LogsStatsCard />
+            <TopRoutesCard />
         </div>
     )
 }
