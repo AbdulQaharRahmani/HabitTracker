@@ -48,4 +48,38 @@ class AuthManager {
     await prefs.remove(_userNameKey);
     await prefs.remove(_userEmailKey);
   }
+  // -----------------------------
+// GET USER NAME
+// -----------------------------
+  static Future<String?> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userNameKey);
+  }
+// -----------------------------
+// GET USER EMAIL
+// -----------------------------
+  static Future<String?> getUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userEmailKey);
+  }
+// -----------------------------
+// GET USER DATA (NAME + EMAIL)
+// -----------------------------
+  static Future<Map<String, String>?> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final name = prefs.getString(_userNameKey);
+    final email = prefs.getString(_userEmailKey);
+
+    if ((name == null || name.isEmpty) &&
+        (email == null || email.isEmpty)) {
+      return null;
+    }
+
+    return {
+      'name': name ?? '',
+      'email': email ?? '',
+    };
+  }
+
 }
