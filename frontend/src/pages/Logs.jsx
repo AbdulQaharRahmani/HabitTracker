@@ -11,6 +11,7 @@ import Search from "../components/Search";
 import LogsTable from "../logs-dashboard/LogsTable";
 import Dropdown from "../components/Dropdown";
 import LogsStatistics from "../logs-dashboard/LogsStats";
+import { getPersianNumber } from "../utils/getPersianNumber";
 export default function Logs() {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() === "rtl";
@@ -88,8 +89,7 @@ export default function Logs() {
     [t],
   );
 
-  const getPersianNumber = (num) =>
-    new Intl.NumberFormat(i18n.language).format(num);
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
@@ -172,7 +172,7 @@ export default function Logs() {
                 onClick={handleFilter}
                 disabled={loading}
               >
-                {loading ? t("Filtering...") : t("Filter")}
+                {loading ? t("Filtering...") : t("Apply filter")}
               </button>
             </div>
           </div>

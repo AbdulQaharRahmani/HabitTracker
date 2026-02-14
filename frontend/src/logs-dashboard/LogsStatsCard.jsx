@@ -1,9 +1,10 @@
 import { FaInfoCircle, FaExclamationTriangle, FaBug, FaListUl, FaQuestionCircle } from "react-icons/fa";
 import useLogsStore from "../store/useLogsStore";
-
+import {useTranslation} from "react-i18next"
+import { getPersianNumber } from "../utils/getPersianNumber";
 export default function LogStats() {
   const { logsStats } = useLogsStore();
-
+   const {t} = useTranslation()
   const getCardTheme = (key) => {
     switch (key) {
       case "total": return { label: "Total Logs", icon: <FaListUl />, color: "indigo" };
@@ -29,7 +30,7 @@ export default function LogStats() {
     <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl w-full rounded-3xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-1.5 h-6 bg-indigo-600 rounded-full shadow-[0_0_10px_rgba(79,70,229,0.2)]"></div>
-        <h2 className="text-lg font-bold text-gray-800 dark:text-white tracking-tight">Logs Statistics</h2>
+        <h2 className="text-lg font-bold text-gray-800 dark:text-white tracking-tight">{t("Logs Statistics")}</h2>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -51,7 +52,7 @@ export default function LogStats() {
               </div>
 
               <h3 className="text-xl font-black tracking-tight dark:text-white relative z-10">
-                {value}
+                {getPersianNumber(value)}
               </h3>
             </div>
           );

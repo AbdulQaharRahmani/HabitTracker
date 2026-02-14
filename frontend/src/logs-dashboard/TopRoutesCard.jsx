@@ -1,14 +1,15 @@
+import { useTranslation } from "react-i18next";
 import useLogsStore from "../store/useLogsStore";
-
+import { getPersianNumber } from "../utils/getPersianNumber";
 export default function TopRoutesCard() {
   const { mostUsedRoutes } = useLogsStore();
-
+  const {t} = useTranslation()
   return (
     <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl w-full rounded-3xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-1.5 h-6 bg-indigo-600 rounded-full shadow-[0_0_10px_rgba(79,70,229,0.2)]"></div>
         <h2 className="text-lg font-bold text-gray-800 dark:text-white tracking-tight">
-          Most Used Routes
+         {t("Top Routes")}
         </h2>
       </div>
 
@@ -24,10 +25,10 @@ export default function TopRoutesCard() {
 
               <div className="text-right shrink-0">
                 <span className="text-sm font-black text-gray-700 dark:text-gray-200">
-                  {route.percent}%
+                  {getPersianNumber(route.percent)}%
                 </span>
                 <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tighter">
-                  {route.count?.toLocaleString()} calls
+                  {`${getPersianNumber(route.count)} ${t("Calls")} `}
                 </p>
               </div>
             </div>

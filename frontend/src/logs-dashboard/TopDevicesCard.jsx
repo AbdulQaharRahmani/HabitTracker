@@ -1,8 +1,11 @@
 import { FaWindows, FaApple, FaAndroid, FaLinux, FaGlobe } from "react-icons/fa";
 import useLogsStore from "../store/useLogsStore";
+import { useTranslation } from "react-i18next";
+import { getPersianNumber } from "../utils/getPersianNumber";
 
 export default function TopDevices() {
 const {topDevices} = useLogsStore()
+const {t} = useTranslation()
   const getDeviceIcon = (name) => {
     const device = name.toLowerCase();
     if (device.includes("windows")) return <FaWindows className="text-slate-400" />;
@@ -18,7 +21,7 @@ const {topDevices} = useLogsStore()
       <div className="flex items-center gap-3 mb-8">
         <div className="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
         <h2 className="text-lg font-bold text-gray-800 dark:text-white tracking-tight">
-          Top Devices
+         {t("Top Devices")}
         </h2>
       </div>
 
@@ -35,13 +38,13 @@ const {topDevices} = useLogsStore()
                     {device.name}
                   </h3>
                   <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500">
-                    {device.count.toLocaleString()} sessions
-                  </span>
+{`${getPersianNumber(device.count)} ${t("Sessions")}`}                  </span>
                 </div>
+
               </div>
 
               <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded">
-                {device.percent}%
+                {getPersianNumber(device.percent)}%
               </span>
             </div>
 

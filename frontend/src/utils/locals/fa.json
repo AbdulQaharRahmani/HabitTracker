@@ -139,7 +139,7 @@
 
   "Task deleted successfully!": "عملیات موفقانه حذف شد!",
   "Failed to delete task": "عملیات حذف نشد",
-  
+
   "monthly Activity": "فعالیت ماهانه",
   "weekly Activity": "فعالیت هفته وار",
   "yearly Activity": " فعالیت سالانه",
@@ -148,6 +148,11 @@
   "Yearly": "سالانه",
     "loading_chart": "در حال بارگذاری اطلاعات نمودار...",
     "page": "صفحه",
-    "of": "از"
+    "of": "از",
+        "Top Devices": " دستگاه های برتر",
+     "Logs Statistics": "آمار لاگ ها",
+     "Top Routes": "  پراستفاده ترین مسیرها ",
+     "Sessions": "نشست",
+  "Calls": "فراخوانی"
 
 }
