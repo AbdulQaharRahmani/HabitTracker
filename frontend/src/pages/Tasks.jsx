@@ -79,7 +79,7 @@ function Tasks() {
             return (
               <div
                 key={categoryName}
-                className="flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-800"
+                className="flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800"
                 style={{
                   height: '420px',
                   minHeight: '420px'
@@ -104,7 +104,7 @@ function Tasks() {
                 </div>
 
                 {/* Tasks Container */}
-                <div className="flex-grow p-3 overflow-y-auto bg-gray-50/50 dark:bg-gray-900">
+                <div className="flex-grow p-3 shadow-2xl overflow-y-auto bg-gray-50/50 dark:bg-gray-900">
                   {items.length > 0 ? (
                     <div className="space-y-2">
                       {items.map((task) => (

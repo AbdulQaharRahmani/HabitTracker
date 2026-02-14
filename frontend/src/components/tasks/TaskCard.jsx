@@ -18,7 +18,7 @@ export default function TaskCard({ title, categoryId, dueDate, description, stat
   };
 
   return (
-    <div className={`group bg-white dark:bg-gray-800 rounded-lg p-2.5 transition-all duration-150 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm ${status === "done" ? "opacity-75" : ""}`}>
+    <div className={`group bg-white dark:bg-gray-800 shadow-md rounded-lg p-2.5 transition-all duration-150 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm ${status === "done" ? "opacity-75" : ""}`}>
       <div className="flex items-start gap-2">
         <button
           onClick={() => completeTask(_id)}
@@ -34,7 +34,7 @@ export default function TaskCard({ title, categoryId, dueDate, description, stat
 
         <div className="flex-grow min-w-0">
           <div className="flex justify-between items-start gap-2">
-            <h4 className={`text-sm font-medium leading-snug ${status === "done" ? "line-through text-gray-400" : "text-gray-800 dark:text-gray-200"}`}>
+            <h4 className={`text-sm font-extrabold leading-snug ${status === "done" ? "line-through text-gray-400" : "text-gray-800 dark:text-gray-200"}`}>
               {t(title)}
             </h4>
             <button
