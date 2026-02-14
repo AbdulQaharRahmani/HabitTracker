@@ -42,7 +42,7 @@ export default function TaskCard({ title, categoryId, dueDate, description, stat
               className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
               aria-label={t("Delete task")}
             >
-              <MdDeleteOutline size={14} className="text-gray-400 hover:text-red-500 transition-colors" />
+              <MdDeleteOutline size={20} className="text-gray-400 hover:text-red-500 transition-colors" />
             </button>
           </div>
 
