@@ -1,16 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Header from "../components/Header.jsx";
-import DarkMode from "../components/DarkMode.jsx";
 import Search from "../components/Search.jsx";
 import AddHabit from "../components/AddHabit.jsx";
 import View from "../components/View.jsx";
 import HabitList from "../components/HabitList.jsx";
 import { useTranslation } from "react-i18next";
+import useHabitStore from "../store/useHabitStore.js";
 
 export default function Habits() {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("list");
+  // NEW: Add page state
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const {
+    searchTerm,
+    setSearchTerm,
+    fetchHabitsPage,
+    fetchHabitsByDate,
+    selectedDate,
+  } = useHabitStore();
+
+  const debounceRef = useRef(null);
+
+  useEffect(() => {
+    fetchHabitsByDate(selectedDate);
+  }, [selectedDate]);
+  const ITEMS_PER_PAGE = 10;
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+
+    setSearchTerm(value);
+    setCurrentPage(1); // ✅ reset pagination
+
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchHabitsPage(1, ITEMS_PER_PAGE); // ✅ unified fetch
+    }, 400);
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(debounceRef.current);
+  }, []);
 
   return (
     <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors">
@@ -44,7 +76,11 @@ export default function Habits() {
         </div>
       </div>
       <div className="pb-4 sm:pb-10">
-        <HabitList viewMode={viewMode} searchTerm={searchTerm} />
+        <HabitList
+          viewMode={viewMode}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
     </div>
   );
