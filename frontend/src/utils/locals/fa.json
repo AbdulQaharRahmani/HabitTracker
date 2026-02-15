@@ -121,13 +121,24 @@
 
   "Task deleted successfully!": "عملیات موفقانه حذف شد!",
   "Failed to delete task": "عملیات حذف نشد",
-  
+
   "monthly Activity": "فعالیت ماهانه",
   "weekly Activity": "فعالیت هفته وار",
   "yearly Activity": " فعالیت سالانه",
   "Weekly": "هفته وار",
   "Monthly": "ماهانه",
   "Yearly": "سالانه",
-    "loading_chart": "در حال بارگذاری اطلاعات نمودار..."
+  "loading_chart": "در حال بارگذاری اطلاعات نمودار...",
+
+  "delete_title": "حذف کار",
+  "delete_description": "آیا مطمئن هستید که می‌خواهید این کار را حذف کنید؟",
+  "delete_confirmText": "حذف",
+
+  "logout_title": "خروج",
+  "logout_description": "آیا مطمئن هستید که می‌خواهید خارج شوید؟",
+  "logout_confirmText": "تأیید",
+
+  "cancel": "لغو"
+
 
 }
