@@ -22,7 +22,6 @@ import { HabitModel } from '../../models/Habit';
 import { CategoryModel } from '../../models/Category';
 import { AppError } from '../../utils/error';
 import { HabitCompletionModel } from '../../models/habitCompletion';
-import { DateHelper } from '../../utils/date.js';
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -570,7 +569,7 @@ describe('Update Habit', () => {
     });
   });
 
-  it('2. Partial pdate (some fields)', async () => {
+  it('2. Partial update (some fields)', async () => {
     req.body = { title: 'Updated Title' };
     HabitModel.findOneAndUpdate.mockResolvedValue({ _id: 'habit123' });
 
@@ -1029,6 +1028,27 @@ describe('Complete Habit', () => {
       status: 400,
     });
 
+    expect(HabitCompletionModel.create).not.toHaveBeenCalled();
+  });
+
+  it('5d. Should not allow completing habit before its creation date', async () => {
+    const habit = {
+      _id: 'habit123',
+      isOwner: vi.fn().mockReturnValue(true),
+      createdAt: new Date('2026-01-01T12:00:00'),
+    };
+
+    HabitModel.findById.mockResolvedValue(habit);
+
+    // Try completing for a date before creation
+    req.body = { date: '2025-12-30' };
+
+    await expect(completeHabit(req, res)).rejects.toMatchObject({
+      status: 400,
+      message: 'You cannot modify habits before their creation date',
+    });
+
+    expect(HabitCompletionModel.isAlreadyCompleted).not.toHaveBeenCalled();
     expect(HabitCompletionModel.create).not.toHaveBeenCalled();
   });
 
