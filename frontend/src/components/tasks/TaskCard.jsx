@@ -38,8 +38,8 @@ export default function TaskCard({
 
   const normalizedCategoryId =
     typeof categoryId === "object" ? categoryId._id : categoryId;
- const categories = useTaskCardStore((s) => s.categories);
- const category = categories.find((c) => c.id === normalizedCategoryId);
+    const categories = useTaskCardStore((s) => s.categories);
+    const category = categories.find((c) => c.id === normalizedCategoryId);
 
   return (
     <div

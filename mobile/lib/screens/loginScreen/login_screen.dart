@@ -1,41 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/app/app_theme.dart';
+import 'package:provider/provider.dart';
+
+import '../../app/app_theme.dart';
 import '../../utils/login/header_card_login.dart';
 import '../../utils/login/login_card.dart';
 import '../../services/controller.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-
-
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: SingleChildScrollView(
-        padding:  EdgeInsets.symmetric(horizontal: 12.h, vertical:100.h),
-        child: Column(
-          children: [
-            const HeaderCard(),
-            LoginCard(controller: LoginController())
-          ],
+    return ChangeNotifierProvider(
+      create: (_) => LoginController(),
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        body: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 100.h),
+          child: Column(
+            children: [
+              const HeaderCard(),
+              const SizedBox(height: 20),
+              LoginCard(controller: LoginController() ),
+            ],
+          ),
         ),
       ),
     );

@@ -132,6 +132,10 @@
   "NO_HABITS_YET": "هنوز هیچ عادتی اضافه نشده",
   "NO_ACTIVE_STREAK_YET": "هنوز هیچ استریکی فعال نیست",
   "NO_HABITS_COMPLETED_YET": "هنوز هیچ عادتی تکمیل نشده",
+
+  "Task deleted successfully!": "عملیات موفقانه حذف شد!",
+  "Failed to delete task": "عملیات حذف نشد",
+  
   "monthly Activity": "فعالیت ماهانه",
   "weekly Activity": "فعالیت هفته وار",
   "yearly Activity": " فعالیت سالانه",
