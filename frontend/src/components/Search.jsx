@@ -1,8 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { FaSearch } from "react-icons/fa";
 
-export default function Search({ searchTerm, handleSearchChange }) {
-  const { t } = useTranslation();
+export default function Search({ searchTerm, setSearchTerm, placeholder }) {
   return (
     <div className="w-full">
       <div
@@ -20,7 +19,7 @@ export default function Search({ searchTerm, handleSearchChange }) {
 
         <input
           type="text"
-          placeholder={t("Search habits...")}
+          placeholder={placeholder}
           value={searchTerm}
           onChange={handleSearchChange}
           className="
