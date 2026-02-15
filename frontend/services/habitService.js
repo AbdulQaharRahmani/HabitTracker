@@ -17,6 +17,12 @@ export const getHabitsChartData = async (startDate, endDate) => {
    return response.data;
 }
 
+export const deleteHabitApi = async (id) => {
+   const response = await api.delete(`/habits/${id}`);
+   console.log(response);
+   return response.data;
+}
+
 export const getChartData = async () => {
    const response = await api.get(`/habits/dashboard/chart-data`)
    return response.data.data

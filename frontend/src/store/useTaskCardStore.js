@@ -8,7 +8,6 @@ export const useTaskCardStore = create((set, get) => ({
   tasks: [],
   loading: false,
   error: null,
-
   isModalOpen: false,
 
   taskData: {
