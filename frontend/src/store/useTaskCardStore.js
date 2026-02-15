@@ -66,12 +66,10 @@ export const useTaskCardStore = create((set, get) => ({
 
   addTask: async (taskPayload) => {
     try {
-      const date = new Date(taskPayload.dueDate);
-
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
-        dueDate: date.toISOString(),
+        dueDate: taskPayload.dueDate,
         categoryId: taskPayload.categoryId,
         priority: normalizePriorityToEnglish(taskPayload.priority),
       };
@@ -203,14 +201,12 @@ export const useTaskCardStore = create((set, get) => ({
   updateTask: async (taskId, taskPayload) => {
 
     try {
-      const date = new Date(taskPayload.dueDate);
-
       const categoryId = taskPayload.categoryId;
 
       const payload = {
         title: taskPayload.title,
         description: taskPayload.description,
-        dueDate: date.toISOString(),
+        dueDate: taskPayload.dueDate,
         categoryId: taskPayload.categoryId,
         priority: normalizePriorityToEnglish(taskPayload.priority),
       };
@@ -227,10 +223,12 @@ export const useTaskCardStore = create((set, get) => ({
                 priority: normalizePriorityToEnglish(taskPayload.priority),
               }
             : task,
-        ),
-      }));
+        ), 
+      } 
+      
+    ));
     } catch (error) {
-      console.error("Update task failed:", error);
+        console.error("Update task failed:", error.response?.data || error.message);
       throw error;
     }
   },

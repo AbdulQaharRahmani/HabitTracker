@@ -40,13 +40,19 @@ export default function EditTask () {
         return;
       }
 
+      const normalizedDate = new Date(taskData.dueDate)
+        .toISOString()
+        .split("T")[0];
+
       const taskPayload = {
         title: taskData.title,
         description: taskData.description,
-        dueDate: taskData.dueDate,
+        dueDate: normalizedDate,
         categoryId: taskData.category,  
         priority: taskData.priority,
       };
+
+      console.log("final takpayload sent", taskData.dueDate);
 
       try {
         await updateTask(editingTaskId, taskPayload);

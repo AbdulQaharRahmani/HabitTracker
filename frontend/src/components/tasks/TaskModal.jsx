@@ -3,7 +3,7 @@ import Dropdown from "../Dropdown";
 import { useTranslation } from "react-i18next";
 import i18n from "../../utils/i18n";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 export default function TaskModal({
   modalTitle,
@@ -23,68 +23,29 @@ export default function TaskModal({
     }
   }, [open, fetchCategories]);
 
-  const weekdays = [
-    { id: "d1", name: isRTL ? "شنبه" : "Saturday", day: 0 },
-    { id: "d2", name: isRTL ? "یکشنبه" : "Sunday", day: 1 },
-    { id: "d3", name: isRTL ? "دوشنبه" : "Monday", day: 2 },
-    { id: "d4", name: isRTL ? "سه‌شنبه" : "Tuesday", day: 3 },
-    { id: "d5", name: isRTL ? "چهارشنبه" : "Wednesday", day: 4 },
-    { id: "d6", name: isRTL ? "پنج‌شنبه" : "Thursday", day: 5 },
-    { id: "d7", name: isRTL ? "جمعه" : "Friday", day: 6 },
-  ];
-
   const today = new Date();
   const tomorrow = new Date();
   tomorrow.setDate(today.getDate() + 1);
 
-  const deadlineItems = [
-    {
-      id: "today",
-      name: isRTL ? "امروز" : "Today",
-      value: today.toISOString(),
-    },
-    {
-      id: "tomorrow",
-      name: isRTL ? "فردا" : "Tomorrow",
-      value: tomorrow.toISOString(),
-    },
-    ...weekdays.map((w) => ({
-      id: w.id,
-      name: w.name,
-      value: getNextWeekdayDate(w.day).toISOString(),
-    })),
-  ];
+  const deadlineItems = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 10 }, (_, i) => {
+      const localDate = new Date(now);
+      localDate.setDate(now.getDate() + i);
 
-  function getNextWeekdayDate(targetDay) {
-    const today = new Date();
-    const day = today.getDay();
-    let diff = targetDay - day;
-    if (diff <= 0) diff += 7;
-    const nextDate = new Date(today);
-    nextDate.setDate(today.getDate() + diff);
-    nextDate.setHours(0, 0, 0, 0);
-    return nextDate;
-  }
+      const year = localDate.getFullYear();
+      const month = String(localDate.getMonth() + 1).padStart(2, "0");
+      const day = String(localDate.getDate()).padStart(2, "0");
 
-  const getDeadlineLabel = (dueDate) => {
-    if (!dueDate) return "";
+      const formattedDate = `${year}-${month}-${day}`; // YYYY-MM-DD
 
-    const selected = deadlineItems.find((item) => item.value === dueDate);
-    if (selected) return selected.name;
-
-    const due = new Date(dueDate);
-    for (let item of deadlineItems) {
-      const itemDate = new Date(item.value);
-      if (
-        itemDate.getFullYear() === due.getFullYear() &&
-        itemDate.getMonth() === due.getMonth() &&
-        itemDate.getDate() === due.getDate()
-      ) {
-        return item.name;
-      }
-    }
-    return "";
-  };
+      return {
+        id: `d${i}`,
+        name: formattedDate,
+        value: formattedDate,
+      };
+    });
+  }, []);
 
   const selectedCategoryName =
     categories.find((cat) => cat.value === taskData.category)?.name || "";
@@ -139,8 +100,12 @@ export default function TaskModal({
             <Dropdown
               items={deadlineItems}
               placeholder={t("Choose Deadline")}
-              value={getDeadlineLabel(taskData.dueDate)}
-              getValue={(value) => setTaskData("dueDate", value)}
+              value={
+                taskData.dueDate?.slice(0, 10)
+              }
+              getValue={(selectedDate) => {
+                setTaskData("dueDate", selectedDate);
+              }}
             />
 
             <label>
@@ -176,7 +141,7 @@ export default function TaskModal({
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
-                  close;
+                  close();
                 }}
                 className="w-full py-3.5 font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-[0.98]"
               >
