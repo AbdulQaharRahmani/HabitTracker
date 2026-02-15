@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/completion_trend_card.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/consistency_heatmap.dart';
@@ -7,11 +8,16 @@ import 'package:habit_tracker/screens/statisticScreen/widgets/header.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/summary_card.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/tasks_item.dart';
 
-class StatisticScreen extends StatelessWidget {
+import 'data/providers/statistic_provider.dart';
+
+class StatisticScreen extends ConsumerWidget {
   const StatisticScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ===== Watch Providers =====
+    final dashboardAsync = ref.watch(dashboardSummaryProvider);
+    final chartAsync = ref.watch(chartDataProvider);
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -28,11 +34,19 @@ class StatisticScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
               // ========== Progress Overview Cards ==========
-              SummaryCards(),
+              dashboardAsync.when(
+                data: (summary) => SummaryCards(summary: summary),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, _) => Text('Error loading summary: $err'),
+              ),
               const SizedBox(height: 32),
 
               //========== Completion Trend Chart ==========
-              CompletionTrendCard(),
+            chartAsync.when(
+              data: (chartData) => CompletionTrendCard(chartData: chartData),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Text('Error loading chart: $err'),
+            ),
 
               const SizedBox(height: 24),
               // Consistency Heatmap

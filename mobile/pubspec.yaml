@@ -47,6 +47,9 @@ dependencies:
   persistent_bottom_nav_bar: ^6.2.1
   icons_plus: ^4.0.0
   google_fonts:
+  flutter_riverpod: ^3.2.1
+  dio:
+
 
 dev_dependencies:
   flutter_test:

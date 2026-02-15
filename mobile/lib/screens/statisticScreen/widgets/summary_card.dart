@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/models/dashboard_summary_model.dart';
 
 class SummaryCards extends StatelessWidget {
-  const SummaryCards({super.key});
+  const SummaryCards({super.key, required DashboardSummaryModel summary});
 
   @override
   Widget build(BuildContext context) {

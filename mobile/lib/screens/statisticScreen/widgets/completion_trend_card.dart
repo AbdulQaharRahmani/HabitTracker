@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/models/chart_data_model.dart';
 
 class CompletionTrendCard extends StatelessWidget {
-  const CompletionTrendCard({super.key});
+  const CompletionTrendCard({super.key, required ChartData chartData});
 
   @override
   Widget build(BuildContext context) {
