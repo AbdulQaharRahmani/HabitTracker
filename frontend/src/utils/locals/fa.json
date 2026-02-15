@@ -121,13 +121,17 @@
 
   "Task deleted successfully!": "عملیات موفقانه حذف شد!",
   "Failed to delete task": "عملیات حذف نشد",
-  
+
   "monthly Activity": "فعالیت ماهانه",
   "weekly Activity": "فعالیت هفته وار",
   "yearly Activity": " فعالیت سالانه",
   "Weekly": "هفته وار",
   "Monthly": "ماهانه",
   "Yearly": "سالانه",
-    "loading_chart": "در حال بارگذاری اطلاعات نمودار..."
+  "loading_chart": "در حال بارگذاری اطلاعات نمودار...",
+
+  "image_invalid_file": "لطفا یک فایل تصویری معتبر انتخاب کنید!",
+  "profile_photo_updated":"عکس پروفایل با موفقیت به روز شد!",
+  "profile_photo_update_fialed":"به روز رسانی عکس پروفایل ناموفق بود. لطفا دوباره تلاش کنید."
 
 }
