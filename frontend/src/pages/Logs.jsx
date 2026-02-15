@@ -126,8 +126,7 @@ export default function Logs() {
             <Search
               placeholder={t("Search logs by route")}
               searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-            />
+              setSearchTerm={(e) => setSearchTerm(e.target.value)} />
           </div>
           {/* filter */}
           <div className="flex flex-col lg:flex-row w-full gap-6 items-end justify-center">

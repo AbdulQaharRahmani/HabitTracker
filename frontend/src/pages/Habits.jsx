@@ -62,7 +62,7 @@ export default function Habits() {
       <div className="my-6 sm:my-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
           <div className="w-full lg:w-1/2 xl:w-2/5">
-            <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder={t("Search habits...")}/>
+            <Search searchTerm={searchTerm} setSearchTerm={handleSearchChange} placeholder={t("Search habits...")}/>
           </div>
 
           <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 sm:gap-4">
