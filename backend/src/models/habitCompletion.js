@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { DateHelper } from '../utils/date.js';
 
 const HabitCompletionSchema = new mongoose.Schema(
   {
@@ -21,16 +22,15 @@ const HabitCompletionSchema = new mongoose.Schema(
 );
 
 // Check if the habit is already completed for the same day.
-HabitCompletionSchema.statics.isAlreadyCompleted = async function (
-  habitId,
-  selectedDate
-) {
+HabitCompletionSchema.statics.isAlreadyCompleted = async function (habitId) {
+  const [startOfToday, endOfToday] = DateHelper.getStartAndEndOfToday();
+
   const isCompleted = await this.exists({
     habitId,
-    date: selectedDate,
+    date: { $gte: startOfToday, $lte: endOfToday },
   });
 
-  return isCompleted;
+  return isCompleted !== null;
 };
 
 export const HabitCompletionModel = mongoose.model(
