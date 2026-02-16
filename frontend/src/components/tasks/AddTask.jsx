@@ -5,6 +5,7 @@ import { FaTimes } from "react-icons/fa";
 import Dropdown from "../Dropdown";
 import toast from "react-hot-toast";
 import i18n from "../../utils/i18n";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export default function AddTask() {
   const { t } = useTranslation();
@@ -144,6 +145,23 @@ export default function AddTask() {
       toast.error(t("Sorry! could not save new task", error));
     }
   };
+
+  useHotkeys(
+    "ctrl+s, meta+s",
+    (e) => {
+      e.preventDefault();
+      HandleTaskCreation(e);
+    },
+    { enabled: isModalOpen }
+  );
+
+  useHotkeys(
+    "esc",
+    () => {
+      setModalOpen(false);
+    },
+    { enabled: isModalOpen }
+  );
 
   return (
     <div>
