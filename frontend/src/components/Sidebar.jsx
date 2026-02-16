@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import useSidebarStore from "../store/useSidebarStore";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -41,6 +40,7 @@ const Sidebar = ({ children }) => {
     toggleSidebar,
     closeSidebar,
     setScreenMode,
+    isMobileOpen
   } = useSidebarStore();
 
   /* --- Profile photo --- */
@@ -77,7 +77,7 @@ const Sidebar = ({ children }) => {
     (e) => {
       e.preventDefault();
       if (isMobileOpen) {
-        closeMobileSidebar();
+        closeSidebar();
       } else if (isOpen) {
         toggleSidebar();
       }
