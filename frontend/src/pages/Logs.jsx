@@ -132,7 +132,7 @@ export default function Logs() {
               <Search
                 placeholder={t("Search logs by route")}
                 searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
+                setSearchTerm={(e)=> {setSearchTerm(e.target.value)}}
               />
             </div>
 
