@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import useLogsStore from "../store/useLogsStore";
@@ -7,30 +7,28 @@ import TopDevices from "./TopDevicesCard";
 import LogsStatsCard from "./LogsStatsCard";
 import TopRoutesCard from "./TopRoutesCard";
 
-export default function LogsStatistics() {
-  const { t } = useTranslation();
-  const {
-    getLogsStatistics,
-    error,
-    loading
-  } = useLogsStore();
+const LogsStatistics = ()=> {
+ const { t } = useTranslation();
+  const getLogsStatistics = useLogsStore((state)=> state.getLogsStatistics)
+  const sidebarError = useLogsStore((state)=> state.sidebarError)
+  const sidebarLoading = useLogsStore((state)=> state.sidebarLoading)
 
   useEffect(() => {
     getLogsStatistics();
   }, [getLogsStatistics]);
 
-  if (error) {
+  if (sidebarError) {
     return (
       <div className="w-full py-16 flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-3xl border border-rose-100 dark:border-rose-900/30">
         <FaExclamationTriangle className="text-rose-500 mb-3" size={24} />
         <p className="font-bold text-rose-600 dark:text-rose-400 tracking-tight text-center px-4">
-          {error}
+          {sidebarError}
         </p>
       </div>
     );
   }
 
-  if (loading) {
+  if (sidebarLoading) {
     return (
       <div className="w-full py-24 flex justify-center items-center bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl rounded-3xl border border-gray-100 dark:border-gray-800">
         <div className="flex flex-col items-center gap-4">
@@ -54,3 +52,5 @@ export default function LogsStatistics() {
     </div>
   );
 }
+
+export default LogsStatistics

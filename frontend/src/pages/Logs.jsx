@@ -23,7 +23,7 @@ export default function Logs() {
     totalPages,
     getNextPage,
     getPrevPage,
-    loading,
+    tableLoading,
     setCurrentPage,
   } = useLogsStore();
 
@@ -49,7 +49,7 @@ export default function Logs() {
 
   useEffect(() => {
     getLogsData(currentPage, appliedFilters, debouncedSearchTerm);
-  }, [currentPage, appliedFilters, debouncedSearchTerm, getLogsData]);
+  }, [currentPage, appliedFilters, debouncedSearchTerm]);
 
   const handleFilter = () => {
     setCurrentPage(1);
@@ -170,9 +170,9 @@ export default function Logs() {
               <button
                 className="w-full lg:w-auto px-5 h-[52px] rounded-xl text-white text-md font-bold bg-indigo-600 hover:bg-indigo-700 transition-all  active:scale-95 disabled:opacity-50"
                 onClick={handleFilter}
-                disabled={loading}
+                disabled={tableLoading}
               >
-                {loading ? t("Filtering...") : t("Apply filter")}
+                {tableLoading ? t("Filtering...") : t("Apply filter")}
               </button>
             </div>
           </div>
@@ -192,14 +192,14 @@ export default function Logs() {
               <button
                 className="bg-indigo-300 p-3 rounded-full text-white hover:bg-indigo-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                 onClick={getPrevPage}
-                disabled={loading || currentPage <= 1}
+                disabled={tableLoading || currentPage <= 1}
               >
                 <FaArrowLeft className={isRtl ? "rotate-180" : ""} />
               </button>
               <button
                 className="bg-indigo-300 p-3 rounded-full text-white hover:bg-indigo-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                 onClick={getNextPage}
-                disabled={loading || currentPage >= totalPages}
+                disabled={tableLoading || currentPage >= totalPages}
               >
                 <FaArrowRight className={isRtl ? "rotate-180" : ""} />
               </button>
