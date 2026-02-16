@@ -1,3 +1,4 @@
+import { getDeviceInfo } from '../utils/log.js';
 import logger from '../utils/logger.js';
 
 export const logMiddleware = (req, res, next) => {
@@ -17,7 +18,7 @@ export const logMiddleware = (req, res, next) => {
           : req.ip ||
             req.headers['x-forwarded-for'] ||
             req.connection.remoteAddress,
-      userAgent: req.headers['user-agent'],
+      userAgent: getDeviceInfo(req),
     };
 
     if (res.statusCode >= 500) {
