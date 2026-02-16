@@ -15,7 +15,7 @@ const useHabitStore = create((set, get) => ({
         set({ selectedDate: date })
         get().fetchHabitsByDate(date)
   },
-      setSearchTerm: (term) => {
+ setSearchTerm: (term) => {
     set({
       searchTerm: term,
       isSearching: !!term.trim(),
@@ -311,22 +311,18 @@ getConsistencyData: async (startDate, endDate) => {
         }
     },
 
-deleteHabit: async (id,t) => {
+deleteHabit: async (id, t) => {
   try {
-    const habit = get().allhabits.find((h) => h._id === id);
-    if (!habit) {
-      console.warn("Habit not found in state");
-      return;
-    }
-
-     await deleteHabitApi(id);
+    await deleteHabitApi(id);
 
     set((state) => ({
+      habits: state.habits.filter((h) => h._id !== id),
       allhabits: state.allhabits.filter((h) => h._id !== id),
     }));
-       toast.success(t("habit deleted successfully!"))
+
+    toast.success(t("habit deleted successfully!"));
   } catch (error) {
-    toast.error(t("Faild to delete habit!"))
+    toast.error(t("Failed to delete habit!"));
     console.error(
       "Delete habit failed:",
       error.response?.data || error.message
@@ -334,6 +330,7 @@ deleteHabit: async (id,t) => {
     set({ error: "Failed to delete habit" });
   }
 },
+
 
 }))
 
