@@ -20,7 +20,7 @@ export default function HabitCard({
   return (
     <div
       className={`
-        mx-auto p-4 rounded-xl bg-white shadow-sm
+        mx-auto p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm
         flex relative items-start gap-4 min-h-[125px]
         flex-wrap sm:flex-nowrap
         ${viewMode === "grid" ? "w-full max-w-xs" : "w-full"}
