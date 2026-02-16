@@ -38,7 +38,7 @@ export default function TaskCard({
     <div
       className={`
         group bg-white dark:bg-gray-800 rounded-md p-2.5
-        transition-all duration-150 border border-gray-200 dark:border-gray-700
+        transition-all duration-150 shadow-md dark:border-gray-700
         hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm
         ${priorityBorder[priority] ?? "border-l-2 border-gray-400"}
         ${status === "done" ? "opacity-75" : ""}
@@ -60,7 +60,7 @@ export default function TaskCard({
         <div className="flex-grow min-w-0">
           <div className="flex justify-between items-start gap-2">
             <h4
-              className={`text-sm font-medium leading-snug ${
+              className={`text-sm font-bold leading-snug ${
                 status === "done"
                   ? "line-through text-gray-400"
                   : "text-gray-800 dark:text-gray-200"
@@ -79,33 +79,33 @@ export default function TaskCard({
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                 aria-label={t("Edit task")}
               >
-                <CiEdit size={14} className="text-gray-400 hover:text-indigo-500 transition-colors" />
+                <CiEdit size={16} className="text-gray-400 hover:text-indigo-500 transition-colors" />
               </button>
               <button
                 onClick={() => deleteTask(_id)}
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                 aria-label={t("Delete task")}
               >
-                <MdDeleteOutline size={14} className="text-gray-400 hover:text-red-500 transition-colors" />
+                <MdDeleteOutline size={16} className="text-gray-400 hover:text-red-500 transition-colors" />
               </button>
             </div>
           </div>
 
-          {description && (
+          {/* {description && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
               {t(description)}
             </p>
-          )}
+          )} */}
 
-          <div className="mt-2 flex items-center gap-2">
-            <div className={`rounded-md py-0.5 px-1.5 text-[0.65rem] font-medium ${dueStyles[type]}`}>
+          <div className=" flex items-center gap-2">
+            <div className={`rounded-md py-0.5 px-1.5 text-[0.5rem] font-medium ${dueStyles[type]}`}>
               {t(label)}
             </div>
 
-            {categoryId?.name && (
+            {/* {categoryId?.name && (
               <div className="flex items-center gap-1.5">
                 <div
-                  className="w-1.5 h-1.5 rounded-full"
+                  className="w-1 h-1 rounded-full"
                   style={{ backgroundColor: categoryId?.backgroundColor ?? "#999" }}
                 />
                 <span
@@ -114,7 +114,7 @@ export default function TaskCard({
                   {t(categoryId.name)}
                 </span>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

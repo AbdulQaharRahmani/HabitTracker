@@ -23,18 +23,8 @@ export default function AddTask() {
       return;
     }
 
-    if (!taskData.dueDate) {
-      toast.error(t("Deadline is required!"));
-      return;
-    }
-
     if (!taskData.category) {
       toast.error(t("Category is required!"));
-      return;
-    }
-
-    if (!taskData.priority) {
-      toast.error(t("Priority is required!"));
       return;
     }
 

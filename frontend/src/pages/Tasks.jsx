@@ -79,7 +79,7 @@ const groupedTasks = useMemo(() => {
                 key={categoryName}
                 className="flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800"
                 style={{
-                  height: '420px',
+                  height: '530px',
                   minHeight: '420px'
                 }}
               >
@@ -102,7 +102,7 @@ const groupedTasks = useMemo(() => {
 
                 <div className="flex-grow p-3 overflow-y-auto bg-gray-50/50 dark:bg-gray-900">
                   {items.length > 0 ? (
-                    <div className="space-y-2  rounded-md">
+                    <div className="space-y-1  rounded-md">
                       {items.map((task) => (
                         <TaskCard key={task._id} {...task} />
                       ))}
