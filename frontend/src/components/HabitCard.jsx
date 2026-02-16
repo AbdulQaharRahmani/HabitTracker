@@ -1,7 +1,9 @@
 import { FaCheckCircle, FaCircle } from "react-icons/fa";
 import { LuPencil } from "react-icons/lu";
 import HabitCardIcon from "./HabitCardIcon";
+import { MdDeleteOutline } from "react-icons/md";
 import useHabitStore from "../store/useHabitStore";
+import { useTranslation } from "react-i18next";
 
 export default function HabitCard({
   title,
@@ -16,6 +18,8 @@ export default function HabitCard({
   const bgColor = `${color}15`;
   const Icon = FaCheckCircle;
   const { openEditHabitModal } = useHabitStore();
+  const deleteHabit = useHabitStore((state) => state.deleteHabit);
+  const { t } = useTranslation();
 
   return (
     <div
@@ -55,8 +59,10 @@ export default function HabitCard({
           </div>
         </div>
 
-        {/* Edit Icon */}
-        <div className="shrink-0">
+           <div className="p-4 flex items-center mx-4">
+
+       </div>
+        <div className="flex sm:flex-col items-center gap-3 shrink-0 self-end sm:self-start">
           <LuPencil
             size={20}
             className="text-[#6366F1] dark:text-indigo-400 cursor-pointer hover:opacity-80 transition-opacity"
@@ -70,6 +76,15 @@ export default function HabitCard({
               })
             }
           />
+          <button onClick={() => deleteHabit(_id,t)}>
+            <MdDeleteOutline
+              size={20}
+              className="
+                text-[#6366F1] dark:text-gray-500
+                hover:text-red-400 transition
+              "
+            />
+          </button>
         </div>
       </div>
     </div>

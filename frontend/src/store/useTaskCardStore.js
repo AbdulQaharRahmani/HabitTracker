@@ -10,7 +10,6 @@ export const useTaskCardStore = create((set, get) => ({
   tasksLoading: false,
   categoriesLoading: false,
   error: null,
-
   isModalOpen: false,
 
   taskData: {
