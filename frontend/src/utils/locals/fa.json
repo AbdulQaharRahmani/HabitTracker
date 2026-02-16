@@ -37,6 +37,8 @@
   "Weekly Summary Email": "ایمیل خلاصه هفتگی",
   "Receive a weekly report of your progress": "گزارش هفتگی پیشرفت خود را دریافت کنید",
   "New Task": "عملیات جدید",
+  "habit deleted successfully!":"عادت موفقانه حذف شد!",
+  "Faild to delete habit!":"خطا در حذف عادت",
   "Manage your daily goals and todos.": "اهداف و کار های روزانه خود را مدیریت کنید.",
   "Due": "موعد",
   "Work": "کار",
