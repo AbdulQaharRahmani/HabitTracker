@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import dayjs from 'dayjs';
+import { UAParser } from 'ua-parser-js';
 
 const logsDir = path.join(process.cwd(), 'logs');
 
@@ -60,4 +61,16 @@ export const getTop = (items, key, limit = 5) => {
     }))
     .sort((a, b) => b.count - a.count)
     .slice(0, limit);
+};
+
+export const getDeviceInfo = (req) => {
+  const parser = new UAParser(req.headers['user-agent']);
+  const result = parser.getResult();
+
+  return {
+    device: result.device.vendor || 'desktop',
+    browser: result.browser.name,
+    os: result.os.name,
+    type: result.device.type || 'desktop',
+  };
 };
