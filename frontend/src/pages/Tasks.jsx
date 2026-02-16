@@ -100,7 +100,7 @@ const groupedTasks = useMemo(() => {
                   </div>
                 </div>
 
-                <div className="flex-grow p-3 overf low-y-auto bg-gray-50/50 dark:bg-gray-900">
+                <div className="flex-grow p-3 overflow-y-auto bg-gray-50/50 dark:bg-gray-900">
                   {items.length > 0 ? (
                     <div className="space-y-2  rounded-md">
                       {items.map((task) => (
