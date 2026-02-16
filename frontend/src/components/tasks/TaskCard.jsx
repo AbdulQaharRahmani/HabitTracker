@@ -4,6 +4,7 @@ import { useTaskCardStore } from "../../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../utils/formatDate";
 import i18n from "../../utils/i18n";
+import { CiEdit } from "react-icons/ci";
 
 export default function TaskCard({
   title,
@@ -12,9 +13,11 @@ export default function TaskCard({
   description,
   status,
   _id,
+  priority,
 }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
+  const openEditModal = useTaskCardStore((s) => s.openEditModal);
 
   const { label, type } = formatDate(dueDate);
 
@@ -25,10 +28,20 @@ export default function TaskCard({
     none: "bg-gray-100/100 text-gray-500",
   };
 
+  const priorityBorder = {
+    high: "border-l-4 border-indigo-600",
+    medium: "border-l-4 border-orange-500",
+    low: "border-l-4 border-gray-300",
+  };
+
   const { t } = useTranslation();
 
   return (
-    <div className="flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8">
+    <div
+      className={`flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8 
+        ${priorityBorder[priority] ?? "-l-4 border-gray-400"}
+      `}
+    >
       <div
         className={`flex items-center justify-between border-gray-300 mx-4 px-4 pr-8 text-center ${
           i18n.language === "fa" ? "border-l pl-10" : "border-r "
@@ -50,15 +63,17 @@ export default function TaskCard({
         <div className="my-1">
           <div
             className={`
-              py-3 px-4 text-lg font-bold transition
-              ${
+              py-3 px-4 text-lg font-bold transition`}
+          >
+            <h3
+              className={`${
                 status === "done"
                   ? "text-gray-400 dark:text-gray-500 line-through"
                   : "text-gray-800 dark:text-gray-100"
-              }
-            `}
-          >
-            {t(title)}
+              }`}
+            >
+              {t(title)}
+            </h3>
             <div>
               <p className="text-gray-400 text-sm font-normal mt-1">
                 {t(description)}
@@ -87,22 +102,39 @@ export default function TaskCard({
               </p>
             </div>
             <div
-              className={`py-2 text-[0.8rem] text-[${categoryId.backgroundColor}] dark:text-gray-500 ‍`}
+              className="py-2 text-[0.8rem]"
+              style={{ color: categoryId?.backgroundColor ?? "#999" }}
             >
-              {t(categoryId.name)}
+              {t(categoryId?.name)}
             </div>
           </div>
         </div>
       </div>
 
       {/* Delete */}
-      <div className="p-4 flex items-center mx-4">
+      <div className="p-4 grid grid-rows-2 items-center mx-4">
         <button onClick={() => deleteTask(_id)}>
           <MdDeleteOutline
             size={24}
             className="
               text-gray-300 dark:text-gray-500
               hover:text-red-400 transition
+              dark:hover:text-red-400
+            "
+          />
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            openEditModal(_id);
+          }}
+        >
+          <CiEdit
+            size={24}
+            className="
+              text-gray-300 dark:text-gray-500
+              hover:text-indigo-600 transition
+              dark:hover:text-indigo-600
             "
           />
         </button>

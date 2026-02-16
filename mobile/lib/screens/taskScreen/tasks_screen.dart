@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
 import '../../app/app_theme.dart';
+import '../../services/taskpage_api/category_api.dart';
 import '../../services/taskpage_api/tasks_api.dart';
+import '../../utils/category/category_model.dart';
 import '../../utils/taskpage_components/task_shimer.dart';
 import '../../utils/taskpage_components/tasks_model.dart';
 import '../../services/token_storage.dart';
@@ -20,6 +24,12 @@ class _TasksScreenState extends State<TasksScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
+  /// UI filter state
+  String? selectedCategoryId;
+
+  /// Backend filter params
+  String _searchTerm = '';
+
   final List<Task> _tasks = [];
   bool _isLoading = false;
   bool _hasMore = true;
@@ -28,22 +38,52 @@ class _TasksScreenState extends State<TasksScreen> {
   int _page = 1;
   final int _limit = 20;
   String? _token;
+  Timer? _searchTimer;
+
+  final CategoryApiService _categoryApi = CategoryApiService();
+  List<CategoryModel> _categories = [];
 
   @override
   void initState() {
     super.initState();
     _init();
     _scrollController.addListener(_onScroll);
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    _scrollController.dispose();
+    _searchTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    _searchTimer?.cancel();
+    _searchTimer = Timer(const Duration(milliseconds: 500), () {
+      if (_searchController.text != _searchTerm) {
+        _searchTerm = _searchController.text;
+        _applyFilters(reset: true);
+      }
+    });
   }
 
   Future<void> _init() async {
     _token = await AuthManager.getToken();
     if (_token == null) return;
-    await _fetchTasks(reset: true);
+
+    await Future.wait([_loadCategories(), _fetchTasks(reset: true)]);
+  }
+
+  Future<void> _loadCategories() async {
+    final categories = await _categoryApi.fetchCategories(token: _token!);
+    setState(() => _categories = categories);
   }
 
   Future<void> _fetchTasks({bool reset = false}) async {
-    if (_isLoading) return;
+    if (_isLoading || (!_hasMore && !reset)) return;
 
     if (reset) {
       _page = 1;
@@ -52,39 +92,34 @@ class _TasksScreenState extends State<TasksScreen> {
       _errorMessage = null;
     }
 
-    if (!_hasMore && !reset) return;
-
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final data = await _apiService.fetchTasks(
         token: _token!,
         page: _page,
         limit: _limit,
+        searchTerm: _searchTerm.isNotEmpty ? _searchTerm : null,
+        categoryId: selectedCategoryId,
       );
 
       final newTasks = data
           .where((t) => !_tasks.any((old) => old.id == t.id))
           .toList();
 
-      _tasks.addAll(newTasks);
-
-      if (data.length < _limit) _hasMore = false;
-      _page++;
-    } catch (_) {
-      _errorMessage = 'Failed to load tasks. Please try again.';
-    } finally {
       setState(() {
-        _isLoading = false;
+        _tasks.addAll(newTasks);
+        if (data.length < _limit) _hasMore = false;
+        _page++;
       });
+    } catch (e) {
+      setState(() => _errorMessage = 'Failed to load tasks');
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
   void _onScroll() {
-    if (!_hasMore || _isLoading) return;
-
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
       _fetchTasks();
@@ -112,13 +147,6 @@ class _TasksScreenState extends State<TasksScreen> {
       setState(() {
         _tasks[index] = _tasks[index].copyWith(status: oldStatus);
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to update task status!'),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 
@@ -127,10 +155,16 @@ class _TasksScreenState extends State<TasksScreen> {
       context,
       MaterialPageRoute(builder: (_) => EditTaskPage(task: task)),
     );
-    if (result != null) await _fetchTasks(reset: true);
+    if (result != null) _applyFilters(reset: true);
   }
 
-  Future<void> _refreshTasks() async => await _fetchTasks(reset: true);
+  Future<void> _refreshTasks() async {
+    _searchController.clear();
+    _searchTerm = '';
+    selectedCategoryId = null;
+
+    await Future.wait([_loadCategories(), _fetchTasks(reset: true)]);
+  }
 
   void _sortByDueDate(List<Task> tasks) {
     tasks.sort((a, b) {
@@ -141,185 +175,224 @@ class _TasksScreenState extends State<TasksScreen> {
     });
   }
 
+  Future<void> _applyFilters({bool reset = false}) async {
+    if (_token == null) return;
+
+    final showLoading = reset && _tasks.isEmpty;
+
+    if (showLoading) setState(() => _isLoading = true);
+
+    try {
+      final data = await _apiService.fetchTasks(
+        token: _token!,
+        page: reset ? 1 : _page,
+        limit: _limit,
+        searchTerm: _searchTerm.isNotEmpty ? _searchTerm : null,
+        categoryId: selectedCategoryId,
+      );
+
+      setState(() {
+        if (reset) {
+          _tasks.clear();
+          _page = 1;
+          _hasMore = true;
+        }
+        _tasks.addAll(data);
+        if (data.length < _limit) _hasMore = false;
+        if (!reset) _page++;
+      });
+    } finally {
+      if (showLoading) setState(() => _isLoading = false);
+    }
+  }
+
+  List<Task> get _filteredTasks {
+    return _tasks.where((task) {
+      final matchCategory =
+          selectedCategoryId == null || task.categoryId == selectedCategoryId;
+      final matchSearch =
+          _searchTerm.isEmpty ||
+          task.title.toLowerCase().contains(_searchTerm.toLowerCase()) ||
+          (task.description?.toLowerCase().contains(
+                _searchTerm.toLowerCase(),
+              ) ??
+              false);
+      return matchCategory && matchSearch;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filteredTasks = _tasks
-        .where((t) => t.title.toLowerCase().contains(
-      _searchController.text.toLowerCase(),
-    ))
+    final todoTasks = _filteredTasks
+        .where((task) => task.status != 'done')
+        .toList();
+    final completedTasks = _filteredTasks
+        .where((task) => task.status == 'done')
         .toList();
 
-    final activeTasks =
-    filteredTasks.where((t) => t.status != 'done').toList();
-    final completedTasks =
-    filteredTasks.where((t) => t.status == 'done').toList();
-
-    _sortByDueDate(activeTasks);
+    _sortByDueDate(todoTasks);
     _sortByDueDate(completedTasks);
-
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppTheme.background,
-        body: RefreshIndicator(
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: RefreshIndicator(
           onRefresh: _refreshTasks,
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
-
-              /// HEADER (UNCHANGED)
+              /// HEADER
               SliverToBoxAdapter(
                 child: Container(
                   color: AppTheme.background,
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
+
+                      // HEADER ROW
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'All Tasks',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
+                            // SEARCH FIELD
+                            Expanded(
+                              flex: 5,
+                              child: Container(
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.search,
+                                      color: Colors.grey,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _searchController,
+                                        decoration: const InputDecoration(
+                                          hintText: 'Search tasks .....',
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            ElevatedButton(
-                              style: ButtonStyle(
-                                padding: const WidgetStatePropertyAll(
-                                  EdgeInsets.only(right: 0, left: 6),
-                                ),
-                                fixedSize: const WidgetStatePropertyAll(
-                                  Size(105, 30),
-                                ),
-                                backgroundColor:
-                                const WidgetStatePropertyAll(
-                                  AppTheme.primary,
-                                ),
-                                elevation:
-                                const WidgetStatePropertyAll(0),
-                                shape: WidgetStatePropertyAll(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              flex: 3,
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  padding: const WidgetStatePropertyAll(
+                                    EdgeInsets.only(right: 0, left: 6),
+                                  ),
+                                  fixedSize: const WidgetStatePropertyAll(
+                                    Size(105, 30),
+                                  ),
+                                  backgroundColor: const WidgetStatePropertyAll(
+                                    AppTheme.primary,
+                                  ),
+                                  elevation: const WidgetStatePropertyAll(0),
+                                  shape: WidgetStatePropertyAll(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              onPressed: () async {
-                                final newTask = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const NewTaskPage(),
-                                  ),
-                                );
-                                if (newTask != null) {
-                                  await _refreshTasks();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Task created successfully!'),
-                                      backgroundColor: Colors.green,
+                                onPressed: () async {
+                                  final newTask = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => NewTaskPage(defaultCategoryId:selectedCategoryId,),
+
                                     ),
                                   );
-                                }
-                              },
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.add, color: Colors.white),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    'New Task',
-                                    style:
-                                    TextStyle(color: Colors.white),
+                                  if (newTask != null) {
+                                    await _refreshTasks();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Task created successfully!',
+                                        ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
                                   ),
-                                ],
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.add, color: Colors.white),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        'New Task',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 15),
-                      /// Search (UNCHANGED)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        child: Container(
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.search, color: Colors.grey),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: TextField(
-                                  controller: _searchController,
-                                  decoration: const InputDecoration(
-                                    hintText: 'search tasks .....',
-                                    border: InputBorder.none,
-                                  ),
-                                  onChanged: (_) => setState(() {}),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-
+                      const SizedBox(height: 10),
+                      _buildCategoryFilters(),
                     ],
                   ),
                 ),
               ),
 
-              /// SHIMMER (INITIAL LOAD ONLY)
               if (_isLoading && _tasks.isEmpty)
                 SliverList(
-
                   delegate: SliverChildBuilderDelegate(
-                        (context, index) =>
-                    const TasksCardShimmer(),
-                    childCount: 6,
+                    (_, __) => const TasksCardShimmer(),
+                    childCount: 3,
                   ),
                 ),
 
-              /// ERROR TEXT (NO UI CHANGE)
-              if (!_isLoading &&
-                  _tasks.isEmpty &&
-                  _errorMessage != null)
+              if (!_isLoading && todoTasks.isEmpty && completedTasks.isEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 60),
                     child: Center(
                       child: Text(
-                        _errorMessage!,
-                        style:
-                        const TextStyle(color: Colors.grey),
+                        selectedCategoryId == null
+                            ? 'No tasks found'
+                            : 'No tasks found for this category',
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ),
                   ),
                 ),
 
-              /// ACTIVE TASKS
-              if (activeTasks.isNotEmpty)
-                _buildSection(
-                  title: 'TO DO (${activeTasks.length})',
-                  tasks: activeTasks,
-                ),
+              if (todoTasks.isNotEmpty) _buildTaskList('TO DO', todoTasks),
 
-              /// COMPLETED TASKS
               if (completedTasks.isNotEmpty)
-                _buildSection(
-                  title:
-                  'Completed (${completedTasks.length})',
-                  tasks: completedTasks,
+                _buildTaskList('Completed', completedTasks),
+
+              if (_isLoading && _tasks.isNotEmpty)
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, __) =>
+                        const TasksCardShimmer(),
+                    childCount: 1,
+                  ),
                 ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 30),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 30)),
             ],
           ),
         ),
@@ -327,37 +400,58 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
-  SliverList _buildSection({
-    required String title,
-    required List<Task> tasks,
-  }) {
+  SliverList _buildTaskList(String title, List<Task> tasks) {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-            (context, index) {
-          if (index == 0) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 30,
-                vertical: 10,
-              ),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            );
-          }
+      delegate: SliverChildBuilderDelegate((context, index) {
+        if (index == 0) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            child: Text(
+              '$title (${tasks.length})',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          );
+        }
 
-          final task = tasks[index - 1];
-          return TasksScreenCard(
+        final task = tasks[index - 1];
+        return TasksScreenCard(
             task: task,
             onStatusChanged: _toggleTaskStatus,
             onEdit: _editTask,
+            );
+      }, childCount: tasks.length + 1),
+    );
+  }
+
+  Widget _buildCategoryFilters() {
+    return SizedBox(
+      height: 50,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        itemCount: _categories.length + 1,
+        itemBuilder: (context, index) {
+          final bool isAll = index == 0;
+          final category = isAll ? null : _categories[index - 1];
+          final bool isSelected = selectedCategoryId == (category?.id);
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: FilterChip(
+              showCheckmark: false,
+              label: Text(isAll ? 'All' : category!.name),
+              selected: isSelected,
+              onSelected: (_) {
+                setState(() => selectedCategoryId = category?.id);
+                _applyFilters(reset: true);
+              },
+              selectedColor: const Color(0xFF5D5FEF),
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+              ),
+            ),
           );
         },
-        childCount: tasks.length + 1,
       ),
     );
   }
