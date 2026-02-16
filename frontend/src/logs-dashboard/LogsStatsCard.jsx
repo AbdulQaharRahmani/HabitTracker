@@ -47,7 +47,7 @@ export default function LogStats() {
               <div className="flex items-center gap-2 mb-2 relative z-10">
                 <span className="text-sm">{icon}</span>
                 <p className="text-[16px] font-black opacity-80">
-                  {label}
+                  {t(`${label}`)}
                 </p>
               </div>
 

@@ -137,6 +137,9 @@
   "IP Address": "IP Address",
   "Not Found": "Not Found!",
   "Loading logs": "Loading logs...",
+  "Errors": "Errors",
+  "Warnings": "Warnings",
+  "Total Logs": "Total Logs",
 
   "logout": "Logout",
   "Old_Password": "Old Password",
@@ -161,7 +164,7 @@
      "Logs Statistics": "Logs Statistics",
      "Top Routes": "Top Routes",
      "Sessions": "Sessions",
-  "Calls": "Calls"  ,
+     "Calls": "Calls"  ,
     "Loading statistics": "Loading Statistics..."
 
 
