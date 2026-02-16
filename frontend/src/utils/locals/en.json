@@ -137,6 +137,9 @@
   "IP Address": "IP Address",
   "Not Found": "Not Found!",
   "Loading logs": "Loading logs...",
+  "Errors": "Errors",
+  "Warnings": "Warnings",
+  "Total Logs": "Total Logs",
 
   "logout": "Logout",
   "Old_Password": "Old Password",
@@ -160,6 +163,13 @@
   "profile_photo_updated":"Profile photo updated successfully!",
   "profile_photo_update_failed":"Failed to update profile photo. Please try again.",
   "page": "Page",
-  "of": "of"
+  "of": "of",
+  "Top devices": "Top Devices",
+  "Logs Statistics": "Logs Statistics",
+  "Top Routes": "Top Routes",
+  "Sessions": "Sessions",
+  "Calls": "Calls"  ,
+  "Loading statistics": "Loading Statistics..."
+
 
 }

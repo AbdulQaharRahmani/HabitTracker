@@ -148,6 +148,9 @@
   "Newest": "جدیدترین",
   "Oldest": "قدیمی‌ترین",
   "Loading logs": "در حال بارگذاری لاگ ها...",
+    "Errors": "خطاها",
+  "Warnings": "هشدار ها",
+  "Total Logs": "مجموع لاگ ها ",
   "Old_Password": "رمز عبور قدیمی",
   "New_Password": "رمز عبور جدید",
   "logout": "خروج",
@@ -169,7 +172,14 @@
   "image_invalid_file": "لطفا یک فایل تصویری معتبر انتخاب کنید!",
   "profile_photo_updated":"عکس پروفایل با موفقیت به روز شد!",
   "profile_photo_update_failed":"به روز رسانی عکس پروفایل ناموفق بود. لطفا دوباره تلاش کنید.",
+
   "page": "صفحه",
-  "of": "از"
+  "of": "از",
+  "Top Devices": " دستگاه های برتر",
+  "Logs Statistics": "آمار لاگ ها",
+  "Top Routes": "  پراستفاده ترین مسیرها ",
+  "Sessions": "نشست",
+  "Calls": "فراخوانی",
+  "Loading statistics": "در حال بارگذاری آمار لاگ ها..."
 
 }
