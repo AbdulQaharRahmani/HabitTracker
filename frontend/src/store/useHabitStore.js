@@ -3,6 +3,7 @@ import api from "../../services/api";
 import toast from "react-hot-toast";
 import {
   completeHabit,
+  deleteHabitApi,
   getChartData,
   getHabitsByDate,
   getHabitsChartData,
@@ -412,6 +413,26 @@ const useHabitStore = create((set, get) => ({
       set({ error: message, loading: false });
     }
   },
+  deleteHabit: async (id, t) => {
+  try {
+    await deleteHabitApi(id);
+
+    set((state) => ({
+      habits: state.habits.filter((h) => h._id !== id),
+      allhabits: state.allhabits.filter((h) => h._id !== id), // optional safety
+    }));
+
+    toast.success(t("habit deleted successfully!"));
+  } catch (error) {
+    toast.error(t("Failed to delete habit!"));
+    console.error(
+      "Delete habit failed:",
+      error.response?.data || error.message
+    );
+    set({ error: "Failed to delete habit" });
+  }
+},
+
 }));
 
 export default useHabitStore;
