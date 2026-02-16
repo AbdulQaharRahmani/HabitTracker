@@ -19,6 +19,7 @@ function Tasks() {
   } = useTaskCardStore((state) => state);
 
 
+  console.log(tasks)
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
@@ -33,37 +34,22 @@ function Tasks() {
 
   const { t } = useTranslation();
 
-  const groupedTasks = useMemo(() => {
-    return tasks.reduce((acc, task) => {
-      const categoryName = task.categoryId?.name || t("Uncategorized");
-      if (!acc[categoryName]) {
-        acc[categoryName] = [];
-      }
-      acc[categoryName].push(task);
-      return acc;
-    }, {});
-  }, [tasks, t]);
+const groupedTasks = useMemo(() => {
+  return tasks.reduce((acc, task) => {
+    const categoryName = task.categoryId?.name || t("Uncategorized");
+    const categoryColor = task.categoryId?.backgroundColor || "#6b7280";
 
-  const getCategoryColor = (categoryName) => {
-    const colors = [
-      "bg-blue-500",
-      "bg-emerald-500",
-      "bg-amber-500",
-      "bg-rose-500",
-      "bg-purple-500",
-      "bg-cyan-500",
-      "bg-indigo-500",
-      "bg-orange-500",
-    ];
-
-    let hash = 0;
-    for (let i = 0; i < categoryName.length; i++) {
-      hash = ((hash << 5) - hash) + categoryName.charCodeAt(i);
-      hash |= 0;
+    if (!acc[categoryName]) {
+      acc[categoryName] = {
+        color: categoryColor,
+        items: []
+      };
     }
+    acc[categoryName].items.push(task);
+    return acc;
+  }, {});
+}, [tasks, t]);
 
-    return colors[Math.abs(hash) % colors.length];
-  };
 
   return (
     <div className={`pb-10 px-4 md:px-6 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen ${i18n.language === "fa" ? "rtl" : "ltr"}`}>
@@ -84,8 +70,10 @@ function Tasks() {
       )}
       {!loading && !error && tasks.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-          {Object.entries(groupedTasks).map(([categoryName, items]) => {
-            const categoryColor = getCategoryColor(categoryName);
+        {Object.entries(groupedTasks).map(([categoryName, data]) => {
+          const { color, items } = data;
+
+          console.log(color);
             return (
               <div
                 key={categoryName}
@@ -96,11 +84,11 @@ function Tasks() {
                 }}
               >
                 <div className="relative">
-                  <div className={`absolute top-0 left-0 right-0 h-1 ${categoryColor}`} />
+                  <div className={`absolute top-0 left-0 right-0 h-1 `} style={{ backgroundColor: color }}/>
                   <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className={`w-2.5 h-2.5 rounded-full ${categoryColor}`} />
+                        <div className={`w-2.5 h-2.5 rounded-full`} style={{ backgroundColor: color }}/>
                         <h3 className="font-semibold text-base text-gray-800 dark:text-gray-200 truncate">
                           {categoryName}
                         </h3>
@@ -142,10 +130,11 @@ function Tasks() {
                   {items.length > 0 && (
                     <div className="mt-1.5 h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${categoryColor}`}
+                        className={`h-full rounded-full transition-all duration-300`}
                         style={{
-                          width: `${(items.filter(task => task.status === "done").length / items.length) * 100}%`
-                        }}
+                          width: `${(items.filter(task => task.status === "done").length / items.length) * 100}%`,
+                          backgroundColor:color
+                      }}
                       />
                     </div>
                   )}
