@@ -7,12 +7,12 @@ import toast from "react-hot-toast";
 import { useHotkeys } from "react-hotkeys-hook"
 
 const frequencyItems = [
-    { id: "f1", name: "Daily", value: "daily" },
-    { id: "f2", name: "Every Other Day", value: "every-other-day" },
-    { id: "f3", name: "Weekly", value: "weekly" },
-    { id: "f4", name: "Biweekly", value: "biweekly" },
-    { id: "f5", name: "Weekdays", value: "weekdays" },
-    { id: "f6", name: "Weekends", value: "weekends" },
+  { id: "f1", name: "Daily", value: "daily" },
+  { id: "f2", name: "Every Other Day", value: "every-other-day" },
+  { id: "f3", name: "Weekly", value: "weekly" },
+  { id: "f4", name: "Biweekly", value: "biweekly" },
+  { id: "f5", name: "Weekdays", value: "weekdays" },
+  { id: "f6", name: "Weekends", value: "weekends" },
 ];
 
 export default function HabitModal() {
@@ -98,13 +98,16 @@ export default function HabitModal() {
                 onSubmit={handleHabitDataSubmission}
               >
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="title" className="font-medium">
+                  <label
+                    htmlFor="title"
+                    className="font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Title <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
                     id="title"
-                    className="border-2 border-gray-100 p-2 rounded-md bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#7B68EE]/20 focus:border-[#7B68EE] outline-none transition-all placeholder:text-sm"
+                    className="border-2 border-gray-100 dark:border-gray-800 p-2 rounded-md bg-gray-50 dark:bg-[#2a2a2a] text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#333] focus:ring-2 focus:ring-[#7B68EE]/20 focus:border-[#7B68EE] outline-none transition-all placeholder:text-gray-400"
                     placeholder="Enter habit title"
                     value={habitData.title}
                     onChange={(e) => setHabitData("title", e.target.value)}
@@ -112,13 +115,16 @@ export default function HabitModal() {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="description" className="font-medium">
+                  <label
+                    htmlFor="description"
+                    className="font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Description
                   </label>
                   <textarea
                     id="description"
                     placeholder="Enter habit description"
-                    className="border-2 border-gray-100 p-2 rounded-md bg-gray-50 h-[120px] resize-none focus:bg-white focus:ring-2 focus:ring-[#7B68EE]/20 focus:border-[#7B68EE] outline-none transition-all placeholder:text-sm"
+                    className="border-2 border-gray-100 dark:border-gray-800 p-2 rounded-md bg-gray-50 dark:bg-[#2a2a2a] text-gray-900 dark:text-white h-[120px] resize-none focus:bg-white dark:focus:bg-[#333] focus:ring-2 focus:ring-[#7B68EE]/20 focus:border-[#7B68EE] outline-none transition-all"
                     value={habitData.description}
                     onChange={(e) =>
                       setHabitData("description", e.target.value)
@@ -126,7 +132,7 @@ export default function HabitModal() {
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 text-gray-700 dark:text-gray-300">
                   <label htmlFor="frequency" className="font-medium">
                     Frequency <span className="text-red-600">*</span>
                   </label>
@@ -138,7 +144,7 @@ export default function HabitModal() {
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 text-gray-700 dark:text-gray-300">
                   <label htmlFor="category" className="font-medium">
                     Category <span className="text-red-600">*</span>
                   </label>
@@ -162,10 +168,10 @@ export default function HabitModal() {
                     type="submit"
                     disabled={loading}
                   >
-                    {loading ? "Saving..." : "Save"}
+                    {loading ? "Saving..." : "Save Habit"}
                   </button>
                   <button
-                    className="w-full py-3.5 text-gray-500 font-semibold rounded-xl border-2 border-gray-100 hover:bg-gray-50 transition-all active:scale-[0.98]"
+                    className="w-full py-3.5 text-gray-500 dark:text-gray-400 font-semibold rounded-xl border-2 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-[0.98]"
                     onClick={() => setModalOpen(false)}
                     type="button"
                   >
