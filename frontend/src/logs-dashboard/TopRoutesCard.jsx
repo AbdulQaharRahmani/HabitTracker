@@ -18,7 +18,7 @@ export default function TopRoutesCard() {
           <div key={index} className="group">
             <div className="flex justify-between items-start mb-2 gap-4">
               <div className="flex-1 min-w-0">
-                <h3 className="text-[13px] font-mono font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/30 px-2 py-1 rounded-md truncate inline-block max-w-full border border-indigo-100/50 dark:border-indigo-800/50" title={route.name}>
+                <h3 dir="auto" className="text-[13px] font-mono font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/30 px-2 py-1 rounded-md truncate inline-block max-w-full border border-indigo-100/50 dark:border-indigo-800/50" title={route.name}>
                   {route.name}
                 </h3>
               </div>
