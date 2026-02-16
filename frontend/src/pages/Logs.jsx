@@ -48,7 +48,7 @@ export default function Logs() {
 
   useEffect(() => {
     getLogsData(currentPage, appliedFilters, debouncedSearchTerm);
-  }, [currentPage, appliedFilters, debouncedSearchTerm, getLogsData]);
+  }, [currentPage, appliedFilters, debouncedSearchTerm]);
 
   const handleFilter = () => {
     setCurrentPage(1);

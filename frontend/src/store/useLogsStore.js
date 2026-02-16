@@ -17,7 +17,7 @@ const useLogsStore = create((set, get) => ({
                 totalPages: data.totalPages,
             });
         } catch (error) {
-              const message = err.response?.data?.message || "Failed to fetch data";
+              const message = error.response?.data?.message || "Failed to fetch data";
             set({
                 error: message,
                 logsData: []
