@@ -137,6 +137,9 @@
   "IP Address": "IP Address",
   "Not Found": "Not Found!",
   "Loading logs": "Loading logs...",
+  "Errors": "Errors",
+  "Warnings": "Warnings",
+  "Total Logs": "Total Logs",
 
   "logout": "Logout",
   "Old_Password": "Old Password",
@@ -156,6 +159,13 @@
   "Yearly": "Yearly",
   "loading_chart": "Loading chart data...",
       "page": "Page",
-    "of": "of"
+    "of": "of",
+    "Top devices": "Top Devices",
+     "Logs Statistics": "Logs Statistics",
+     "Top Routes": "Top Routes",
+     "Sessions": "Sessions",
+     "Calls": "Calls"  ,
+    "Loading statistics": "Loading Statistics..."
+
 
 }

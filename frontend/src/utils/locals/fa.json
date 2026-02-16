@@ -148,6 +148,9 @@
   "Newest": "جدیدترین",
   "Oldest": "قدیمی‌ترین",
   "Loading logs": "در حال بارگذاری لاگ ها...",
+    "Errors": "خطاها",
+  "Warnings": "هشدار ها",
+  "Total Logs": "مجموع لاگ ها ",
   "Old_Password": "رمز عبور قدیمی",
   "New_Password": "رمز عبور جدید",
   "logout": "خروج",
@@ -166,6 +169,12 @@
   "Yearly": "سالانه",
     "loading_chart": "در حال بارگذاری اطلاعات نمودار...",
     "page": "صفحه",
-    "of": "از"
+    "of": "از",
+        "Top Devices": " دستگاه های برتر",
+     "Logs Statistics": "آمار لاگ ها",
+     "Top Routes": "  پراستفاده ترین مسیرها ",
+     "Sessions": "نشست",
+  "Calls": "فراخوانی",
+  "Loading statistics": "در حال بارگذاری آمار لاگ ها..."
 
 }

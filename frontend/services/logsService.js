@@ -26,3 +26,7 @@ export const fetchLogs = async (page = 1, limit = 10, filters = {}, search = "")
         totalPages: Math.ceil(Number(count) / limit) || 1,
     };
 };
+export const fetchLogsStats  = async ()=>{
+    let response = await api.get("/logs/log-stats")
+    return response.data.data
+}

@@ -4,9 +4,10 @@ import { FaExclamationTriangle, FaSearch } from "react-icons/fa";
 import {formatDate} from "../utils/dateFormatter"
 export default function LogTable({ filteredList }) {
   const { t } = useTranslation();
-  const { loading, error } = useLogsStore();
+const tableError = useLogsStore((state)=> state.tableError)
+const tableLoading = useLogsStore((state)=> state.tableLoading)
 
-  if (error) {
+  if (tableError) {
     return (
       <div className="w-full py-16 flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
         <FaExclamationTriangle className="text-red-500 mb-3" size={24} />
@@ -15,7 +16,7 @@ export default function LogTable({ filteredList }) {
     );
   }
 
-  if (loading) {
+  if (tableLoading) {
     return (
       <div className="w-full py-24 flex justify-center items-center bg-white dark:bg-gray-900 rounded-2xl">
         <div className="flex flex-col items-center gap-3">
