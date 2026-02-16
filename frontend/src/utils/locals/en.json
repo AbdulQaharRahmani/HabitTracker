@@ -113,6 +113,7 @@
   "Log Management & Analytics Dashboard": "Log Management & Analytics Dashboard",
   "Admin": "Admin",
   "Logout": "Logout",
+  "Logs": "Logs",
   "Search logs by route": "Search logs by route...",
   "Level": "Level",
   "Method" : "Method",
@@ -143,10 +144,10 @@
   "NO_HABITS_YET": "No habits added yet",
   "NO_ACTIVE_STREAK_YET": "No active streak yet",
   "NO_HABITS_COMPLETED_YET": "No habits completed yet",
-  
+
   "Task deleted successfully!": "Task deleted successfully!",
   "Failed to delete task": "Failed to delete task",
-  
+
   "monthly Activity": "Monthly Activity",
   "weekly Activity": "Weekly Activity",
   "yearly Activity": "Yearly Activity",
