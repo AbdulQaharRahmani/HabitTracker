@@ -129,7 +129,7 @@ export default function Logs() {
           {/* Filter Section */}
           <div className="flex flex-col items-center justify-center gap-8 bg-white dark:bg-gray-900 p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
             <div className="w-full max-w-xl">
-              <Search
+              <Search  
                 placeholder={t("Search logs by route")}
                 searchTerm={searchTerm}
                 setSearchTerm={(e)=> {setSearchTerm(e.target.value)}}
