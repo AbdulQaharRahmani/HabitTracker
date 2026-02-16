@@ -12,9 +12,9 @@ import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
-import mongoSanitize from '@exortek/express-mongo-sanitize';
 import { logMiddleware } from './middleware/logger.js';
 import { privateLimiter, publicLimiter } from './middleware/rateLimiter.js';
+import { sanitizeKeys } from './middleware/sanitizer.js';
 
 const app = express();
 
@@ -30,8 +30,17 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(mongoSanitize());
-app.use(helmet());
+app.use((req, res, next) => {
+  req.body = sanitizeKeys(req.body);
+  req.params = sanitizeKeys(req.params);
+  next();
+});
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
 app.use(logMiddleware);
 //#endregion
 

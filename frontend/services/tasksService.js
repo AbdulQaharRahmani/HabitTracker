@@ -21,8 +21,20 @@ export const updateTaskStatus = async (id, status) => {
     const message =
       error?.response?.data?.message ||
       error?.message ||
-      "Failed to update task completion";
-    console.log(message);
+      "Failed to update task status";
+    throw new Error(message);
   }
 };
 
+export const deleteTask = async (taskId) => {
+   try {
+     const response = await api.delete(`/tasks/${taskId}`);
+     return response.data;
+   } catch (error) {
+     console.error(
+       "Delete task failed:",
+       error.response?.data || error.message,
+     );
+     throw error;
+   }
+}

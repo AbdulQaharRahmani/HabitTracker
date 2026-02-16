@@ -19,11 +19,13 @@ class TaskApiService {
     required String token,
     int page = 1,
     int limit = 20,
-    String? search,
+    String? searchTerm,
+     String? status,
+    String? categoryId,
   }) async {
     try {
       final uri = Uri.parse(
-        '$baseUrl/tasks?limit=$limit&page=$page${search != null ? '&search=$search' : ''}',
+        '$baseUrl/tasks?limit=$limit&page=$page${searchTerm != null ? '&search=$searchTerm' : ''}',
       );
 
       final response = await http
@@ -60,7 +62,7 @@ class TaskApiService {
   }
 
   /// ===============================
-  /// Add new task (safe & fast)
+  /// Add new task
   /// ===============================
   Future<Map<String, dynamic>> addTask({
     required String title,
@@ -69,7 +71,7 @@ class TaskApiService {
     required String priority,
     required String categoryId,
     String? token,
-    String? dueDate,
+    DateTime? dueDate,
   }) async {
     final authToken = token ?? await AuthManager.getToken();
     if (authToken == null) {
@@ -82,7 +84,13 @@ class TaskApiService {
       'status': status,
       'priority': priority,
       'categoryId': categoryId,
+      if (dueDate != null) 'dueDate': formatDueDate(dueDate),
+
     };
+
+    debugPrint('📤 Create Task Payload: ${jsonEncode(payload)}');
+
+
 
     final response = await http
         .post(
@@ -96,7 +104,7 @@ class TaskApiService {
         .timeout(_timeoutDuration);
 
     final body = jsonDecode(response.body);
-
+    debugPrint('📤 body of response from backend : ${body}');
     if (response.statusCode == 200 || response.statusCode == 201) {
       return {
         'success': true,
@@ -107,7 +115,10 @@ class TaskApiService {
     return {
       'success': false,
       'error': body['message'] ?? 'Failed to create task',
+
+
     };
+
   }
 
   /// ===============================
@@ -185,7 +196,7 @@ class TaskApiService {
 
 
   /// ===============================
-  /// Delete task (safe)
+  /// Delete task
   /// ===============================
   Future<void> deleteTask(String taskId, String token) async {
     final response = await http
@@ -203,4 +214,53 @@ class TaskApiService {
       throw Exception('Failed to delete task');
     }
   }
+  // filter tasks and fetch filter tasks
+  Future<List<Task>> fetchFilteredTasks({
+    required String token,
+    String? searchTerm,
+    String? status,
+    String? categoryId,
+    String? dueDate,
+  }) async {
+    final query = <String, String>{};
+
+    if (searchTerm != null && searchTerm.isNotEmpty) {
+      query['searchTerm'] = searchTerm;
+    }
+    if (status != null) query['status'] = status;
+    if (categoryId != null) query['categoryId'] = categoryId;
+    if (dueDate != null) query['dueDate'] = dueDate;
+
+    final uri = Uri.parse('$baseUrl/tasks/filter')
+        .replace(queryParameters: query);
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final List list = body['data'] ?? [];
+      return list.map((e) => Task.fromJson(e)).toList();
+    }
+
+    throw Exception('Failed to filter tasks');
+  }
+  String formatDueDate(DateTime date) {
+    final utc = date.toUtc();
+
+    return
+      '${utc.year.toString().padLeft(4, '0')}-'
+          '${utc.month.toString().padLeft(2, '0')}-'
+          '${utc.day.toString().padLeft(2, '0')}T'
+          '${utc.hour.toString().padLeft(2, '0')}:'
+          '${utc.minute.toString().padLeft(2, '0')}:'
+          '${utc.second.toString().padLeft(2, '0')}.'
+          '${utc.millisecond.toString().padLeft(3, '0')}Z';
+  }
+
 }
