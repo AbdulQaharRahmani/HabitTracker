@@ -419,7 +419,7 @@ const useHabitStore = create((set, get) => ({
 
     set((state) => ({
       habits: state.habits.filter((h) => h._id !== id),
-      allhabits: state.allhabits.filter((h) => h._id !== id), // optional safety
+      allhabits: state.allhabits.filter((h) => h._id !== id),
     }));
 
     toast.success(t("habit deleted successfully!"));
