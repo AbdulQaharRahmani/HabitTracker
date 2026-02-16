@@ -34,6 +34,12 @@ export default function TaskCard({
     low: "border-l-4 border-gray-300 dark:border-gray-600",
   };
 
+  const priorityBorder = {
+    high: "border-l-4 border-indigo-600",
+    medium: "border-l-4 border-orange-500",
+    low: "border-l-4 border-gray-300",
+  };
+
   const { t } = useTranslation();
 
   return (
