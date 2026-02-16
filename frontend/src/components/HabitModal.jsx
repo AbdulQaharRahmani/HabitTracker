@@ -44,20 +44,10 @@ export default function HabitModal() {
     "ctrl+s, meta+s",
     (e) => {
       e.preventDefault();
-      if (formRef.current) {
-        formRef.current.dispatchEvent(
-          new Event("submit", { cancelable: true })
-        );
-      }
-      toast.success("Form saved!")
+      handleHabitDataSubmission(e);
     },
     { enabled: isModalOpen }
   );
-
-  useHotkeys("ctrl+n, meta+n", (e) => {
-    e.preventDefault();
-    setModalOpen(true);
-  });
 
   useHotkeys(
     "esc",
@@ -103,6 +93,7 @@ export default function HabitModal() {
 
             <div className="flex-1 overflow-y-auto p-4">
               <form
+                ref={formRef}
                 className="flex flex-col gap-4"
                 onSubmit={handleHabitDataSubmission}
               >
