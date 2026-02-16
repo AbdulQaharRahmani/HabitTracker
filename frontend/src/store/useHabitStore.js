@@ -109,33 +109,39 @@ const useHabitStore = create((set, get) => ({
     }
   },
   toggleHabit: async (id) => {
+    const formatDate = (date) =>
+      date.toISOString().split("T")[0];
     if (get().selectedDate.toDateString() !== new Date().toDateString()) {
-      return toast.error(
-        "You can only mark today's habit as completed or uncompleted",
-      );
+      return toast.error("You can only mark today's habit as completed or uncompleted")
     }
-    const habitToToggle = get().habits.find((habit) => habit._id === id);
-    const completionState = habitToToggle.completed;
-    set((state) => ({
-      habits: state.habits.map((habit) =>
-        habit._id === id ? { ...habit, completed: !habit.completed } : habit,
+
+    const habitToToggle = get().habits.find(h => h._id === id)
+    if (!habitToToggle) return
+
+    const prevState = habitToToggle.completed
+    const date = formatDate(get().selectedDate)
+
+    set(state => ({
+      habits: state.habits.map(h =>
+          h._id === id ? { ...h, completed: !h.completed } : h
       ),
-    }));
+      habitCompletions: state.habitCompletions + (prevState ? -1 : 1)
+    }))
+
     try {
-      if (habitToToggle.completed) {
-        await unCompleteHabit(id);
-        set((state) => ({ habitCompletions: state.habitCompletions - 1 }));
+      if (prevState) {
+        await unCompleteHabit(id, { date })
       } else {
-        await completeHabit(id);
-        set((state) => ({ habitCompletions: state.habitCompletions + 1 }));
+        await completeHabit(id, { date })
       }
     } catch (err) {
-      console.log(err);
-      set((state) => ({
-        habits: state.habits.map((habit) =>
-          habit._id === id ? { ...habit, completed: completionState } : habit,
+      console.log(err)
+      set(state => ({
+        habits: state.habits.map(h =>
+          h._id === id ? { ...h, completed: prevState } : h
         ),
-      }));
+        habitCompletions: state.habitCompletions + (prevState ? 1 : -1)
+      }))
     }
   },
   isModalOpen: false,
