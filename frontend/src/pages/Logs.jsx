@@ -168,7 +168,7 @@ export default function Logs() {
               </div>
 
               <button
-                className="w-full lg:w-auto px-5 h-[52px] rounded-xl text-white text-md font-bold bg-indigo-600 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95 disabled:opacity-50"
+                className="w-full lg:w-auto px-5 h-[52px] rounded-xl text-white text-md font-bold bg-indigo-600 hover:bg-indigo-700 transition-all  active:scale-95 disabled:opacity-50"
                 onClick={handleFilter}
                 disabled={loading}
               >
