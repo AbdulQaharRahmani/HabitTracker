@@ -59,7 +59,7 @@ export default function AddTask() {
     } catch (error) {
       toast.error(t("Sorry! could not save new task", error));
     }
-  }; 
+  };
 
   return (
     <div>
@@ -78,11 +78,11 @@ export default function AddTask() {
       </button>
       <div>
         {isModalOpen && (
-          <TaskModal 
+          <TaskModal
             modalFunctionality={HandleTaskCreation}
-            modalTitle={t("Add new Task")} 
+            modalTitle={t("Add new Task")}
             close={() => setModalOpen(false)}
-            open={isModalOpen} 
+            open={isModalOpen}
           ></TaskModal>
         )}
       </div>
