@@ -65,6 +65,7 @@ export default function Habits() {
             <Search
               searchTerm={searchTerm}
               setSearchTerm={handleSearchChange}
+              placeholder={t("Search habits...")}
             />
           </div>
 
