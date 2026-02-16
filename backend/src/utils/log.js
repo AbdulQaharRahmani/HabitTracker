@@ -68,9 +68,14 @@ export const getDeviceInfo = (req) => {
   const result = parser.getResult();
 
   return {
-    device: result.device.vendor || 'desktop',
+    device: {
+      type: result.device.type || 'desktop',
+      model: result.device.vendor || 'desktop',
+    },
+    os: {
+      name: result.os.name,
+      version: result.os.version,
+    },
     browser: result.browser.name,
-    os: result.os.name,
-    type: result.device.type || 'desktop',
   };
 };
