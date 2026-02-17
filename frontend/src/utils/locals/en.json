@@ -169,7 +169,12 @@
   "Top Routes": "Top Routes",
   "Sessions": "Sessions",
   "Calls": "Calls"  ,
-  "Loading statistics": "Loading Statistics..."
+  "Loading statistics": "Loading Statistics...",
+
+
+  "habit_completed":"Habit marked as complete!",
+  "habit_incomplete":"Habit marked as incomplete!",
+  "habit_update_failed":"Habit update failed — please retry."
 
 
 }
