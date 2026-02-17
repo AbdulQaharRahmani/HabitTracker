@@ -175,6 +175,17 @@
     "Top Routes": "  پراستفاده ترین مسیرها ",
     "Sessions": "نشست",
     "Calls": "فراخوانی",
-    "Loading statistics": "در حال بارگذاری آمار لاگ ها..."
+    "Loading statistics": "در حال بارگذاری آمار لاگ ها...",
+
+  "delete_task": "حذف تسک",
+  "delete_task_description": "آیا مطمئن هستید که می‌خواهید این تسک را حذف کنید؟",
+  "delete_habit": "حذف عادت",
+  "delete_habit_description": "آیا مطمئن هستید که می‌خواهید این عادت را حذف کنید؟",
+  "delete_confirmText": "حذف",
+  "logout_title": "خروج از حساب",
+  "logout_description": "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟",
+  "logout_confirmText": "تأیید",
+  "cancel": "انصراف"
+
 
 }
