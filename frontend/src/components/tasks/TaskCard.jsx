@@ -56,76 +56,88 @@ export default function TaskCard({
 
  return (
   <>
-    <div
-      className={`flex items-start justify-between bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8 p-4 ${
-        priorityBorder[priority] ?? "border-l-4 border-gray-400"
-      }`}
+   <div
+      className={`flex bg-white dark:bg-gray-800 rounded-xl shadow-sm mx-8
+        ${priorityBorder[priority] ?? "-l-4 border-gray-400"}
+      `}
     >
-      {/* Status */}
       <div
-        className={`flex items-center px-4 border-gray-300 ${
-          i18n.language === "fa" ? "border-l pl-6" : "border-r pr-6"
+        className={`flex items-center justify-between border-gray-300 mx-4 px-4 pr-8 text-center ${
+          i18n.language === "fa" ? "border-l pl-10" : "border-r "
         }`}
       >
         <button onClick={() => completeTask(_id)}>
           {status === "done" ? (
-            <FaCheckCircle size={20} className="text-green-500" />
+            <FaCheckCircle size={20} className="text-green-400" />
           ) : (
             <FaRegCircle
               size={20}
-              className="text-gray-300 hover:text-green-500 transition duration-150"
+              className="text-gray-300 hover:text-green-400 transiton ease-in duration-100"
             />
           )}
         </button>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 px-4">
-        <h3
-          className={`text-lg font-bold ${
-            status === "done"
-              ? "text-gray-400 dark:text-gray-500 line-through"
-              : "text-gray-800 dark:text-gray-100"
-          }`}
-        >
-          {t(title)}
-        </h3>
-
-        <p className="text-gray-400 text-sm mt-1">
-          {t(description)}
-        </p>
-
-        {/* Meta Info */}
-        <div className="flex flex-wrap items-center gap-4 mt-3">
-          {/* Due */}
+      <div className="grid grid-cols-2 justify-between items-start flex-1 md:justify-start md:grid-cols-[2fr_1fr]">
+        <div className="my-1">
           <div
-            className={`flex items-center gap-2 rounded-lg py-1 px-3 text-sm font-semibold ${dueStyles[type]}`}
+            className={`
+              py-3 px-4 text-lg font-bold transition`}
           >
-            <FaCircle size={6} />
-            <span>
-              {t("Due")}: {t(label)}
-            </span>
+            <h3
+              className={`${
+                status === "done"
+                  ? "text-gray-400 dark:text-gray-500 line-through"
+                  : "text-gray-800 dark:text-gray-100"
+              }`}
+            >
+              {t(title)}
+            </h3>
+            <div>
+              <p className="text-gray-400 text-sm font-normal mt-1">
+                {t(description)}
+              </p>
+            </div>
           </div>
 
-          {/* Category */}
-          <div
-            className="text-sm font-medium"
-            style={{ color: categoryId?.backgroundColor ?? "#999" }}
-          >
-            {t(categoryId?.name)}
+          <div className="flex flex-rows-2 items-center">
+            {/* Deadline */}
+            <div
+              className={`
+                block rounded-lg mb-2 mx-4 py-1 px-3
+                bg-indigo-100 dark:bg-indigo-900/40 ${dueStyles[type]}
+               `}
+            >
+              <p
+                className="
+                  flex gap-2 text-[0.8rem] font-semibold
+
+                "
+              >
+                <FaCircle size={6} className="mt-2" />
+                <span>
+                  {t("Due")}: {t(label)}
+                </span>
+              </p>
+            </div>
+            <div
+              className="py-2 text-[0.8rem]"
+              style={{ color: categoryId?.backgroundColor ?? "#999" }}
+            >
+              {t(categoryId?.name)}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col gap-4">
-        <button onClick={() => setIsModalOpen(true)}>
+      {/* Delete */}
+      <div className="p-4 grid grid-rows-2 items-center mx-4">
+         <button onClick={() => setIsModalOpen(true)}>
           <MdDeleteOutline
             size={22}
             className="text-gray-300 dark:text-gray-500 hover:text-red-500 transition"
           />
         </button>
-
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -133,8 +145,12 @@ export default function TaskCard({
           }}
         >
           <CiEdit
-            size={22}
-            className="text-gray-300 dark:text-gray-500 hover:text-indigo-600 transition"
+            size={24}
+            className="
+              text-gray-300 dark:text-gray-500
+              hover:text-indigo-600 transition
+              dark:hover:text-indigo-600
+            "
           />
         </button>
       </div>
