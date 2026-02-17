@@ -48,7 +48,8 @@ export default function TaskCard({
       await deleteTask(_id,t);
       setIsModalOpen(false);
 
-
+    }catch(err){
+      console.error("Failed to delete task:", err);
     }finally{
       setIsDeleting(false);
     }
@@ -160,8 +161,8 @@ export default function TaskCard({
       isOpen={isModalOpen}
       onClose={() => setIsModalOpen(false)}
       onConfirm={handleDelete}
-      title={t("delete_title")}
-      description={t("delete_description")}
+      title={t("delete_task")}
+      description={t("delete_task_description")}
       confirmText={t("delete_confirmText")}
       type="danger"
       isLoading={isDeleting}
