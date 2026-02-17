@@ -4,6 +4,7 @@ import { useTaskCardStore } from "../../store/useTaskCardStore";
 import toast from "react-hot-toast";
 import i18n from "../../utils/i18n";
 import { useHotkeys } from "react-hotkeys-hook";
+import TaskModal from "./TaskModal"
 
 export default function AddTask() {
   const { t } = useTranslation();
@@ -74,7 +75,9 @@ export default function AddTask() {
   useHotkeys(
     "esc",
     () => {
-      setModalOpen(false);
+      if(isModalOpen) {
+        setModalOpen(false);
+      }
     },
     { enabled: isModalOpen }
   );
