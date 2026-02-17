@@ -1,37 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/screens/statisticScreen/data/models/dashboard_summary_model.dart';
-
-class SummaryCards extends StatelessWidget {
-  const SummaryCards({super.key, required DashboardSummaryModel summary});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        SummaryCard(
-          title: 'Habits',
-          value: '12',
-          icon: Icons.checklist_outlined,
-          iconColor: Colors.brown,
-        ),
-        SummaryCard(
-          title: 'Streak',
-          value: '5',
-          icon: Icons.local_fire_department,
-          iconColor: Colors.red,
-        ),
-        SummaryCard(
-          title: 'Rate',
-          value: '87%',
-          icon: Icons.percent,
-          iconColor: Colors.deepPurple,
-        ),
-      ],
-    );
-  }
-}
 
 class SummaryCard extends StatelessWidget {
   final String title;

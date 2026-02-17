@@ -5,7 +5,9 @@ import 'package:habit_tracker/screens/statisticScreen/widgets/completion_trend_c
 import 'package:habit_tracker/screens/statisticScreen/widgets/consistency_heatmap.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/filter_tabs.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/header.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/summary_card.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/shemer_summary_cards.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/shimmer_chart.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/summary_cards.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/tasks_item.dart';
 
 import 'data/providers/statistic_provider.dart';
@@ -15,52 +17,66 @@ class StatisticScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ===== Watch Providers =====
-    final dashboardAsync = ref.watch(dashboardSummaryProvider);
-    final chartAsync = ref.watch(chartDataProvider);
+    final summaryAsync = ref.watch(summaryProvider);
+    final chartAsync = ref.watch(chartProvider);
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ========== Header Section ==========
-              StatisticsHeader(),
-              const SizedBox(height: 24),
-              // ========== Filter Section ==========
-              FilterTabs(),
+        child: RefreshIndicator(
+          onRefresh: () async {
 
-              const SizedBox(height: 24),
-              // ========== Progress Overview Cards ==========
-              dashboardAsync.when(
-                data: (summary) => SummaryCards(summary: summary),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, _) => Text('Error loading summary: $err'),
-              ),
-              const SizedBox(height: 32),
+            ref.invalidate(summaryProvider);
+            ref.read(chartProvider.notifier).reloadChart();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
-              //========== Completion Trend Chart ==========
-            chartAsync.when(
-              data: (chartData) => CompletionTrendCard(chartData: chartData),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Text('Error loading chart: $err'),
+                StatisticsHeader(),
+                const SizedBox(height: 24),
+                FilterTabs(),
+                const SizedBox(height: 24),
+
+                // Summary
+                summaryAsync.when(
+                  data: (summary) =>
+                      SummaryCards(summary: summary),
+                  loading: () => const ShimmerSummaryCards(),
+                  error: (err, _) => Text("Error: $err"),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Chart
+                chartAsync.when(
+                  data: (chartData) =>
+                      CompletionTrendCard(chartData: chartData),
+                  loading: () => const ShimmerChart(),
+                  error: (err, _) => Text("Error: $err"),
+                ),
+
+                const SizedBox(height: 24),
+
+                ConsistencyHeatmap(),
+                const SizedBox(height: 32),
+
+                const Text(
+                  'Top Performing',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                TasksItem(),
+              ],
             ),
-
-              const SizedBox(height: 24),
-              // Consistency Heatmap
-              ConsistencyHeatmap(),
-              const SizedBox(height: 32),
-              const Text(
-                'Top Performing',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-
-              // ========== Top Performing Tasks ==========
-              TasksItem(),
-            ],
           ),
         ),
       ),

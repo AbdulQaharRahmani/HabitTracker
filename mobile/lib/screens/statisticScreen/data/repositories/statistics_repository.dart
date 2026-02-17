@@ -12,12 +12,20 @@ class StatisticsRepository {
   // ==========================
   // Get Dashboard Summary
   // ==========================
-  Future<DashboardSummaryModel> getDashboardSummary() async {
-
+  Future<DashboardSummaryModel> getDashboardSummary({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
     final token = await AuthManager.getToken();
 
+    final uri = Uri.parse(
+      '$baseUrl/habits/dashboard'
+          '?startDate=${startDate.toIso8601String().split("T").first}'
+          '&endDate=${endDate.toIso8601String().split("T").first}',
+    );
+
     final response = await http.get(
-      Uri.parse('$baseUrl/habits/dashboard'),
+      uri,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -31,6 +39,7 @@ class StatisticsRepository {
       throw Exception('Failed to load dashboard summary');
     }
   }
+
 
   // ==========================
   // Get Chart Data
