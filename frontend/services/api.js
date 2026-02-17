@@ -1,20 +1,17 @@
 import axios from "axios";
+import useAuthStore from "../src/store/useAuthStore";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true
 });
 
 api.interceptors.request.use(
   (config) => {
-    const authStorage = localStorage.getItem("auth-data");
+    const token = useAuthStore.getState().token
 
-    if (authStorage) {
-      const { state } = JSON.parse(authStorage);
-      const token = state?.token;
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     if (!(config.data instanceof FormData)) {
@@ -25,5 +22,32 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+api.interceptors.response.use(
+  (response) =>{
+    return response
+  },
+  async (error) =>{
+    const originalRequest = error.config
+    originalRequest.retry;
+    if (!originalRequest.retry && error.response.status === 401) {
+      originalRequest.retry = true
+      try {
+        const response = await axios.post("/auth/refresh")
+        const accessToken = response.data.accessToken
+        useAuthStore.getState().login(accessToken, response.data.user)
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`
+        return api(originalRequest)
+      } catch (refreshError) {
+        useAuthStore.getState().logout()
+        return Promise.reject(refreshError)
+      }
+
+    }
+    return Promise.reject(error)
+
+  }
+
+)
 
 export default api;
