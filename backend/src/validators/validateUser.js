@@ -102,3 +102,14 @@ export const updateUserPreferenceValidator = [
     .isBoolean()
     .withMessage('weeklySummaryEmailEnabled should be boolean'),
 ];
+
+export const resetPasswordValidator = [
+  body('newPassword')
+    .notEmpty()
+    .withMessage('New password is required')
+    .isLength({ min: 5 })
+    .withMessage('New password must be at least 5 characters')
+    .isAlphanumeric()
+    .withMessage('New password must contain only letters and numbers')
+    .trim(),
+];
