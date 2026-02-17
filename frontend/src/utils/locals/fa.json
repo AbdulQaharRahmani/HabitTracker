@@ -71,16 +71,24 @@
   "This is the description part": "این بخش توضیحات است.",
 
   "Add New Task": "اضافه کردن عملیات جدید",
+  "Add New Habit": "اضافه کردن عادت جدید",
   "Title": "عنوان",
+  "New Habit": "اضافه کردن عادت جدید",
   "Description": "توضیحات",
+  "Frequency": "تکرار",
   "Deadline": "موعد",
   "Category": "کتگوری",
   "Save": "ذخیره",
+  "Saving...": "در حال ذخیره",
+  "Save Habit": "ذخیره",
   "Cancel": "لغو",
   "Enter task title": "عنوان را وارد کنید",
+  "Enter habit title": "عنوان را وارد کنید",
   "Enter task description": "توضیحات را وارد کنید",
+  "Enter habit description": "توضیحات را وارد کنید",
   "Choose Deadline": "موعد را انتخاب کنید",
   "Choose Category": "کتگوری را انتخاب کنید",
+  "Choose Frequency": "تکرار را انتخاب کنید",
   "Title is required!": "عنوان الزامی است!",
   "Descripton is required!": "توضیحات الزامی است!",
   "Deadline is required!": "تاریخ ختم الزامی است!",
@@ -101,7 +109,7 @@
   "low": "کم",
   "medium": "متوسط",
   "high": "زیاد",
-  
+
   "create_account": "ساخت حساب",
   "your_journey": "سفر خود را به سوی عادات بهتر امروز شروع کنید.",
   "full_name": "نام کامل",
@@ -135,7 +143,7 @@
 
   "Task deleted successfully!": "عملیات موفقانه حذف شد!",
   "Failed to delete task": "عملیات حذف نشد",
-  
+
   "monthly Activity": "فعالیت ماهانه",
   "weekly Activity": "فعالیت هفته وار",
   "yearly Activity": " فعالیت سالانه",

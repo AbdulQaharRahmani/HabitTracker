@@ -84,7 +84,7 @@ const groupedTasks = useMemo(() => {
                 }}
               >
                 <div className="relative">
-                  <div className={`absolute top-0 left-0 right-0 h-1 `} style={{ backgroundColor: color }}/>
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 `} style={{ backgroundColor: color }}/>
                   <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
