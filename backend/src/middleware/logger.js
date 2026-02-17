@@ -17,7 +17,6 @@ export const logMiddleware = (req, res, next) => {
           : req.ip ||
             req.headers['x-forwarded-for'] ||
             req.connection.remoteAddress,
-      userAgent: req.headers['user-agent'],
     };
 
     if (res.statusCode >= 500) {
