@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useHabitStore from "../store/useHabitStore";
 import Dropdown from "./Dropdown";
 import { FaTimes } from "react-icons/fa";
@@ -52,7 +52,9 @@ export default function HabitModal() {
   useHotkeys(
     "esc",
     () => {
-      setModalOpen(false);
+      if(isModalOpen) {
+        setModalOpen(false);
+      }
     },
     { enabled: isModalOpen }
   );  
