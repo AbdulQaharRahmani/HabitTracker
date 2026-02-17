@@ -79,10 +79,9 @@ export const getLogStats = async (req, res) => {
   };
 
   const topRoutes = getTop(logs, 'path', 5);
-  const topDevices = getTop(logs, 'userAgent', 5);
 
   res.status(200).json({
     success: true,
-    data: { stats, topRoutes, topDevices },
+    data: { stats, topRoutes },
   });
 };
