@@ -6,10 +6,19 @@ import { useTaskCardStore } from "../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import i18n from "../utils/i18n";
 import EditTask from "../components/tasks/EditTask";
+import { useHotkeys } from "react-hotkeys-hook";
+import useSidebarStore from "../store/useSidebarStore";
 
 function Tasks() {
-  const { tasks, fetchTasks, loading, error, isModalOpen, isEditModalOpen } =
+  const { tasks, fetchTasks, loading, error, isModalOpen, isEditModalOpen, setModalOpen } =
     useTaskCardStore((state) => state);
+
+  const {
+    isOpen,
+    toggleSidebar,
+    closeSidebar,
+    isMobileOpen
+  } = useSidebarStore();
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
@@ -23,6 +32,15 @@ function Tasks() {
   }, []);
 
   const { t } = useTranslation();
+
+  useHotkeys(
+    "ctrl+k, meta+k",
+    (e) => {
+      e.preventDefault();
+        setModalOpen(true);
+      },
+      { enabled: !isModalOpen }
+  );
 
   return (
     <div
