@@ -15,6 +15,7 @@ import helmet from 'helmet';
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { logMiddleware } from './middleware/logger.js';
 import { sanitizeKeys } from './middleware/sanitizer.js';
+import { authorizeRoles } from './middleware/authorizeRoles.js';
 
 const app = express();
 
@@ -67,12 +68,51 @@ app.use('/api/auth', limiter, authRoutes);
 
 // Protect routes
 
-app.use('/api/categories', authMiddleware, limiter, categoryRoutes);
-app.use('/api/habits', authMiddleware, limiter, habitRoutes);
-app.use('/api/tasks', authMiddleware, limiter, taskRoutes);
-app.use('/api/users', authMiddleware, limiter, userRoutes);
-app.use('/api/offline-data', authMiddleware, limiter, syncRoutes);
-app.use('/api/logs', authMiddleware, limiter, logRoutes);
+// Role: Admin & User
+app.use(
+  '/api/categories',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  limiter,
+  categoryRoutes
+);
+app.use(
+  '/api/habits',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  limiter,
+  habitRoutes
+);
+app.use(
+  '/api/tasks',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  limiter,
+  taskRoutes
+);
+app.use(
+  '/api/users',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  limiter,
+  userRoutes
+);
+app.use(
+  '/api/offline-data',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  limiter,
+  syncRoutes
+);
+
+// Role: Admin
+app.use(
+  '/api/logs',
+  authMiddleware,
+  authorizeRoles('admin'),
+  limiter,
+  logRoutes
+);
 
 //#endregion
 
