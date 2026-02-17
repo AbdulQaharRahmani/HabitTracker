@@ -15,6 +15,7 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import useSidebarStore from "../store/useSidebarStore";
 import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
 import useAuthStore from "../store/useAuthStore";
+import { useTaskCardStore } from "../store/useTaskCardStore";
 
 const dashboardItems = [
   { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
@@ -43,6 +44,8 @@ const Sidebar = ({ children }) => {
     isMobileOpen
   } = useSidebarStore();
 
+  const { isModalOpen, isEditModalOpen} = useTaskCardStore()
+
   /* --- Profile photo --- */
   useEffect(() => {
     if (!userId) return;
@@ -69,18 +72,6 @@ const Sidebar = ({ children }) => {
     (e) => {
       e.preventDefault();
       toggleSidebar();
-    }
-  );
-
-  useHotkeys(
-    "esc",
-    (e) => {
-      e.preventDefault();
-      if (isMobileOpen) {
-        closeSidebar();
-      } else if (isOpen) {
-        toggleSidebar();
-      }
     }
   );
 
