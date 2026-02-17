@@ -7,7 +7,9 @@ import {
   FaChartLine,
   FaCog,
   FaSignOutAlt,
+  FaList
 } from "react-icons/fa";
+import { LuLogs } from "react-icons/lu";
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
@@ -20,6 +22,7 @@ const dashboardItems = [
   { id: "habits", name: "Habits", icon: <HiOutlineFire />, path: "/habits" },
   { id: "tasks", name: "Tasks", icon: <HiOutlineClipboardList />, path: "/tasks" },
   { id: "statistics", name: "Statistics", icon: <FaChartLine />, path: "/statistics" },
+  { id: "logs", name: "Logs", icon: <FaList />, path: "/logs" },
 ];
 
 const preferencesItems = [
