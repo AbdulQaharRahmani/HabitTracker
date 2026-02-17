@@ -55,21 +55,18 @@ export default function HabitModal() {
       setModalOpen(false);
     },
     { enabled: isModalOpen }
-  );
+  );  
 
- const handleHabitDataSubmission = useCallback(
-    async (e) => {
-      e?.preventDefault();
+  const handleHabitDataSubmission = async (e) => {
+    e?.preventDefault();
 
-      if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
-        return toast.error("Title, Category, and Frequency are required");
-      }
-      await submitHabit(habitData, isEditingMode, currentHabitID);
-      fetchHabits();
-      setModalOpen(false)
-    },
-    [habitData, isEditingMode, currentHabitID, submitHabit, fetchHabits, setModalOpen]
-  );
+    if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
+      return toast.error("Title, Category, and Frequency are required");
+    }
+    await submitHabit(habitData, isEditingMode, currentHabitID);
+    fetchHabits();
+    setModalOpen(false)
+  }  
 
   const handleAddCategory = async (name, color) => {
     await addUserCategory(name, color);
