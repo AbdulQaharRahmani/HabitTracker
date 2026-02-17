@@ -2,66 +2,86 @@ import { useTranslation } from "react-i18next";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
 import toast from "react-hot-toast";
 import TaskModal from "./TaskModal";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export default function EditTask () {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
-    const {
-        isEditModalOpen,
-        taskData,
-        editingTaskId,
-        updateTask,
-    } = useTaskCardStore();
+  const {
+    isEditModalOpen,
+    taskData,
+    editingTaskId,
+    updateTask,
+  } = useTaskCardStore();
 
-    const closeModal = useTaskCardStore((state) => state.closeModal);
+  const closeModal = useTaskCardStore((state) => state.closeModal);
 
-    const HandleTaskEdition = async (e) => {
-      e.preventDefault();
+  const HandleTaskEdition = async (e) => {
+    e.preventDefault();
 
-      if (!editingTaskId) return;
+    if (!editingTaskId) return;
 
-      if (!taskData.title) {
-        toast.error(t("Title is required!"));
-        return;
-      }
+    if (!taskData.title) {
+      toast.error(t("Title is required!"));
+      return;
+    }
 
-      if (!taskData.dueDate) {
-        toast.error(t("Deadline is required!"));
-        return;
-      }
+    if (!taskData.dueDate) {
+      toast.error(t("Deadline is required!"));
+      return;
+    }
 
-      if (!taskData.category) {
-        toast.error(t("Category is required!"));
-        return;
-      }
+    if (!taskData.category) {
+      toast.error(t("Category is required!"));
+      return;
+    }
 
-      if (!taskData.priority) {
-        toast.error(t("Priority is required!"));
-        return;
-      }
+    if (!taskData.priority) {
+      toast.error(t("Priority is required!"));
+      return;
+    }
 
-      const normalizedDate = new Date(taskData.dueDate)
-        .toISOString()
-        .split("T")[0];
+    const normalizedDate = new Date(taskData.dueDate)
+      .toISOString()
+      .split("T")[0];
 
-      const taskPayload = {
-        title: taskData.title,
-        description: taskData.description,
-        dueDate: normalizedDate,
-        categoryId: taskData.category,  
-        priority: taskData.priority,
-      };
-
-      console.log("final takpayload sent", taskData.dueDate);
-
-      try {
-        await updateTask(editingTaskId, taskPayload);
-        closeModal();
-        toast.success(t("Task edited successfully!"));
-      } catch (error) {
-        toast.error(t("Sorry! could not edit task"));
-      }
+    const taskPayload = {
+      title: taskData.title,
+      description: taskData.description,
+      dueDate: normalizedDate,
+      categoryId: taskData.category,  
+      priority: taskData.priority,
     };
+
+    console.log("final takpayload sent", taskData.dueDate);
+
+    try {
+      await updateTask(editingTaskId, taskPayload);
+      closeModal();
+      toast.success(t("Task edited successfully!"));
+    } catch (error) {
+      toast.error(t("Sorry! could not edit task"));
+    }
+  };
+
+  useHotkeys(
+    "ctrl+s, meta+s",
+    (e) => {
+      e.preventDefault();
+      HandleTaskEdition(e);
+    },
+    { enabled: isEditModalOpen }
+  );
+  
+  useHotkeys(
+    "esc",
+    () => {
+      if(isEditModalOpen) {
+        closeModal();
+      }
+    },
+    { enabled: isEditModalOpen }
+  );
 
     return (
       <div>
