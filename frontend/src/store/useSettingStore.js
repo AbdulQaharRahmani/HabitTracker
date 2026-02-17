@@ -12,11 +12,12 @@ const useSettingStore = create((set) => ({
 
       set({ username: newUsername });
 
-      useAuthStore.getState().updateUsername(newUsername);
+      useAuthStore.getState().updateUserName(newUsername);
 
       toast.success("Username updated successfully");
       return true;
     } catch (err) {
+      console.log(err)
       toast.error(err.response?.data?.message || "Could not update username");
       return false;
     }

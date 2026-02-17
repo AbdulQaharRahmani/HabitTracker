@@ -19,7 +19,36 @@ import { Toaster } from "react-hot-toast";
 import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Logs from "./pages/Logs";
+import { useEffect, useState } from "react";
+import api from "../services/api";
+import useAuthStore from "./store/useAuthStore";
+import { refreshToken } from "../services/authServices";
 function App() {
+  const [initialLoading, setInitialLoading] = useState(true)
+  const login = useAuthStore((state)=> state.login)
+  const logout = useAuthStore((state)=> state.logout)
+  useEffect(()=>{
+   const getAccessToken = async ()=>{
+    try{
+    let response = await refreshToken()
+    login(response.token, null)
+    }catch(error){
+      console.log(error)
+      logout()
+    }finally{
+      setInitialLoading(false)
+    }
+   }
+   getAccessToken()
+  },[])
+
+  if(initialLoading){
+    return(
+      <div>
+        Loading...
+      </div>
+    )
+  }
   return (
     <>
       <Toaster

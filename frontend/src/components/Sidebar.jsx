@@ -35,7 +35,7 @@ const Sidebar = ({ children }) => {
 
   const { userProfileUrl, fetchProfilePhoto, loading } =
     useProfilePhotoStore();
-  const { userId, username, logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const {
     isOpen,
     screenMode,
@@ -46,9 +46,9 @@ const Sidebar = ({ children }) => {
 
   /* --- Profile photo --- */
   useEffect(() => {
-    if (!userId) return;
-    fetchProfilePhoto(userId);
-  }, [userId, fetchProfilePhoto]);
+    if (!user?.userId) return;
+    fetchProfilePhoto(user?.userId);
+  }, [user?.userId, fetchProfilePhoto]);
 
   /* --- Screen resize sync --- */
   useEffect(() => {
@@ -126,7 +126,7 @@ const Sidebar = ({ children }) => {
 
             {isOpen && (
               <div>
-                <h3 className="font-semibold text-lg mt-2">{username}</h3>
+                <h3 className="font-semibold text-lg mt-2">{user?.username}</h3>
                 <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
                   {t("View Profile")}
                 </button>
