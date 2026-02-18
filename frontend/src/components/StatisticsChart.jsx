@@ -16,17 +16,6 @@ export default function StatisticsChart() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "fa";
 
-  // const {
-  //   getWeeklyStatistics,
-  //   weeklyStatistics,
-  //   monthlyStatistics,
-  //   yearlyStatistics,
-  //   getMonthlyStatistics,
-  //   getYearlyStatistics,
-  //   getChartData,
-  //   chartLoading,
-  //   chartError,
-  // } = useHabitStore((state) => state);
   const getWeeklyStatistics = useHabitStore((state)=> state.getWeeklyStatistics)
   const weeklyStatistics = useHabitStore((state)=> state.weeklyStatistics)
   const monthlyStatistics = useHabitStore((state)=> state.monthlyStatistics)
