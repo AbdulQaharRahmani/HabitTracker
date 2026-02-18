@@ -1,7 +1,6 @@
 import { FaTimes } from "react-icons/fa";
 import Dropdown from "../Dropdown";
 import { useTranslation } from "react-i18next";
-import i18n from "../../utils/i18n";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
 import { useEffect, useMemo } from "react";
 
@@ -12,43 +11,17 @@ export default function TaskModal({
   close,
 }) {
   const { t } = useTranslation();
-  const isRTL = i18n.language === "fa";
-
-  const { taskData, setTaskData, fetchCategories, categories } =
-    useTaskCardStore();
-
-  useEffect(() => {
-    if (open) {
-      fetchCategories();
-    }
-  }, [open, fetchCategories]);
-
-  const today = new Date();
-  const tomorrow = new Date();
-  tomorrow.setDate(today.getDate() + 1);
+  const { taskData, setTaskData } = useTaskCardStore();
 
   const deadlineItems = useMemo(() => {
     const now = new Date();
     return Array.from({ length: 10 }, (_, i) => {
       const localDate = new Date(now);
       localDate.setDate(now.getDate() + i);
-
-      const year = localDate.getFullYear();
-      const month = String(localDate.getMonth() + 1).padStart(2, "0");
-      const day = String(localDate.getDate()).padStart(2, "0");
-
-      const formattedDate = `${year}-${month}-${day}`; // YYYY-MM-DD
-
-      return {
-        id: `d${i}`,
-        name: formattedDate,
-        value: formattedDate,
-      };
+      const formattedDate = localDate.toISOString().split('T')[0];
+      return { id: `d${i}`, name: formattedDate, value: formattedDate };
     });
   }, []);
-
-  const selectedCategoryName =
-    categories.find((cat) => cat.value === taskData.category)?.name || "";
 
   const priorityItems = [
     { name: t("low"), value: t("low") },
@@ -68,82 +41,69 @@ export default function TaskModal({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
-          <form
-            className="flex flex-col p-4 gap-2"
-            onSubmit={modalFunctionality}
-          >
-            <label htmlFor="title">
-              {t("Title")} <span className="text-red-600">*</span>
-            </label>
+          <form className="flex flex-col p-4 gap-4" onSubmit={modalFunctionality}>
 
-            <input
-              type="text"
-              id="title"
-              placeholder={t("Enter task title")}
-              value={taskData.title}
-              onChange={(e) => setTaskData("title", e.target.value)}
-              className="border-2 rounded-md p-2 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE] outline-none transition-all"
-            />
+            {/* Title */}
+            <div className="flex flex-col gap-1">
+              <label htmlFor="title" className="text-sm font-medium">
+                {t("Title")} <span className="text-red-600">*</span>
+              </label>
+              <input
+                type="text"
+                id="title"
+                placeholder={t("Enter task title")}
+                value={taskData.title}
+                onChange={(e) => setTaskData("title", e.target.value)}
+                className="border-2 rounded-md p-2 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-[#7B68EE] outline-none transition-all"
+              />
+            </div>
 
-            <label htmlFor="description">{t("Description")}</label>
-            <textarea
-              id="description"
-              placeholder={t("Enter task description")}
-              value={taskData.description}
-              onChange={(e) => setTaskData("description", e.target.value)}
-              className="border-2 rounded-md p-2 h-[150px] resize-none bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[#7B68EE]/30 focus:border-[#7B68EE] outline-none transition-all"
-            />
+            {/* Description */}
+            <div className="flex flex-col gap-1">
+              <label htmlFor="description" className="text-sm font-medium">{t("Description")}</label>
+              <textarea
+                id="description"
+                placeholder={t("Enter task description")}
+                value={taskData.description}
+                onChange={(e) => setTaskData("description", e.target.value)}
+                className="border-2 rounded-md p-2 h-[100px] resize-none bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-[#7B68EE] outline-none"
+              />
+            </div>
 
-            <label>
-              {t("Deadline")} <span className="text-red-600">*</span>
-            </label>
-            <Dropdown
-              items={deadlineItems}
-              placeholder={t("Choose Deadline")}
-              value={
-                taskData.dueDate?.slice(0, 10)
-              }
-              getValue={(selectedDate) => {
-                setTaskData("dueDate", selectedDate);
-              }}
-            />
+            {/* Deadline */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium">{t("Deadline")} <span className="text-red-600">*</span></label>
+              <Dropdown
+                items={deadlineItems}
+                placeholder={t("Choose Deadline")}
+                value={taskData.dueDate?.slice(0, 10)}
+                getValue={(val) => setTaskData("dueDate", val)}
+              />
+            </div>
 
-            <label>
-              {t("Category")} <span className="text-red-600">*</span>
-            </label>
-            <Dropdown
-              items={categories}
-              placeholder={t("Choose Category")}
-              value={t(selectedCategoryName)}
-              getValue={(id) => setTaskData("category", id)}
-            />
+            {/* Priority */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium">{t("Priority")} <span className="text-red-600">*</span></label>
+              <Dropdown
+                items={priorityItems}
+                placeholder={t("Choose Task Priority")}
+                value={taskData.priority || ""}
+                getValue={(val) => setTaskData("priority", val)}
+              />
+            </div>
 
-            <label>
-              {t("Priority")} <span className="text-red-600">*</span>
-            </label>
-            <Dropdown
-              items={priorityItems}
-              placeholder={t("Choose Task Priority")}
-              value={taskData.priority || ""}
-              getValue={(value) => setTaskData("priority", value)}
-            />
-
-            <div className="pt-6 flex flex-col gap-3">
+            {/* Buttons */}
+            <div className="pt-4 flex flex-col gap-2">
               <button
                 type="submit"
-                className="w-full py-3.5 font-bold text-white rounded-xl shadow-lg shadow-[#7B68EE]/30 hover:opacity-90 transition-all active:scale-[0.98]"
-                style={{ backgroundColor: "#7B68EE" }}
+                className="w-full py-3 font-bold text-white rounded-lg hover:opacity-90 transition-all bg-[#7B68EE]"
               >
-                {t("Save")}
+                {t("Save Task")}
               </button>
-
               <button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  close();
-                }}
-                className="w-full py-3.5 font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-[0.98]"
+                onClick={close}
+                className="w-full py-3 font-semibold rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 transition-all hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 {t("Cancel")}
               </button>
