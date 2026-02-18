@@ -158,6 +158,10 @@
   "Monthly": "Monthly",
   "Yearly": "Yearly",
   "loading_chart": "Loading chart data...",
+
+  "image_invalid_file":"Please select a valid image file!",
+  "profile_photo_updated":"Profile photo updated successfully!",
+  "profile_photo_update_failed":"Failed to update profile photo. Please try again.",
   "page": "Page",
   "of": "of",
   "Top devices": "Top Devices",
@@ -166,6 +170,12 @@
   "Sessions": "Sessions",
   "Calls": "Calls"  ,
   "Loading statistics": "Loading Statistics...",
+
+
+  "habit_completed":"Habit marked as complete!",
+  "habit_incomplete":"Habit marked as incomplete!",
+  "habit_update_failed":"Habit update failed — please retry.",
+
 
   "delete_task": "Delete Task",
   "delete_task_description": "Are you sure you want to delete this task?",

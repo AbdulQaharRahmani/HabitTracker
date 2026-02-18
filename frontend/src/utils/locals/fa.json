@@ -185,7 +185,15 @@
   "logout_title": "خروج از حساب",
   "logout_description": "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟",
   "logout_confirmText": "تأیید",
-  "cancel": "انصراف"
+  "cancel": "انصراف",
+
+  "image_invalid_file": "لطفا یک فایل تصویری معتبر انتخاب کنید!",
+  "profile_photo_updated":"عکس پروفایل با موفقیت به روز شد!",
+  "profile_photo_update_failed":"به روز رسانی عکس پروفایل ناموفق بود. لطفا دوباره تلاش کنید.",
 
 
+  "habit_completed": "عادت با موفقیت تکمیل شد!",
+ "habit_incomplete": "وضعیت عادت به ناتکمیل تغییر یافت!",
+ "habit_update_failed": "به‌روزرسانی عادت انجام نشد. دوباره تلاش کنید."
 }
+
