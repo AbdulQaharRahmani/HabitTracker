@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import TodayCard from "./TodayCard";
 import useHabitStore from "../store/useHabitStore";
+import toast from 'react-hot-toast';
+import {useTranslation} from 'react-i18next';
 
 const iconMap = {
   Health: "🏋️‍♂️",
@@ -16,9 +18,25 @@ const TodayList = () => {
   const { habits, loading, error, fetchHabitsByDate, toggleHabit } =
     useHabitStore();
 
+    const {t} = useTranslation();
+
   useEffect(() => {
     fetchHabitsByDate();
   }, [fetchHabitsByDate]);
+
+  const handleToggleComplete = async(habit)=>{
+    toast.dismiss();
+
+    try{
+      await toggleHabit(habit._id);
+      toast.success(habit.completed ? t("habit_incomplete") : t("habit_completed"));
+
+
+    }catch(error){
+       toast.error(t("habit_update_failed"));
+       console.log(error);
+    }
+  }
   if(habits.length === 0){
     return(
         <div
@@ -69,7 +87,7 @@ const TodayList = () => {
           }
           color={habit.categoryId?.backgroundColor || "blue"}
           completed={habit.completed}
-          onToggleComplete={() => toggleHabit(habit._id)}
+          onToggleComplete={()=>handleToggleComplete(habit)}
           progress={habit.completed ? 100 : 0}
         />
       ))}
