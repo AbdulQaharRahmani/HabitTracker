@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { getPersianNumber } from "../../utils/getPersianNumber";
 
 function CircularProgress({ percent = 0 }) {
   const { t } = useTranslation();
@@ -84,7 +85,7 @@ function CircularProgress({ percent = 0 }) {
 
         <div className="absolute text-center">
           <p className="text-2xl sm:text-3xl mb-1 font-semibold text-indigo-500 dark:text-indigo-400">
-            <span className="font-bold">{percentage}</span>%
+            <span className="font-bold">{getPersianNumber(percentage)}</span>%
           </p>
           <p className="text-gray-500 dark:text-gray-300 font-semibold uppercase text-[8px] sm:text-[10px]">
             {content.status}
