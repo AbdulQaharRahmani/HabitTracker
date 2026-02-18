@@ -43,7 +43,7 @@ function LanguageSwitcher({isSidebarOpen={isOpen}}) {
 
         {isSidebarOpen && (
           <>
-            <span className="ml-4 font-medium">{current.label}</span>
+            <span className="mx-4 font-medium">{current.label}</span>
             <span className="ml-auto text-xs">
               {isOpen ? <SlArrowUp /> : <SlArrowDown />}
             </span>
