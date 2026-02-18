@@ -221,7 +221,8 @@ useEffect(()=>{
                     >
                       <span className="text-lg">{item.icon}</span>
                        {isOpen && (
-                      <span className="ml-4 font-medium">{t(item.name)}</span>
+                       <span className={`${isRtl ? "mr-4" : "ml-4"} font-medium`}>{t(item.name)}</span>
+
                        )}
                     </NavLink>
                   </li>
