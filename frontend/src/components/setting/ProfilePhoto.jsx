@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useProfilePhotoStore } from "../../store/useProfilePhotoStore";
 import useAuthStore from "../../store/useAuthStore";
+import toast from 'react-hot-toast';
 
 function ProfilePhoto() {
   const fileInputRef = useRef(null);
@@ -13,13 +14,17 @@ function ProfilePhoto() {
 
   const userId = useAuthStore((state) => state.userId);
 
+
   useEffect(() => {
     if (!userId) return;
     fetchProfilePhoto(userId);
   }, [fetchProfilePhoto, userId]);
 
   const handleButtonClick = () => {
+
     fileInputRef.current.click();
+
+
   };
 
   const handleFileChange = async (event) => {
@@ -27,16 +32,23 @@ function ProfilePhoto() {
     if (!file || !userId) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file.");
+      toast.error(t("image_invalid_file"));
       return;
     }
 
     const objectUrl = URL.createObjectURL(file);
     setPreview(objectUrl);
 
-    await uploadProfilePhoto(file, userId);
+    try{
+      await uploadProfilePhoto(file, userId);
+      toast.success(t("profile_photo_updated"));
+    }catch(error){
+      console.log(error);
+      toast.error(t("profile_photo_update_failed"));
+    }finally{
+      setPreview(null);
+    }
 
-    setPreview(null);
   };
 
   useEffect(() => {
@@ -66,7 +78,7 @@ function ProfilePhoto() {
       <button
         onClick={handleButtonClick}
         disabled={loading}
-        className="px-4 py-2 text-xs font-semibold transition-colors border shadow-sm border-slate-200 rounded-lg hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300"
+        className="px-3 py-2 text-xs font-semibold transition-colors shadow-sm  bg-indigo-500 text-white rounded-md hover:bg-indigo-700  dark:hover:bg-indigo-800 dark:text-gray-300"
       >
         {t("CHANGE PHOTO")}
       </button>
