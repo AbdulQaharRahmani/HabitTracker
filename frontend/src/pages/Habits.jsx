@@ -7,7 +7,6 @@ import HabitList from "../components/HabitList.jsx";
 import { useTranslation } from "react-i18next";
 import useHabitStore from "../store/useHabitStore.js";
 import { useHotkeys } from "react-hotkeys-hook";
-import useSidebarStore from "../store/useSidebarStore";
 
 
 export default function Habits() {
@@ -25,13 +24,6 @@ export default function Habits() {
     isModalOpen,
     setModalOpen,
   } = useHabitStore();
-
-  const {
-    isOpen,
-    toggleSidebar,
-    closeSidebar,
-    isMobileOpen
-  } = useSidebarStore();
 
   const debounceRef = useRef(null);
 

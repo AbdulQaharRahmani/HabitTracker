@@ -7,18 +7,10 @@ import { useTranslation } from "react-i18next";
 import i18n from "../utils/i18n";
 import EditTask from "../components/tasks/EditTask";
 import { useHotkeys } from "react-hotkeys-hook";
-import useSidebarStore from "../store/useSidebarStore";
 
 function Tasks() {
   const { tasks, fetchTasks, loading, error, isModalOpen, isEditModalOpen, setModalOpen } =
     useTaskCardStore((state) => state);
-
-  const {
-    isOpen,
-    toggleSidebar,
-    closeSidebar,
-    isMobileOpen
-  } = useSidebarStore();
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
