@@ -12,8 +12,8 @@ import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
-import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { logMiddleware } from './middleware/logger.js';
+import { privateLimiter, publicLimiter } from './middleware/rateLimiter.js';
 import { sanitizeKeys } from './middleware/sanitizer.js';
 import { authorizeRoles } from './middleware/authorizeRoles.js';
 
@@ -22,15 +22,6 @@ const app = express();
 //#region Normal Midlleware
 
 app.use(express.json());
-
-const limiter = rateLimit({
-  keyGenerator: (req) => {
-    return req.user ? req.user._id.toString() : ipKeyGenerator(req);
-  },
-  windowMs: 15 * 60 * 1000,
-  limit: (req) => (req.user ? 100 : 50),
-  message: 'Too many requests, please try again later.',
-});
 
 app.use(
   cors({
@@ -64,7 +55,7 @@ app.get('/api/health', (req, res) => {
 
 // Public routes
 
-app.use('/api/auth', limiter, authRoutes);
+app.use('/api/auth', publicLimiter, authRoutes);
 
 // Protect routes
 
@@ -73,35 +64,35 @@ app.use(
   '/api/categories',
   authMiddleware,
   authorizeRoles('admin', 'user'),
-  limiter,
+  privateLimiter,
   categoryRoutes
 );
 app.use(
   '/api/habits',
   authMiddleware,
   authorizeRoles('admin', 'user'),
-  limiter,
+  privateLimiter,
   habitRoutes
 );
 app.use(
   '/api/tasks',
   authMiddleware,
   authorizeRoles('admin', 'user'),
-  limiter,
+  privateLimiter,
   taskRoutes
 );
 app.use(
   '/api/users',
   authMiddleware,
   authorizeRoles('admin', 'user'),
-  limiter,
+  privateLimiter,
   userRoutes
 );
 app.use(
   '/api/offline-data',
   authMiddleware,
   authorizeRoles('admin', 'user'),
-  limiter,
+  privateLimiter,
   syncRoutes
 );
 
@@ -110,7 +101,7 @@ app.use(
   '/api/logs',
   authMiddleware,
   authorizeRoles('admin'),
-  limiter,
+  privateLimiter,
   logRoutes
 );
 
