@@ -91,7 +91,7 @@ class AppTheme {
   static const Color chartGridDark = Color(0xFF374151);
   static const Color chartTooltipBackgroundDark = Color(0xFF1F2937);
 
-  static const Color heatEmptyDark = Color(0xFF1F2937);
+  static const Color heatEmptyDark =  Color(0x144f46e5);
   static const Color heatLowDark = Color(0x334f46e5);
   static const Color heatMediumDark = Color(0x664f46e5);
   static const Color heatHighDark = Color(0xFF6366F1);
