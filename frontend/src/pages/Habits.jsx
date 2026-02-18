@@ -6,6 +6,8 @@ import View from "../components/View.jsx";
 import HabitList from "../components/HabitList.jsx";
 import { useTranslation } from "react-i18next";
 import useHabitStore from "../store/useHabitStore.js";
+import { useHotkeys } from "react-hotkeys-hook";
+
 
 export default function Habits() {
   const { t } = useTranslation();
@@ -19,6 +21,8 @@ export default function Habits() {
     fetchHabitsPage,
     fetchHabitsByDate,
     selectedDate,
+    isModalOpen,
+    setModalOpen,
   } = useHabitStore();
 
   const debounceRef = useRef(null);
@@ -43,6 +47,15 @@ export default function Habits() {
   useEffect(() => {
     return () => clearTimeout(debounceRef.current);
   }, []);
+
+  useHotkeys(
+    "ctrl+k, meta+k",
+    (e) => {
+      e.preventDefault();
+        setModalOpen(true);
+      },
+      { enabled: !isModalOpen }
+  );
 
   return (
     <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors">
