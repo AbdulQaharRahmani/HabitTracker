@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { SlArrowDown } from "react-icons/sl";
 import { SlArrowUp } from "react-icons/sl";
 
-function LanguageSwitcher() {
+function LanguageSwitcher({isSidebarOpen={isOpen}}) {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -30,30 +30,33 @@ function LanguageSwitcher() {
     languages.find((l) => l.code === i18n.language) || languages[0];
 
   return (
-    <div
-      className="absolute top-3 end-16 z-50 inline-block text-left"
-      ref={dropdownRef}
-    >
+    <div className="relative w-full" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-[12px] transition-all duration-200
-        bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300
-        dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/10
-        border shadow-sm focus:outline-none"
+        className={`flex items-center w-full p-3 rounded-lg transition
+          text-gray-600 hover:bg-gray-100
+          dark:text-gray-200 dark:hover:bg-white/10
+          ${isSidebarOpen ? "justify-start" : "justify-center"}
+        `}
       >
-        <span className="text-lg leading-none">{current.flag}</span>
-        <span className="text-sm font-medium">{current.label}</span>
+      <span className="text-lg">{current.flag}</span>
 
-        <span className="text-[10px] font-bold opacity-70 ml-1">
-          {isOpen ? <SlArrowUp /> : <SlArrowDown />}
-        </span>
+        {isSidebarOpen && (
+          <>
+            <span className="ml-4 font-medium">{current.label}</span>
+            <span className="ml-auto text-xs">
+              {isOpen ? <SlArrowUp /> : <SlArrowDown />}
+            </span>
+          </>
+        )}
       </button>
 
       {isOpen && (
-        <div
-          className="absolute top-full mt-2 end-0 w-40 overflow-hidden rounded-[12px] z-50
-          bg-white dark:bg-[#1a1c2e] border border-gray-200 dark:border-white/10 shadow-2xl"
-        >
+        <div className={`absolute mt-2 rounded-lg shadow-lg z-50
+          bg-white dark:bg-[#1a1c2e]
+          border border-gray-200 dark:border-white/10
+          ${isSidebarOpen ? "left-0 w-full" : "left-16 w-40"}
+        `}>
           {languages.map((lang) => (
             <button
               key={lang.code}
@@ -61,14 +64,14 @@ function LanguageSwitcher() {
                 i18n.changeLanguage(lang.code);
                 setIsOpen(false);
               }}
-              className={`flex items-center w-full gap-3 px-4 py-3 text-sm transition-colors
+              className={`flex items-center w-full gap-3 px-4 py-3 text-sm transition
                 ${
                   i18n.language === lang.code
-                    ? "bg-blue-600 text-white"
+                    ? "bg-indigo-500 text-white"
                     : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10"
                 }`}
             >
-              <span className="text-base">{lang.flag}</span>
+              <span>{lang.flag}</span>
               <span>{lang.label}</span>
             </button>
           ))}
@@ -76,6 +79,7 @@ function LanguageSwitcher() {
       )}
     </div>
   );
+
 }
 
 export default LanguageSwitcher;
