@@ -270,135 +270,48 @@ const useHabitStore = create((set, get) => ({
       },
     }));
   },
-  chartData: [],
-  weeklyStatistics: [],
-  monthlyStatistics: [],
-  yearlyStatistics: [],
+    chartData: [],
+    weeklyStatistics: [],
+    monthlyStatistics: [],
+    yearlyStatistics: [],
+    chartLoading: false,
+    chartError: null,
+    getChartData: async () => {
+        const data = await getChartData();
+        set({ chartData: data });
+    },
 
-  getChartData: async () => {
-    try {
-      const data = await getChartData();
-      set({ chartData: data || [] });
-    } catch (err) {
-      set({ error: "Failed to load chart data" });
-    }
-  },
+    getStatistics: async (mode) => {
+        set({chartLoading: true})
+        const { chartData } = get();
+        const isYearly = mode === 'yearly';
 
-  getWeeklyStatistics: async () => {
-    set({ loading: true, error: null });
+        const source = isYearly ? chartData?.monthly : chartData?.daily;
+        if (!source || source.length === 0) return;
 
-    try {
-      const start = new Date();
-      start.setDate(start.getDate() - 6);
+        const start = new Date();
+        if (mode === 'weekly') start.setDate(start.getDate() - 6);
+        else if (mode === 'monthly') start.setDate(start.getDate() - 30);
+        else if (mode === 'yearly') start.setMonth(start.getMonth() - 12);
+        try{
+        const response = await getHabitsChartData(formatDate(start), formatDate(new Date()));
+        const rawData = isYearly ? (response.data.monthly || []) : (response.data.daily || []);
+        const formatted = formatStatstics(rawData, mode);
+        set({ [`${mode}Statistics`]: formatted });
+        }catch(error){
+        const message = error.response?.data?.message || "Failed to fetch data";
+        set({chartError:message})
+        }finally{
+            set({chartLoading:false})
+        }
 
-      const response = await getHabitsChartData(
-        formatDate(start),
-        formatDate(new Date()),
-      );
+    },
 
-      const rawData =
-        response?.data?.daily || response?.daily || response || [];
+    getWeeklyStatistics: () => get().getStatistics('weekly'),
+    getMonthlyStatistics: () => get().getStatistics('monthly'),
+    getYearlyStatistics: () => get().getStatistics('yearly'),
 
-      const grouped = rawData.reduce((acc, day) => {
-        const weekday = new Date(day.date + "T00:00:00").toLocaleDateString(
-          "en-US",
-          { weekday: "short" },
-        );
-        acc[weekday] = (acc[weekday] || 0) + (day.completed || 0);
-        return acc;
-      }, {});
-
-      const formatted = Object.keys(grouped).map((key) => ({
-        name: key,
-        completed: grouped[key],
-      }));
-
-      set({ weeklyStatistics: formatted });
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Failed to fetch weekly statistics";
-      set({ error: message });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  getMonthlyStatistics: async () => {
-    set({ loading: true, error: null });
-
-    try {
-      const start = new Date();
-      start.setMonth(start.getMonth() - 5);
-
-      const response = await getHabitsChartData(
-        formatDate(start),
-        formatDate(new Date()),
-      );
-
-      const rawData =
-        response?.data?.daily || response?.daily || response || [];
-
-      const grouped = rawData.reduce((acc, day) => {
-        const month = new Date(day.date + "T00:00:00").toLocaleDateString(
-          "en-US",
-          { month: "short" },
-        );
-        acc[month] = (acc[month] || 0) + (day.completed || 0);
-        return acc;
-      }, {});
-
-      const formatted = Object.keys(grouped).map((key) => ({
-        name: key,
-        completed: grouped[key],
-      }));
-
-      set({ monthlyStatistics: formatted });
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Failed to fetch monthly statistics";
-      set({ error: message });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  getYearlyStatistics: async () => {
-    set({ loading: true, error: null });
-
-    try {
-      const start = new Date();
-      start.setFullYear(start.getFullYear() - 3);
-
-      const response = await getHabitsChartData(
-        formatDate(start),
-        formatDate(new Date()),
-      );
-
-      const rawData =
-        response?.data?.daily || response?.daily || response || [];
-
-      const grouped = rawData.reduce((acc, day) => {
-        const year = day.date.split("-")[0];
-        acc[year] = (acc[year] || 0) + (day.completed || 0);
-        return acc;
-      }, {});
-
-      const formatted = Object.keys(grouped).map((key) => ({
-        name: key,
-        completed: grouped[key],
-      }));
-
-      set({ yearlyStatistics: formatted });
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Failed to fetch yearly statistics";
-      set({ error: message });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  getConsistencyData: async (startDate, endDate) => {
+    getConsistencyData: async (startDate, endDate) => {
     set({ loading: true, error: null });
     try {
       const result = await getHabitsChartData(startDate, endDate);
