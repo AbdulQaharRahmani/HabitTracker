@@ -37,9 +37,9 @@ class StatisticScreen extends ConsumerWidget {
               children: [
 
                 StatisticsHeader(),
-                const SizedBox(height: 24),
-                FilterTabs(),
-                const SizedBox(height: 24),
+                // const SizedBox(height: 24),
+                // FilterTabs(),
+                const SizedBox(height: 20),
 
                 // Summary
                 summaryAsync.when(
@@ -49,7 +49,7 @@ class StatisticScreen extends ConsumerWidget {
                   error: (err, _) => Text("Error: $err"),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 15),
 
                 // Chart
                 chartAsync.when(
@@ -59,10 +59,10 @@ class StatisticScreen extends ConsumerWidget {
                   error: (err, _) => Text("Error: $err"),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
                 ConsistencyHeatmap(),
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
 
                 const Text(
                   'Top Performing',
