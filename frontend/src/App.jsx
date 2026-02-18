@@ -19,6 +19,10 @@ import { Toaster } from "react-hot-toast";
 import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Logs from "./pages/Logs";
+
+import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
+
+
 function App() {
   return (
     <>
@@ -44,8 +48,10 @@ function App() {
     <Router>
       <LanguageSwitcher />
       <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        <Route element={<AuthRedirectRoute/>}>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
         <Route element={<ProtectedRoute />}>
         <Route
           element={
