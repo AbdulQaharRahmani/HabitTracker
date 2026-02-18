@@ -157,6 +157,7 @@ export default function TaskCard({
       </div>
     </div>
 
+
     <ConfirmationModal
       isOpen={isModalOpen}
       onClose={() => setIsModalOpen(false)}
@@ -169,3 +170,4 @@ export default function TaskCard({
     />
   </>
 )};
+

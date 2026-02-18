@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useHabitStore from "../store/useHabitStore";
 import Dropdown from "./Dropdown";
 import { FaTimes } from "react-icons/fa";
 import SearchableDropdown from "./SearchableDropdown";
 import toast from "react-hot-toast";
+import { useHotkeys } from "react-hotkeys-hook"
 
 const frequencyItems = [
   { id: "f1", name: "Daily", value: "daily" },
@@ -36,14 +37,38 @@ export default function HabitModal() {
     }
   }, [isModalOpen, fetchCategories]);
 
+  const formRef = useRef(null);
+
+
+  useHotkeys(
+    "ctrl+s, meta+s",
+    (e) => {
+      e.preventDefault();
+      handleHabitDataSubmission(e);
+    },
+    { enabled: isModalOpen }
+  );
+
+  useHotkeys(
+    "esc",
+    () => {
+      if(isModalOpen) {
+        setModalOpen(false);
+      }
+    },
+    { enabled: isModalOpen }
+  );  
+
   const handleHabitDataSubmission = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+
     if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
       return toast.error("Title, Category, and Frequency are required");
     }
     await submitHabit(habitData, isEditingMode, currentHabitID);
     fetchHabits();
-  };
+    setModalOpen(false)
+  }  
 
   const handleAddCategory = async (name, color) => {
     await addUserCategory(name, color);
@@ -53,20 +78,21 @@ export default function HabitModal() {
   return (
     <>
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex justify-center items-start sm:items-center bg-black/60 p-4 py-10 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl md:w-1/2 w-full max-h-full flex flex-col overflow-hidden shadow-2xl transition-colors duration-200">
-            <div className="flex justify-between p-4 border-b border-gray-100 dark:border-gray-800">
-              <h2 className="font-bold text-gray-900 dark:text-white">
+        <div className="fixed inset-0 z-50 flex justify-center items-start sm:items-center bg-black bg-opacity-50 p-4 py-10">
+          <div className="bg-white p-4 rounded-xl md:w-1/2 w-full max-h-full flex flex-col overflow-hidden shadow-2xl">
+            <div className="flex justify-between p-4 border-b border-gray-100">
+              <h2 className="font-bold">
                 {isEditingMode ? "Edit Habit" : "Add New Habit"}
               </h2>
               <FaTimes
                 onClick={() => setModalOpen(false)}
-                className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                className="cursor-pointer"
               />
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
               <form
+                ref={formRef}
                 className="flex flex-col gap-4"
                 onSubmit={handleHabitDataSubmission}
               >

@@ -2,7 +2,9 @@ import { GrAdd } from "react-icons/gr";
 import { useTranslation } from "react-i18next";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
 import toast from "react-hot-toast";
-import TaskModal from "./TaskModal";
+import i18n from "../../utils/i18n";
+import { useHotkeys } from "react-hotkeys-hook";
+import TaskModal from "./TaskModal"
 
 export default function AddTask() {
   const { t } = useTranslation();
@@ -60,6 +62,25 @@ export default function AddTask() {
       toast.error(t("Sorry! could not save new task", error));
     }
   }; 
+
+  useHotkeys(
+    "ctrl+s, meta+s",
+    (e) => {
+      e.preventDefault();
+      HandleTaskCreation(e);
+    },
+    { enabled: isModalOpen }
+  );
+
+  useHotkeys(
+    "esc",
+    () => {
+      if(isModalOpen) {
+        setModalOpen(false);
+      }
+    },
+    { enabled: isModalOpen }
+  );
 
   return (
     <div>

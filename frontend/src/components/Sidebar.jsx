@@ -1,6 +1,7 @@
+import { useTranslation } from "react-i18next";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useEffect, useState } from "react";
 import { NavLink,useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import ConfirmationModal from "./modals/ConfirmationModal";
 
 
@@ -18,6 +19,7 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import useSidebarStore from "../store/useSidebarStore";
 import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
 import useAuthStore from "../store/useAuthStore";
+import { useTaskCardStore } from "../store/useTaskCardStore";
 
 const dashboardItems = [
   { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
@@ -46,6 +48,7 @@ const Sidebar = ({ children }) => {
     toggleSidebar,
     closeSidebar,
     setScreenMode,
+    isMobileOpen
   } = useSidebarStore();
 
   const navigate = useNavigate();
@@ -53,6 +56,7 @@ const Sidebar = ({ children }) => {
 const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  const { isModalOpen, isEditModalOpen} = useTaskCardStore()
 
   /* --- Profile photo --- */
   useEffect(() => {
@@ -89,6 +93,14 @@ useEffect(()=>{
   console.log(isRtl);
 },[isRtl]);
 
+
+   useHotkeys(
+    "ctrl+b, meta+b",
+    (e) => {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  );
 
   return (
   <>
