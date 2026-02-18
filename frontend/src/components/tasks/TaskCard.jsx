@@ -51,11 +51,12 @@ export default function TaskCard({
           aria-label={status === "done" ? t("Mark as incomplete") : t("Mark as complete")}
         >
           {status === "done" ? (
-            <FaCheckCircle size={14} className="text-green-500" />
+            <FaCheckCircle size={20} className="text-green-400" />
           ) : (
             <FaRegCircle size={14} className="text-gray-400 hover:text-green-500 transition-colors" />
           )}
         </button>
+      </div>
 
         <div className="flex-grow min-w-0">
           <div className="flex justify-between items-start gap-2">
@@ -91,33 +92,14 @@ export default function TaskCard({
             </div>
           </div>
 
-          {/* {description && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
-              {t(description)}
-            </p>
-          )} */}
-
           <div className=" flex items-center gap-2">
             <div className={`rounded-md py-0.5 px-1.5 text-[0.5rem] font-medium ${dueStyles[type]}`}>
               {t(label)}
             </div>
 
-            {/* {categoryId?.name && (
-              <div className="flex items-center gap-1.5">
-                <div
-                  className="w-1 h-1 rounded-full"
-                  style={{ backgroundColor: categoryId?.backgroundColor ?? "#999" }}
-                />
-                <span
-                   style={{ color: categoryId?.backgroundColor ?? "#999" }}
-                  className="text-[0.65rem] font-medium text-gray-500 dark:text-gray-400">
-                  {t(categoryId.name)}
-                </span>
-              </div>
-            )} */}
+
           </div>
         </div>
       </div>
-    </div>
-  );
+  )
 }

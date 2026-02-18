@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useHabitStore from "../store/useHabitStore";
 import Dropdown from "./Dropdown";
 import { FaTimes } from "react-icons/fa";
 import SearchableDropdown from "./SearchableDropdown";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useHotkeys } from "react-hotkeys-hook"
 
 const frequencyItems = [
   { id: "f1", name: "Daily", value: "daily" },
@@ -39,14 +40,38 @@ export default function HabitModal() {
     }
   }, [isModalOpen, fetchCategories]);
 
+  const formRef = useRef(null);
+
+
+  useHotkeys(
+    "ctrl+s, meta+s",
+    (e) => {
+      e.preventDefault();
+      handleHabitDataSubmission(e);
+    },
+    { enabled: isModalOpen }
+  );
+
+  useHotkeys(
+    "esc",
+    () => {
+      if(isModalOpen) {
+        setModalOpen(false);
+      }
+    },
+    { enabled: isModalOpen }
+  );
+
   const handleHabitDataSubmission = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+
     if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
       return toast.error("Title, Category, and Frequency are required");
     }
     await submitHabit(habitData, isEditingMode, currentHabitID);
     fetchHabits();
-  };
+    setModalOpen(false)
+  }
 
   const handleAddCategory = async (name, color) => {
     await addUserCategory(name, color);
@@ -64,12 +89,13 @@ export default function HabitModal() {
               </h2>
               <FaTimes
                 onClick={() => setModalOpen(false)}
-                className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                className="cursor-pointer"
               />
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
               <form
+                ref={formRef}
                 className="flex flex-col gap-4"
                 onSubmit={handleHabitDataSubmission}
               >
