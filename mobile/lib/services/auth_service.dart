@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 
 import '../screens/habitScreen/add_habit.dart';
+import '../screens/statisticScreen/data/models/daily_consistency.dart';
 import '../utils/today_progressBar/task_item.dart';
 
 
@@ -364,4 +365,44 @@ class AuthService {
 
     return json['status'] == 'done' || json['status'] == 'completed';
   }
+
+
+  // ===========================================================================
+// CONSISTENCY (FULL YEAR)
+// ===========================================================================
+
+  Future<List<HabitDay>> fetchConsistencyYear({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    try {
+      final res = await http.get(
+        Uri.parse(
+          "$_api/habits/dashboard/chart-data"
+              "?startDate=${startDate.toIso8601String()}"
+              "&endDate=${endDate.toIso8601String()}",
+        ),
+        headers: await _headers(),
+      );
+
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 && body['success'] == true) {
+        final daily = body['data']['daily'] as List<dynamic>;
+
+        return daily.map((d) {
+          return HabitDay(
+            date: DateTime.parse(d['date']),
+            completed: d['completed'] ?? 0,
+          );
+        }).toList();
+      }
+
+      return [];
+    } catch (e) {
+      debugPrint("Error fetching consistency: $e");
+      return [];
+    }
+  }
+
 }

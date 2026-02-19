@@ -1,14 +1,14 @@
-class DailyCompletion {
+class DailyConsistency {
   final DateTime date;
   final int completed;
 
-  DailyCompletion({
+  DailyConsistency({
     required this.date,
     required this.completed,
   });
 
-  factory DailyCompletion.fromJson(Map<String, dynamic> json) {
-    return DailyCompletion(
+  factory DailyConsistency.fromJson(Map<String, dynamic> json) {
+    return DailyConsistency(
       date: DateTime.parse(json['date']),
       completed: json['completed'],
     );
@@ -16,13 +16,13 @@ class DailyCompletion {
 }
 
 class ChartData {
-  final List<DailyCompletion> daily;
+  final List<DailyConsistency> daily;
 
   ChartData({required this.daily});
 
   factory ChartData.fromJson(Map<String, dynamic> json) {
     final dailyList = (json['daily'] as List)
-        .map((e) => DailyCompletion.fromJson(e))
+        .map((e) => DailyConsistency.fromJson(e))
         .toList();
 
     return ChartData(daily: dailyList);

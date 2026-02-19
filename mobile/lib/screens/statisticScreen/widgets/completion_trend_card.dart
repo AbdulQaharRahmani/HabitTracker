@@ -34,7 +34,7 @@ class CompletionTrendCard extends ConsumerWidget {
   /// Builds the main container with header and line chart.
   Widget _buildCompletionTrend(
     List<FlSpot> spots,
-    List<DailyCompletion> visibleData,
+    List<DailyConsistency> visibleData,
     double percentChange,
     ChartFilter filter,
   ) {
@@ -314,8 +314,8 @@ class CompletionTrendCard extends ConsumerWidget {
   double _calculatePercentChange(ChartFilter filter, ChartData data) {
     final allData = data.daily..sort((a, b) => a.date.compareTo(b.date));
     final now = DateTime.now();
-    List<DailyCompletion> current = [];
-    List<DailyCompletion> previous = [];
+    List<DailyConsistency> current = [];
+    List<DailyConsistency> previous = [];
 
     switch (filter) {
       case ChartFilter.week:

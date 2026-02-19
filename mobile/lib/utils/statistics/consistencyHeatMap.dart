@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/models/chart_data_model.dart';
 
 class ConsistencyHeatmap extends StatelessWidget {
-  const ConsistencyHeatmap({super.key});
+  const ConsistencyHeatmap({super.key, required List<DailyConsistency> data});
 
   // sample dataset (date-only keys)
   Map<DateTime, int> _sampleDatasets() {

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import '../data/models/chart_data_model.dart';
+import '../data/models/daily_consistency.dart' hide ChartData;
 import 'filter_enum.dart';
 
 class ChartMapper {
@@ -13,7 +14,7 @@ class ChartMapper {
   }
 
   // Get visible data (for labels)
-  static List<DailyCompletion> getVisibleData({
+  static List<DailyConsistency> getVisibleData({
     required ChartFilter filter,
     required ChartData data,
   }) {
@@ -21,10 +22,10 @@ class ChartMapper {
   }
 
   // Helper method to apply filter based on date
-  static List<DailyCompletion> _getFilteredData(
+  static List<DailyConsistency> _getFilteredData(
       ChartFilter filter, ChartData data) {
     // Ensure data is sorted
-    final sorted = List<DailyCompletion>.from(data.daily)
+    final sorted = List<DailyConsistency>.from(data.daily)
       ..sort((a, b) => a.date.compareTo(b.date));
 
     switch (filter) {
@@ -51,12 +52,23 @@ class ChartMapper {
     }
   }
 
-  static List<FlSpot> _mapToSpots(List<DailyCompletion> list) {
+  static List<FlSpot> _mapToSpots(List<DailyConsistency> list) {
     return List.generate(list.length, (index) {
       return FlSpot(
         index.toDouble(),
         list[index].completed.toDouble(),
       );
     });
+  }
+}
+
+extension ChartDataMapper on ChartData {
+  List<HabitDay> toHabitDays() {
+    return daily
+        .map((e) => HabitDay(
+      date: e.date,
+      completed: e.completed,
+    ))
+        .toList();
   }
 }

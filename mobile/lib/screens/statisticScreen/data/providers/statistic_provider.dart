@@ -22,8 +22,8 @@ AsyncNotifierProvider<SummaryNotifier, DashboardSummaryModel>(
 class SummaryNotifier extends AsyncNotifier<DashboardSummaryModel> {
   @override
   Future<DashboardSummaryModel> build() async {
-    final repo = ref.watch(statisticsRepositoryProvider); // watch
-    final range = ref.watch(dateRangeProvider); // watch
+    final repo = ref.watch(statisticsRepositoryProvider);
+    final range = ref.watch(dateRangeProvider);
     return repo.getDashboardSummary(startDate: range.start, endDate: range.end);
 
   }
@@ -115,3 +115,5 @@ final dateRangeProvider = Provider<DateRange>((ref) {
       );
   }
 });
+
+

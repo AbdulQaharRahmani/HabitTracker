@@ -1,197 +1,219 @@
 import 'package:flutter/material.dart';
+import '../data/models/daily_consistency.dart';
 
-class ConsistencyHeatmap extends StatelessWidget {
-  const ConsistencyHeatmap({super.key});
+class ProfessionalHeatmap extends StatefulWidget {
+  final List<HabitDay> data;
+
+  const ProfessionalHeatmap({super.key, required this.data});
 
   @override
-  Widget build(BuildContext context) {
-    return _buildConsistencyHeatmap();
-  }
+  State<ProfessionalHeatmap> createState() => _ProfessionalHeatmapState();
+}
 
-  // ========== Consistency Heatmap ==========
-  Widget _buildConsistencyHeatmap() {
-    final weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
+  late PageController _pageController;
+  // LateInitializationError
+  late final DateTime now = DateTime.now();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Consistency',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 20),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Week Days Header
-              Row(
-                children: [
-                  const SizedBox(width: 40),
-                  ...weekDays
-                      .map(
-                        (day) => Expanded(
-                          child: Center(
-                            child: Text(
-                              day,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ],
-              ),
-              const SizedBox(height: 12),
+  static const double cellSize = 24;
+  static const double cellSpacing = 5;
 
-              // Heatmap Grid with Week Numbers
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Week Numbers Column
-                  Column(
-                    children: List.generate(4, (weekIndex) {
-                      return Container(
-                        height: 30,
-                        width: 30,
-                        margin: const EdgeInsets.only(bottom: 8),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'W${weekIndex + 1}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(width: 8),
+  late List<int> months;
 
-                  // Heatmap Cells
-                  Expanded(
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                            childAspectRatio: 1,
-                          ),
-                      itemCount: 28,
-                      itemBuilder: (context, index) {
-                        final week = index ~/ 7;
-                        final day = index % 7;
+  @override
+  void initState() {
+    super.initState();
 
-                        // Simulate activity data (replace with real data)
-                        int activityLevel = 0;
-                        if (week == 0 && day < 3) activityLevel = 1;
-                        if (week == 1 && day < 5) activityLevel = 2;
-                        if (week == 2 && day < 6) activityLevel = 3;
-                        if (week == 3 && day < 4) activityLevel = 4;
+    months = List.generate(now.month, (index) => index + 1);
 
-                        // Special: Today's cell
-                        final isToday = (week == 3 && day == 6); // Last cell
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: _getActivityColor(activityLevel),
-                            borderRadius: BorderRadius.circular(6),
-                            border: isToday
-                                ? Border.all(
-                                    color: const Color(0xFF4F46E5),
-                                    width: 2,
-                                  )
-                                : null,
-                          ),
-                          child: isToday
-                              ? Center(
-                                  child: Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF4F46E5),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                )
-                              : null,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Legend
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Less',
-                    style: TextStyle(fontSize: 10, color: Colors.grey[500]),
-                  ),
-                  const SizedBox(width: 8),
-                  ...List.generate(5, (index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: _getActivityColor(index),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    );
-                  }),
-                  const SizedBox(width: 8),
-                  Text(
-                    'More',
-                    style: TextStyle(fontSize: 10, color: Colors.grey[500]),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
+    _pageController = PageController(
+      initialPage: months.length - 1,
+      viewportFraction: 0.85,
     );
   }
 
-  Color _getActivityColor(int level) {
-    switch (level) {
-      case 0:
-        return const Color(0xFFF3F4F6);
-      case 1:
-        return const Color(0xFFE0E7FF);
-      case 2:
-        return const Color(0xFFC7D2FE);
-      case 3:
-        return const Color(0xFFA5B4FC);
-      case 4:
-        return const Color(0xFF818CF8);
-      default:
-        return const Color(0xFF4F46E5);
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 280,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row for static Column
+          Padding(
+            padding: const EdgeInsets.only(top: 30),
+            child: _buildWeekDays(),
+          ),
+          const SizedBox(width: 12),
+          // PageView for month
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: months.length,
+              itemBuilder: (context, index) {
+                final month = months[index];
+                final monthDays = _generateMonth(now.year, month);
+                final weeks = _groupByWeek(monthDays);
+
+                return Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          "${_monthName(month)} ${now.year}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: weeks.map((week) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: cellSpacing+10),
+                              child: Column(
+                                children: week.map((day) => _buildCell(day)).toList(),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<HabitDay> _generateMonth(int year, int month) {
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    List<HabitDay> fullDays = [];
+
+    for (int day = 1; day <= daysInMonth; day++) {
+      final date = DateTime(year, month, day);
+      final existing = widget.data.firstWhere(
+            (d) =>
+        d.date.year == date.year &&
+            d.date.month == date.month &&
+            d.date.day == date.day,
+        orElse: () => HabitDay(date: date, completed: 0),
+      );
+      fullDays.add(existing);
     }
+    return fullDays;
+  }
+
+  List<List<HabitDay>> _groupByWeek(List<HabitDay> monthDays) {
+    List<List<HabitDay>> weeks = [];
+    List<HabitDay> currentWeek = [];
+
+    // early month empty days
+    int emptyDays = monthDays.first.date.weekday % 7;
+    for (int i = 0; i < emptyDays; i++) {
+      currentWeek.add(HabitDay(
+          date: monthDays.first.date.subtract(Duration(days: emptyDays - i)),
+          completed: -1));
+    }
+
+    for (var day in monthDays) {
+      currentWeek.add(day);
+      if (currentWeek.length == 7) {
+        weeks.add(currentWeek);
+        currentWeek = [];
+      }
+    }
+
+    if (currentWeek.isNotEmpty) {
+      //filling empty days
+      while (currentWeek.length < 7) {
+        currentWeek.add(HabitDay(
+            date: currentWeek.last.date.add(const Duration(days: 1)),
+            completed: -1));
+      }
+      weeks.add(currentWeek);
+    }
+
+    return weeks;
+  }
+
+  Widget _buildCell(HabitDay day) {
+    final isToday = day.date.year == now.year &&
+        day.date.month == now.month &&
+        day.date.day == now.day;
+
+    return Tooltip(
+      message: day.completed >= 0
+          ? "${day.date.day}/${day.date.month}/${day.date.year} - Completed: ${day.completed}"
+          : "",
+      child: Container(
+        width: cellSize,
+        height: cellSize,
+        margin: const EdgeInsets.only(bottom: cellSpacing),
+        decoration: BoxDecoration(
+          color: _colorScale(day.completed),
+          borderRadius: BorderRadius.circular(5),
+          border: isToday ? Border.all(color: Colors.black26, width: 1.5) : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeekDays() {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return Column(
+      children: days
+          .map(
+            (d) => SizedBox(
+          height: cellSize + cellSpacing,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              d,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ),
+        ),
+      )
+          .toList(),
+    );
+  }
+
+  Color _colorScale(int value) {
+    if (value == -1) return Colors.transparent;
+    if (value == 0) return Colors.grey.shade200;
+    if (value == 1) return Colors.orange.shade200;
+    if (value == 2) return Colors.lightGreen;
+    if (value == 3) return Colors.green;
+    return Colors.green.shade700;
+  }
+
+  String _monthName(int month) {
+    const months = [
+      '',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May',
+      'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return months[month];
   }
 }
