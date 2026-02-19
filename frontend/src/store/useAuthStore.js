@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { logout } from "../../services/authServices";
 
 const useAuthStore = create(
   persist(
@@ -15,25 +16,33 @@ const useAuthStore = create(
           isAuthLoading: false,
         }));
       },
-      updateUserName: (newUserName)=>{
-        set((state)=>{
-          if(!state.user){
+      updateUserName: (newUserName) => {
+        set((state) => {
+          if (!state.user) {
             return state
           }
-          return{
+          return {
             user: {
               ...state.user,
-              username:newUserName
+              username: newUserName
             }
           }
         })
       },
-      logout: () => {
-        set({
-          token: null,
-          user: null,
-          isAuthLoading: false,
-        });
+      logout: async () => {
+        try {
+          await logout()
+        } catch (error) {
+          console.log(error)
+        } finally {
+          set({
+            token: null,
+            user: null,
+            isAuthLoading: false,
+          });
+          localStorage.removeItem("userData-storage")
+        }
+
       },
     }),
     {

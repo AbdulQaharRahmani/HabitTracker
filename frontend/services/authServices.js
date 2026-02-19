@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "./api";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 /**
@@ -19,4 +20,7 @@ export const refreshToken = async () => {
     return response.data.token;
   }
 
+export const logout = async ()=>{
+   await api.post("/auth/logout")
+}
 
