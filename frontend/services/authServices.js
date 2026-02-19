@@ -15,7 +15,8 @@ export const refreshToken = async () => {
       {},
       { withCredentials: true }
     );
-    return response.data;
+    console.log(response.data)
+    return response.data.token;
   }
 
 

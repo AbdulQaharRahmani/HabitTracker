@@ -30,8 +30,8 @@ function App() {
   useEffect(()=>{
    const getAccessToken = async ()=>{
     try{
-    let response = await refreshToken()
-    login(response.token, null)
+    let token = await refreshToken()
+    login(token, null)
     }catch(error){
       console.log(error)
       logout()

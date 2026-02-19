@@ -37,7 +37,7 @@ const useAuthStore = create(
       },
     }),
     {
-      name: "auth-storage",
+      name: "userData-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ user: state.user }), // just store the user data (id, username) not the token
     }

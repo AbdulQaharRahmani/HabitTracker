@@ -29,16 +29,16 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config
-    originalRequest.retry;
-    if (!originalRequest.retry && error.response.status === 401) {
-      originalRequest.retry = true
+    if (error.response?.status === 401 && !originalRequest._retry ) {
+      originalRequest._retry = true
       try {
          const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
         {},
         { withCredentials: true }
-      ); const accessToken = response.data
-        useAuthStore.getState().login(accessToken)
+      );
+       const accessToken = response.data.token
+        useAuthStore.getState().login(accessToken, null)
         originalRequest.headers.Authorization = `Bearer ${accessToken}`
         return api(originalRequest)
       } catch (refreshError) {
