@@ -34,6 +34,8 @@ const Settings = () => {
   const [oldPasswordType, setOldPasswordType] = useState("password");
   const [newPasswordType, setNewPasswordType] = useState("password");
 
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     fetchUserPreferences();
   }, []);
@@ -69,16 +71,18 @@ const Settings = () => {
     await updateUsername(username);
   };
   const handleChangePassword = async () => {
+    if (isSaving) return;
+
+    setIsSaving(true);
+
     try {
       const success = await updatePassword(oldPassword, newPassword);
+      setIsSaving(false);
 
       if (success) {
-        toast.success(t("Password changed successfully"));
         setShowPasswordModal(false);
         setOldPassword("");
         setNewPassword("");
-      } else {
-        toast.error(t("Old password is incorrect"));
       }
     } catch (err) {
       toast.error(t("Failed to change password"));
@@ -107,7 +111,7 @@ const Settings = () => {
             <div className="flex flex-col md:flex-row gap-8">
               <ProfilePhoto />
 
-              <div className="flex-1 space-y-6">
+              <div className="flex-1">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Display Name */}
                   <div>
@@ -120,7 +124,7 @@ const Settings = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       onBlur={handleUsernameBlur}
-                      className="w-full px-4 py-2 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                      className="w-full px-4 py-2 mb-6 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </div>
 
@@ -227,7 +231,7 @@ const Settings = () => {
                           onClick={handleChangePassword}
                           className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                         >
-                          {t("Save")}
+                          {isSaving ? t("Saving...") : t("Save")}
                         </button>
                       </div>
                     </div>
