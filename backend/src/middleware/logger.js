@@ -1,11 +1,13 @@
 import logger from '../utils/logger.js';
+import { randomUUID } from 'crypto';
 
 export const logMiddleware = (req, res, next) => {
   const start = Date.now();
 
-  res.on('finish', async () => {
+  res.on('finish', () => {
     const duration = Date.now() - start;
     const logData = {
+      logId: randomUUID(),
       method: req.method,
       path: req.originalUrl.split('?')[0],
       statusCode: res.statusCode,
