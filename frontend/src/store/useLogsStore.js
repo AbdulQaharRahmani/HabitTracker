@@ -43,7 +43,6 @@ const useLogsStore = create((set, get) => ({
         if (loading || currentPage <= 1) return;
         set({ currentPage: currentPage - 1 });
     },
-    topDevices: [],
     logsStats: {
         error: 0,
         info:0,
@@ -56,16 +55,13 @@ const useLogsStore = create((set, get) => ({
         try {
             let data = await fetchLogsStats()
             set({
-                topDevices: data.topDevices,
                 logsStats: data.stats,
                 mostUsedRoutes: data.topRoutes
             })
-            console.log(data)
         } catch (error) {
             const message = error.response?.data?.message || "Failed to fetch data";
             set({
                 sidebarError: message,
-                topDevices: [],
                 logsStats: [],
                 mostUsedRoutes: [],
             });
