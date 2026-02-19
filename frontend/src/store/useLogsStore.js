@@ -10,10 +10,10 @@ const useLogsStore = create((set, get) => ({
     sidebarLoading: false,
     sidebarError : null,
 
-    getLogsData: async (page, filters, search) => {
+    getLogsData: async (page, limit = 20, filters, search) => {
         set({ tableLoading: true, error: null });
         try {
-            const data = await fetchLogs(page, 10, filters, search);
+            const data = await fetchLogs(page, limit, filters, search);
             set({
                 logsData: data.logs,
                 totalPages: data.totalPages,
