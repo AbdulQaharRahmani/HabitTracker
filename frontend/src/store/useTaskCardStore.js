@@ -20,18 +20,11 @@ export const useTaskCardStore = create((set, get) => ({
     priority: null,
   },
 
-  setModalOpen: () => {
-    set((state) => ({
-      isModalOpen: !state.isModalOpen,
-      taskData: {
-        title: "",
-        description: "",
-        dueDate: null,
-        category: null,
-        priority: null,
-      },
-    }));
-  },
+  setModalOpen: (isOpen) => {
+  set((state) => ({
+    isModalOpen: typeof isOpen === 'boolean' ? isOpen : !state.isModalOpen,
+  }));
+},
 
   setTaskData: (item, value) => {
     set((state) => ({
@@ -155,7 +148,7 @@ export const useTaskCardStore = create((set, get) => ({
       }));
 
       toast.success(t("Task deleted successfully!"))
-      
+
     } catch (error) {
       console.error(
         "Sorry! task deletion failed:",
@@ -165,7 +158,7 @@ export const useTaskCardStore = create((set, get) => ({
       set({ error: "Failed to delete task" });
     }
   },
-  
+
   // Edit task
 
   isEditModalOpen: false,
@@ -240,9 +233,9 @@ export const useTaskCardStore = create((set, get) => ({
                 priority: normalizePriorityToEnglish(taskPayload.priority),
               }
             : task,
-        ), 
-      } 
-      
+        ),
+      }
+
     ));
     } catch (error) {
         console.error("Update task failed:", error.response?.data || error.message);
