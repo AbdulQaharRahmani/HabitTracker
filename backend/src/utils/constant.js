@@ -28,3 +28,12 @@ export const DAY_MAP = {
   friday: 5,
   saturday: 6,
 };
+
+export const SENSITIVE_KEYS = new Set([
+  'password',
+  'token',
+  'authorization',
+  'cookie',
+  'refreshToken',
+  'accessToken',
+]);
