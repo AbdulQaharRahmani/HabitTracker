@@ -276,7 +276,6 @@ export const completeHabit = async (req, res) => {
 
   //Check if date is before habit created date
   const startDate = dayjs(habit.startDate);
-  console.log('StartDate: ', startDate.toString());
 
   if (selectedDate.isBefore(startDate, 'day'))
     throw new AppError(
