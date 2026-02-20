@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { SlArrowDown } from "react-icons/sl";
 import { SlArrowUp } from "react-icons/sl";
 
-function LanguageSwitcher({isSidebarOpen={isOpen}}) {
+function LanguageSwitcher() {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -30,33 +30,37 @@ function LanguageSwitcher({isSidebarOpen={isOpen}}) {
     languages.find((l) => l.code === i18n.language) || languages[0];
 
   return (
-    <div className="relative w-full" ref={dropdownRef}>
+    <div className="relative min-w-[180px]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center w-full p-3 rounded-lg transition
-          text-gray-600 hover:bg-gray-100
-          dark:text-gray-200 dark:hover:bg-white/10
-          ${isSidebarOpen ? "justify-start" : "justify-center"}
-        `}
+        className="
+          w-full flex items-center justify-between
+          px-4 py-2 text-sm
+          transition-all border outline-none
+          bg-slate-50 border-slate-200 rounded-lg
+          dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200
+        "
       >
-      <span className="text-lg">{current.flag}</span>
+        <div className="flex items-center gap-2">
+          <span>{current.flag}</span>
+          <span>{current.label}</span>
+        </div>
 
-        {isSidebarOpen && (
-          <>
-            <span className="mx-4 font-medium">{current.label}</span>
-            <span className="ml-auto text-xs">
-              {isOpen ? <SlArrowUp /> : <SlArrowDown />}
-            </span>
-          </>
+        {isOpen ? (
+          <SlArrowUp className="text-xs" />
+        ) : (
+          <SlArrowDown className="text-xs" />
         )}
       </button>
 
       {isOpen && (
-        <div className={`absolute mt-2 rounded-lg shadow-lg z-50
-          bg-white dark:bg-[#1a1c2e]
-          border border-gray-200 dark:border-white/10
-          ${isSidebarOpen ? "left-0 w-full" : "left-16 w-40"}
-        `}>
+        <div
+          className="
+            absolute mt-2 w-full rounded-lg shadow-md z-50
+            bg-white border border-slate-200
+            dark:bg-gray-900 dark:border-gray-700
+          "
+        >
           {languages.map((lang) => (
             <button
               key={lang.code}
@@ -64,15 +68,17 @@ function LanguageSwitcher({isSidebarOpen={isOpen}}) {
                 i18n.changeLanguage(lang.code);
                 setIsOpen(false);
               }}
-              className={`flex items-center w-full gap-3 px-4 py-3 text-sm transition
+              className={`
+                w-full text-left px-4 py-2 text-sm transition
                 ${
                   i18n.language === lang.code
-                    ? "bg-indigo-500 text-white"
-                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10"
-                }`}
+                    ? "bg-indigo-600 text-white"
+                    : "hover:bg-slate-100 dark:hover:bg-gray-800"
+                }
+              `}
             >
-              <span>{lang.flag}</span>
-              <span>{lang.label}</span>
+              <span className="mr-2">{lang.flag}</span>
+              {lang.label}
             </button>
           ))}
         </div>
