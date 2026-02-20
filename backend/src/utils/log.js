@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import dayjs from 'dayjs';
+import { SENSITIVE_KEYS } from './constant.js';
 
 const logsDir = path.join(process.cwd(), 'logs');
 
@@ -60,4 +61,18 @@ export const getTop = (items, key, limit = 5) => {
     }))
     .sort((a, b) => b.count - a.count)
     .slice(0, limit);
+};
+
+//  replaces secrets fields (passwords, tokens,...) with [REDACTED] value, for logs security
+export const sanitizeSensitiveData = (value) => {
+  if (Array.isArray(value)) return value.map(sanitizeSensitiveData);
+
+  if (!value || typeof value !== 'object') return value;
+
+  const obj = {};
+  for (const [k, v] of Object.entries(value)) {
+    obj[k] = SENSITIVE_KEYS.has(k) ? '[REDACTED]' : sanitizeSensitiveData(v);
+  }
+
+  return obj;
 };
