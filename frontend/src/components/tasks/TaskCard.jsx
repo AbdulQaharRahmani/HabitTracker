@@ -102,7 +102,7 @@ export default function TaskCard({
                 <CiEdit size={16} className="text-gray-400 hover:text-indigo-500 transition-colors" />
               </button>
               <button
-                onClick={() => deleteTask(_id)}
+                onClick={() => setIsModalOpen(true)}
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                 aria-label={t("Delete task")}
               >
@@ -137,31 +137,6 @@ export default function TaskCard({
             )} */}
           </div>
         </div>
-      </div>
-
-      {/* Delete */}
-      <div className="p-4 grid grid-rows-2 items-center mx-4">
-         <button onClick={() => setIsModalOpen(true)}>
-          <MdDeleteOutline
-            size={22}
-            className="text-gray-300 dark:text-gray-500 hover:text-red-500 transition"
-          />
-        </button>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            openEditModal(_id);
-          }}
-        >
-          <CiEdit
-            size={24}
-            className="
-              text-gray-300 dark:text-gray-500
-              hover:text-indigo-600 transition
-              dark:hover:text-indigo-600
-            "
-          />
-        </button>
       </div>
     </div>
 
