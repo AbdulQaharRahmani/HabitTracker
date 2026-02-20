@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import LanguageSwitcher from "./internationalization"
 
 import {
   FaCalendarDay,
@@ -11,7 +10,6 @@ import {
   FaSignOutAlt,
   FaList
 } from "react-icons/fa";
-import { LuLogs } from "react-icons/lu";
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
@@ -212,16 +210,6 @@ const Sidebar = ({ children }) => {
                 ))}
               </ul>
         </nav>
-
-        <div className="px-3 py-2">
-          <div
-            className={`flex items-center p-3 rounded-lg ${
-              isOpen ? "justify-start" : "justify-center"
-            }`}
-          >
-            <LanguageSwitcher isSidebarOpen={isOpen}/>
-          </div>
-        </div>
 
         {/*--- Logout --- */}
         <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
