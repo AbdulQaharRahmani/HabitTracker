@@ -2,7 +2,9 @@ import path from 'path';
 import fs from 'fs';
 import { DateHelper } from '../utils/date.js';
 import { getDatesBetween, getTop, readLogsByDate } from '../utils/log.js';
-import { notFound } from '../utils/error.js';
+import { AppError, notFound } from '../utils/error.js';
+import { validate as isUUID } from 'uuid';
+import { ERROR_CODES } from '../utils/constant.js';
 
 export const getLogs = async (req, res) => {
   const [startDate, endDate] = DateHelper.getStartAndEndOfDate(
@@ -92,6 +94,9 @@ export const getLogStats = async (req, res) => {
 
 export const getLogById = async (req, res) => {
   const { id } = req.params;
+  if (!id || !isUUID(id))
+    throw new AppError('Invalid Id', 400, ERROR_CODES.INVALID_ID);
+
   let result = null;
 
   const logsDir = path.join(process.cwd(), 'logs');
