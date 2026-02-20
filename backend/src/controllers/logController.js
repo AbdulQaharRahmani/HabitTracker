@@ -1,5 +1,8 @@
+import path from 'path';
+import fs from 'fs';
 import { DateHelper } from '../utils/date.js';
 import { getDatesBetween, getTop, readLogsByDate } from '../utils/log.js';
+import { notFound } from '../utils/error.js';
 
 export const getLogs = async (req, res) => {
   const [startDate, endDate] = DateHelper.getStartAndEndOfDate(
@@ -84,5 +87,40 @@ export const getLogStats = async (req, res) => {
   res.status(200).json({
     success: true,
     data: { stats, topRoutes, topDevices },
+  });
+};
+
+export const getLogById = async (req, res) => {
+  const { id } = req.params;
+  let result = null;
+
+  const logsDir = path.join(process.cwd(), 'logs');
+
+  const files = fs
+    .readdirSync(logsDir)
+    .filter((file) => file.startsWith('application-'))
+    .sort()
+    .reverse();
+
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(logsDir, file), 'utf-8');
+    const lines = content.split('\n').filter(Boolean);
+
+    for (const line of lines) {
+      const log = JSON.parse(line);
+      if (log.logId === id) {
+        result = log;
+        break;
+      }
+    }
+
+    if (result) break;
+  }
+
+  if (!result) throw notFound('log');
+
+  res.status(200).json({
+    success: true,
+    data: result,
   });
 };
