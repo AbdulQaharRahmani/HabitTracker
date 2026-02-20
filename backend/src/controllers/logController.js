@@ -6,6 +6,19 @@ import { AppError, notFound } from '../utils/error.js';
 import { validate as isUUID } from 'uuid';
 import { ERROR_CODES } from '../utils/constant.js';
 
+const toLogSummary = (log) => ({
+  logId: log.logId,
+  timestamp: log.timestamp,
+  level: log.level,
+  method: log.method,
+  path: log.path,
+  statusCode: log.statusCode,
+  userId: log.userId ?? null,
+  duration: log.duration,
+  clientIp: log.clientIp,
+  userAgent: log.userAgent,
+});
+
 export const getLogs = async (req, res) => {
   const [startDate, endDate] = DateHelper.getStartAndEndOfDate(
     req.query.startDate,
@@ -51,7 +64,8 @@ export const getLogs = async (req, res) => {
   const startIndex = (page - 1) * limit;
   const lastIndex = startIndex + limit;
 
-  const paginatedLogs = logs.slice(startIndex, lastIndex);
+  const summaryLogs = logs.map(toLogSummary);
+  const paginatedLogs = summaryLogs.slice(startIndex, lastIndex);
 
   res.status(200).json({
     success: true,
@@ -106,6 +120,7 @@ export const getLogById = async (req, res) => {
     .filter((file) => file.startsWith('application-'))
     .sort()
     .reverse();
+  console.log(files);
 
   for (const file of files) {
     const content = fs.readFileSync(path.join(logsDir, file), 'utf-8');
