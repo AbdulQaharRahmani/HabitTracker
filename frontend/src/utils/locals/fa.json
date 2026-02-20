@@ -37,8 +37,8 @@
   "Weekly Summary Email": "ایمیل خلاصه هفتگی",
   "Receive a weekly report of your progress": "گزارش هفتگی پیشرفت خود را دریافت کنید",
   "New Task": "عملیات جدید",
-  "habit deleted successfully!":"عادت موفقانه حذف شد!",
-  "Faild to delete habit!":"خطا در حذف عادت",
+  "habit deleted successfully!": "عادت موفقانه حذف شد!",
+  "Faild to delete habit!": "خطا در حذف عادت",
   "Manage your daily goals and todos.": "اهداف و کار های روزانه خود را مدیریت کنید.",
   "Due": "موعد",
   "Work": "کار",
@@ -132,7 +132,7 @@
   "Log Management & Analytics Dashboard": "داشبورد مدیریت و تحلیل لاگ‌ها",
   "Admin": "مدیر",
   "Logout": "خروج",
-    "Logs": "لاگ ها",
+  "Logs": "لاگ ها",
   "Search logs by route": "جستجوی لاگ‌ها بر اساس مسیر...",
   "Level": "سطح",
   "Method": "روش",
@@ -156,7 +156,7 @@
   "Newest": "جدیدترین",
   "Oldest": "قدیمی‌ترین",
   "Loading logs": "در حال بارگذاری لاگ ها...",
-    "Errors": "خطاها",
+  "Errors": "خطاها",
   "Warnings": "هشدار ها",
   "Total Logs": "مجموع لاگ ها ",
   "Old_Password": "رمز عبور قدیمی",
@@ -178,8 +178,8 @@
   "loading_chart": "در حال بارگذاری اطلاعات نمودار...",
 
   "image_invalid_file": "لطفا یک فایل تصویری معتبر انتخاب کنید!",
-  "profile_photo_updated":"عکس پروفایل با موفقیت به روز شد!",
-  "profile_photo_update_failed":"به روز رسانی عکس پروفایل ناموفق بود. لطفا دوباره تلاش کنید.",
+  "profile_photo_updated": "عکس پروفایل با موفقیت به روز شد!",
+  "profile_photo_update_failed": "به روز رسانی عکس پروفایل ناموفق بود. لطفا دوباره تلاش کنید.",
 
   "page": "صفحه",
   "of": "از",
@@ -191,7 +191,7 @@
   "Loading statistics": "در حال بارگذاری آمار لاگ ها...",
 
   "habit_completed": "عادت با موفقیت تکمیل شد!",
- "habit_incomplete": "وضعیت عادت به ناتکمیل تغییر یافت!",
- "habit_update_failed": "به‌روزرسانی عادت انجام نشد. دوباره تلاش کنید."
+  "habit_incomplete": "وضعیت عادت به ناتکمیل تغییر یافت!",
+  "habit_update_failed": "به‌روزرسانی عادت انجام نشد. دوباره تلاش کنید.",
+  "username": "نام کاربری"
 }
-

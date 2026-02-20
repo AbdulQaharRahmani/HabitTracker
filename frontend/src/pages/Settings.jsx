@@ -12,8 +12,13 @@ const Settings = () => {
   const { t } = useTranslation();
   const { setTheme } = useTheme();
 
-  const { preferences, fetchUserPreferences, updateUserPrefrences ,loading, error} =
-    useProfilePhotoStore();
+  const {
+    preferences,
+    fetchUserPreferences,
+    updateUserPrefrences,
+    loading,
+    error,
+  } = useProfilePhotoStore();
 
   const {
     username: authUsername,
@@ -64,7 +69,6 @@ const Settings = () => {
     }
   }, [debouncedPrefs]);
 
-
   const handleUsernameBlur = async () => {
     if (!username.trim() || username === authUsername) return;
     await updateUsername(username);
@@ -88,14 +92,15 @@ const Settings = () => {
     }
   };
 
-
-  {loading && (
-  <div className="animate-pulse space-y-6 mt-6">
-    <div className="h-32 bg-gray-200 rounded-xl"></div>
-    <div className="h-40 bg-gray-200 rounded-xl"></div>
-    <div className="h-40 bg-gray-200 rounded-xl"></div>
-  </div>
-)}
+  {
+    loading && (
+      <div className="animate-pulse space-y-6 mt-6">
+        <div className="h-32 bg-gray-200 rounded-xl"></div>
+        <div className="h-40 bg-gray-200 rounded-xl"></div>
+        <div className="h-40 bg-gray-200 rounded-xl"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-6 font-sans transition-colors duration-200 bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">
@@ -129,7 +134,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder={t("User Name")}
-                      value={username}
+                      value={t("username")}
                       onChange={(e) => setUsername(e.target.value)}
                       onBlur={handleUsernameBlur}
                       className="w-full px-4 py-2 mb-6 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
@@ -185,7 +190,7 @@ const Settings = () => {
                                 : "password",
                             )
                           }
-                          className="absolute right-4 bottom-1 -translate-y-1/2 text-xl text-gray-700 dark:text-gray-700"
+                          className="absolute right-4 rtl:right-auto rtl:left-4 bottom-1 -translate-y-1/2 text-xl text-gray-700 dark:text-gray-700"
                         >
                           {oldPasswordType === "password" ? (
                             <FaEyeSlash />
@@ -215,7 +220,7 @@ const Settings = () => {
                                 : "password",
                             )
                           }
-                          className="absolute right-4 bottom-1 -translate-y-1/2 text-xl text-gray-700 dark:text-gray-700"
+                          className="absolute right-4 rtl:right-auto rtl:left-4 bottom-1 -translate-y-1/2 text-xl text-gray-700 dark:text-gray-700"
                         >
                           {newPasswordType === "password" ? (
                             <FaEyeSlash />
