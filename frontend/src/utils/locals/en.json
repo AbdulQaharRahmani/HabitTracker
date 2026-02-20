@@ -174,7 +174,9 @@
 
   "habit_completed":"Habit marked as complete!",
   "habit_incomplete":"Habit marked as incomplete!",
-  "habit_update_failed":"Habit update failed — please retry."
+  "habit_update_failed":"Habit update failed — please retry.",
 
+  "Language": "Language",
+  "Select your preferred Language": "Select your preferred Language"
 
 }
