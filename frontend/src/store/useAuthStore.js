@@ -8,7 +8,6 @@ const useAuthStore = create(
       token: null,
       user: null,
       isAuthLoading: true,
-
       login: (token, userData) => {
         set((state) => ({
           token,
@@ -38,7 +37,6 @@ const useAuthStore = create(
           set({
             token: null,
             user: null,
-            isAuthLoading: false,
           });
           localStorage.removeItem("userData-storage")
         }

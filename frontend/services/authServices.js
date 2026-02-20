@@ -19,8 +19,11 @@ export const refreshToken = async () => {
     console.log(response.data)
     return response.data.token;
   }
-
-export const logout = async ()=>{
-   await api.post("/auth/logout")
-}
+export const logout = async () => {
+  await axios.post(
+    `${API_BASE_URL}/auth/logout`,
+         {},
+      { withCredentials: true }
+  );
+};
 

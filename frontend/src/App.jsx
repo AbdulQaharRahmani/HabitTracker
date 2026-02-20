@@ -24,26 +24,29 @@ import api from "../services/api";
 import useAuthStore from "./store/useAuthStore";
 import { refreshToken } from "../services/authServices";
 function App() {
-  const [initialLoading, setInitialLoading] = useState(true)
-  const login = useAuthStore((state)=> state.login)
-  const logout = useAuthStore((state)=> state.logout)
-  useEffect(()=>{
-   const getAccessToken = async ()=>{
-    try{
-    let token = await refreshToken()
-    login(token, null)
-    }catch(error){
-      console.log(error)
-      logout()
-    }finally{
-      setInitialLoading(false)
-    }
-   }
-   getAccessToken()
-  },[])
+  const isAuthLoading = useAuthStore((state) => state.isAuthLoading)
+  const login = useAuthStore((state) => state.login)
+  const logout = useAuthStore((state) => state.logout)
+  useEffect(() => {
+    const getAccessToken = async () => {
+      try {
+        useAuthStore.setState({ isAuthLoading: true })
+        let token = await refreshToken()
+        login(token, null)
 
-  if(initialLoading){
-    return(
+      } catch (error) {
+        console.log(error)
+        logout()
+      } finally {
+        useAuthStore.setState({ isAuthLoading: false })
+
+      }
+    }
+    getAccessToken()
+  }, [])
+
+  if (isAuthLoading) {
+    return (
       <div>
         Loading...
       </div>
@@ -52,49 +55,49 @@ function App() {
   return (
     <>
       <Toaster
-      position="top-center"
-      reverseOrder={false}
-      gutter={20}
-      containerClassName="toast-container"
-      toastOptions={{
-        duration: 5000,
-        className: "toast-base",
-        success: {
-          className: "toast-success",
-        },
-        error: {
-          className: "toast-error",
-        },
-        loading: {
-          className: "toast-loading",
-        },
-      }}
-    />
-    <Router>
-      <LanguageSwitcher />
-      <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route element={<ProtectedRoute />}>
-        <Route
-          element={
-            <Sidebar>
-              <Outlet />
-            </Sidebar>
-          }
-        >
-          <Route path="/" element={<Today />} />
-          <Route path="/habits" element={<Habits />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/statistics" element={<Statistics />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/logs" element={<Logs />} />
-        </Route>
-        </Route>
-        <Route path="*" element={<>not found</>} />
-      </Routes>
-    </Router>
-          </>
+        position="top-center"
+        reverseOrder={false}
+        gutter={20}
+        containerClassName="toast-container"
+        toastOptions={{
+          duration: 5000,
+          className: "toast-base",
+          success: {
+            className: "toast-success",
+          },
+          error: {
+            className: "toast-error",
+          },
+          loading: {
+            className: "toast-loading",
+          },
+        }}
+      />
+      <Router>
+        <LanguageSwitcher />
+        <Routes>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route element={<ProtectedRoute />}>
+            <Route
+              element={
+                <Sidebar>
+                  <Outlet />
+                </Sidebar>
+              }
+            >
+              <Route path="/" element={<Today />} />
+              <Route path="/habits" element={<Habits />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/statistics" element={<Statistics />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/logs" element={<Logs />} />
+            </Route>
+          </Route>
+          <Route path="*" element={<>not found</>} />
+        </Routes>
+      </Router>
+    </>
   );
 }
 
