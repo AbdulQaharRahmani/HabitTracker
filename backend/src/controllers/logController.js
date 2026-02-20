@@ -4,20 +4,7 @@ import { DateHelper } from '../utils/date.js';
 import { getDatesBetween, getTop, readLogsByDate } from '../utils/log.js';
 import { AppError, notFound } from '../utils/error.js';
 import { validate as isUUID } from 'uuid';
-import { ERROR_CODES } from '../utils/constant.js';
-
-const toLogSummary = (log) => ({
-  logId: log.logId,
-  timestamp: log.timestamp,
-  level: log.level,
-  method: log.method,
-  path: log.path,
-  statusCode: log.statusCode,
-  userId: log.userId ?? null,
-  duration: log.duration,
-  clientIp: log.clientIp,
-  userAgent: log.userAgent,
-});
+import { ERROR_CODES, toLogSummary } from '../utils/constant.js';
 
 export const getLogs = async (req, res) => {
   const [startDate, endDate] = DateHelper.getStartAndEndOfDate(
