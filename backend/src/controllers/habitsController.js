@@ -275,10 +275,12 @@ export const completeHabit = async (req, res) => {
     );
 
   //Check if date is before habit created date
-  const createdAt = dayjs(habit.createdAt).startOf('day');
-  if (selectedDate.isBefore(createdAt, 'day'))
+  const startDate = dayjs(habit.startDate);
+  console.log('StartDate: ', startDate.toString());
+
+  if (selectedDate.isBefore(startDate, 'day'))
     throw new AppError(
-      'You cannot modify habits before their creation date',
+      'You can not complete habits before their creation date',
       400,
       ERROR_CODES.VALIDATION_ERROR
     );
@@ -332,11 +334,11 @@ export const uncompleteHabit = async (req, res) => {
       ERROR_CODES.RESOURCE_ALREADY_REMOVED
     );
 
-  const createdAt = dayjs(habit.createdAt).startOf('day');
+  const startDate = dayjs(habit.startDate);
   //Check if date is before habit created date
-  if (selectedDate.isBefore(createdAt, 'day'))
+  if (selectedDate.isBefore(startDate, 'day'))
     throw new AppError(
-      'You cannot modify habits before their creation date',
+      'You can not uncomplete habits before their creation date',
       400,
       ERROR_CODES.VALIDATION_ERROR
     );
