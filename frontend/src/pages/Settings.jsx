@@ -12,7 +12,7 @@ const Settings = () => {
   const { t } = useTranslation();
   const { setTheme } = useTheme();
 
-  const { preferences, fetchUserPreferences, updateUserPrefrences } =
+  const { preferences, fetchUserPreferences, updateUserPrefrences ,loading, error} =
     useProfilePhotoStore();
 
   const {
@@ -62,7 +62,6 @@ const Settings = () => {
     }
   }, [debouncedPrefs]);
 
-  if (!localPrefs) return null;
 
   const handleUsernameBlur = async () => {
     if (!username.trim() || username === authUsername) return;
@@ -84,6 +83,15 @@ const Settings = () => {
       toast.error(t("Failed to change password"));
     }
   };
+
+
+  {loading && (
+  <div className="animate-pulse space-y-6 mt-6">
+    <div className="h-32 bg-gray-200 rounded-xl"></div>
+    <div className="h-40 bg-gray-200 rounded-xl"></div>
+    <div className="h-40 bg-gray-200 rounded-xl"></div>
+  </div>
+)}
 
   return (
     <div className="min-h-screen p-6 font-sans transition-colors duration-200 bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">

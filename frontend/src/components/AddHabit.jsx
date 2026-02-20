@@ -1,7 +1,9 @@
 import { GrAdd } from "react-icons/gr";
 import HabitModal from "./HabitModal.jsx";
 import useHabitStore from "../store/useHabitStore.js";
+import { useTranslation } from "react-i18next";
 export default function AddHabit() {
+    const { t } = useTranslation();
     const { isModalOpen, openAddHabitModal } = useHabitStore()
     return (
         <div className="">
@@ -13,7 +15,7 @@ export default function AddHabit() {
                     <GrAdd size={14} />
                 </span>
                 <span className="">
-                    New Habit
+                    {t("New Habit")}
                 </span>
             </button>
             {

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import LanguageSwitcher from "./internationalization"
@@ -17,6 +18,7 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import useSidebarStore from "../store/useSidebarStore";
 import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
 import useAuthStore from "../store/useAuthStore";
+import { useTaskCardStore } from "../store/useTaskCardStore";
 
 const dashboardItems = [
   { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
@@ -43,7 +45,10 @@ const Sidebar = ({ children }) => {
     toggleSidebar,
     closeSidebar,
     setScreenMode,
+    isMobileOpen
   } = useSidebarStore();
+
+  const { isModalOpen, isEditModalOpen} = useTaskCardStore()
 
   /* --- Profile photo --- */
   useEffect(() => {
@@ -65,6 +70,14 @@ const Sidebar = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [setScreenMode]);
 
+
+   useHotkeys(
+    "ctrl+b, meta+b",
+    (e) => {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
