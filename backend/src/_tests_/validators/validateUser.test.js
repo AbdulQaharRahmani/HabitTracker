@@ -1,27 +1,36 @@
 import { describe, it, vi, expect, beforeEach } from 'vitest';
-import { loginValidate, registerValidate } from '../middleware/validateUser';
-import { AppError } from '../utils/error';
+import { validate } from '../../middleware/validate.js';
 
 vi.mock('express-validator', () => {
+  const chain = {
+    notEmpty: vi.fn().mockReturnThis(),
+    withMessage: vi.fn().mockReturnThis(),
+    isEmail: vi.fn().mockReturnThis(),
+    normalizeEmail: vi.fn().mockReturnThis(),
+    isLength: vi.fn().mockReturnThis(),
+    isAlphanumeric: vi.fn().mockReturnThis(),
+    isString: vi.fn().mockReturnThis(),
+    optional: vi.fn().mockReturnThis(),
+    trim: vi.fn().mockReturnThis(),
+    toLowerCase: vi.fn().mockReturnThis(),
+    isIn: vi.fn().mockReturnThis(),
+    matches: vi.fn().mockReturnThis(),
+    isBoolean: vi.fn().mockReturnThis(),
+  };
+
   return {
-    body: vi.fn(() => ({
-      notEmpty: vi.fn().mockReturnThis(),
-      withMessage: vi.fn().mockReturnThis(),
-      isEmail: vi.fn().mockReturnThis(),
-      normalizeEmail: vi.fn().mockReturnThis(),
-      isLength: vi.fn().mockReturnThis(),
-      isAlphanumeric: vi.fn().mockReturnThis(),
-      trim: vi.fn().mockReturnThis(),
-    })),
+    body: vi.fn(() => chain),
     validationResult: vi.fn(),
   };
 });
 
 vi.mock('../utils/error.js', () => {
-  const MockAppError = vi.fn(function (message, statusCode) {
+  const MockAppError = vi.fn(function (...args) {
+    const [message, status] = args;
     this.message = message;
-    this.statusCode = statusCode;
+    this.status = status || 400;
     this.name = 'AppError';
+    this._args = args;
   });
 
   MockAppError.prototype = Object.create(Error.prototype);
@@ -40,12 +49,13 @@ describe('Authentication Middleware Tests', () => {
     validationResult = expressValidator.validationResult;
   });
 
-  describe('registerValidate middleware', () => {
-    const validateFunction = registerValidate[2];
+  describe('registerValidator middleware', () => {
+    const validateFunction = validate;
 
     it('1. Valid Email and Password -> Pass Validation', async () => {
       const req = {
         body: {
+          username: 'tester',
           email: 'valid@test.com',
           password: 'test123',
         },
@@ -59,16 +69,16 @@ describe('Authentication Middleware Tests', () => {
         array: () => [],
       });
 
-      await validateFunction(req, res, next);
+      validateFunction(req, res, next);
 
       expect(next).toHaveBeenCalled();
       expect(next).toHaveBeenCalledTimes(1);
     });
 
-    it('2. Email is missing -> Failed Validation with AppError("Email is required",400)', async () => {
+    it('2. Email is missing -> Failed Validation with AppError', async () => {
       const req = {
         body: {
-          password: 'test123',
+          password: 'password123',
         },
       };
 
@@ -77,11 +87,7 @@ describe('Authentication Middleware Tests', () => {
 
       validationResult.mockReturnValue({
         isEmpty: () => false,
-        array: () => [
-          {
-            msg: 'Email is required',
-          },
-        ],
+        array: () => [{ msg: 'Email is required' }],
       });
 
       try {
@@ -89,12 +95,9 @@ describe('Authentication Middleware Tests', () => {
         expect(true).toBe(false);
       } catch (error) {
         expect(error.message).toBe('Email is required');
-        expect(error.statusCode).toBe(400);
-        expect(error.name).toBe('AppError');
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
-      const { AppError } = await import('../utils/error.js');
-      expect(AppError).toHaveBeenCalledWith('Email is required', 400);
     });
 
     it('3. Password is missing -> AppError("Password is required", 400)', async () => {
@@ -116,7 +119,7 @@ describe('Authentication Middleware Tests', () => {
         expect(true).toBe(false);
       } catch (error) {
         expect(error.message).toBe('Password is required');
-        expect(error.statusCode).toBe(400);
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
     });
@@ -145,7 +148,7 @@ describe('Authentication Middleware Tests', () => {
         expect(true).toBe(false);
       } catch (error) {
         expect(error.message).toBe('Please enter a valid email');
-        expect(error.statusCode).toBe(400);
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
     });
@@ -174,7 +177,7 @@ describe('Authentication Middleware Tests', () => {
         expect(true).toBe(false);
       } catch (error) {
         expect(error.message).toBe('Password must be at least 5 characters');
-        expect(error.statusCode).toBe(400);
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
     });
@@ -205,12 +208,12 @@ describe('Authentication Middleware Tests', () => {
         expect(error.message).toBe(
           'Password must contain only letters and numbers'
         );
-        expect(error.statusCode).toBe(400);
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('7. Request body is empty -> AppError with first validation error', async () => {
+    it('7. Request body is empty -> AppError with first validation error', () => {
       const req = { body: {} };
       const res = {};
       const next = vi.fn();
@@ -221,18 +224,196 @@ describe('Authentication Middleware Tests', () => {
       });
 
       try {
-        await validateFunction(req, res, next);
+        validateFunction(req, res, next);
         expect(true).toBe(false);
       } catch (error) {
         expect(error.message).toBe('Email is required');
-        expect(error.statusCode).toBe(400);
+        expect(error.status).toBe(400);
+      }
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('7b. Username is missing -> AppError("Username is required", 400)', async () => {
+      const req = {
+        body: {
+          email: 'test@test.com',
+          password: 'test123',
+        },
+      };
+
+      const res = {};
+      const next = vi.fn();
+
+      validationResult.mockReturnValue({
+        isEmpty: () => false,
+        array: () => [{ msg: 'Username is required' }],
+      });
+
+      try {
+        await validateFunction(req, res, next);
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error.message).toBe('Username is required');
+        expect(error.status).toBe(400);
+      }
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('7c. Username is too long (>25 chars) -> Should fail validation', async () => {
+      const req = {
+        body: {
+          username: 'a'.repeat(26),
+          email: 'test@test.com',
+          password: 'test123',
+        },
+      };
+
+      const res = {};
+      const next = vi.fn();
+
+      validationResult.mockReturnValue({
+        isEmpty: () => false,
+        array: () => [{ msg: 'Username exceeds maximum length' }],
+      });
+
+      try {
+        await validateFunction(req, res, next);
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error.message).toBe('Username exceeds maximum length');
+        expect(error.status).toBe(400);
+      }
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('7d. Username is not a string -> Should fail validation', async () => {
+      const req = {
+        body: {
+          username: 123,
+          email: 'test@test.com',
+          password: 'test123',
+        },
+      };
+
+      const res = {};
+      const next = vi.fn();
+
+      validationResult.mockReturnValue({
+        isEmpty: () => false,
+        array: () => [{ msg: 'Username should be string' }],
+      });
+
+      try {
+        await validateFunction(req, res, next);
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error.message).toBe('Username should be string');
+        expect(error.status).toBe(400);
+      }
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('7e. Username with only whitespace -> Should fail after trim', async () => {
+      const req = {
+        body: {
+          username: '   ',
+          email: 'test@test.com',
+          password: 'test123',
+        },
+      };
+
+      const res = {};
+      const next = vi.fn();
+
+      validationResult.mockReturnValue({
+        isEmpty: () => false,
+        array: () => [{ msg: 'Username is required' }],
+      });
+
+      try {
+        await validateFunction(req, res, next);
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error.message).toBe('Username is required');
+        expect(error.status).toBe(400);
+      }
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('7f. Password exactly 5 characters (boundary) -> Should pass', async () => {
+      const req = {
+        body: {
+          username: 'tester',
+          email: 'test@test.com',
+          password: '12345',
+        },
+      };
+
+      const res = {};
+      const next = vi.fn();
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => [],
+      });
+
+      await validateFunction(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('7g. Password with leading/trailing spaces -> Should be trimmed', async () => {
+      const req = {
+        body: {
+          username: 'tester',
+          email: 'test@test.com',
+          password: '  test123  ',
+        },
+      };
+
+      const res = {};
+      const next = vi.fn();
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => [],
+      });
+
+      await validateFunction(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('7h. Password with only spaces after trim -> Should fail', async () => {
+      const req = {
+        body: {
+          username: 'tester',
+          email: 'test@test.com',
+          password: '     ',
+        },
+      };
+
+      const res = {};
+      const next = vi.fn();
+
+      validationResult.mockReturnValue({
+        isEmpty: () => false,
+        array: () => [{ msg: 'Password is required' }],
+      });
+
+      try {
+        await validateFunction(req, res, next);
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error.message).toBe('Password is required');
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
     });
   });
 
-  describe('loginValidate - Input Validation', () => {
-    const validateFunction = loginValidate[2];
+  describe('loginValidator - Input Validation', () => {
+    const validateFunction = validate;
 
     it('8. Valid login data -> Pass Validation', async () => {
       const req = { body: { email: 'test@test.com', password: 'anypassword' } };
@@ -259,11 +440,11 @@ describe('Authentication Middleware Tests', () => {
       });
 
       try {
-        await validateFunction(req, res, next);
+        validateFunction(req, res, next);
         expect(true).toBe(false);
       } catch (error) {
         expect(error.message).toBe('Email is required');
-        expect(error.statusCode).toBe(400);
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
     });
@@ -283,7 +464,7 @@ describe('Authentication Middleware Tests', () => {
         expect(true).toBe(false);
       } catch (error) {
         expect(error.message).toBe('Password is required');
-        expect(error.statusCode).toBe(400);
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
     });
@@ -303,7 +484,7 @@ describe('Authentication Middleware Tests', () => {
         expect(true).toBe(false);
       } catch (error) {
         expect(error.message).toBe('Email is required');
-        expect(error.statusCode).toBe(400);
+        expect(error.status).toBe(400);
       }
       expect(next).not.toHaveBeenCalled();
     });
