@@ -89,7 +89,7 @@ export const loginUser = async (req, res) => {
   const existingToken = await refreshTokenModel.findOne({ userId: user._id });
 
   if (existingToken) {
-    await existingToken.set({ token: hashedToken, expiresAt }).save()
+    await existingToken.set({ token: hashedToken, expiresAt }).save();
   } else {
     await refreshTokenModel.create({
       userId: user._id,
@@ -115,6 +115,7 @@ export const loginUser = async (req, res) => {
       id: user._id,
       email: user.email,
       username: user.username,
+      role: user.role,
     },
   });
 };
@@ -182,7 +183,7 @@ export const googleLogin = async (req, res) => {
   const existingToken = await refreshTokenModel.findOne({ userId: user._id });
 
   if (existingToken) {
-    await existingToken.set({ token: hashedToken, expiresAt }).save()
+    await existingToken.set({ token: hashedToken, expiresAt }).save();
   } else {
     await refreshTokenModel.create({
       userId: user._id,
@@ -206,6 +207,7 @@ export const googleLogin = async (req, res) => {
       token,
       id: user._id,
       email: user.email,
+      role: user.role,
     },
   });
 };
@@ -224,8 +226,8 @@ export const refreshAccessToken = async (req, res) => {
 
   await refreshTokenModel.deleteOne({ token: hashedToken }); //delete previous hashed token
 
-  const user = await UserModel.findById({ _id: storeToken.userId })
-  if (!user) throw unauthorized()
+  const user = await UserModel.findById({ _id: storeToken.userId });
+  if (!user) throw unauthorized();
 
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken();
