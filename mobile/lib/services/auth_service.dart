@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 
 import '../screens/habitScreen/add_habit.dart';
 import '../screens/statisticScreen/data/models/daily_consistency.dart';
+import '../utils/profile/profile_model.dart';
 import '../utils/today_progressBar/task_item.dart';
 
 
@@ -142,6 +143,25 @@ class AuthService {
       return jsonDecode(res.body);
     } catch (e) {
       return {'success': false, 'message': 'Failed to fetch habits dashboard: $e'};
+    }
+  }
+
+  Future<Welcome> fetchHabitsDashboard() async {
+    try {
+      final headers = await _headers();
+      final res = await http.get(
+        Uri.parse("$_api/habits/dashboard"),
+        headers: headers,
+      );
+
+      if (res.statusCode == 200) {
+        final welcome = welcomeFromJson(res.body);
+        return welcome;
+      } else {
+        throw Exception('Failed to load dashboard: ${res.statusCode}');
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 
