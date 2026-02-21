@@ -4,7 +4,9 @@ import 'package:habit_tracker/screens/statisticScreen/statistics_screen.dart';
 import 'package:habit_tracker/screens/taskScreen/tasks_screen.dart';
 import 'package:habit_tracker/screens/todayScreen/today_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 import '../habitScreen/habits_screen.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -35,34 +37,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<PersistentBottomNavBarItem> _navBarsItems() {
-
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(Iconsax.calendar_1),
+        icon: const Icon(Iconsax.calendar_1),
         title: "Today",
         activeColorPrimary: AppTheme.primary,
         inactiveColorPrimary: AppTheme.textMuted,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Iconsax.add_square),
+        icon: const Icon(Iconsax.add_square),
         title: "Habits",
         activeColorPrimary: AppTheme.primary,
         inactiveColorPrimary: AppTheme.textMuted,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Iconsax.task_square),
+        icon: const Icon(Iconsax.task_square),
         title: "Tasks",
         activeColorPrimary: AppTheme.primary,
         inactiveColorPrimary: AppTheme.textMuted,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Iconsax.chart_2),
+        icon: const Icon(Iconsax.chart_2),
         title: "Statistics",
         activeColorPrimary: AppTheme.primary,
         inactiveColorPrimary: AppTheme.textMuted,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Iconsax.setting_2),
+        icon: const Icon(Iconsax.setting_2),
         title: "Setting",
         activeColorPrimary: AppTheme.primary,
         inactiveColorPrimary: AppTheme.textMuted,
@@ -72,17 +73,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PersistentTabView(padding: EdgeInsets.only(top: 8,bottom: 4),
+    Provider.of<ThemeProvider>(context);
+    return PersistentTabView(
+      padding: EdgeInsets.only(top: 8, bottom: 4),
       context,
       controller: _controller,
       screens: _buildScreens(),
       items: _navBarsItems(),
       navBarStyle: NavBarStyle.style6,
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.surface,
       resizeToAvoidBottomInset: true,
       handleAndroidBackButtonPress: true,
       stateManagement: true,
-
       decoration: NavBarDecoration(
         borderRadius: BorderRadius.circular(0),
       ),

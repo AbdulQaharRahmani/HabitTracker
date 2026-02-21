@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 import 'package:habit_tracker/utils/setting_utils/setting_icons.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/theme_provider.dart';
 
 class SettingNavItem extends StatelessWidget {
   final IconData icon;
@@ -38,7 +41,7 @@ class SettingTimeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const SettingIcon(
+      leading:  SettingIcon(
         icon: Icons.schedule,
         color: AppTheme.learningText,
       ),
@@ -98,9 +101,10 @@ class SettingDangerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     return ListTile(
-      leading: const SettingIcon(icon: Icons.delete, color: AppTheme.error),
-      title: const Text(
+      leading: SettingIcon(icon: Icons.delete, color: AppTheme.error),
+      title:  Text(
         "Delete Account",
         style: TextStyle(color: AppTheme.error),
       ),
