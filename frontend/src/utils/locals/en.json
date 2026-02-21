@@ -174,5 +174,5 @@
   "habit_completed": "Habit marked as complete!",
   "habit_incomplete": "Habit marked as incomplete!",
   "habit_update_failed": "Habit update failed — please retry.",
-  "username": "username"
+  "User Name": "username"
 }

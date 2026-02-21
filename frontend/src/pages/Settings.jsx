@@ -134,7 +134,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder={t("User Name")}
-                      value={t("username")}
+                      value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       onBlur={handleUsernameBlur}
                       className="w-full px-4 py-2 mb-6 transition-all border shadow-sm bg-slate-50 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"

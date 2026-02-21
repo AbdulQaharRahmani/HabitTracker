@@ -28,9 +28,10 @@ const useSettingStore = create((set) => ({
         oldPassword: oldPassword.trim(),
         newPassword: newPassword.trim(),
       });
+
+      toast.success("Password updated. please log in again");
       useAuthStore.getState().logout();
 
-      toast.success("Password updated successfully");
       return true;
     } catch (err) {
       toast.error(err.response?.data?.message || "Password update failed");
