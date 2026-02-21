@@ -12,7 +12,6 @@ import {
   FaSignOutAlt,
   FaList
 } from "react-icons/fa";
-import { LuLogs } from "react-icons/lu";
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 

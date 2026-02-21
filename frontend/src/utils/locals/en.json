@@ -176,6 +176,8 @@
   "habit_incomplete":"Habit marked as incomplete!",
   "habit_update_failed":"Habit update failed — please retry.",
 
+  "Language": "Language",
+  "Select your preferred Language": "Select your preferred Language"
 
   "delete_task": "Delete Task",
   "delete_task_description": "Are you sure you want to delete this task?",

@@ -212,6 +212,9 @@
 
   "habit_completed": "عادت با موفقیت تکمیل شد!",
  "habit_incomplete": "وضعیت عادت به ناتکمیل تغییر یافت!",
- "habit_update_failed": "به‌روزرسانی عادت انجام نشد. دوباره تلاش کنید."
+ "habit_update_failed": "به‌روزرسانی عادت انجام نشد. دوباره تلاش کنید.",
+
+ "Language": "زبان",
+  "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید"
 }
 
