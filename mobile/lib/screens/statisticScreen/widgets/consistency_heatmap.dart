@@ -1,199 +1,293 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import '../data/models/daily_consistency.dart';
 
-class ConsistencyHeatmap extends StatelessWidget {
-  const ConsistencyHeatmap({super.key});
+class ProfessionalHeatmap extends StatefulWidget {
+  final List<HabitDay> data;
+
+  const ProfessionalHeatmap({super.key, required this.data});
 
   @override
-  Widget build(BuildContext context) {
-    return _buildConsistencyHeatmap();
-  }
+  State<ProfessionalHeatmap> createState() => _ProfessionalHeatmapState();
+}
 
-  Widget _buildConsistencyHeatmap() {
-    final weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
+  late PageController _pageController;
+  // LateInitializationError
+  late final DateTime now = DateTime.now();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Consistency',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.shadow,
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Week Days Header
-              Row(
-                children: [
-                  const SizedBox(width: 40),
-                  ...weekDays
-                      .map(
-                        (day) => Expanded(
-                      child: Center(
-                        child: Text(
-                          day,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                      .toList(),
-                ],
-              ),
-              const SizedBox(height: 12),
+  static const double cellSize = 24;
+  static const double cellSpacing = 5;
 
-              // Heatmap Grid with Week Numbers
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Week Numbers Column
-                  Column(
-                    children: List.generate(4, (weekIndex) {
-                      return Container(
-                        height: 30,
-                        width: 30,
-                        margin: const EdgeInsets.only(bottom: 8),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'W${weekIndex + 1}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(width: 8),
+  late List<int> months;
 
-                  // Heatmap Cells
-                  Expanded(
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 7,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 1,
-                      ),
-                      itemCount: 28,
-                      itemBuilder: (context, index) {
-                        final week = index ~/ 7;
-                        final day = index % 7;
+  @override
+  void initState() {
+    super.initState();
 
-                        int activityLevel = 0;
-                        if (week == 0 && day < 3) activityLevel = 1;
-                        if (week == 1 && day < 5) activityLevel = 2;
-                        if (week == 2 && day < 6) activityLevel = 3;
-                        if (week == 3 && day < 4) activityLevel = 4;
+    months = List.generate(now.month, (index) => index + 1);
 
-                        final isToday = (week == 3 && day == 6); // Last cell
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: _getActivityColor(activityLevel),
-                            borderRadius: BorderRadius.circular(6),
-                            border: isToday
-                                ? Border.all(
-                              color: AppTheme.primary,
-                              width: 2,
-                            )
-                                : null,
-                          ),
-                          child: isToday
-                              ? Center(
-                            child: Container(
-                              width: 6,
-                              height: 6,
-                              decoration:  BoxDecoration(
-                                color: AppTheme.primary,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          )
-                              : null,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Legend
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Less',
-                    style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
-                  ),
-                  const SizedBox(width: 8),
-                  ...List.generate(5, (index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: _getActivityColor(index),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    );
-                  }),
-                  const SizedBox(width: 8),
-                  Text(
-                    'More',
-                    style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
+    _pageController = PageController(
+      initialPage: months.length - 1,
+      viewportFraction: 0.85,
     );
   }
 
-  Color _getActivityColor(int level) {
-    switch (level) {
-      case 0:
-        return AppTheme.heatEmpty;
-      case 1:
-        return AppTheme.heatLow;
-      case 2:
-        return AppTheme.heatMedium;
-      case 3:
-        return AppTheme.heatHigh;
-      case 4:
-        return AppTheme.primary;
-      default:
-        return AppTheme.primary;
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 300,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 6,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Row for static Column
+                Padding(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: _buildWeekDays(),
+                ),
+                const SizedBox(width: 12),
+                // PageView for month
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: months.length,
+                    itemBuilder: (context, index) {
+                      final month = months[index];
+                      final monthDays = _generateMonth(now.year, month);
+                      final weeks = _groupByWeek(monthDays);
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      "${_monthName(month)} ${now.year}",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: weeks.map((week) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                            right: cellSpacing + 10,
+                                            // left:cellSpacing,
+                                          ),
+                                          child: Column(
+                                            children: week
+                                                .map((day) => _buildCell(day))
+                                                .toList(),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(flex: 1, child: _buildLegend()),
+        ],
+      ),
+    );
+  }
+
+  List<HabitDay> _generateMonth(int year, int month) {
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    List<HabitDay> fullDays = [];
+
+    for (int day = 1; day <= daysInMonth; day++) {
+      final date = DateTime(year, month, day);
+      final existing = widget.data.firstWhere(
+        (d) =>
+            d.date.year == date.year &&
+            d.date.month == date.month &&
+            d.date.day == date.day,
+        orElse: () => HabitDay(date: date, completed: 0),
+      );
+      fullDays.add(existing);
     }
+    return fullDays;
+  }
+
+  List<List<HabitDay>> _groupByWeek(List<HabitDay> monthDays) {
+    List<List<HabitDay>> weeks = [];
+    List<HabitDay> currentWeek = [];
+
+    // early month empty days
+    int emptyDays = monthDays.first.date.weekday % 7;
+    for (int i = 0; i < emptyDays; i++) {
+      currentWeek.add(
+        HabitDay(
+          date: monthDays.first.date.subtract(Duration(days: emptyDays - i)),
+          completed: -1,
+        ),
+      );
+    }
+
+    for (var day in monthDays) {
+      currentWeek.add(day);
+      if (currentWeek.length == 7) {
+        weeks.add(currentWeek);
+        currentWeek = [];
+      }
+    }
+
+    if (currentWeek.isNotEmpty) {
+      //filling empty days
+      while (currentWeek.length < 7) {
+        currentWeek.add(
+          HabitDay(
+            date: currentWeek.last.date.add(const Duration(days: 1)),
+            completed: -1,
+          ),
+        );
+      }
+      weeks.add(currentWeek);
+    }
+
+    return weeks;
+  }
+
+  Widget _buildCell(HabitDay day) {
+    final isToday =
+        day.date.year == now.year &&
+        day.date.month == now.month &&
+        day.date.day == now.day;
+
+    return Tooltip(
+      message: day.completed >= 0
+          ? "${day.date.day}/${day.date.month}/${day.date.year} - Completed: ${day.completed}"
+          : "",
+      child: Container(
+        width: cellSize,
+        height: cellSize,
+        margin: const EdgeInsets.only(bottom: cellSpacing,left:cellSpacing-4 ),
+        decoration: BoxDecoration(
+          color: _colorScale(day.completed),
+          borderRadius: BorderRadius.circular(5),
+          border: isToday
+              ? Border.all(color: Colors.black26, width: 1.5)
+              : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeekDays() {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return Column(
+      children: days
+          .map(
+            (d) => SizedBox(
+              height: cellSize + cellSpacing,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  d,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Color _colorScale(int value) {
+    if (value == -1) return Colors.transparent;
+    if (value == 0) return AppTheme.heatLow;
+    if (value == 1) return AppTheme.heatLow;
+    if (value == 2) return AppTheme.heatMedium;
+    return AppTheme.heatHigh;
+  }
+
+  String _monthName(int month) {
+    const months = [
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[month];
+  }
+
+  Widget _buildLegend() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 0, right: 30, bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          const Text(
+            "Less",
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          const SizedBox(width: 8),
+          ...List.generate(3, (index) {
+            return Container(
+              width: cellSize - 4,
+              height: cellSize - 4,
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              decoration: BoxDecoration(
+                color: _colorScale(index),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            );
+          }),
+          const SizedBox(width: 8),
+          const Text(
+            "More",
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
   }
 }

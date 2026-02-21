@@ -1,56 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/completion_trend_card.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/consistency_heatmap.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/filter_tabs.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/header.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/summary_card.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/tasks_item.dart';
-import 'package:provider/provider.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/shemer_heatmap.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/shemer_summary_cards.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/shimmer_chart.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/summary_cards.dart';
+import 'data/providers/consistency_provider.dart';
+import 'data/providers/statistic_provider.dart';
 
-import '../../providers/theme_provider.dart';
-
-class StatisticScreen extends StatelessWidget {
+class StatisticScreen extends ConsumerWidget {
   const StatisticScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    Provider.of<ThemeProvider>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final summaryAsync = ref.watch(summaryProvider);
+    final chartAsync = ref.watch(chartProvider);
+    final consistencyAsync = ref.watch(consistencyDataProvider);
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ========== Header Section ==========
-              StatisticsHeader(),
-              const SizedBox(height: 24),
-              // ========== Filter Section ==========
-              FilterTabs(),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(summaryProvider);
+            ref.read(chartProvider.notifier).reloadChart();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                StatisticsHeader(),
+                // const SizedBox(height: 24),
+                // FilterTabs(),
+                const SizedBox(height: 20),
 
-              const SizedBox(height: 24),
-              // ========== Progress Overview Cards ==========
-              SummaryCards(),
-              const SizedBox(height: 32),
+                // Summary
+                summaryAsync.when(
+                  data: (summary) => SummaryCards(summary: summary),
+                  loading: () => const ShimmerSummaryCards(),
+                  error: (err, _) => Text("Error: $err"),
+                ),
 
-              //========== Completion Trend Chart ==========
-              CompletionTrendCard(),
+                const SizedBox(height: 15),
 
-              const SizedBox(height: 24),
-              // Consistency Heatmap
-              ConsistencyHeatmap(),
-              const SizedBox(height: 32),
-              const Text(
-                'Top Performing',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
+                // Chart
+                chartAsync.when(
+                  data: (chartData) =>
+                      CompletionTrendCard(chartData: chartData),
+                  loading: () => const ShimmerChart(),
+                  error: (err, _) => Text("Error: $err"),
+                ),
 
-              // ========== Top Performing Tasks ==========
-              TasksItem(),
-            ],
+                const SizedBox(height: 20),
+                const Text(
+                  'Consistency',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 15),
+
+                //  consistency
+
+                consistencyAsync.when(
+                  data: (data) => ProfessionalHeatmap(data: data),
+                  loading: () => const ShimmerHeatmap(),
+                  error: (err, _) => Text("Error: $err"),
+                ),
+
+
+              ],
+            ),
           ),
         ),
       ),

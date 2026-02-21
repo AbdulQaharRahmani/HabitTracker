@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 
 import '../screens/habitScreen/add_habit.dart';
+import '../screens/statisticScreen/data/models/daily_consistency.dart';
 import '../utils/profile/profile_model.dart';
 import '../utils/today_progressBar/task_item.dart';
 
@@ -131,6 +132,20 @@ class AuthService {
       return {'success': false, 'message': 'Failed to fetch user profile: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> getHabitsDashboard() async {
+    try {
+      final res = await http.get(
+        Uri.parse("$_api/habits/dashboard"),
+        headers: await _headers(),
+      );
+
+      return jsonDecode(res.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to fetch habits dashboard: $e'};
+    }
+  }
+
   Future<Welcome> fetchHabitsDashboard() async {
     try {
       final headers = await _headers();
@@ -370,46 +385,44 @@ class AuthService {
 
     return json['status'] == 'done' || json['status'] == 'completed';
   }
-}
+
+
+  // ===========================================================================
+// CONSISTENCY (FULL YEAR)
 // ===========================================================================
-// DISPLAY NAME (Single Source of Truth)
-// ===========================================================================
-Future<String> getDisplayName() async {
-  try {
-    final authService = AuthService();
-    final profileRes = await authService.getUserProfile();
 
-    if (profileRes['success'] == true) {
-      final data = profileRes['data'];
+  Future<List<HabitDay>> fetchConsistencyYear({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    try {
+      final res = await http.get(
+        Uri.parse(
+          "$_api/habits/dashboard/chart-data"
+              "?startDate=${startDate.toIso8601String()}"
+              "&endDate=${endDate.toIso8601String()}",
+        ),
+        headers: await _headers(),
+      );
 
-      final username = data?['username']?.toString();
-      if (username != null && username.trim().isNotEmpty) {
-        return username;
+      final body = jsonDecode(res.body);
+
+      if (res.statusCode == 200 && body['success'] == true) {
+        final daily = body['data']['daily'] as List<dynamic>;
+
+        return daily.map((d) {
+          return HabitDay(
+            date: DateTime.parse(d['date']),
+            completed: d['completed'] ?? 0,
+          );
+        }).toList();
       }
 
-      final email = data?['email']?.toString();
-      if (email != null && email.contains('@')) {
-        return email.split('@').first;
-      }
+      return [];
+    } catch (e) {
+      debugPrint("Error fetching consistency: $e");
+      return [];
     }
-
-    // 2️⃣ از SharedPreferences
-    final storedUser = await AuthManager.getUserData();
-    if (storedUser != null) {
-      final name = storedUser['name'];
-      if (name != null && name.isNotEmpty) {
-        return name;
-      }
-
-      final email = storedUser['email'];
-      if (email != null && email.contains('@')) {
-        return email.split('@').first;
-      }
-    }
-
-    // 3️⃣ fallback
-    return 'Habit Tracker User';
-  } catch (e) {
-    return 'Habit Tracker User';
   }
+
 }
