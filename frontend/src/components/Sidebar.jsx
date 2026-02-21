@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink,useNavigate } from "react-router-dom";
+import ConfirmationModal from "./modals/ConfirmationModal";
+
 
 import {
   FaCalendarDay,
@@ -32,7 +34,9 @@ const preferencesItems = [
 ];
 
 const Sidebar = ({ children }) => {
-  const { t } = useTranslation();
+
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === "rtl";
   const [preview, setPreview] = useState(null);
 
   const { userProfileUrl, fetchProfilePhoto, loading } =
@@ -46,6 +50,11 @@ const Sidebar = ({ children }) => {
     setScreenMode,
     isMobileOpen
   } = useSidebarStore();
+
+  const navigate = useNavigate();
+
+const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { isModalOpen, isEditModalOpen} = useTaskCardStore()
 
@@ -69,6 +78,21 @@ const Sidebar = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [setScreenMode]);
 
+ const handleLogout = async () => {
+  try {
+    setIsLoggingOut(true);
+    logout();
+    navigate("/login");
+  } finally {
+    setIsLoggingOut(false);
+    setIsLogoutOpen(false);
+  }
+};
+
+useEffect(()=>{
+  console.log(isRtl);
+},[isRtl]);
+
 
    useHotkeys(
     "ctrl+b, meta+b",
@@ -79,6 +103,7 @@ const Sidebar = ({ children }) => {
   );
 
   return (
+  <>
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* --- Mobile Toggle Button --- */}
       {
@@ -113,13 +138,16 @@ const Sidebar = ({ children }) => {
         `}
       >
          {/* Desktop Toggle */}
-      <div className="hidden md:flex justify-end mt-5 mr-[-12px] absolute top-0 right-0">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600"
-        >
-          {isOpen ? <FiChevronLeft size={16} /> : <FiChevronRight size={16} />}
-        </button>
+      <div className={`hidden md:flex mt-5 absolute top-0 ${isRtl ? "left-0" : "right-0"} ${isRtl ? "ml-[-12px]" : "mr-[-12px]"} justify-${isRtl ? "start" : "end"}`}>
+       <button
+        className={` fixed top-4 z-50 p-2 rounded-full bg-indigo-600 text-white shadow-lg
+          ${isOpen ? `absolute ${isRtl ? "-right-8" : "-left-8"}` : `${isRtl ? "right-16" : "left-16"}`}`}
+        onClick={toggleSidebar}
+      >
+        {isOpen ? (isRtl ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />)
+                : (isRtl ? <FiChevronLeft size={16} /> : <FiChevronRight size={16} />)}
+      </button>
+
       </div>
 
         {/* --- Profile --- */}
@@ -168,14 +196,15 @@ const Sidebar = ({ children }) => {
                       className={({ isActive }) =>
                         `flex items-center p-3 rounded-lg transition ${
                           isActive
-                            ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
-                            : "text-gray-600 hover:bg-gray-100"
+                          ? `${isRtl ? "border-r-4" : "border-l-4"} bg-indigo-50 text-indigo-600`
+                          : "text-gray-600 hover:bg-gray-100"
                         }`
                       }
                     >
                       <span className="text-lg">{item.icon}</span>
                       {isOpen && (
-                      <span className="ml-4 font-medium">{t(item.name)}</span>
+                      <span className={`${isRtl ? "mr-4" : "ml-4"} font-medium`}>{t(item.name)}</span>
+
                        )}
                     </NavLink>
                   </li>
@@ -196,15 +225,16 @@ const Sidebar = ({ children }) => {
                       }}
                       className={({ isActive }) =>
                         `flex items-center p-3 rounded-lg transition ${
-                          isActive
-                            ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
-                            : "text-gray-600 hover:bg-gray-100"
+                         isActive
+                          ? `${isRtl ? "border-r-4" : "border-l-4"} bg-indigo-50 text-indigo-600`
+                          : "text-gray-600 hover:bg-gray-100"
                         }`
                       }
                     >
                       <span className="text-lg">{item.icon}</span>
                        {isOpen && (
-                      <span className="ml-4 font-medium">{t(item.name)}</span>
+                       <span className={`${isRtl ? "mr-4" : "ml-4"} font-medium`}>{t(item.name)}</span>
+
                        )}
                     </NavLink>
                   </li>
@@ -215,14 +245,12 @@ const Sidebar = ({ children }) => {
         {/*--- Logout --- */}
         <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
           <button
-            onClick={() => {
-              logout();
-              closeSidebar();
-            }}
+            onClick={() => setIsLogoutOpen(true)}
             className="w-full flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50"
           >
             <FaSignOutAlt />
-            {isOpen && <span className="ml-4 font-medium">{t("logout")}</span>}
+             {isOpen && <span className={`${isRtl ? "mr-4" : "ml-4"} font-medium`}>{t("logout")}</span>}
+
           </button>
         </div>
       </aside>
@@ -234,6 +262,19 @@ const Sidebar = ({ children }) => {
         <div className="p-4 md:p-6">{children}</div>
       </main>
     </div>
+
+    <ConfirmationModal
+      isOpen={isLogoutOpen}
+      onClose={() => setIsLogoutOpen(false)}
+      onConfirm={handleLogout}
+      title={t("logout_title")}
+      description={t("logout_description")}
+      confirmText={t("logout_confirmText")}
+      type="indigo"
+      isLoading={isLoggingOut}
+    />
+
+  </>
   );
 };
 
