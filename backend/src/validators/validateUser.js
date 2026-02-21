@@ -119,5 +119,6 @@ export const forgotPasswordValidator = [
     .notEmpty()
     .withMessage('Email is required')
     .isEmail()
-    .withMessage('Please enter a valid email'),
+    .withMessage('Please enter a valid email')
+    .normalizeEmail(),
 ];

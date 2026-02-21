@@ -1,10 +1,10 @@
 import 'dotenv/config';
 import { agenda } from './config/agenda.js';
-import { sendEmailJobs } from './jobs/emailJobs.js';
+import { defineResetPasswordEmailJobs } from './jobs/emailJobs.js';
 
 async function startWorker() {
   //Initial Jobs
-  sendEmailJobs(agenda);
+  defineResetPasswordEmailJobs(agenda);
 
   agenda.on('retry', (job, details) => {
     console.log(`Job ${job.attrs.name} retry # ${details.attempt}`);

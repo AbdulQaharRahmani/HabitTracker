@@ -1,11 +1,10 @@
 import { backoffStrategies } from 'agenda';
 import { sendEmail } from '../utils/email.js';
 
-export const sendEmailJobs = async (agenda) => {
+export const defineResetPasswordEmailJobs = async (agenda) => {
   agenda.define(
     'send-reset-password-email',
     async (job) => {
-      console.log('Job data', job.attrs.data);
       const { email, username, resetUrl } = job.attrs.data;
 
       try {
