@@ -13,7 +13,7 @@ import {
   hashToken,
 } from '../utils/jwt.js';
 import { refreshTokenModel } from '../models/RefreshToken.js';
-import { sendEmail } from '../utils/email.js';
+import { agenda } from '../config/agenda.js';
 
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -271,20 +271,18 @@ export const forgotPassword = async (req, res) => {
 
   const resetToken = user.createPasswordResetToken();
 
-  // console.log(resetToken);
   await user.save({ validateBeforeSave: false });
-  const resetUrl = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}resetPassword/${resetToken}`;
 
-  await sendEmail({
-    email: user.email,
+  await agenda.now('send-reset-password-email', {
     username: user.username,
-    subject: 'Reset password Requested',
+    email: user.email,
     resetUrl: resetUrl,
   });
 
   res.status(200).json({
     success: true,
-    message: 'Email send successfully',
+    message: 'Email sent successfully',
   });
 };
 

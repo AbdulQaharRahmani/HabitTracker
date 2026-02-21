@@ -113,3 +113,11 @@ export const resetPasswordValidator = [
     .withMessage('New password must contain only letters and numbers')
     .trim(),
 ];
+
+export const forgotPasswordValidator = [
+  body('email')
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Please enter a valid email'),
+];

@@ -10,6 +10,7 @@ import {
   resetPassword,
 } from '../controllers/authController.js';
 import {
+  forgotPasswordValidator,
   loginValidator,
   registerValidator,
   resetPasswordValidator,
@@ -25,7 +26,12 @@ router.post(
   asyncHandler(registerUser)
 );
 router.post('/login', loginValidator, validate, asyncHandler(loginUser));
-router.post('/forgotPassword', asyncHandler(forgotPassword));
+router.post(
+  '/forgotPassword',
+  forgotPasswordValidator,
+  validate,
+  asyncHandler(forgotPassword)
+);
 router.put(
   '/resetPassword/:resetToken',
   resetPasswordValidator,

@@ -9,7 +9,9 @@
   },
   "scripts": {
     "start": "node ./src/server.js",
-    "dev": "nodemon ./src/server.js",
+    "start:api": "nodemon ./src/server.js",
+    "start:worker": "nodemon ./src/worker.js",
+    "dev": "concurrently \"npm run start:api\" \"npm run start:worker\"",
     "seed": "node ./src/seeders/index.js",
     "lint": "eslint .",
     "test": "vitest"
@@ -26,6 +28,8 @@
   },
   "homepage": "https://github.com/AbdulQaharRahmani/HabitTracker#readme",
   "dependencies": {
+    "@agendajs/mongo-backend": "^3.2.0",
+    "agenda": "^6.2.3",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -48,6 +52,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^2.0.0",
     "@eslint/js": "^9.39.2",
+    "concurrently": "^9.2.1",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
