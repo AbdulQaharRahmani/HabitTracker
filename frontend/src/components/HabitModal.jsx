@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useHabitStore from "../store/useHabitStore";
 import Dropdown from "./Dropdown";
 import { FaTimes } from "react-icons/fa";
 import SearchableDropdown from "./SearchableDropdown";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { useHotkeys } from "react-hotkeys-hook"
 
 const frequencyItems = [
   { id: "f1", name: "Daily", value: "daily" },
@@ -30,20 +32,46 @@ export default function HabitModal() {
     fetchHabits,
   } = useHabitStore();
 
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (isModalOpen) {
       fetchCategories();
     }
   }, [isModalOpen, fetchCategories]);
 
+  const formRef = useRef(null);
+
+
+  useHotkeys(
+    "ctrl+s, meta+s",
+    (e) => {
+      e.preventDefault();
+      handleHabitDataSubmission(e);
+    },
+    { enabled: isModalOpen }
+  );
+
+  useHotkeys(
+    "esc",
+    () => {
+      if(isModalOpen) {
+        setModalOpen(false);
+      }
+    },
+    { enabled: isModalOpen }
+  );
+
   const handleHabitDataSubmission = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+
     if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
       return toast.error("Title, Category, and Frequency are required");
     }
     await submitHabit(habitData, isEditingMode, currentHabitID);
     fetchHabits();
-  };
+    setModalOpen(false)
+  }
 
   const handleAddCategory = async (name, color) => {
     await addUserCategory(name, color);
@@ -57,16 +85,17 @@ export default function HabitModal() {
           <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl md:w-1/2 w-full max-h-full flex flex-col overflow-hidden shadow-2xl transition-colors duration-200">
             <div className="flex justify-between p-4 border-b border-gray-100 dark:border-gray-800">
               <h2 className="font-bold text-gray-900 dark:text-white">
-                {isEditingMode ? "Edit Habit" : "Add New Habit"}
+                {isEditingMode ? t("Edit Habit") : t("Add New Habit")}
               </h2>
               <FaTimes
                 onClick={() => setModalOpen(false)}
-                className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                className="cursor-pointer"
               />
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
               <form
+                ref={formRef}
                 className="flex flex-col gap-4"
                 onSubmit={handleHabitDataSubmission}
               >
@@ -75,13 +104,13 @@ export default function HabitModal() {
                     htmlFor="title"
                     className="font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Title <span className="text-red-600">*</span>
+                    {t("Title")} <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
                     id="title"
                     className="border-2 border-gray-100 dark:border-gray-800 p-2 rounded-md bg-gray-50 dark:bg-[#2a2a2a] text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#333] focus:ring-2 focus:ring-[#7B68EE]/20 focus:border-[#7B68EE] outline-none transition-all placeholder:text-gray-400"
-                    placeholder="Enter habit title"
+                    placeholder={t("Enter habit title")}
                     value={habitData.title}
                     onChange={(e) => setHabitData("title", e.target.value)}
                   />
@@ -92,11 +121,11 @@ export default function HabitModal() {
                     htmlFor="description"
                     className="font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Description
+                    {t("Description")}
                   </label>
                   <textarea
                     id="description"
-                    placeholder="Enter habit description"
+                    placeholder={t("Enter habit description")}
                     className="border-2 border-gray-100 dark:border-gray-800 p-2 rounded-md bg-gray-50 dark:bg-[#2a2a2a] text-gray-900 dark:text-white h-[120px] resize-none focus:bg-white dark:focus:bg-[#333] focus:ring-2 focus:ring-[#7B68EE]/20 focus:border-[#7B68EE] outline-none transition-all"
                     value={habitData.description}
                     onChange={(e) =>
@@ -107,11 +136,11 @@ export default function HabitModal() {
 
                 <div className="flex flex-col gap-1 text-gray-700 dark:text-gray-300">
                   <label htmlFor="frequency" className="font-medium">
-                    Frequency <span className="text-red-600">*</span>
+                    {t("Frequency")} <span className="text-red-600">*</span>
                   </label>
                   <Dropdown
                     items={frequencyItems}
-                    placeholder={"Choose Frequency"}
+                    placeholder={t("Choose Frequency")}
                     value={habitData.frequency}
                     getValue={(value) => setHabitData("frequency", value)}
                   />
@@ -119,7 +148,7 @@ export default function HabitModal() {
 
                 <div className="flex flex-col gap-1 text-gray-700 dark:text-gray-300">
                   <label htmlFor="category" className="font-medium">
-                    Category <span className="text-red-600">*</span>
+                    {t("Category")} <span className="text-red-600">*</span>
                   </label>
                   <SearchableDropdown
                     items={categories}
@@ -130,7 +159,7 @@ export default function HabitModal() {
                     }
                     getValue={(value) => setHabitData("categoryId", value)}
                     onAdd={handleAddCategory}
-                    placeholder={"Search or Add Category"}
+                    placeholder={t("Choose Category")}
                   />
                 </div>
 
@@ -141,14 +170,14 @@ export default function HabitModal() {
                     type="submit"
                     disabled={loading}
                   >
-                    {loading ? "Saving..." : "Save Habit"}
+                    {loading ? t("Saving...") : t("Save Habit")}
                   </button>
                   <button
                     className="w-full py-3.5 text-gray-500 dark:text-gray-400 font-semibold rounded-xl border-2 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-[0.98]"
                     onClick={() => setModalOpen(false)}
                     type="button"
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                 </div>
               </form>

@@ -6,6 +6,8 @@ import View from "../components/View.jsx";
 import HabitList from "../components/HabitList.jsx";
 import { useTranslation } from "react-i18next";
 import useHabitStore from "../store/useHabitStore.js";
+import { useHotkeys } from "react-hotkeys-hook";
+
 
 export default function Habits() {
   const { t } = useTranslation();
@@ -19,6 +21,8 @@ export default function Habits() {
     fetchHabitsPage,
     fetchHabitsByDate,
     selectedDate,
+    isModalOpen,
+    setModalOpen,
   } = useHabitStore();
 
   const debounceRef = useRef(null);
@@ -44,6 +48,15 @@ export default function Habits() {
     return () => clearTimeout(debounceRef.current);
   }, []);
 
+  useHotkeys(
+    "ctrl+k, meta+k",
+    (e) => {
+      e.preventDefault();
+        setModalOpen(true);
+      },
+      { enabled: !isModalOpen }
+  );
+
   return (
     <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors">
       <div className="pt-4 sm:pt-6">
@@ -62,13 +75,10 @@ export default function Habits() {
       <div className="my-6 sm:my-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
           <div className="w-full lg:w-1/2 xl:w-2/5">
-            <Search
-              searchTerm={searchTerm}
-              handleSearchChange={handleSearchChange}
-            />
+            <Search searchTerm={searchTerm} setSearchTerm={handleSearchChange} placeholder={t("Search habits...")}/>
           </div>
 
-          <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 sm:gap-2">
             <div className="w-full xs:w-auto">
               <View viewMode={viewMode} setViewMode={setViewMode} />
             </div>

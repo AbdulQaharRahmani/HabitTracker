@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/app_state.dart';
 import '../../utils/profile/profile_model.dart'; // contains Welcome, HabitsData, UserData, TaskItem
@@ -221,16 +223,16 @@ class _TodayScreenState extends State<TodayScreen> {
           Icon sectionIcon;
           switch (entry.key) {
             case 'HEALTH':
-              sectionIcon = const Icon(Icons.favorite, color: AppTheme.error);
+              sectionIcon =  Icon(Icons.favorite, color: AppTheme.error);
               break;
             case 'STUDY':
-              sectionIcon = const Icon(Icons.school, color: AppTheme.primary);
+              sectionIcon =  Icon(Icons.school, color: AppTheme.primary);
               break;
             case 'WORK':
-              sectionIcon = const Icon(Icons.work, color: AppTheme.primary);
+              sectionIcon = Icon(Icons.work, color: AppTheme.primary);
               break;
             default:
-              sectionIcon = const Icon(Icons.task, color: AppTheme.success);
+              sectionIcon =  Icon(Icons.task, color: AppTheme.success);
           }
 
           return Column(
@@ -294,7 +296,7 @@ class _TodayScreenState extends State<TodayScreen> {
             child: Container(
               width: 42.w,
               height: 42.w,
-              decoration: const BoxDecoration(
+              decoration:  BoxDecoration(
                 color: AppTheme.textPrimary,
                 shape: BoxShape.circle,
               ),
@@ -324,7 +326,7 @@ class _TodayScreenState extends State<TodayScreen> {
             child: Container(
               width: 36.w,
               height: 36.w,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppTheme.textPrimary,
                 shape: BoxShape.circle,
               ),
@@ -412,6 +414,7 @@ class _TodayScreenState extends State<TodayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     int total = 0;
     int completed = 0;
 

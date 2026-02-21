@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:habit_tracker/services/auth_service.dart';
+import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
 import '../../features/routes.dart';
+import '../../providers/theme_provider.dart';
 import '../../services/token_storage.dart'; // ← AuthManager
 import '../../services/app_state.dart';
 import '../../utils/profile/profile_model.dart';
@@ -44,7 +46,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    // If not preloaded or force refresh, load fresh data
     try {
       final savedName = await AuthManager.getUserName();
 
@@ -85,6 +86,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildShimmer() {
+    final isDark = AppTheme.background == AppTheme.darkBackground;
+    final shimmerBase = isDark ? Colors.grey[800]! : Colors.grey[300]!;
+    final shimmerHighlight = isDark ? Colors.grey[700]! : Colors.grey[100]!;
+    final shimmerContainer = isDark ? Colors.grey[800] : Colors.grey[300];
+    final shimmerInner = isDark ? Colors.grey[700] : Colors.grey[400];
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SingleChildScrollView(
@@ -95,11 +102,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Profile Avatar Shimmer
             Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: shimmerBase,
+              highlightColor: shimmerHighlight,
               child: CircleAvatar(
                 radius: 60.r,
-                backgroundColor: Colors.grey[300],
+                backgroundColor: shimmerContainer,
               ),
             ),
 
@@ -107,13 +114,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Name Shimmer
             Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: shimmerBase,
+              highlightColor: shimmerHighlight,
               child: Container(
                 width: 150.w,
                 height: 24.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: shimmerContainer,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
@@ -123,13 +130,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Streak Badge Shimmer
             Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: shimmerBase,
+              highlightColor: shimmerHighlight,
               child: Container(
                 width: 120.w,
                 height: 36.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: shimmerContainer,
                   borderRadius: BorderRadius.circular(30.r),
                 ),
               ),
@@ -139,12 +146,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Stats Card Shimmer
             Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: shimmerBase,
+              highlightColor: shimmerHighlight,
               child: Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: shimmerContainer,
                   borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: Row(
@@ -157,7 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           width: 56.w,
                           height: 56.w,
                           decoration: BoxDecoration(
-                            color: Colors.grey[400],
+                            color: shimmerInner,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -166,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           width: 40.w,
                           height: 20.h,
                           decoration: BoxDecoration(
-                            color: Colors.grey[400],
+                            color: shimmerInner,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
@@ -175,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           width: 60.w,
                           height: 14.h,
                           decoration: BoxDecoration(
-                            color: Colors.grey[400],
+                            color: shimmerInner,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
@@ -190,12 +197,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Preferences Shimmer
             Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: shimmerBase,
+              highlightColor: shimmerHighlight,
               child: Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: shimmerContainer,
                   borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: Column(
@@ -209,7 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             width: 20.w,
                             height: 20.w,
                             decoration: BoxDecoration(
-                              color: Colors.grey[400],
+                              color: shimmerInner,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -222,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 100.w,
                                   height: 14.h,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[400],
+                                    color: shimmerInner,
                                     borderRadius: BorderRadius.circular(4.r),
                                   ),
                                 ),
@@ -231,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 80.w,
                                   height: 16.h,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[400],
+                                    color: shimmerInner,
                                     borderRadius: BorderRadius.circular(4.r),
                                   ),
                                 ),
@@ -253,6 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     if (loading) {
       return _buildShimmer();
     }
@@ -347,11 +355,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: AppTheme.shadow,
                       blurRadius: 12.r,
                       offset: Offset(0, 6.h),
                     ),
@@ -389,11 +397,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Container(
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(16.r),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: AppTheme.shadow,
                         blurRadius: 12.r,
                         offset: Offset(0, 6.h),
                       ),
