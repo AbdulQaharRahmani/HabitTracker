@@ -8,8 +8,6 @@ import '../data/providers/statistic_provider.dart';
 import 'chart_mapper.dart';
 import 'filter_enum.dart';
 
-/// A card that displays the completion trend as a line chart.
-/// It adapts the bottom axis labels based on the selected filter.
 class CompletionTrendCard extends ConsumerWidget {
   final ChartData chartData;
 
@@ -27,11 +25,9 @@ class CompletionTrendCard extends ConsumerWidget {
       data: chartData,
     );
 
-
     final percentChange = _calculatePercentChange(filter, chartData);
     return _buildCompletionTrend(spots, visibleData, percentChange, filter);
   }
-
 
   /// Builds the main container with header and line chart.
   Widget _buildCompletionTrend(
@@ -44,7 +40,9 @@ class CompletionTrendCard extends ConsumerWidget {
     final todayDate = DateTime(now.year, now.month, now.day);
 
     final maxValue = chartData.daily.isNotEmpty
-        ? chartData.daily.map((e) => e.completed).reduce((a, b) => a > b ? a : b)
+        ? chartData.daily
+              .map((e) => e.completed)
+              .reduce((a, b) => a > b ? a : b)
         : 0;
     final maxY = maxValue > 0 ? maxValue.toDouble() : 5.0;
     return Container(
@@ -113,12 +111,10 @@ class CompletionTrendCard extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-
-    // Line chart.
+          // Line chart.
           SizedBox(
             height: 200,
             child: LineChart(
-
               LineChartData(
                 minY: -0.2,
                 maxY: maxY,
@@ -166,16 +162,31 @@ class CompletionTrendCard extends ConsumerWidget {
                               return const SizedBox();
                             }
                           case ChartFilter.month:
-                          // Month: show first day of each week (1,8,15,22,29) with month abbreviation.
-                          // Highlight the week that contains today.
+                            // Month: show first day of each week (1,8,15,22,29) with month abbreviation.
+                            // Highlight the week that contains today.
                             if (date.day == 1 || date.day % 7 == 1) {
-                              labelText = DateFormat('MMM d').format(date); // e.g., Nov 1
+                              labelText = DateFormat(
+                                'MMM d',
+                              ).format(date); // e.g., Nov 1
                               // Determine if today falls within this week
-                              final weekStart = DateTime(date.year, date.month, date.day);
-                              final weekEnd = weekStart.add(const Duration(days: 6));
-                              final isCurrentWeek = todayDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
-                                  todayDate.isBefore(weekEnd.add(const Duration(days: 1)));
-                              labelColor = isCurrentWeek ? AppTheme.success : Colors.grey[500]!;
+                              final weekStart = DateTime(
+                                date.year,
+                                date.month,
+                                date.day,
+                              );
+                              final weekEnd = weekStart.add(
+                                const Duration(days: 6),
+                              );
+                              final isCurrentWeek =
+                                  todayDate.isAfter(
+                                    weekStart.subtract(const Duration(days: 1)),
+                                  ) &&
+                                  todayDate.isBefore(
+                                    weekEnd.add(const Duration(days: 1)),
+                                  );
+                              labelColor = isCurrentWeek
+                                  ? AppTheme.success
+                                  : Colors.grey[500]!;
                             } else {
                               return const SizedBox();
                             }
@@ -183,14 +194,12 @@ class CompletionTrendCard extends ConsumerWidget {
                           case ChartFilter.lastMonth:
                             // Month: show first day of each week
                             if (date.day == 1 || date.day % 7 == 1) {
-                              labelText = DateFormat(
-                                'MMM d',
-                              ).format(date); // e.g., Nov 1
+                              labelText = DateFormat('MMM d').format(date);
                               labelColor = isToday
                                   ? AppTheme.success
                                   : Colors.grey[500]!;
                             } else {
-                              return const SizedBox(); // don't show other days
+                              return const SizedBox();
                             }
                             break;
 
@@ -199,9 +208,7 @@ class CompletionTrendCard extends ConsumerWidget {
                             if (index == 0 ||
                                 date.month !=
                                     visibleData[index - 1].date.month) {
-                              labelText = DateFormat.MMM().format(
-                                date,
-                              ); // e.g., Nov
+                              labelText = DateFormat.MMM().format(date);
                               labelColor =
                                   date.month == todayDate.month &&
                                       date.year == todayDate.year
@@ -286,17 +293,17 @@ class CompletionTrendCard extends ConsumerWidget {
                       vertical: 6,
                     ),
                     tooltipMargin: 12,
-                      getTooltipItems: (touchedSpots) {
-                        return touchedSpots.map((spot) {
-                          return LineTooltipItem(
-                            '${spot.y.toInt()} habits',
-                            const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        }).toList();
-                      },
+                    getTooltipItems: (touchedSpots) {
+                      return touchedSpots.map((spot) {
+                        return LineTooltipItem(
+                          '${spot.y.toInt()} habits',
+                          const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }).toList();
+                    },
                   ),
                 ),
               ),
@@ -322,7 +329,7 @@ class CompletionTrendCard extends ConsumerWidget {
   }
 
   /// Calculates the percentage change between the current period and the previous period
-  /// based on the selected filter.
+
   double _calculatePercentChange(ChartFilter filter, ChartData data) {
     final allData = data.daily..sort((a, b) => a.date.compareTo(b.date));
     final now = DateTime.now();

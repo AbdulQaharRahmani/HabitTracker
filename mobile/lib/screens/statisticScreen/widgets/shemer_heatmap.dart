@@ -49,18 +49,18 @@ class _ShimmerHeatmapState extends State<ShimmerHeatmap>
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ستون روزهای هفته
+                //weeks column
                 Padding(
                   padding: const EdgeInsets.only(top: 30),
                   child: _buildWeekDaysShimmer(cellSize, cellSpacing),
                 ),
                 const SizedBox(width: 12),
-                // ناحیه‌ی ماه (PageView)
+                //   (PageView)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // عنوان ماه
+                      // month title
                       AnimatedBuilder(
                         animation: _controller,
                         builder: (context, child) {
