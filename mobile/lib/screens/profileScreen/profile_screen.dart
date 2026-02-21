@@ -1,16 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/services/token_storage.dart';
+import 'package:habit_tracker/services/auth_service.dart';
+import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
 import '../../features/routes.dart';
+import '../../providers/theme_provider.dart';
+import '../../services/token_storage.dart'; // ← AuthManager
+import '../../utils/profile/profile_model.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final AuthService _api = AuthService();
+
+  HabitsData? habitsData;
+  UserData? userData;
+
+  String displayName = 'Habit Tracker User';
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    try {
+      final savedName = await AuthManager.getUserName();
+
+      final welcome = await _api.fetchHabitsDashboard();
+      final profileRes = await _api.getUserProfile();
+
+      setState(() {
+        habitsData = welcome.habitsData;
+
+        userData = profileRes['data'] != null
+            ? UserData.fromJson(profileRes['data'])
+            : null;
+
+        displayName = (savedName?.trim().isNotEmpty == true)
+            ? savedName!
+            : (userData?.userId.trim().isNotEmpty == true)
+            ? userData!.userId
+            : 'Habit Tracker User';
+
+        loading = false;
+      });
+    } catch (e) {
+      final fallbackName = await AuthManager.getUserName();
+      setState(() {
+        displayName = fallbackName ?? 'Habit Tracker User';
+        loading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Initialize ScreenUtil in the build if not initialized in main.dart
-    // ScreenUtil.init(context, designSize: const Size(375, 812));
+    Provider.of<ThemeProvider>(context);
+    if (loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final String streakText = '${habitsData?.currentStreak ?? 0} Day Streak';
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -18,18 +78,20 @@ class ProfileScreen extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
-            // Profile Picture with edit option
-            SizedBox(height: 25),
+            SizedBox(height: 40.h),
+
+            // Profile Avatar
             Stack(
               children: [
                 CircleAvatar(
                   radius: 60.r,
                   backgroundColor: AppTheme.primary.withOpacity(0.1),
-                  child: Icon(
-                    Icons.person,
-                    size: 60.r,
-                    color: AppTheme.primary,
-                  ),
+                  backgroundImage: userData?.profileImage != null
+                      ? NetworkImage(userData!.profileImage!)
+                      : null,
+                  child: userData?.profileImage == null
+                      ? Icon(Icons.person, size: 60.r, color: AppTheme.primary)
+                      : null,
                 ),
                 Positioned(
                   bottom: 0,
@@ -41,258 +103,165 @@ class ProfileScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: AppTheme.background,
-                        width: 2.w,
+                        width: 3.w,
                       ),
                     ),
-                    child: Icon(
-                      Icons.camera_alt,
-                      size: 18.r,
-                      color: Colors.white,
-                    ),
+                    child: Icon(Icons.camera_alt, size: 18.r, color: AppTheme.textWhite),
                   ),
                 ),
               ],
             ),
+
             SizedBox(height: 16.h),
 
-            // Name & Email
-            Column(
-              children: [
-                Text(
-                  'John Doe',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22.sp,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  'john.doe@email.com',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textMuted,
-                    fontSize: 14.sp,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 4.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Text(
-                    '42 Day Streak',
+            // Name
+            Text(
+              displayName,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 24.sp,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+
+            SizedBox(height: 8.h),
+
+            // Streak Badge
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(30.r),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.local_fire_department,
+                      color: AppTheme.primary, size: 20.r),
+                  SizedBox(width: 8.w),
+                  Text(
+                    streakText,
                     style: TextStyle(
                       color: AppTheme.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14.sp,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            SizedBox(height: 24.h),
 
-            // Habit Stats
+            SizedBox(height: 32.h),
+
+            // Stats Card
             Container(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(16.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 4.h),
+                    color: AppTheme.shadow,
+                    blurRadius: 12.r,
+                    offset: Offset(0, 6.h),
                   ),
                 ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStat('Total Habits', '12', Icons.list_alt),
                   _buildStat(
-                    'Current Streak',
-                    '7',
-                    Icons.local_fire_department,
-                    color: Colors.orange,
+                    label: 'Total Habits',
+                    value: '${habitsData?.totalHabits ?? 0}',
+                    icon: Icons.list_alt,
+                    color: AppTheme.primary,
                   ),
                   _buildStat(
-                    'Completed',
-                    '95%',
-                    Icons.check_circle,
-                    color: Colors.green,
+                    label: 'Current Streak',
+                    value: '${habitsData?.currentStreak ?? 0}d',
+                    icon: Icons.local_fire_department,
+                    color: AppTheme.warning,
+                  ),
+                  _buildStat(
+                    label: 'Completion Rate',
+                    value: '${habitsData?.completionRate ?? 0}%',
+                    icon: Icons.check_circle_outline,
+                    color: AppTheme.success,
                   ),
                 ],
               ),
             ),
+
             SizedBox(height: 24.h),
 
-            // Weekly Progress
-            Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 4.h),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Weekly Progress',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.sp,
-                            ),
-                      ),
-                      Text(
-                        '86%',
-                        style: TextStyle(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.h),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4.r),
-                    child: LinearProgressIndicator(
-                      value: 0.86,
-                      backgroundColor: Colors.grey[200],
-                      color: AppTheme.primary,
-                      minHeight: 8.h,
+            // Preferences
+            if (userData != null) ...[
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: AppTheme.surface,
+                  borderRadius: BorderRadius.circular(16.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.shadow,
+                      blurRadius: 12.r,
+                      offset: Offset(0, 6.h),
                     ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'Completed 43 of 50 habits this week',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textMuted,
-                      fontSize: 12.sp,
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Preferences',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.sp,
+                        color: AppTheme.textPrimary,
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 16.h),
+                    _buildPreferenceRow(
+                      icon: Icons.calendar_today,
+                      label: 'Week Starts On',
+                      value: (userData!.weekStartDay ?? 'monday').capitalize(),
+                    ),
+                    _buildPreferenceRow(
+                      icon: Icons.access_time,
+                      label: 'Daily Reminder',
+                      value: userData!.dailyReminderEnabled == true
+                          ? userData!.dailyReminderTime ?? 'Not set'
+                          : 'Disabled',
+                    ),
+                    _buildPreferenceRow(
+                      icon: Icons.public,
+                      label: 'Timezone',
+                      value: userData!.timezone ?? 'UTC',
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 24.h),
+              SizedBox(height: 32.h),
+            ],
 
-            // Achievements Section
-            Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 4.h),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Achievements',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.sp,
-                            ),
-                      ),
-                      Text(
-                        '3/8',
-                        style: TextStyle(
-                          color: AppTheme.textMuted,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.h),
-                  SizedBox(
-                    height: 80.h,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        _buildAchievement(
-                          icon: Icons.emoji_events,
-                          title: '7-Day Streak',
-                          color: Colors.amber,
-                          unlocked: true,
-                        ),
-                        _buildAchievement(
-                          icon: Icons.nightlight_round,
-                          title: 'Night Owl',
-                          color: Colors.indigo,
-                          unlocked: true,
-                        ),
-                        _buildAchievement(
-                          icon: Icons.fitness_center,
-                          title: 'Fitness Pro',
-                          color: Colors.green,
-                          unlocked: true,
-                        ),
-                        _buildAchievement(
-                          icon: Icons.book,
-                          title: 'Book Worm',
-                          color: Colors.purple,
-                          unlocked: false,
-                        ),
-                        _buildAchievement(
-                          icon: Icons.eco,
-                          title: 'Early Bird',
-                          color: Colors.teal,
-                          unlocked: false,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 24.h),
-
-            // Logout Button
+            // Logout
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                  onPressed: () async {
-                    await AuthManager.logout();
-
-                    Navigator.of(context, rootNavigator: true)
-                        .pushNamedAndRemoveUntil(
-                      AppRoutes.login,
-                          (route) => false,
-                    );
-                  },
-
-                icon: Icon(Icons.logout, size: 20.sp),
-                label: Text('Logout', style: TextStyle(fontSize: 16.sp)),
+                onPressed: () async {
+                  await AuthManager.logout();
+                  if (!mounted) return;
+                  Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+                    AppRoutes.login,
+                        (route) => false,
+                  );
+                },
+                icon: Icon(Icons.logout, size: 20.sp, color: AppTheme.error),
+                label: Text('Logout', style: TextStyle(fontSize: 16.sp, color: AppTheme.error)),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
+                  foregroundColor: AppTheme.error,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
-                  side: BorderSide(color: Colors.red.withOpacity(0.3)),
+                  side: BorderSide(color: AppTheme.error.withOpacity(0.3)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
                   ),
@@ -300,74 +269,86 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 24.h),
+            SizedBox(height: 32.h),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStat(
-    String label,
-    String value,
-    IconData icon, {
-    Color color = AppTheme.primary,
+  Widget _buildStat({
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color color,
   }) {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(12.w),
+          padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, size: 24.r, color: color),
+          child: Icon(icon, size: 28.r, color: color),
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 12.h),
         Text(
           value,
           style: TextStyle(
-            fontSize: 18.sp,
+            fontSize: 20.sp,
             fontWeight: FontWeight.bold,
             color: AppTheme.textPrimary,
           ),
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: 6.h),
         Text(
           label,
-          style: TextStyle(fontSize: 12.sp, color: AppTheme.textMuted),
+          style: TextStyle(fontSize: 13.sp, color: AppTheme.textMuted),
+          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildAchievement({
+  Widget _buildPreferenceRow({
     required IconData icon,
-    required String title,
-    required Color color,
-    required bool unlocked,
+    required String label,
+    required String value,
   }) {
     return Padding(
-      padding: EdgeInsets.only(right: 16.w),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: Row(
         children: [
-          Icon(icon, size: 30.r, color: unlocked ? color : Colors.grey[400]),
-          SizedBox(height: 8.h),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
-              color: unlocked ? AppTheme.textPrimary : Colors.grey[400],
+          Icon(icon, size: 20.r, color: AppTheme.primary),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
           ),
-          if (!unlocked)
-            Icon(Icons.lock_outline, size: 12.r, color: Colors.grey),
         ],
       ),
     );
   }
+}
+
+// Helper
+extension StringExtension on String {
+  String capitalize() => isEmpty ? this : this[0].toUpperCase() + substring(1);
 }

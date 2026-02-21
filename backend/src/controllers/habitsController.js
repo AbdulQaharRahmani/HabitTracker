@@ -283,7 +283,7 @@ export const completeHabit = async (req, res) => {
       ERROR_CODES.VALIDATION_ERROR
     );
 
-    // Validate if habit is completed for the same day
+  //Validate if habit is completed for the same day
   if (
     await HabitCompletionModel.isAlreadyCompleted(req.params.id, selectedDate)
   )

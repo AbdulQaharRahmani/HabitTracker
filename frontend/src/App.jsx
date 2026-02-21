@@ -13,11 +13,13 @@ import Sidebar from "./components/Sidebar";
 import Today from "./pages/Today";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import LanguageSwitcher from "./components/internationalization";
-import DarkMode from "./components/DarkMode";
 import { Toaster } from "react-hot-toast";
 import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Logs from "./pages/Logs";
+
+import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
+
 
 function App() {
   return (
@@ -42,10 +44,11 @@ function App() {
       }}
     />
     <Router>
-      <LanguageSwitcher />
       <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        <Route element={<AuthRedirectRoute/>}>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
         <Route element={<ProtectedRoute />}>
         <Route
           element={
@@ -59,6 +62,7 @@ function App() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/logs" element={<Logs />} />
         </Route>
         </Route>
         <Route path="*" element={<>not found</>} />

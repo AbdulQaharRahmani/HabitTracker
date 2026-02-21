@@ -1,125 +1,173 @@
 import { useTranslation } from "react-i18next";
-import useSidebarStore from "../store/useSidebarStore";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useEffect, useState } from "react";
+import { NavLink,useNavigate } from "react-router-dom";
+import ConfirmationModal from "./modals/ConfirmationModal";
+
 
 import {
   FaCalendarDay,
   FaChartLine,
   FaCog,
-  FaBars,
-  FaTimes,
-  FaUser,
+  FaSignOutAlt,
+  FaList
 } from "react-icons/fa";
 import { HiOutlineFire, HiOutlineClipboardList } from "react-icons/hi";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
-import { NavLink } from "react-router-dom";
+import useSidebarStore from "../store/useSidebarStore";
 import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
 import useAuthStore from "../store/useAuthStore";
-import { useEffect, useState } from "react";
+import { useTaskCardStore } from "../store/useTaskCardStore";
 
 const dashboardItems = [
   { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
   { id: "habits", name: "Habits", icon: <HiOutlineFire />, path: "/habits" },
-  {
-    id: "tasks",
-    name: "Tasks",
-    icon: <HiOutlineClipboardList />,
-    path: "/tasks",
-  },
-  {
-    id: "statistics",
-    name: "Statistics",
-    icon: <FaChartLine />,
-    path: "/statistics",
-  },
+  { id: "tasks", name: "Tasks", icon: <HiOutlineClipboardList />, path: "/tasks" },
+  { id: "statistics", name: "Statistics", icon: <FaChartLine />, path: "/statistics" },
+  { id: "logs", name: "Logs", icon: <FaList />, path: "/logs" },
 ];
 
 const preferencesItems = [
-  {
-    id: "settings",
-    name: "Settings",
-    icon: <FaCog />,
-    path: "/settings",
-  },
+  { id: "settings", name: "Settings", icon: <FaCog />, path: "/settings" },
 ];
 
 const Sidebar = ({ children }) => {
-  const { t } = useTranslation();
-   const [preview, setPreview] = useState(null);
-    const { userProfileUrl, fetchProfilePhoto, loading } =
-      useProfilePhotoStore();
+
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === "rtl";
+  const [preview, setPreview] = useState(null);
+
+  const { userProfileUrl, fetchProfilePhoto, loading } =
+    useProfilePhotoStore();
+  const { userId, username, logout } = useAuthStore();
   const {
     isOpen,
-    isMobileOpen,
-    toggleMobileSidebar,
-    closeMobileSidebar,
+    screenMode,
+    toggleSidebar,
+    closeSidebar,
+    setScreenMode,
+    isMobileOpen
   } = useSidebarStore();
 
- const {userId,username} = useAuthStore((state) => state);
+  const navigate = useNavigate();
 
+const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const { isModalOpen, isEditModalOpen} = useTaskCardStore()
+
+  /* --- Profile photo --- */
   useEffect(() => {
     if (!userId) return;
     fetchProfilePhoto(userId);
-  }, [fetchProfilePhoto, userId]);
+  }, [userId, fetchProfilePhoto]);
+
+  /* --- Screen resize sync --- */
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setScreenMode("mobile");
+      } else {
+        setScreenMode("desktop");
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setScreenMode]);
+
+ const handleLogout = async () => {
+  try {
+    setIsLoggingOut(true);
+    logout();
+    navigate("/login");
+  } finally {
+    setIsLoggingOut(false);
+    setIsLogoutOpen(false);
+  }
+};
+
+useEffect(()=>{
+  console.log(isRtl);
+},[isRtl]);
+
+
+   useHotkeys(
+    "ctrl+b, meta+b",
+    (e) => {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  );
 
   return (
+  <>
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      {/* Mobile Toggle Button */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-indigo-600 text-white shadow-lg"
-        onClick={toggleMobileSidebar}
+      {/* --- Mobile Toggle Button --- */}
+      {
+         screenMode ==="mobile" && ( <button
+        className={`md:hidden fixed top-4  z-50 p-2 rounded-full bg-indigo-600 text-white shadow-lg ${isOpen ? "absolute left-60" : "left-4"}`}
+        onClick={toggleSidebar}
       >
-        {isMobileOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
-      </button>
+         {isOpen ? <FiChevronLeft size={16} /> : <FiChevronRight size={16} />}
+      </button>)
+      }
 
-      {/* Mobile Overlay */}
-      {isMobileOpen && (
+
+      {/* --- Mobile Overlay ---*/}
+      {screenMode === "mobile" && isOpen && (
         <div
           className="md:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={closeMobileSidebar}
+          onClick={closeSidebar}
         />
       )}
 
-      {/* Sidebar */}
+      {/* --- Sidebar ---*/}
       <aside
         className={`
-          fixed top-0 left-0 md:relative
-          h-screen
+          fixed top-0 left-0 md:relative h-screen z-40
           bg-white dark:bg-gray-900
-          text-gray-800 dark:text-gray-100
-          transition-all duration-300 ease-in-out
-          z-40
-          ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-          ${isOpen ? "w-64" : "w-20"}
-          flex flex-col
-          shadow-xl
-          border-r border-gray-200 dark:border-gray-700
-          overflow-y-auto
+          transition-all duration-300 ease-in-out position-relative
+          ${screenMode === "mobile" && !isOpen ? "-translate-x-full" : "translate-x-0"}
+          ${screenMode === "desktop" ? "pt-10" : ""}
+
+          ${isOpen ? "md:w-64 w-64" : "md:w-20 w-64"}
+          flex flex-col shadow-xl border-r border-gray-200 dark:border-gray-700
         `}
       >
-        {/* Profile */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <div
-            className={`flex ${
-              isOpen
-                ? "flex-col text-center space-y-1"
-                : "flex-col items-center"
-            }`}
-          >
-            <div className="relative flex justify-center">
-              <div className="w-[60px] h-[60px] rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
-                <img
-                  src={loading && preview ? preview : userProfileUrl}
-                  alt="Profile"
-                  className="object-cover w-full h-full rounded-full"
-                />
-              </div>
+         {/* Desktop Toggle */}
+      <div className={`hidden md:flex mt-5 absolute top-0 ${isRtl ? "left-0" : "right-0"} ${isRtl ? "ml-[-12px]" : "mr-[-12px]"} justify-${isRtl ? "start" : "end"}`}>
+       <button
+        className={` fixed top-4 z-50 p-2 rounded-full bg-indigo-600 text-white shadow-lg
+          ${isOpen ? `absolute ${isRtl ? "-right-8" : "-left-8"}` : `${isRtl ? "right-16" : "left-16"}`}`}
+        onClick={toggleSidebar}
+      >
+        {isOpen ? (isRtl ? <FiChevronRight size={16} /> : <FiChevronLeft size={16} />)
+                : (isRtl ? <FiChevronLeft size={16} /> : <FiChevronRight size={16} />)}
+      </button>
+
+      </div>
+
+        {/* --- Profile --- */}
+        <div className="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+
+
+          <div className={`flex mt-5 ${isOpen ? " flex-col text-center space-y-2" : "flex-col items-center mb-10"}`}>
+           <div className="relative flex justify-center">
+               <div className="flex justify-center items-center mx-auto w-[60px] h-[60px] rounded-full overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 border border-gray-300">
+              <img
+                src={loading && preview ? preview : userProfileUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
             </div>
 
             {isOpen && (
-              <div className="w-full">
+              <div>
                 <h3 className="font-semibold text-lg mt-2">{username}</h3>
-                <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline mt-1">
+                <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
                   {t("View Profile")}
                 </button>
               </div>
@@ -127,13 +175,12 @@ const Sidebar = ({ children }) => {
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
-          {isOpen && (
-            <div className="mb-6">
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500 dark:text-gray-400">
-                {t("DASHBOARD")}
-              </h4>
+        {/* --- Navigation ---*/}
+        <nav className="flex-1 py-4 px-3 overflow-y-auto">
+
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500">
+              {isOpen && (t("DASHBOARD"))}
+            </h4>
 
               <ul className="space-y-1">
                 {dashboardItems.map((item) => (
@@ -141,54 +188,30 @@ const Sidebar = ({ children }) => {
                     <NavLink
                       to={item.path}
                       end={item.path === "/"}
-                      onClick={closeMobileSidebar}
+                      onClick={() =>{
+
+                        screenMode === "mobile" && closeSidebar();
+                      }}
                       className={({ isActive }) =>
-                        `
-                        w-full flex items-center rounded-lg p-3 transition-all duration-200
-                        ${
+                        `flex items-center p-3 rounded-lg transition ${
                           isActive
-                            ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:translate-x-1"
-                        }
-                        ${!isOpen ? "justify-center" : "justify-start"}
-                      `
+                          ? `${isRtl ? "border-r-4" : "border-l-4"} bg-indigo-50 text-indigo-600`
+                          : "text-gray-600 hover:bg-gray-100"
+                        }`
                       }
                     >
-                      {({ isActive }) => (
-                        <>
-                          <span
-                            className={`${!isOpen ? "text-xl" : "text-lg"} ${
-                              isActive
-                                ? "text-indigo-600 dark:text-indigo-400"
-                                : "text-gray-500 dark:text-gray-400"
-                            }`}
-                          >
-                            {item.icon}
-                          </span>
+                      <span className="text-lg">{item.icon}</span>
+                      {isOpen && (
+                      <span className={`${isRtl ? "mr-4" : "ml-4"} font-medium`}>{t(item.name)}</span>
 
-                          {isOpen && (
-                            <>
-                              <span className="ml-4 rtl:mr-3 font-medium">
-                                {t(item.name)}
-                              </span>
-                              {isActive && (
-                                <div className="ml-auto w-2 h-2 bg-indigo-600 rounded-full" />
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
+                       )}
                     </NavLink>
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
 
-          {isOpen && (
-            <div>
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 px-3 text-gray-500 dark:text-gray-400">
-                {t("Preferences")}
+              <h4 className="text-xs font-semibold uppercase tracking-wider mt-6 mb-3 px-3 text-gray-500">
+                 {isOpen && (t("Preferences"))}
               </h4>
 
               <ul className="space-y-1">
@@ -196,57 +219,61 @@ const Sidebar = ({ children }) => {
                   <li key={item.id}>
                     <NavLink
                       to={item.path}
-                      onClick={closeMobileSidebar}
+                      onClick={() => {
+                        screenMode === "mobile" && closeSidebar();
+                      }}
                       className={({ isActive }) =>
-                        `
-                        w-full flex items-center rounded-lg p-3 transition-all duration-200
-                        ${
-                          isActive
-                            ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:translate-x-1"
-                        }
-                        ${!isOpen ? "justify-center" : "justify-start"}
-                      `
+                        `flex items-center p-3 rounded-lg transition ${
+                         isActive
+                          ? `${isRtl ? "border-r-4" : "border-l-4"} bg-indigo-50 text-indigo-600`
+                          : "text-gray-600 hover:bg-gray-100"
+                        }`
                       }
                     >
-                      {({ isActive }) => (
-                        <>
-                          <span
-                            className={`${!isOpen ? "text-xl" : "text-lg"} ${
-                              isActive
-                                ? "text-indigo-600 dark:text-indigo-400"
-                                : "text-gray-500 dark:text-gray-400"
-                            }`}
-                          >
-                            {item.icon}
-                          </span>
+                      <span className="text-lg">{item.icon}</span>
+                       {isOpen && (
+                       <span className={`${isRtl ? "mr-4" : "ml-4"} font-medium`}>{t(item.name)}</span>
 
-                          {isOpen && (
-                            <>
-                              <span className="ml-4 rtl:mr-3 font-medium">
-                                {t(item.name)}
-                              </span>
-                              {isActive && (
-                                <div className="ml-auto w-2 h-2 bg-indigo-600 rounded-full" />
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
+                       )}
                     </NavLink>
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
         </nav>
+
+        {/*--- Logout --- */}
+        <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => setIsLogoutOpen(true)}
+            className="w-full flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50"
+          >
+            <FaSignOutAlt />
+             {isOpen && <span className={`${isRtl ? "mr-4" : "ml-4"} font-medium`}>{t("logout")}</span>}
+
+          </button>
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 bg-gray-100 dark:bg-gray-950 overflow-y-auto h-screen">
+      {/* --- Main Content --- */}
+      <main className="flex-1 overflow-y-auto h-screen">
+
+
         <div className="p-4 md:p-6">{children}</div>
       </main>
     </div>
+
+    <ConfirmationModal
+      isOpen={isLogoutOpen}
+      onClose={() => setIsLogoutOpen(false)}
+      onConfirm={handleLogout}
+      title={t("logout_title")}
+      description={t("logout_description")}
+      confirmText={t("logout_confirmText")}
+      type="indigo"
+      isLoading={isLoggingOut}
+    />
+
+  </>
   );
 };
 

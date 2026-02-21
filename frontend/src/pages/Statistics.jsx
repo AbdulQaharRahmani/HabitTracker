@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import DayilyConsistency from '../components/DailyConsistency'
 import Header from '../components/Header'
 import ExportData from '../components/ExportData';
@@ -7,10 +8,28 @@ import CompletionRateStatics from '../components/CompletionRateStatics';
 import i18n from '../utils/i18n';
 import { useTranslation } from "react-i18next";
 import StatisticsChart from '../components/StatisticsChart'
+import DailyConsistency from '../components/DailyConsistency';
+import {useStatisticsStore} from '../store/useStatisticsStore';
 
 function Statistics() {
   const { t } = useTranslation();
   const isRTL = i18n.language === "fa";
+
+  const {
+    totalHabits,
+    currentStreak,
+    completionRate,
+    fetchStatistics,
+    loading,
+    error,
+  } = useStatisticsStore(state=>state);
+
+
+  useEffect(()=>{
+     fetchStatistics();
+  },[fetchStatistics])
+
+
 
   const persianDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
 
@@ -25,34 +44,60 @@ function Statistics() {
     return String(value);
   }
 
-  return (
-    <div
-      className="px-4 lg:px-9"
-      dir={isRTL ? "rtl" : "ltr"}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Header
-          title={t("Your Progress")}
-          subtitle={t("Overview of your consistency and growth.")}
-        />
-        <ExportData />
-      </div>
-
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
-        <TotalHabitsStatics totalHabits={formatNumber(10)} />
-        <CurrentStreakStatics currentStreak={formatNumber(5)} />
-        <CompletionRateStatics completionRate={formatNumber(75)} />
-      </div>
-
-      {/* Charts */}
-      <div className="space-y-2">
-        <DayilyConsistency />
-        <StatisticsChart />
-      </div>
+  if(error){
+    return (
+      <div className="text-center text-red-500">{error}</div>
+    )
+  }
+return (
+  <div
+    className="px-4 lg:px-9"
+    dir={isRTL ? "rtl" : "ltr"}
+  >
+    {/* Header always visible */}
+    <div className="flex items-center justify-between">
+      <Header
+        title={t("Your Progress")}
+        subtitle={t("Overview of your consistency and growth.")}
+      />
+      <ExportData />
     </div>
-  );
+
+    {/* Loading State */}
+      {loading && (
+        <div className="animate-pulse space-y-4 mt-6">
+          <div className="h-24 bg-gray-200 rounded-lg"></div>
+          <div className="h-64 bg-gray-200 rounded-lg"></div>
+        </div>
+      )}
+
+    {/* Error */}
+    {error && (
+      <div className="my-6 text-center text-red-500">
+        {error}
+      </div>
+    )}
+
+    {/* Show content only when not loading and no error */}
+    {!loading && !error && (
+      <>
+        <div className="my-4">
+          <div className="flex items-center sm:mr-0 lg:flex lg:gap-6 md:gap-2 sm:gap-2 md:grid-rows-3 xxs:grid xxs:grid-rows-3 xxs:gap-4">
+            <TotalHabitsStatics totalHabits={formatNumber(totalHabits)} />
+            <CurrentStreakStatics currentStreak={formatNumber(currentStreak)} />
+            <CompletionRateStatics completionRate={formatNumber(completionRate)} />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <DailyConsistency />
+          <StatisticsChart />
+        </div>
+      </>
+    )}
+  </div>
+);
+
 }
 
 export default Statistics

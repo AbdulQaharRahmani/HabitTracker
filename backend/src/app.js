@@ -11,7 +11,10 @@ import categoryRoutes from './routes/categories.js';
 import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
+import helmet from 'helmet';
 import { logMiddleware } from './middleware/logger.js';
+import { privateLimiter, publicLimiter } from './middleware/rateLimiter.js';
+import { sanitizeKeys } from './middleware/sanitizer.js';
 
 const app = express();
 
@@ -27,6 +30,17 @@ app.use(
 );
 
 app.use(cookieParser());
+app.use((req, res, next) => {
+  req.body = sanitizeKeys(req.body);
+  req.params = sanitizeKeys(req.params);
+  next();
+});
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
 app.use(logMiddleware);
 //#endregion
 
@@ -40,16 +54,16 @@ app.get('/api/health', (req, res) => {
 
 // Public routes
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', publicLimiter, authRoutes);
 
 // Protect routes
 
-app.use('/api/categories', authMiddleware, categoryRoutes);
-app.use('/api/habits', authMiddleware, habitRoutes);
-app.use('/api/tasks', authMiddleware, taskRoutes);
-app.use('/api/users', authMiddleware, userRoutes);
-app.use('/api/logs', authMiddleware, logRoutes);
-app.use('/api/offline-data', authMiddleware, syncRoutes);
+app.use('/api/categories', authMiddleware, privateLimiter, categoryRoutes);
+app.use('/api/habits', authMiddleware, privateLimiter, habitRoutes);
+app.use('/api/tasks', authMiddleware, privateLimiter, taskRoutes);
+app.use('/api/users', authMiddleware, privateLimiter, userRoutes);
+app.use('/api/offline-data', authMiddleware, privateLimiter, syncRoutes);
+app.use('/api/logs', authMiddleware, privateLimiter, logRoutes);
 
 //#endregion
 
