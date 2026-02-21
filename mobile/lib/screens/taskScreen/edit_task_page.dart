@@ -4,6 +4,7 @@ import '../../services/taskpage_api/category_api.dart';
 import '../../services/taskpage_api/tasks_api.dart';
 import '../../utils/taskpage_components/tasks_model.dart';
 import '../../utils/category/category_model.dart';
+import '../../utils/date_validator.dart';
 import '../../services/token_storage.dart';
 
 class EditTaskPage extends StatefulWidget {
@@ -105,7 +106,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: _dueDate ?? DateTime.now(),
-      firstDate: DateTime(2020),
+      firstDate: DateValidator.getEarliestAllowedDate(),
       lastDate: DateTime(2100),
     );
 

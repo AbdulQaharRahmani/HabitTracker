@@ -3,24 +3,15 @@ import 'package:http/http.dart' as http;
 
 import '../../utils/category/category_model.dart';
 import '../token_storage.dart';
+import '../http_client.dart';
 
 class CategoryApiService {
   static const String baseUrl =
       'https://habit-tracker-17sr.onrender.com/api';
 
-  /// Fetch all categories for the logged-in user
+  /// Fetch all categories for the logged-in user - with auto-refresh
   Future<List<CategoryModel>> fetchCategories({String? token}) async {
-    final authToken = token ?? await AuthManager.getToken();
-    if (authToken == null) {
-      throw Exception('Auth token not found');
-    }
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/categories'),
-      headers: {
-        'Authorization': 'Bearer $authToken',
-      },
-    );
+    final response = await AuthenticatedHttpClient.get('/categories');
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
@@ -32,20 +23,11 @@ class CategoryApiService {
     }
   }
 
-  /// Create a new category
+  /// Create a new category - with auto-refresh
   Future<CategoryModel> createCategory(
       CreateCategoryModel category) async {
-    final token = await AuthManager.getToken();
-    if (token == null) {
-      throw Exception('Auth token not found');
-    }
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/categories'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+    final response = await AuthenticatedHttpClient.post(
+      '/categories',
       body: jsonEncode(category.toJson()),
     );
 

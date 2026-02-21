@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:habit_tracker/services/token_storage.dart';
 import 'package:http/http.dart' as http;
 
-
+import 'http_client.dart';
 import '../screens/habitScreen/add_habit.dart';
 import '../utils/profile/profile_model.dart';
 import '../utils/today_progressBar/task_item.dart';
@@ -67,10 +67,16 @@ class AuthService {
       if (res.statusCode == 200 && data['success'] == true) {
         final userData = data['data'];
 
-        // 🔑 Token
-        final token = userData['token'];
+        // 🔑 Access Token
+        final token = userData['token'] ?? userData['accessToken'];
         if (token != null && token.toString().isNotEmpty) {
           await AuthManager.saveToken(token);
+        }
+
+        // 🔑 Refresh Token
+        final refreshToken = userData['refreshToken'];
+        if (refreshToken != null && refreshToken.toString().isNotEmpty) {
+          await AuthManager.saveRefreshToken(refreshToken);
         }
 
         final name = userData['username'];
@@ -121,11 +127,7 @@ class AuthService {
 
   Future<Map<String, dynamic>> getUserProfile() async {
     try {
-      final res = await http.get(
-        Uri.parse("$_api/users/preference"),
-        headers: await _headers(),
-      );
-
+      final res = await AuthenticatedHttpClient.get('/users/preference');
       return jsonDecode(res.body);
     } catch (e) {
       return {'success': false, 'message': 'Failed to fetch user profile: $e'};
@@ -133,11 +135,7 @@ class AuthService {
   }
   Future<Welcome> fetchHabitsDashboard() async {
     try {
-      final headers = await _headers();
-      final res = await http.get(
-        Uri.parse("$_api/habits/dashboard"),
-        headers: headers,
-      );
+      final res = await AuthenticatedHttpClient.get('/habits/dashboard');
 
       if (res.statusCode == 200) {
         final welcome = welcomeFromJson(res.body);
@@ -167,15 +165,16 @@ class AuthService {
   }
 
   // ===========================================================================
-  // TASKS
+  // TASKS (with pagination support)
   // ===========================================================================
 
-  Future<List<TaskItem>> fetchTasks({required DateTime forDate}) async {
+  Future<List<TaskItem>> fetchTasks({
+    required DateTime forDate,
+    int page = 1,
+    int limit = 50,
+  }) async {
     try {
-      final res = await http.get(
-        Uri.parse("$_api/tasks"),
-        headers: await _headers(),
-      );
+      final res = await AuthenticatedHttpClient.get('/tasks?page=$page&limit=$limit');
 
       final body = jsonDecode(res.body);
 
@@ -190,20 +189,48 @@ class AuthService {
     }
   }
 
+  /// Fetch ALL tasks with automatic pagination
+  Future<List<TaskItem>> fetchAllTasks({required DateTime forDate}) async {
+    final List<TaskItem> allTasks = [];
+    int page = 1;
+    const int limit = 50;
+    bool hasMore = true;
+
+    try {
+      while (hasMore) {
+        final tasks = await fetchTasks(forDate: forDate, page: page, limit: limit);
+
+        if (tasks.isEmpty) {
+          hasMore = false;
+        } else {
+          allTasks.addAll(tasks);
+          if (tasks.length < limit) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        }
+      }
+      return allTasks;
+    } catch (e) {
+      debugPrint('Error fetching all tasks: $e');
+      return allTasks;
+    }
+  }
+
   // ===========================================================================
-  // HABITS
+  // HABITS (with pagination support)
   // ===========================================================================
 
-  Future<List<TaskItem>> fetchHabits({required DateTime forDate}) async {
+  Future<List<TaskItem>> fetchHabits({
+    required DateTime forDate,
+    int page = 1,
+    int limit = 50,
+  }) async {
     try {
       final date = _formatDate(forDate);
 
-      final res = await http.get(
-        Uri.parse("$_api/habits/date?date=$date"),
-        headers: await _headers(),
-      );
-    print('backend response is : $res');
-    print(res.body);
+      final res = await AuthenticatedHttpClient.get('/habits/date?date=$date&page=$page&limit=$limit');
 
       final body = jsonDecode(res.body);
 
@@ -218,12 +245,38 @@ class AuthService {
     }
   }
 
+  /// Fetch ALL habits with automatic pagination
+  Future<List<TaskItem>> fetchAllHabits({required DateTime forDate}) async {
+    final List<TaskItem> allHabits = [];
+    int page = 1;
+    const int limit = 50;
+    bool hasMore = true;
+
+    try {
+      while (hasMore) {
+        final habits = await fetchHabits(forDate: forDate, page: page, limit: limit);
+
+        if (habits.isEmpty) {
+          hasMore = false;
+        } else {
+          allHabits.addAll(habits);
+          if (habits.length < limit) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        }
+      }
+      return allHabits;
+    } catch (e) {
+      debugPrint('Error fetching all habits: $e');
+      return allHabits;
+    }
+  }
+
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      final res = await http.get(
-        Uri.parse("$_api/categories"),
-        headers: await _headers(),
-      );
+      final res = await AuthenticatedHttpClient.get('/categories');
 
       final data = jsonDecode(res.body);
       return (data['data'] as List)
@@ -241,9 +294,8 @@ class AuthService {
     required String categoryId,
   }) async {
     try {
-      final res = await http.post(
-        Uri.parse("$_api/habits"),
-        headers: await _headers(),
+      final res = await AuthenticatedHttpClient.post(
+        '/habits',
         body: jsonEncode({
           "title": title,
           "description": description,
@@ -266,16 +318,19 @@ class AuthService {
     required TaskItem item,
     required DateTime forDate,
   }) async {
-    final headers = await _headers();
-
     if (item.sourceType == 'habit') {
       final date = _formatDate(forDate);
-      final url = Uri.parse("$_api/habits/${item.id}/complete");
 
       try {
         final res = item.done
-            ? await http.post(url, headers: headers, body: jsonEncode({"date": date}))
-            : await http.delete(url, headers: headers, body: jsonEncode({"date": date}));
+            ? await AuthenticatedHttpClient.post(
+                '/habits/${item.id}/complete',
+                body: jsonEncode({"date": date}),
+              )
+            : await AuthenticatedHttpClient.delete(
+                '/habits/${item.id}/complete',
+                body: jsonEncode({"date": date}),
+              );
 
         if (res.statusCode == 200 || res.statusCode == 201) {
           final body = jsonDecode(res.body);
@@ -289,9 +344,8 @@ class AuthService {
     }
 
     try {
-      final res = await http.patch(
-        Uri.parse("$_api/tasks/${item.id}/status"),
-        headers: headers,
+      final res = await AuthenticatedHttpClient.patch(
+        '/tasks/${item.id}/status',
         body: jsonEncode({"done": item.done}),
       );
 

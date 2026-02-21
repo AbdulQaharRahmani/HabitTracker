@@ -4,7 +4,9 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../app/app_theme.dart';
 import '../../services/auth_service.dart';
+import '../../services/app_state.dart';
 import '../../utils/profile/profile_model.dart'; // contains Welcome, HabitsData, UserData, TaskItem
+import '../../utils/date_validator.dart';
 import '../../features/routes.dart'; // if needed for named routes (optional)
 import '../profileScreen/profile_screen.dart'; // ProfileScreen import
 
@@ -24,6 +26,7 @@ class TodayScreen extends StatefulWidget {
 
 class _TodayScreenState extends State<TodayScreen> {
   final AuthService _api = AuthService();
+  final AppState _appState = AppState();
 
   bool get _isToday => DateUtils.isSameDay(selectedDate, DateTime.now());
 
@@ -56,6 +59,9 @@ class _TodayScreenState extends State<TodayScreen> {
     });
 
     _loadAllData(selectedDate);
+
+    // Preload profile data in background
+    _appState.preloadProfileData();
   }
 
   List<DateTime> _buildDateRange(DateTime start) {
@@ -107,9 +113,16 @@ class _TodayScreenState extends State<TodayScreen> {
     });
 
     try {
-      // Load daily content
-      final tasks = await _api.fetchTasks(forDate: date);
-      final habits = await _api.fetchHabits(forDate: date);
+      // Load daily content with pagination (fetch ALL items)
+      final results = await Future.wait([
+        _api.fetchAllTasks(forDate: date),
+        _api.fetchAllHabits(forDate: date),
+        _api.fetchHabitsDashboard(),
+      ]);
+
+      final tasks = results[0] as List<TaskItem>;
+      final habits = results[1] as List<TaskItem>;
+      final welcome = results[2] as Welcome;
 
       final itemsTasks = tasks.where((t) => t.appliesToDate(date)).toList();
       final itemsHabits = habits; // adjust filtering if needed
@@ -127,9 +140,6 @@ class _TodayScreenState extends State<TodayScreen> {
         (habitSections[key] ??= []).add(h);
       }
 
-      // Load global dashboard stats (independent of selected date)
-      final welcome = await _api.fetchHabitsDashboard();
-
       setState(() {
         _taskSections = taskSections;
         _habitSections = habitSections;
@@ -146,14 +156,9 @@ class _TodayScreenState extends State<TodayScreen> {
   }
 
   Future<void> _toggleDone(TaskItem item) async {
-    if (!_isToday) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You can only complete habits for today'),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
-        ),
-      );
+    // Validate date range (last 7 days to today)
+    if (!DateValidator.isDateInAllowedRange(selectedDate)) {
+      DateValidator.showDateError(context, selectedDate);
       return;
     }
 
