@@ -27,6 +27,7 @@ import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
 
 function App() {
   const isAuthLoading = useAuthStore((state) => state.isAuthLoading)
+  const[initialLoading, setInitialLoading] = useState(true)
   const login = useAuthStore((state) => state.login)
   const logout = useAuthStore((state) => state.logout)
   useEffect(() => {
@@ -41,17 +42,15 @@ function App() {
         logout()
       } finally {
         useAuthStore.setState({ isAuthLoading: false })
+        setInitialLoading(false)
 
       }
     }
     getAccessToken()
   }, [])
-
-  if (isAuthLoading) {
-    return (
-      <div>
-        Loading...
-      </div>
+  if(initialLoading){
+    return(
+      <div>Loadig session....</div>
     )
   }
   return (
