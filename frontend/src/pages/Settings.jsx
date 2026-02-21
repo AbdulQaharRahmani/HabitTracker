@@ -7,12 +7,13 @@ import { useDebounce } from "../hooks/useDebounce";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import useSettingStore from "../store/useSettingStore";
+import LanguageSwitcher from "../components/internationalization"
 
 const Settings = () => {
   const { t } = useTranslation();
   const { setTheme } = useTheme();
 
-  const { preferences, fetchUserPreferences, updateUserPrefrences } =
+  const { preferences, fetchUserPreferences, updateUserPrefrences ,loading, error} =
     useProfilePhotoStore();
 
   const {
@@ -62,7 +63,6 @@ const Settings = () => {
     }
   }, [debouncedPrefs]);
 
-  if (!localPrefs) return null;
 
   const handleUsernameBlur = async () => {
     if (!username.trim() || username === authUsername) return;
@@ -84,6 +84,15 @@ const Settings = () => {
       toast.error(t("Failed to change password"));
     }
   };
+
+
+  {loading && (
+  <div className="animate-pulse space-y-6 mt-6">
+    <div className="h-32 bg-gray-200 rounded-xl"></div>
+    <div className="h-40 bg-gray-200 rounded-xl"></div>
+    <div className="h-40 bg-gray-200 rounded-xl"></div>
+  </div>
+)}
 
   return (
     <div className="min-h-screen p-6 font-sans transition-colors duration-200 bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">
@@ -293,6 +302,23 @@ const Settings = () => {
                   <option value="thursday">Thursday</option>
                   <option value="friday">Friday</option>
                 </select>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-slate-800 dark:text-gray-200">
+                    {t("Language")}
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-gray-400">
+                    {t("Select your preferred Language")}.
+                  </p>
+                </div>
+                <div className=" py-2">
+                  <div
+                  >
+                    <LanguageSwitcher />
+                  </div>
+                </div>
               </div>
             </div>
           </section>

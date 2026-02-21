@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 import '../../utils/setting_utils/setting_card.dart';
 import '../../utils/setting_utils/setting_header.dart';
 import '../../utils/setting_utils/setting_items.dart';
@@ -19,6 +21,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -41,11 +44,14 @@ class _SettingScreenState extends State<SettingScreen> {
                     const SettingSection(title: "General"),
                     SettingCard(
                       children: [
-                        SettingNavItem(
+                        SettingSwitchItem(
                           icon: Icons.dark_mode,
                           color: Colors.blue,
-                          title: "Appearance",
-                          subtitle: "Dark System",
+                          title: "Dark Mode",
+                          value: themeProvider.isDarkMode,
+                          onChanged: (value) {
+                            themeProvider.toggleTheme();
+                          },
                         ),
                         SettingNavItem(
                           icon: Icons.calendar_today,

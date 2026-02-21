@@ -158,14 +158,34 @@
   "Monthly": "Monthly",
   "Yearly": "Yearly",
   "loading_chart": "Loading chart data...",
-      "page": "Page",
-    "of": "of",
-    "Top devices": "Top Devices",
-     "Logs Statistics": "Logs Statistics",
-     "Top Routes": "Top Routes",
-     "Sessions": "Sessions",
-     "Calls": "Calls"  ,
-    "Loading statistics": "Loading Statistics..."
+
+  "image_invalid_file":"Please select a valid image file!",
+  "profile_photo_updated":"Profile photo updated successfully!",
+  "profile_photo_update_failed":"Failed to update profile photo. Please try again.",
+  "page": "Page",
+  "of": "of",
+  "Top devices": "Top Devices",
+  "Logs Statistics": "Logs Statistics",
+  "Top Routes": "Top Routes",
+  "Sessions": "Sessions",
+  "Calls": "Calls"  ,
+  "Loading statistics": "Loading Statistics...",
 
 
+  "habit_completed":"Habit marked as complete!",
+  "habit_incomplete":"Habit marked as incomplete!",
+  "habit_update_failed":"Habit update failed — please retry.",
+
+  "Language": "Language",
+  "Select your preferred Language": "Select your preferred Language"
+
+  "delete_task": "Delete Task",
+  "delete_task_description": "Are you sure you want to delete this task?",
+  "delete_habit": "Delete Habit",
+  "delete_habit_description": "Are you sure you want to delete this habit?",
+  "delete_confirmText": "Delete",
+  "logout_title": "Logout",
+  "logout_description": "Are you sure you want to logout?",
+  "logout_confirmText": "Confirm",
+  "cancel": "Cancel"
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/services/auth_service.dart';
+import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
 import '../../features/routes.dart';
+import '../../providers/theme_provider.dart';
 import '../../services/token_storage.dart'; // ← AuthManager
 import '../../utils/profile/profile_model.dart';
 
@@ -30,10 +32,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadProfileData() async {
     try {
-      // 1. نام را مستقیم از SharedPreferences می‌گیریم (اولویت اصلی)
       final savedName = await AuthManager.getUserName();
 
-      // 2. بقیه اطلاعات پروفایل و داشبورد از API
       final welcome = await _api.fetchHabitsDashboard();
       final profileRes = await _api.getUserProfile();
 
@@ -52,11 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         loading = false;
       });
-
-      debugPrint('Profile loaded → name: $displayName, habits: ${habitsData?.toJson()}');
     } catch (e) {
-      debugPrint('Profile load error: $e');
-
       final fallbackName = await AuthManager.getUserName();
       setState(() {
         displayName = fallbackName ?? 'Habit Tracker User';
@@ -67,6 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     if (loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -109,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         width: 3.w,
                       ),
                     ),
-                    child: Icon(Icons.camera_alt, size: 18.r, color: Colors.white),
+                    child: Icon(Icons.camera_alt, size: 18.r, color: AppTheme.textWhite),
                   ),
                 ),
               ],
@@ -117,12 +114,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             SizedBox(height: 16.h),
 
-            // Name ── حالا از SharedPreferences اولویت دارد
+            // Name
             Text(
               displayName,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 24.sp,
+                color: AppTheme.textPrimary,
               ),
             ),
 
@@ -159,11 +157,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(16.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: AppTheme.shadow,
                     blurRadius: 12.r,
                     offset: Offset(0, 6.h),
                   ),
@@ -182,13 +180,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     label: 'Current Streak',
                     value: '${habitsData?.currentStreak ?? 0}d',
                     icon: Icons.local_fire_department,
-                    color: Colors.orange,
+                    color: AppTheme.warning,
                   ),
                   _buildStat(
                     label: 'Completion Rate',
                     value: '${habitsData?.completionRate ?? 0}%',
                     icon: Icons.check_circle_outline,
-                    color: Colors.green,
+                    color: AppTheme.success,
                   ),
                 ],
               ),
@@ -201,11 +199,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: AppTheme.shadow,
                       blurRadius: 12.r,
                       offset: Offset(0, 6.h),
                     ),
@@ -219,6 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 18.sp,
+                        color: AppTheme.textPrimary,
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -257,12 +256,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         (route) => false,
                   );
                 },
-                icon: Icon(Icons.logout, size: 20.sp),
-                label: Text('Logout', style: TextStyle(fontSize: 16.sp)),
+                icon: Icon(Icons.logout, size: 20.sp, color: AppTheme.error),
+                label: Text('Logout', style: TextStyle(fontSize: 16.sp, color: AppTheme.error)),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
+                  foregroundColor: AppTheme.error,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
-                  side: BorderSide(color: Colors.red.withOpacity(0.3)),
+                  side: BorderSide(color: AppTheme.error.withOpacity(0.3)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
                   ),
