@@ -7,6 +7,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import useSettingStore from "../store/useSettingStore";
+import LanguageSwitcher from "../components/internationalization"
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -310,6 +311,23 @@ const Settings = () => {
                   <option value="thursday">Thursday</option>
                   <option value="friday">Friday</option>
                 </select>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-slate-800 dark:text-gray-200">
+                    {t("Language")}
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-gray-400">
+                    {t("Select your preferred Language")}.
+                  </p>
+                </div>
+                <div className=" py-2">
+                  <div
+                  >
+                    <LanguageSwitcher />
+                  </div>
+                </div>
               </div>
             </div>
           </section>

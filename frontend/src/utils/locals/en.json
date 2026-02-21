@@ -174,5 +174,17 @@
   "habit_completed": "Habit marked as complete!",
   "habit_incomplete": "Habit marked as incomplete!",
   "habit_update_failed": "Habit update failed — please retry.",
-  "User Name": "username"
+
+  "Language": "Language",
+  "Select your preferred Language": "Select your preferred Language",
+
+  "delete_task": "Delete Task",
+  "delete_task_description": "Are you sure you want to delete this task?",
+  "delete_habit": "Delete Habit",
+  "delete_habit_description": "Are you sure you want to delete this habit?",
+  "delete_confirmText": "Delete",
+  "logout_title": "Logout",
+  "logout_description": "Are you sure you want to logout?",
+  "logout_confirmText": "Confirm",
+  "cancel": "Cancel"
 }

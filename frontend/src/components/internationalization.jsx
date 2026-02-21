@@ -30,29 +30,36 @@ function LanguageSwitcher() {
     languages.find((l) => l.code === i18n.language) || languages[0];
 
   return (
-    <div
-      className="absolute top-3 end-16 z-50 inline-block text-left"
-      ref={dropdownRef}
-    >
+    <div className="relative min-w-[180px]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-[12px] transition-all duration-200
-        bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300
-        dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/10
-        border shadow-sm focus:outline-none"
+        className="
+          w-full flex items-center justify-between
+          px-4 py-2 text-sm
+          transition-all border outline-none
+          bg-slate-50 border-slate-200 rounded-lg
+          dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200
+        "
       >
-        <span className="text-lg leading-none">{current.flag}</span>
-        <span className="text-sm font-medium">{current.label}</span>
+        <div className="flex items-center gap-2">
+          <span>{current.flag}</span>
+          <span>{current.label}</span>
+        </div>
 
-        <span className="text-[10px] font-bold opacity-70 ml-1">
-          {isOpen ? <SlArrowUp /> : <SlArrowDown />}
-        </span>
+        {isOpen ? (
+          <SlArrowUp className="text-xs" />
+        ) : (
+          <SlArrowDown className="text-xs" />
+        )}
       </button>
 
       {isOpen && (
         <div
-          className="absolute top-full mt-2 end-0 w-40 overflow-hidden rounded-[12px] z-50
-          bg-white dark:bg-[#1a1c2e] border border-gray-200 dark:border-white/10 shadow-2xl"
+          className="
+            absolute mt-2 w-full rounded-lg shadow-md z-50
+            bg-white border border-slate-200
+            dark:bg-gray-900 dark:border-gray-700
+          "
         >
           {languages.map((lang) => (
             <button
@@ -61,21 +68,24 @@ function LanguageSwitcher() {
                 i18n.changeLanguage(lang.code);
                 setIsOpen(false);
               }}
-              className={`flex items-center w-full gap-3 px-4 py-3 text-sm transition-colors
+              className={`
+                w-full text-left px-4 py-2 text-sm transition
                 ${
                   i18n.language === lang.code
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10"
-                }`}
+                    ? "bg-indigo-600 text-white"
+                    : "hover:bg-slate-100 dark:hover:bg-gray-800"
+                }
+              `}
             >
-              <span className="text-base">{lang.flag}</span>
-              <span>{lang.label}</span>
+              <span className="mr-2">{lang.flag}</span>
+              {lang.label}
             </button>
           ))}
         </div>
       )}
     </div>
   );
+
 }
 
 export default LanguageSwitcher;
