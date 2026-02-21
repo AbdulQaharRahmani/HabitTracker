@@ -1,9 +1,12 @@
+import {useState} from 'react';
 import { FaRegCircle, FaCircle, FaCheckCircle } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
+import ConfirmationModal from '../modals/ConfirmationModal';
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../utils/formatDate";
 import { CiEdit } from "react-icons/ci";
+
 
 export default function TaskCard({
   title,
@@ -17,6 +20,9 @@ export default function TaskCard({
   const completeTask = useTaskCardStore((state) => state.completeTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
   const openEditModal = useTaskCardStore((s) => s.openEditModal);
+
+  const [isModalOpen,setIsModalOpen]=useState(false);
+  const [isDeleting,setIsDeleting]=useState(false);
 
   const { label, type } = formatDate(dueDate);
   const { t } = useTranslation();
@@ -34,13 +40,27 @@ export default function TaskCard({
     low: "border-l-2 border-gray-300 dark:border-gray-600",
   };
 
-  return (
+  const handleDelete=async()=>{
+    try{
+      setIsDeleting(true);
+      await deleteTask(_id,t);
+      setIsModalOpen(false);
+
+    }catch(err){
+      console.error("Failed to delete task:", err);
+    }finally{
+      setIsDeleting(false);
+    }
+  }
+
+ return (
+  <>
     <div
       className={`
         group bg-white dark:bg-gray-800 rounded-md p-2.5
         transition-all duration-150 shadow-md dark:border-gray-700
         hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm
-        ${priorityBorder[priority] ?? "border-l-2 border-gray-400"}
+        ${priorityBorder[priority] ?? "-l-4  border-l-2 border-gray-400"}
         ${status === "done" ? "opacity-75" : ""}
       `}
     >
@@ -82,7 +102,7 @@ export default function TaskCard({
                 <CiEdit size={16} className="text-gray-400 hover:text-indigo-500 transition-colors" />
               </button>
               <button
-                onClick={() => deleteTask(_id)}
+                onClick={() => setIsModalOpen(true)}
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                 aria-label={t("Delete task")}
               >
@@ -119,5 +139,18 @@ export default function TaskCard({
         </div>
       </div>
     </div>
-  );
-}
+
+
+    <ConfirmationModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      onConfirm={handleDelete}
+      title={t("delete_task")}
+      description={t("delete_task_description")}
+      confirmText={t("delete_confirmText")}
+      type="danger"
+      isLoading={isDeleting}
+    />
+  </>
+)};
+
