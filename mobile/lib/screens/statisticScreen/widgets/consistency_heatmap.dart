@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/app/app_theme.dart';
 import '../data/models/daily_consistency.dart';
 
 class ProfessionalHeatmap extends StatefulWidget {
@@ -41,66 +42,89 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 280,
+      height: 300,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Row for static Column
-          Padding(
-            padding: const EdgeInsets.only(top: 30),
-            child: _buildWeekDays(),
-          ),
-          const SizedBox(width: 12),
-          // PageView for month
           Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: months.length,
-              itemBuilder: (context, index) {
-                final month = months[index];
-                final monthDays = _generateMonth(now.year, month);
-                final weeks = _groupByWeek(monthDays);
+            flex: 6,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Row for static Column
+                Padding(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: _buildWeekDays(),
+                ),
+                const SizedBox(width: 12),
+                // PageView for month
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: months.length,
+                    itemBuilder: (context, index) {
+                      final month = months[index];
+                      final monthDays = _generateMonth(now.year, month);
+                      final weeks = _groupByWeek(monthDays);
 
-                return Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Text(
-                          "${_monthName(month)} ${now.year}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: weeks.map((week) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: cellSpacing+10),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
                               child: Column(
-                                children: week.map((day) => _buildCell(day)).toList(),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      "${_monthName(month)} ${now.year}",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
 
-              },
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: weeks.map((week) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                            right: cellSpacing + 10,
+                                            // left:cellSpacing,
+                                          ),
+                                          child: Column(
+                                            children: week
+                                                .map((day) => _buildCell(day))
+                                                .toList(),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
+
+          Expanded(flex: 1, child: _buildLegend()),
         ],
       ),
     );
@@ -113,8 +137,8 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
     for (int day = 1; day <= daysInMonth; day++) {
       final date = DateTime(year, month, day);
       final existing = widget.data.firstWhere(
-            (d) =>
-        d.date.year == date.year &&
+        (d) =>
+            d.date.year == date.year &&
             d.date.month == date.month &&
             d.date.day == date.day,
         orElse: () => HabitDay(date: date, completed: 0),
@@ -131,9 +155,12 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
     // early month empty days
     int emptyDays = monthDays.first.date.weekday % 7;
     for (int i = 0; i < emptyDays; i++) {
-      currentWeek.add(HabitDay(
+      currentWeek.add(
+        HabitDay(
           date: monthDays.first.date.subtract(Duration(days: emptyDays - i)),
-          completed: -1));
+          completed: -1,
+        ),
+      );
     }
 
     for (var day in monthDays) {
@@ -147,9 +174,12 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
     if (currentWeek.isNotEmpty) {
       //filling empty days
       while (currentWeek.length < 7) {
-        currentWeek.add(HabitDay(
+        currentWeek.add(
+          HabitDay(
             date: currentWeek.last.date.add(const Duration(days: 1)),
-            completed: -1));
+            completed: -1,
+          ),
+        );
       }
       weeks.add(currentWeek);
     }
@@ -158,7 +188,8 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
   }
 
   Widget _buildCell(HabitDay day) {
-    final isToday = day.date.year == now.year &&
+    final isToday =
+        day.date.year == now.year &&
         day.date.month == now.month &&
         day.date.day == now.day;
 
@@ -169,11 +200,13 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
       child: Container(
         width: cellSize,
         height: cellSize,
-        margin: const EdgeInsets.only(bottom: cellSpacing),
+        margin: const EdgeInsets.only(bottom: cellSpacing,left:cellSpacing-4 ),
         decoration: BoxDecoration(
           color: _colorScale(day.completed),
           borderRadius: BorderRadius.circular(5),
-          border: isToday ? Border.all(color: Colors.black26, width: 1.5) : null,
+          border: isToday
+              ? Border.all(color: Colors.black26, width: 1.5)
+              : null,
         ),
       ),
     );
@@ -185,35 +218,76 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
       children: days
           .map(
             (d) => SizedBox(
-          height: cellSize + cellSpacing,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              d,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              height: cellSize + cellSpacing,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  d,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ),
             ),
-          ),
-        ),
-      )
+          )
           .toList(),
     );
   }
 
   Color _colorScale(int value) {
     if (value == -1) return Colors.transparent;
-    if (value == 0) return Colors.grey.shade200;
-    if (value == 1) return Colors.orange.shade200;
-    if (value == 2) return Colors.lightGreen;
-    if (value == 3) return Colors.green;
-    return Colors.green.shade700;
+    if (value == 0) return AppTheme.heatLow;
+    if (value == 1) return AppTheme.heatLow;
+    if (value == 2) return AppTheme.heatMedium;
+    return AppTheme.heatHigh;
   }
 
   String _monthName(int month) {
     const months = [
       '',
-      'Jan', 'Feb', 'Mar', 'Apr', 'May',
-      'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return months[month];
+  }
+
+  Widget _buildLegend() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 0, right: 30, bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          const Text(
+            "Less",
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          const SizedBox(width: 8),
+          ...List.generate(3, (index) {
+            return Container(
+              width: cellSize - 4,
+              height: cellSize - 4,
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              decoration: BoxDecoration(
+                color: _colorScale(index),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            );
+          }),
+          const SizedBox(width: 8),
+          const Text(
+            "More",
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
   }
 }

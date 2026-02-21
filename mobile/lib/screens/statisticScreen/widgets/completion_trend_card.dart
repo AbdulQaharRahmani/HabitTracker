@@ -27,9 +27,11 @@ class CompletionTrendCard extends ConsumerWidget {
       data: chartData,
     );
 
+
     final percentChange = _calculatePercentChange(filter, chartData);
     return _buildCompletionTrend(spots, visibleData, percentChange, filter);
   }
+
 
   /// Builds the main container with header and line chart.
   Widget _buildCompletionTrend(
@@ -41,6 +43,10 @@ class CompletionTrendCard extends ConsumerWidget {
     final now = DateTime.now();
     final todayDate = DateTime(now.year, now.month, now.day);
 
+    final maxValue = chartData.daily.isNotEmpty
+        ? chartData.daily.map((e) => e.completed).reduce((a, b) => a > b ? a : b)
+        : 0;
+    final maxY = maxValue > 0 ? maxValue.toDouble() : 5.0;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -107,13 +113,15 @@ class CompletionTrendCard extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // Line chart.
+
+    // Line chart.
           SizedBox(
             height: 200,
             child: LineChart(
+
               LineChartData(
-                minY: 0,
-                maxY: 100,
+                minY: -0.2,
+                maxY: maxY,
                 gridData: const FlGridData(show: false),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
@@ -230,8 +238,12 @@ class CompletionTrendCard extends ConsumerWidget {
                   LineChartBarData(
                     spots: spots,
                     isCurved: true,
+                    curveSmoothness: 0.3,
+                    isStrokeCapRound: true,
+                    isStrokeJoinRound: true,
+                    preventCurveOverShooting: true,
                     color: const Color(0xFF4F46E5),
-                    barWidth: 4,
+                    barWidth: 2.8,
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
@@ -274,17 +286,17 @@ class CompletionTrendCard extends ConsumerWidget {
                       vertical: 6,
                     ),
                     tooltipMargin: 12,
-                    getTooltipItems: (touchedSpots) {
-                      return touchedSpots.map((spot) {
-                        return LineTooltipItem(
-                          '${spot.y.toInt()} %',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }).toList();
-                    },
+                      getTooltipItems: (touchedSpots) {
+                        return touchedSpots.map((spot) {
+                          return LineTooltipItem(
+                            '${spot.y.toInt()} habits',
+                            const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }).toList();
+                      },
                   ),
                 ),
               ),
