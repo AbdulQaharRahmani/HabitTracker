@@ -17,6 +17,7 @@ export const ERROR_CODES = {
   END_DATE_BEFORE_START_DATE: 'END_DATE_BEFORE_START_DATE',
   INVALID_DATE_FORMAT: 'INVALID_DATE_FORMAT',
   DATE_OUT_OF_RANGE: 'DATE_OUT_OF_RANGE',
+  INVALID_ID: 'INVALID_ID',
 };
 
 export const DAY_MAP = {
@@ -28,3 +29,25 @@ export const DAY_MAP = {
   friday: 5,
   saturday: 6,
 };
+
+export const SENSITIVE_KEYS = new Set([
+  'password',
+  'token',
+  'authorization',
+  'cookie',
+  'refreshToken',
+  'accessToken',
+]);
+
+export const toLogSummary = (log) => ({
+  logId: log.logId,
+  timestamp: log.timestamp,
+  level: log.level,
+  method: log.method,
+  path: log.path,
+  statusCode: log.statusCode,
+  userId: log.userId ?? null,
+  duration: log.duration,
+  clientIp: log.clientIp,
+  userAgent: log.userAgent,
+});

@@ -1,5 +1,10 @@
+import path from 'path';
+import fs from 'fs';
 import { DateHelper } from '../utils/date.js';
 import { getDatesBetween, getTop, readLogsByDate } from '../utils/log.js';
+import { AppError, notFound } from '../utils/error.js';
+import { validate as isUUID } from 'uuid';
+import { ERROR_CODES, toLogSummary } from '../utils/constant.js';
 
 export const getLogs = async (req, res) => {
   const [startDate, endDate] = DateHelper.getStartAndEndOfDate(
@@ -46,7 +51,8 @@ export const getLogs = async (req, res) => {
   const startIndex = (page - 1) * limit;
   const lastIndex = startIndex + limit;
 
-  const paginatedLogs = logs.slice(startIndex, lastIndex);
+  const summaryLogs = logs.map(toLogSummary);
+  const paginatedLogs = summaryLogs.slice(startIndex, lastIndex);
 
   res.status(200).json({
     success: true,
@@ -84,5 +90,44 @@ export const getLogStats = async (req, res) => {
   res.status(200).json({
     success: true,
     data: { stats, topRoutes, topDevices },
+  });
+};
+
+export const getLogById = async (req, res) => {
+  const { id } = req.params;
+  if (!id || !isUUID(id))
+    throw new AppError('Invalid Id', 400, ERROR_CODES.INVALID_ID);
+
+  let result = null;
+
+  const logsDir = path.join(process.cwd(), 'logs');
+
+  const files = fs
+    .readdirSync(logsDir)
+    .filter((file) => file.startsWith('application-'))
+    .sort()
+    .reverse();
+  console.log(files);
+
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(logsDir, file), 'utf-8');
+    const lines = content.split('\n').filter(Boolean);
+
+    for (const line of lines) {
+      const log = JSON.parse(line);
+      if (log.logId === id) {
+        result = log;
+        break;
+      }
+    }
+
+    if (result) break;
+  }
+
+  if (!result) throw notFound('log');
+
+  res.status(200).json({
+    success: true,
+    data: result,
   });
 };
