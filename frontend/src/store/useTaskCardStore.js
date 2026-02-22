@@ -154,7 +154,7 @@ export const useTaskCardStore = create((set, get) => ({
         "Sorry! task deletion failed:",
         error.response?.data || error.message,
       );
-      toast.error(t("Failed to delete task"))
+      toast.error(t("failed_to_delete_task"))
       set({ error: "Failed to delete task" });
     }
   },

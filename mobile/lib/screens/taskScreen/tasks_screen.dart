@@ -1,8 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
+import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 import '../../services/taskpage_api/category_api.dart';
 import '../../services/taskpage_api/tasks_api.dart';
 import '../../utils/category/category_model.dart';
@@ -24,10 +25,7 @@ class _TasksScreenState extends State<TasksScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
-  /// UI filter state
   String? selectedCategoryId;
-
-  /// Backend filter params
   String _searchTerm = '';
 
   final List<Task> _tasks = [];
@@ -103,9 +101,7 @@ class _TasksScreenState extends State<TasksScreen> {
         categoryId: selectedCategoryId,
       );
 
-      final newTasks = data
-          .where((t) => !_tasks.any((old) => old.id == t.id))
-          .toList();
+      final newTasks = data.where((t) => !_tasks.any((old) => old.id == t.id)).toList();
 
       setState(() {
         _tasks.addAll(newTasks);
@@ -120,8 +116,7 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
       _fetchTasks();
     }
   }
@@ -179,7 +174,6 @@ class _TasksScreenState extends State<TasksScreen> {
     if (_token == null) return;
 
     final showLoading = reset && _tasks.isEmpty;
-
     if (showLoading) setState(() => _isLoading = true);
 
     try {
@@ -208,35 +202,29 @@ class _TasksScreenState extends State<TasksScreen> {
 
   List<Task> get _filteredTasks {
     return _tasks.where((task) {
-      final matchCategory =
-          selectedCategoryId == null || task.categoryId == selectedCategoryId;
-      final matchSearch =
-          _searchTerm.isEmpty ||
+      final matchCategory = selectedCategoryId == null || task.categoryId == selectedCategoryId;
+      final matchSearch = _searchTerm.isEmpty ||
           task.title.toLowerCase().contains(_searchTerm.toLowerCase()) ||
-          (task.description?.toLowerCase().contains(
-                _searchTerm.toLowerCase(),
-              ) ??
-              false);
+          (task.description?.toLowerCase().contains(_searchTerm.toLowerCase()) ?? false);
       return matchCategory && matchSearch;
     }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final todoTasks = _filteredTasks
-        .where((task) => task.status != 'done')
-        .toList();
-    final completedTasks = _filteredTasks
-        .where((task) => task.status == 'done')
-        .toList();
+    Provider.of<ThemeProvider>(context);
+    final todoTasks = _filteredTasks.where((task) => task.status != 'done').toList();
+    final completedTasks = _filteredTasks.where((task) => task.status == 'done').toList();
 
     _sortByDueDate(todoTasks);
     _sortByDueDate(completedTasks);
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refreshTasks,
+          color: AppTheme.primary,
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -260,18 +248,14 @@ class _TasksScreenState extends State<TasksScreen> {
                               child: Container(
                                 height: 44,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppTheme.inputBackground,
                                   borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppTheme.border),
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 15,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 15),
                                 child: Row(
                                   children: [
-                                    const Icon(
-                                      Icons.search,
-                                      color: Colors.grey,
-                                    ),
+                                    Icon(Icons.search, color: AppTheme.textMuted),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: TextField(
@@ -280,6 +264,7 @@ class _TasksScreenState extends State<TasksScreen> {
                                           hintText: 'Search tasks .....',
                                           border: InputBorder.none,
                                         ),
+                                        style: TextStyle(color: AppTheme.textPrimary),
                                       ),
                                     ),
                                   ],
@@ -291,55 +276,38 @@ class _TasksScreenState extends State<TasksScreen> {
                               flex: 3,
                               child: ElevatedButton(
                                 style: ButtonStyle(
-                                  padding: const WidgetStatePropertyAll(
-                                    EdgeInsets.only(right: 0, left: 6),
-                                  ),
-                                  fixedSize: const WidgetStatePropertyAll(
-                                    Size(105, 30),
-                                  ),
-                                  backgroundColor: const WidgetStatePropertyAll(
-                                    AppTheme.primary,
-                                  ),
+                                  padding: const WidgetStatePropertyAll(EdgeInsets.only(right: 0, left: 6)),
+                                  fixedSize: const WidgetStatePropertyAll(Size(105, 30)),
+                                  backgroundColor: WidgetStatePropertyAll(AppTheme.primary),
                                   elevation: const WidgetStatePropertyAll(0),
                                   shape: WidgetStatePropertyAll(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   ),
                                 ),
                                 onPressed: () async {
                                   final newTask = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => NewTaskPage(defaultCategoryId:selectedCategoryId,),
-
+                                      builder: (_) => NewTaskPage(defaultCategoryId: selectedCategoryId),
                                     ),
                                   );
                                   if (newTask != null) {
                                     await _refreshTasks();
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Task created successfully!',
-                                        ),
-                                        backgroundColor: Colors.green,
+                                       SnackBar(
+                                        content: Text('Task created successfully!'),
+                                        backgroundColor: AppTheme.success,
                                       ),
                                     );
                                   }
                                 },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                  child: const Row(
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  child: Row(
                                     children: [
                                       Icon(Icons.add, color: Colors.white),
                                       SizedBox(width: 5),
-                                      Text(
-                                        'New Task',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
+                                      Text('New Task', style: TextStyle(color: Colors.white)),
                                     ],
                                   ),
                                 ),
@@ -358,7 +326,7 @@ class _TasksScreenState extends State<TasksScreen> {
               if (_isLoading && _tasks.isEmpty)
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (_, __) => const TasksCardShimmer(),
+                        (_, __) => const TasksCardShimmer(),
                     childCount: 3,
                   ),
                 ),
@@ -369,10 +337,8 @@ class _TasksScreenState extends State<TasksScreen> {
                     padding: const EdgeInsets.only(top: 60),
                     child: Center(
                       child: Text(
-                        selectedCategoryId == null
-                            ? 'No tasks found'
-                            : 'No tasks found for this category',
-                        style: const TextStyle(color: Colors.grey),
+                        selectedCategoryId == null ? 'No tasks found' : 'No tasks found for this category',
+                        style: TextStyle(color: AppTheme.textMuted),
                       ),
                     ),
                   ),
@@ -380,14 +346,12 @@ class _TasksScreenState extends State<TasksScreen> {
 
               if (todoTasks.isNotEmpty) _buildTaskList('TO DO', todoTasks),
 
-              if (completedTasks.isNotEmpty)
-                _buildTaskList('Completed', completedTasks),
+              if (completedTasks.isNotEmpty) _buildTaskList('Completed', completedTasks),
 
               if (_isLoading && _tasks.isNotEmpty)
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (_, __) =>
-                        const TasksCardShimmer(),
+                        (_, __) => const TasksCardShimmer(),
                     childCount: 1,
                   ),
                 ),
@@ -408,17 +372,17 @@ class _TasksScreenState extends State<TasksScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: Text(
               '$title (${tasks.length})',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
             ),
           );
         }
 
         final task = tasks[index - 1];
         return TasksScreenCard(
-            task: task,
-            onStatusChanged: _toggleTaskStatus,
-            onEdit: _editTask,
-            );
+          task: task,
+          onStatusChanged: _toggleTaskStatus,
+          onEdit: _editTask,
+        );
       }, childCount: tasks.length + 1),
     );
   }
@@ -439,15 +403,20 @@ class _TasksScreenState extends State<TasksScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: FilterChip(
               showCheckmark: false,
-              label: Text(isAll ? 'All' : category!.name),
+              label: Text(
+                isAll ? 'All' : category!.name,
+                style: TextStyle(color: isSelected ? AppTheme.textWhite : AppTheme.textPrimary),
+              ),
               selected: isSelected,
               onSelected: (_) {
                 setState(() => selectedCategoryId = category?.id);
                 _applyFilters(reset: true);
               },
-              selectedColor: const Color(0xFF5D5FEF),
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
+              selectedColor: AppTheme.primary,
+              backgroundColor: isSelected ? AppTheme.primary : AppTheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isSelected ? AppTheme.primary : AppTheme.border),
               ),
             ),
           );

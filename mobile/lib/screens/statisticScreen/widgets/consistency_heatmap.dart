@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/app/app_theme.dart';
 
 class ConsistencyHeatmap extends StatelessWidget {
   const ConsistencyHeatmap({super.key});
@@ -8,27 +9,30 @@ class ConsistencyHeatmap extends StatelessWidget {
     return _buildConsistencyHeatmap();
   }
 
-  // ========== Consistency Heatmap ==========
   Widget _buildConsistencyHeatmap() {
     final weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Consistency',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
+          ),
         ),
         const SizedBox(height: 20),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: AppTheme.shadow,
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -44,18 +48,18 @@ class ConsistencyHeatmap extends StatelessWidget {
                   ...weekDays
                       .map(
                         (day) => Expanded(
-                          child: Center(
-                            child: Text(
-                              day,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                      child: Center(
+                        child: Text(
+                          day,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.textSecondary,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      )
+                      ),
+                    ),
+                  )
                       .toList(),
                 ],
               ),
@@ -77,7 +81,7 @@ class ConsistencyHeatmap extends StatelessWidget {
                           'W${weekIndex + 1}',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[500],
+                            color: AppTheme.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -92,25 +96,23 @@ class ConsistencyHeatmap extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                            childAspectRatio: 1,
-                          ),
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 7,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        childAspectRatio: 1,
+                      ),
                       itemCount: 28,
                       itemBuilder: (context, index) {
                         final week = index ~/ 7;
                         final day = index % 7;
 
-                        // Simulate activity data (replace with real data)
                         int activityLevel = 0;
                         if (week == 0 && day < 3) activityLevel = 1;
                         if (week == 1 && day < 5) activityLevel = 2;
                         if (week == 2 && day < 6) activityLevel = 3;
                         if (week == 3 && day < 4) activityLevel = 4;
 
-                        // Special: Today's cell
                         final isToday = (week == 3 && day == 6); // Last cell
 
                         return Container(
@@ -119,22 +121,22 @@ class ConsistencyHeatmap extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                             border: isToday
                                 ? Border.all(
-                                    color: const Color(0xFF4F46E5),
-                                    width: 2,
-                                  )
+                              color: AppTheme.primary,
+                              width: 2,
+                            )
                                 : null,
                           ),
                           child: isToday
                               ? Center(
-                                  child: Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF4F46E5),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                )
+                            child: Container(
+                              width: 6,
+                              height: 6,
+                              decoration:  BoxDecoration(
+                                color: AppTheme.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          )
                               : null,
                         );
                       },
@@ -150,7 +152,7 @@ class ConsistencyHeatmap extends StatelessWidget {
                 children: [
                   Text(
                     'Less',
-                    style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
                   ),
                   const SizedBox(width: 8),
                   ...List.generate(5, (index) {
@@ -167,7 +169,7 @@ class ConsistencyHeatmap extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     'More',
-                    style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
                   ),
                 ],
               ),
@@ -181,17 +183,17 @@ class ConsistencyHeatmap extends StatelessWidget {
   Color _getActivityColor(int level) {
     switch (level) {
       case 0:
-        return const Color(0xFFF3F4F6);
+        return AppTheme.heatEmpty;
       case 1:
-        return const Color(0xFFE0E7FF);
+        return AppTheme.heatLow;
       case 2:
-        return const Color(0xFFC7D2FE);
+        return AppTheme.heatMedium;
       case 3:
-        return const Color(0xFFA5B4FC);
+        return AppTheme.heatHigh;
       case 4:
-        return const Color(0xFF818CF8);
+        return AppTheme.primary;
       default:
-        return const Color(0xFF4F46E5);
+        return AppTheme.primary;
     }
   }
 }

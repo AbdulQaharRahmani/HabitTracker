@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 Widget dailyGoalCard({
   required int completed,
   required int total,
@@ -26,7 +28,7 @@ Widget dailyGoalCard({
           value: progress,
           minHeight: 10.h,
           backgroundColor: AppTheme.textWhite,
-          valueColor: const AlwaysStoppedAnimation(
+          valueColor:  AlwaysStoppedAnimation(
             AppTheme.primary,
           ),
         ),

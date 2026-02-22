@@ -25,7 +25,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
   // ===== UI State =====
   bool _isLoading = false;
-  bool _isTokenLoading = true; // Used only for token fetch
+  bool _isTokenLoading = true;
   String? _token;
 
   // ===== Categories =====
@@ -39,7 +39,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
   // ===== Due Date =====
   DateTime? _selectedDueDate;
 
-
   @override
   void initState() {
     super.initState();
@@ -47,7 +46,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
     _loadTokenAndCategories();
   }
 
-  /// Load token and fetch categories from server
   Future<void> _loadTokenAndCategories() async {
     try {
       final token = await AuthManager.getToken();
@@ -66,12 +64,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
     } catch (e) {
       setState(() => _isTokenLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching categories: $e')),
+        SnackBar(
+          content: Text('Error fetching categories: $e'),
+          backgroundColor: AppTheme.error,
+        ),
       );
     }
   }
 
-  /// Create a new task on server
   Future<void> _createTask() async {
     if (_token == null || _selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +96,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
         priority: _selectedPriority,
         categoryId: _selectedCategoryId!,
         token: _token,
-        dueDate: _selectedDueDate
+        dueDate: _selectedDueDate,
       );
 
       if (!mounted) return;
@@ -105,13 +105,19 @@ class _NewTaskPageState extends State<NewTaskPage> {
         Navigator.pop(context, res['data']);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(res['error'] ?? 'Failed to create task')),
+          SnackBar(
+            content: Text(res['error'] ?? 'Failed to create task'),
+            backgroundColor: AppTheme.error,
+          ),
         );
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error creating task: $e')),
+        SnackBar(
+          content: Text('Error creating task: $e'),
+          backgroundColor: AppTheme.error,
+        ),
       );
     } finally {
       if (!mounted) return;
@@ -119,7 +125,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
     }
   }
 
-  /// Handle creation of new category
   Future<void> _handleNewCategory(CreateCategoryModel model) async {
     try {
       setState(() => _isLoading = true);
@@ -132,21 +137,23 @@ class _NewTaskPageState extends State<NewTaskPage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+       SnackBar(
           content: Text('Category created successfully!'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.success,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error creating category: $e')),
+        SnackBar(
+          content: Text('Error creating category: $e'),
+          backgroundColor: AppTheme.error,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  /// ===== Pick Due Date & Time =====
   Future<void> _pickDueDate() async {
     final date = await showDatePicker(
       context: context,
@@ -173,17 +180,17 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ===== Build the entire form immediately =====
     return Scaffold(
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
         backgroundColor: AppTheme.surface,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Create New Task',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
         ),
+        iconTheme: IconThemeData(color: AppTheme.textPrimary),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -201,7 +208,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
             const SizedBox(height: 20),
             _buildLabel('Category'),
 
-            // ===== Only category dropdown shows loading if needed =====
             _isTokenLoading || _categories.isEmpty
                 ? const SizedBox(
               height: 44,
@@ -217,9 +223,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 height: 44,
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.inputBackground,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: AppTheme.border),
                 ),
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -227,7 +233,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                       ? '${_selectedDueDate!.year}-${_selectedDueDate!.month.toString().padLeft(2,'0')}-${_selectedDueDate!.day.toString().padLeft(2,'0')} '
                       '${_selectedDueDate!.hour.toString().padLeft(2,'0')}:${_selectedDueDate!.minute.toString().padLeft(2,'0')}'
                       : 'Select due date & time',
-                  style: const TextStyle(color: Colors.black87),
+                  style: TextStyle(color: AppTheme.textPrimary),
                 ),
               ),
             ),
@@ -245,12 +251,12 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
+                    : Text(
                   'Create Task',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.surface,
+                    color: AppTheme.textWhite,
                   ),
                 ),
               ),
@@ -261,12 +267,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
     );
   }
 
-  // ===== UI Helpers =====
   Widget _buildLabel(String text) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: AppTheme.textPrimary,
@@ -280,51 +285,56 @@ class _NewTaskPageState extends State<NewTaskPage> {
         maxLines: maxLines,
         decoration: InputDecoration(
           hintText: hint,
+          hintStyle: TextStyle(color: AppTheme.textMuted),
           filled: true,
-          fillColor: const Color(0xfff3f4f6),
+          fillColor: AppTheme.inputBackground,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
         ),
+        style: TextStyle(color: AppTheme.textPrimary),
       );
 
   Widget _buildPriorityDropdown() => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12),
     decoration: BoxDecoration(
-      color: AppTheme.background,
+      color: AppTheme.inputBackground,
       borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: AppTheme.border),
     ),
     child: DropdownButtonHideUnderline(
       child: DropdownButton<String>(
         value: _selectedPriority,
         isExpanded: true,
         items: _priorities
-            .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+            .map((p) => DropdownMenuItem(value: p, child: Text(p, style: TextStyle(color: AppTheme.textPrimary))))
             .toList(),
         onChanged: (val) => setState(() => _selectedPriority = val!),
+        dropdownColor: AppTheme.surface,
+        icon: Icon(Icons.arrow_drop_down, color: AppTheme.textSecondary),
       ),
     ),
   );
 
   Widget _buildCategoryDropdown() {
     if (_categories.isEmpty) {
-      return const Text('No categories available', style: TextStyle(color: Colors.grey));
+      return Text('No categories available', style: TextStyle(color: AppTheme.textMuted));
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.inputBackground,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppTheme.border, width: 1),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedCategoryId,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-          dropdownColor: Colors.white,
+          icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.textSecondary),
+          dropdownColor: AppTheme.surface,
           borderRadius: BorderRadius.circular(16),
           items: [
             ..._categories.map((cat) => DropdownMenuItem<String>(
@@ -345,26 +355,26 @@ class _NewTaskPageState extends State<NewTaskPage> {
                         ),
                       ],
                     ),
-                    child: Icon(cat.icon, color: Colors.white, size: 18),
+                    child: Icon(cat.icon, color: AppTheme.textWhite, size: 18),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       cat.name,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: AppTheme.textPrimary),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
             )),
-            const DropdownMenuItem<String>(
+             DropdownMenuItem<String>(
               value: 'add_new',
               child: Row(
                 children: [
-                  Icon(Icons.add_circle_outline_rounded, color: Colors.blue),
+                  Icon(Icons.add_circle_outline_rounded, color: AppTheme.primary),
                   SizedBox(width: 10),
-                  Text('Add new category', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.blue)),
+                  Text('Add new category', style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primary)),
                 ],
               ),
             ),

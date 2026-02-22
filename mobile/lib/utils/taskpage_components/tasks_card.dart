@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 import 'tasks_model.dart';
 
 class TasksScreenCard extends StatelessWidget {
@@ -16,13 +18,15 @@ class TasksScreenCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
+
     final done = task.isDone;
     final category = task.category;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(21, 0, 21, 10),
       elevation: 0,
-      color: done ? Colors.grey.shade300 : AppTheme.surface,
+      color: done ? AppTheme.textMuted.withOpacity(0.2) : AppTheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -33,12 +37,12 @@ class TasksScreenCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: category?.backgroundColor ?? Colors.blue,
+                color: category?.backgroundColor ?? AppTheme.primary,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 category?.icon ?? Icons.task_alt_sharp,
-                color: Colors.white,
+                color: AppTheme.textWhite,
                 size: 22,
               ),
             ),
@@ -56,36 +60,32 @@ class TasksScreenCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: done ? Colors.grey : Colors.black,
+                      color: done ? AppTheme.textMuted : AppTheme.textPrimary,
                       decoration: done ? TextDecoration.lineThrough : null,
                     ),
                   ),
                   const SizedBox(height: 4),
-
+                  if (task.description != null && task.description!.isNotEmpty)
                     Text(
                       task.description!,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
-                        color: done ? Colors.grey : Colors.black54,
+                        color: done ? AppTheme.textMuted : AppTheme.textSecondary,
                         decoration: done ? TextDecoration.lineThrough : null,
                       ),
                     ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: task.category!.backgroundColor.withValues(
-                          alpha: 0.5),
+                      color: task.category?.backgroundColor.withOpacity(0.5) ?? AppTheme.primary.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       ' ${task.priority.toUpperCase()}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -98,11 +98,7 @@ class TasksScreenCard extends StatelessWidget {
                   if (task.dueDate != null)
                     Row(
                       children: [
-                        const Icon(
-                          Icons.access_time,
-                          size: 18,
-                          color: Colors.grey,
-                        ),
+                        Icon(Icons.access_time, size: 18, color: AppTheme.textMuted),
                         const SizedBox(width: 4),
                         Text(
                           _formatDueDate(task.dueDate!),
@@ -124,15 +120,13 @@ class TasksScreenCard extends StatelessWidget {
                 IconButton(
                   icon: Icon(
                     done ? Icons.check_circle : Icons.radio_button_unchecked,
-                    color: done ? Colors.green : Colors.grey,
+                    color: done ? AppTheme.success : AppTheme.textMuted,
                   ),
-                  onPressed: onStatusChanged != null
-                      ? () => onStatusChanged!(task)
-                      : null,
+                  onPressed: onStatusChanged != null ? () => onStatusChanged!(task) : null,
                 ),
                 if (onEdit != null)
                   IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.black54),
+                    icon: Icon(Icons.edit, color: AppTheme.textSecondary),
                     onPressed: () => onEdit!(task),
                   ),
               ],
@@ -143,39 +137,21 @@ class TasksScreenCard extends StatelessWidget {
     );
   }
 
-  // ===== Helper Methods =====
   String _formatDueDate(DateTime dueDate) {
     return '${dueDate.year.toString().padLeft(2, '0')} '
         '${_monthName(dueDate.month)} ${dueDate.day}, '
-        '${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute
-        .toString()
-        .padLeft(2, '0')}';
+        '${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute.toString().padLeft(2, '0')}';
   }
 
   String _monthName(int month) {
-    const names = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return names[month - 1];
   }
 
   Color _dueDateColor(DateTime dueDate) {
     final now = DateTime.now();
-    if (dueDate.isBefore(now)) return Colors.grey;
-    if (dueDate
-        .difference(now)
-        .inHours <= 24) return Colors.orange;
-    return Colors.grey[700]!;
+    if (dueDate.isBefore(now)) return AppTheme.textMuted;
+    if (dueDate.difference(now).inHours <= 24) return AppTheme.warning;
+    return AppTheme.textSecondary;
   }
 }

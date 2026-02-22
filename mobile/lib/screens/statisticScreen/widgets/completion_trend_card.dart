@@ -10,7 +10,6 @@ class CompletionTrendCard extends StatelessWidget {
     return _buildCompletionTrend();
   }
 
-  // ========== Completion Trend Chart ==========
   Widget _buildCompletionTrend() {
     return Container(
       width: double.infinity,
@@ -20,7 +19,7 @@ class CompletionTrendCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadow,
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -37,13 +36,20 @@ class CompletionTrendCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Completion Trend',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                   Text(
                     'Consistency over last 30 days',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textMuted,
+                    ),
                   ),
                 ],
               ),
@@ -53,14 +59,14 @@ class CompletionTrendCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.success.withValues(alpha: 0.1),
+                  color: AppTheme.success.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.trending_up,
-                      color:  AppTheme.success,
+                      color: AppTheme.success,
                       size: 16,
                     ),
                     const SizedBox(width: 4),
@@ -69,7 +75,7 @@ class CompletionTrendCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF10B981),
+                        color: AppTheme.success,
                       ),
                     ),
                   ],
@@ -108,7 +114,7 @@ class CompletionTrendCard extends StatelessWidget {
                               dates[index],
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Colors.grey[500],
+                                color: AppTheme.textMuted,
                               ),
                             ),
                           );
@@ -131,15 +137,15 @@ class CompletionTrendCard extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: [
-                      const FlSpot(0, 0),
-                      const FlSpot(1, 60),
-                      const FlSpot(2, 20),
-                      const FlSpot(3, 60),
-                      const FlSpot(4, 93),
+                    spots: const [
+                      FlSpot(0, 0),
+                      FlSpot(1, 60),
+                      FlSpot(2, 20),
+                      FlSpot(3, 60),
+                      FlSpot(4, 93),
                     ],
                     isCurved: true,
-                    color: const Color(0xFF4F46E5),
+                    color: AppTheme.chartLine,
                     barWidth: 4,
                     belowBarData: BarAreaData(
                       show: true,
@@ -147,9 +153,8 @@ class CompletionTrendCard extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xFF4F46E5).withValues(alpha: 0.3),
-
-                          Color(0xFF4F46E5).withValues(alpha: 0.0),
+                          AppTheme.chartFillTop,
+                          AppTheme.chartFillBottom,
                         ],
                       ),
                     ),
@@ -159,9 +164,9 @@ class CompletionTrendCard extends StatelessWidget {
                         if (index == barData.spots.length - 1) {
                           return FlDotCirclePainter(
                             radius: 3,
-                            color: Color(0xFF4F46E5),
+                            color: AppTheme.chartLine,
                             strokeWidth: 2,
-                            strokeColor: Color(0xFF4F46E5),
+                            strokeColor: AppTheme.chartLine,
                           );
                         }
                         return FlDotCirclePainter(
@@ -175,7 +180,7 @@ class CompletionTrendCard extends StatelessWidget {
                 lineTouchData: LineTouchData(
                   enabled: true,
                   touchTooltipData: LineTouchTooltipData(
-                    tooltipBgColor: Colors.black,
+                    tooltipBgColor: AppTheme.chartTooltipBackground,
                     tooltipRoundedRadius: 8,
                     tooltipPadding: const EdgeInsets.symmetric(
                       horizontal: 8,
