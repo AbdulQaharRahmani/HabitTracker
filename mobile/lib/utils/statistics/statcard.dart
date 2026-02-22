@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/theme_provider.dart';
 
 class StatCard extends StatelessWidget {
   final IconData icon;
@@ -18,12 +21,14 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: AppTheme.shadow,
             blurRadius: 12,
@@ -42,7 +47,7 @@ class StatCard extends StatelessWidget {
           SizedBox(height: 4.h),
           Text(
             title,
-            style: const TextStyle(fontSize: 8, color: AppTheme.textSecondary),
+            style:  TextStyle(fontSize: 8, color: AppTheme.textSecondary),
           ),
         ],
       ),
