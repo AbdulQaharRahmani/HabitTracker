@@ -11,6 +11,7 @@ import {
 } from "../../services/habitService";
 import { formatDate } from "../utils/dateFormatter";
 import { formatStatstics } from "../utils/formatStatistics";
+import i18next from "i18next";
 const useHabitStore = create((set, get) => ({
   searchTerm: "",
   isSearching: false,
@@ -128,15 +129,17 @@ const useHabitStore = create((set, get) => ({
       ),
       habitCompletions: state.habitCompletions + (prevState ? -1 : 1)
     }))
-
     try {
       if (prevState) {
         await unCompleteHabit(id, { date })
+        toast.success(i18next.t("habit_incomplete"));
       } else {
         await completeHabit(id, { date })
+        toast.success(i18next.t("habit_completed"));
       }
     } catch (err) {
       console.log(err)
+      toast.error(err.response.data?.message || "Operation Failed Try Again")
       set(state => ({
         habits: state.habits.map(h =>
           h._id === id ? { ...h, completed: prevState } : h
