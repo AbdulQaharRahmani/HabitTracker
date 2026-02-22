@@ -19,11 +19,12 @@ function Tasks() {
     isEditModalOpen,
     fetchCategories,
     setModalOpen,
-    setTaskData } =
-    useTaskCardStore((state) => state);
+    setTaskData
+  } = useTaskCardStore((state) => state);
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
+
   useEffect(() => {
     fetchTasks(ITEMS_PER_PAGE, page);
   }, [page, isModalOpen, isEditModalOpen, fetchTasks]);
@@ -34,48 +35,74 @@ function Tasks() {
 
   const { t } = useTranslation();
 
-  const groupedTasks = useMemo(() => {
-    return tasks.reduce((acc, task) => {
+  const groupedArray = useMemo(() => {
+    const groups = tasks.reduce((acc, task) => {
       const catId = task.categoryId?._id || "uncategorized";
       const categoryName = task.categoryId?.name || t("Uncategorized");
       const categoryColor = task.categoryId?.backgroundColor || "#6b7280";
 
-
       if (!acc[catId]) {
-        acc[catId] = {
-          id: catId,
-          name: categoryName,
-          color: categoryColor,
-          items: []
-        };
+        acc[catId] = { id: catId, name: categoryName, color: categoryColor, items: [] };
       }
       acc[catId].items.push(task);
       return acc;
     }, {});
+    return Object.values(groups);
   }, [tasks, t]);
 
-const handleAddNewTaskToCategory = (catId) => {
-  console.log("Clicking + for Category ID:", catId);
+  const handleAddNewTaskToCategory = (catId) => {
+    setTaskData("title", "");
+    setTaskData("description", "");
+    setTaskData("dueDate", null);
+    setTaskData("priority", "medium");
+    setTaskData("category", catId === "uncategorized" ? null : catId);
+    setModalOpen(true);
+  };
 
-  setTaskData("title", "");
-  setTaskData("description", "");
-  setTaskData("dueDate", null);
-  setTaskData("priority", "medium");
+  useHotkeys("up, down, left, right", (e) => {
+    const active = document.activeElement;
+    if (!active || !active.hasAttribute('data-task-card')) return;
 
-  setTaskData("category", catId === "uncategorized" ? null : catId);
+    e.preventDefault();
+    const currentId = active.getAttribute('data-id');
 
-  setModalOpen(true);
-};
+    let colIndex = -1;
+    let rowIndex = -1;
 
-    useHotkeys(
-    "ctrl+k, meta+k",
-    (e) => {
-      e.preventDefault();
-        setModalOpen(true);
-      },
-      { enabled: !isModalOpen }
-  );
+    groupedArray.forEach((group, cIdx) => {
+      const rIdx = group.items.findIndex(item => item._id === currentId);
+      if (rIdx !== -1) {
+        colIndex = cIdx;
+        rowIndex = rIdx;
+      }
+    });
 
+    let nextCol = colIndex;
+    let nextRow = rowIndex;
+
+    if (e.key === "ArrowUp") nextRow--;
+    if (e.key === "ArrowDown") nextRow++;
+    if (e.key === "ArrowLeft") nextCol--;
+    if (e.key === "ArrowRight") nextCol++;
+
+    if (nextCol < 0) nextCol = 0;
+    if (nextCol >= groupedArray.length) nextCol = groupedArray.length - 1;
+
+    const targetGroup = groupedArray[nextCol];
+    if (nextRow < 0) nextRow = 0;
+    if (nextRow >= targetGroup.items.length) nextRow = targetGroup.items.length - 1;
+
+    const nextTask = targetGroup.items[nextRow];
+    if (nextTask) {
+      const nextEl = document.querySelector(`[data-id="${nextTask._id}"]`);
+      nextEl?.focus();
+    }
+  }, { enableOnFormTags: false });
+
+  useHotkeys("ctrl+k, meta+k", (e) => {
+    e.preventDefault();
+    setModalOpen(true);
+  }, { enabled: !isModalOpen });
 
   return (
     <div className={`pb-10 px-4 md:px-6 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen ${i18n.language === "fa" ? "rtl" : "ltr"}`}>
@@ -88,7 +115,7 @@ const handleAddNewTaskToCategory = (catId) => {
 
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-          {Object.values(groupedTasks).map((group) => (
+          {groupedArray.map((group) => (
             <div
               key={group.id}
               className="flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800"
@@ -135,4 +162,5 @@ const handleAddNewTaskToCategory = (catId) => {
     </div>
   );
 }
+
 export default Tasks;
