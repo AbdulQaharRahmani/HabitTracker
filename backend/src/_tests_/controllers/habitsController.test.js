@@ -1192,8 +1192,8 @@ describe('Uncomplete Habit', () => {
 
     HabitModel.findById.mockResolvedValue(habit);
 
-    // System time is mocked to 2026-01-01. Use a date more than 7 days in the past.
-    req.body = { date: '2025-12-24' };
+    // System time is mocked to 2026-01-01. I am using a date more than 7 days in the past.
+    req.body = { date: '2025-12-29' };
 
     await expect(uncompleteHabit(req, res)).rejects.toMatchObject({
       status: 400,
@@ -1210,7 +1210,7 @@ describe('Uncomplete Habit', () => {
 
     HabitModel.findById.mockResolvedValue(habit);
 
-    // System time is mocked to 2026-01-01. Use a future date.
+    // System time is mocked to 2026-01-01. Using a future date.
     req.body = { date: '2026-01-02' };
 
     await expect(uncompleteHabit(req, res)).rejects.toMatchObject({
