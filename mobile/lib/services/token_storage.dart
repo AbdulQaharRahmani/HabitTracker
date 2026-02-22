@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthManager {
   static const String _key = 'jwt_token';
+  static const String _refreshKey = 'refresh_token';
   static const String _isLoggedInKey = 'is_logged_in';
   static const String _userNameKey = 'user_name';
   static const String _userEmailKey = 'user_email';
@@ -14,6 +15,22 @@ class AuthManager {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, token);
     await prefs.setBool(_isLoggedInKey, true);
+  }
+
+  // -----------------------------
+  // SAVE REFRESH TOKEN
+  // -----------------------------
+  static Future<void> saveRefreshToken(String refreshToken) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_refreshKey, refreshToken);
+  }
+
+  // -----------------------------
+  // GET REFRESH TOKEN
+  // -----------------------------
+  static Future<String?> getRefreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_refreshKey);
   }
   /// Save user data after login
   static Future<void> saveUserData(String name, String email) async {
@@ -45,8 +62,10 @@ class AuthManager {
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_key);
+    await prefs.remove(_refreshKey);
     await prefs.remove(_userNameKey);
     await prefs.remove(_userEmailKey);
+    await prefs.remove(_isLoggedInKey);
   }
   // -----------------------------
 // GET USER NAME
