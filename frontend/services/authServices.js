@@ -16,7 +16,6 @@ export const refreshToken = async () => {
       {},
       { withCredentials: true }
     );
-    console.log(response.data)
     return response.data.token;
   }
 export const logout = async () => {
