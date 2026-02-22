@@ -1,47 +1,61 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { logout } from "../../services/authServices";
 
 const useAuthStore = create(
   persist(
     (set) => ({
       token: null,
-      userId: null,
-      username: null,
+      user: null,
+      isAuthLoading: false,
       isAuthenticated: false,
-
-      // 🔹 login
-      login: (token, id, username) => {
-        set({
-          token,
-          userId: id,
-          username,
-          isAuthenticated: true,
-        });
-      },
-
-      // 🔹 update username (used by Settings)
-      updateUsername: (username) => {
+      login: (token, userData) => {
         set((state) => ({
-          ...state,
-          username,
+          token,
+          user: userData ? userData : state.user,
+          isAuthLoading: false,
+          isAuthenticated: true
         }));
       },
 
-      // 🔹 logout
-      logout: () => {
-        set({
-          token: null,
-          userId: null,
-          username: null,
-          isAuthenticated: false,
-        });
-        localStorage.removeItem("auth-data");
+
+
+
+      updateUserName: (newUserName) => {
+        set((state) => {
+          if (!state.user) {
+            return state
+          }
+          return {
+            user: {
+              ...state.user,
+              username: newUserName
+            }
+          }
+        })
+      },
+      logout: async () => {
+        try {
+          await logout()
+        } catch (error) {
+          console.log(error)
+        } finally {
+          set({
+            token: null,
+            user: null,
+            isAuthenticated: false
+          });
+          localStorage.removeItem("userData-storage")
+        }
+
       },
     }),
     {
-      name: "auth-data",
-    },
-  ),
+      name: "userData-storage",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ user: state.user }), // just store the user data (id, username) not the token
+    }
+  )
 );
 
 export default useAuthStore;

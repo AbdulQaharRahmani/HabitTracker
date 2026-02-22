@@ -29,11 +29,7 @@ const TodayList = () => {
 
     try{
       await toggleHabit(habit._id);
-      toast.success(habit.completed ? t("habit_incomplete") : t("habit_completed"));
-
-
     }catch(error){
-       toast.error(t("habit_update_failed"));
        console.log(error);
     }
   }
