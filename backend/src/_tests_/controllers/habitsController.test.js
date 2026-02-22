@@ -1183,4 +1183,60 @@ describe('Uncomplete Habit', () => {
       message: 'Not allowed to modify this habit',
     });
   });
+
+  it('6. Should not allow uncompleting for dates more than 7 days in the past', async () => {
+    const habit = {
+      _id: 'habit-1',
+      isOwner: vi.fn().mockReturnValue(true),
+    };
+
+    HabitModel.findById.mockResolvedValue(habit);
+
+    // System time is mocked to 2026-01-01. Use a date more than 7 days in the past.
+    req.body = { date: '2025-12-24' };
+
+    await expect(uncompleteHabit(req, res)).rejects.toMatchObject({
+      status: 400,
+    });
+
+    expect(HabitCompletionModel.findOneAndDelete).not.toHaveBeenCalled();
+  });
+
+  it('7. Should not allow uncompleting for future dates', async () => {
+    const habit = {
+      _id: 'habit-1',
+      isOwner: vi.fn().mockReturnValue(true),
+    };
+
+    HabitModel.findById.mockResolvedValue(habit);
+
+    // System time is mocked to 2026-01-01. Use a future date.
+    req.body = { date: '2026-01-02' };
+
+    await expect(uncompleteHabit(req, res)).rejects.toMatchObject({
+      status: 400,
+    });
+
+    expect(HabitCompletionModel.findOneAndDelete).not.toHaveBeenCalled();
+  });
+
+  it('8. Should not allow uncompleting habit before its creation date', async () => {
+    const habit = {
+      _id: 'habit-1',
+      isOwner: vi.fn().mockReturnValue(true),
+      createdAt: new Date('2026-01-01T12:00:00'),
+    };
+
+    HabitModel.findById.mockResolvedValue(habit);
+
+    // Try uncompleting for a date before creation
+    req.body = { date: '2025-12-30' };
+
+    await expect(uncompleteHabit(req, res)).rejects.toMatchObject({
+      status: 400,
+      message: 'You cannot modify habits before their creation date',
+    });
+
+    expect(HabitCompletionModel.findOneAndDelete).not.toHaveBeenCalled();
+  });
 });
