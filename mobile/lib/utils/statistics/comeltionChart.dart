@@ -2,12 +2,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/theme_provider.dart';
 
 class CompletionChart extends StatelessWidget {
-  /// Completion percentages for last 30 days (0 - 100)
   final List<double> values;
-
-  /// Labels (e.g dates)
   final List<String> labels;
 
   const CompletionChart({
@@ -18,13 +18,12 @@ class CompletionChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     if (values.isEmpty || labels.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    final double growth =
-    ((values.last - values.first).toDouble());
-
+    final double growth = ((values.last - values.first).toDouble());
     final bool isPositive = growth >= 0;
 
     return Container(
@@ -50,27 +49,22 @@ class CompletionChart extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
                 ),
               ),
               const Spacer(),
 
               /// Growth badge
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 10.w,
-                  vertical: 4.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: isPositive
-                      ? AppTheme.successBackground
-                      : Colors.red,
+                  color: isPositive ? AppTheme.successBackground : AppTheme.error,
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
                   '${isPositive ? '+' : ''}${growth.toStringAsFixed(1)}%',
                   style: TextStyle(
-                    color:
-                    isPositive ? AppTheme.success : AppTheme.error,
+                    color: isPositive ? AppTheme.success : AppTheme.textWhite,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -104,17 +98,10 @@ class CompletionChart extends StatelessWidget {
                 gridData: FlGridData(show: false),
                 borderData: FlBorderData(show: false),
 
-                /// ===== Axis =====
                 titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
+                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -124,21 +111,15 @@ class CompletionChart extends StatelessWidget {
                         if (index < 0 || index >= labels.length) {
                           return const SizedBox.shrink();
                         }
-
-                        final bool isToday =
-                            index == labels.length - 1;
-
+                        final bool isToday = index == labels.length - 1;
                         return Padding(
                           padding: EdgeInsets.only(top: 8.h),
                           child: Text(
                             labels[index],
                             style: TextStyle(
                               fontSize: 11.sp,
-                              fontWeight:
-                              isToday ? FontWeight.w600 : null,
-                              color: isToday
-                                  ? AppTheme.chartLine
-                                  : AppTheme.textMuted,
+                              fontWeight: isToday ? FontWeight.w600 : null,
+                              color: isToday ? AppTheme.chartLine : AppTheme.textMuted,
                             ),
                           ),
                         );
@@ -147,7 +128,6 @@ class CompletionChart extends StatelessWidget {
                   ),
                 ),
 
-                /// ===== Line =====
                 lineBarsData: [
                   LineChartBarData(
                     isCurved: true,
@@ -156,44 +136,35 @@ class CompletionChart extends StatelessWidget {
                     dotData: FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      gradient: const LinearGradient(
-                        colors: [
-                          AppTheme.chartFillTop,
-                          AppTheme.chartFillBottom,
-                        ],
+                      gradient: LinearGradient(
+                        colors: [AppTheme.chartFillTop, AppTheme.chartFillBottom],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
                     ),
                     spots: List.generate(
                       values.length,
-                          (i) => FlSpot(
-                        i.toDouble(),
-                        values[i],
-                      ),
+                          (i) => FlSpot(i.toDouble(), values[i]),
                     ),
                   ),
                 ],
 
-                /// ===== Tooltip =====
                 lineTouchData: LineTouchData(
                   handleBuiltInTouches: true,
                   touchTooltipData: LineTouchTooltipData(
-                    tooltipBgColor: Colors.black87,
+                    tooltipBgColor: AppTheme.chartTooltipBackground,
                     tooltipRoundedRadius: 8.r,
                     getTooltipItems: (spots) {
-                      return spots.map(
-                            (spot) {
-                          return LineTooltipItem(
-                            '${spot.y.toInt()}%',
-                            TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          );
-                        },
-                      ).toList();
+                      return spots.map((spot) {
+                        return LineTooltipItem(
+                          '${spot.y.toInt()}%',
+                          TextStyle(
+                            color: AppTheme.textWhite,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }).toList();
                     },
                   ),
                 ),

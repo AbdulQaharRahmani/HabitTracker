@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/app_theme.dart';
 import '../../features/add_habit_model.dart';
+import '../../providers/theme_provider.dart';
 
 class CategoryModel {
   final String id;
@@ -71,7 +73,6 @@ class AddHabitDialog {
                             ),
                           ),
                         ),
-
                       ],
                     ),
                   ),
@@ -116,7 +117,6 @@ class _AddHabitFormState extends State<_AddHabitForm> {
 
   final _frequencies = ['Daily', 'Weekly', 'Monthly'];
 
-
   List<CategoryModel> _categories = [];
   bool _isLoadingCategories = true;
   String? _errorMessage;
@@ -130,7 +130,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     super.initState();
     _fetchCategories();
   }
-// Method for getting token from cache
+
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('jwt_token');
@@ -146,11 +146,9 @@ class _AddHabitFormState extends State<_AddHabitForm> {
 
     try {
       final token = await _getToken();
-      print("🚀 Fetching Categories with Token: ${token != null ? 'Present' : 'NULL'}");
-
       if (token == null) {
         setState(() {
-          _errorMessage = "Error: Please relogin to account, token not found)";
+          _errorMessage = "Error: Please relogin to account, token not found";
           _isLoadingCategories = false;
         });
         return;
@@ -164,11 +162,8 @@ class _AddHabitFormState extends State<_AddHabitForm> {
         },
       ).timeout(const Duration(seconds: 30));
 
-      print("📥 Server Response Code: ${response.statusCode}");
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedData = jsonDecode(response.body);
-
         final List<dynamic> categoriesJson = decodedData['data'];
 
         setState(() {
@@ -177,17 +172,14 @@ class _AddHabitFormState extends State<_AddHabitForm> {
           _isLoadingCategories = false;
         });
       } else {
-        // چاپ متن ارور سرور برای رفع مشکل 500
-        print("❌ Server Error Body: ${response.body}");
         setState(() {
-          _errorMessage = "خطای سرور: ${response.statusCode}";
+          _errorMessage = "Server error: ${response.statusCode}";
           _isLoadingCategories = false;
         });
       }
     } catch (e) {
-      print("❌ Connection Exception: $e");
       setState(() {
-        _errorMessage = "Error with connecting to network";
+        _errorMessage = "Network connection error";
         _isLoadingCategories = false;
       });
     }
@@ -233,11 +225,10 @@ class _AddHabitFormState extends State<_AddHabitForm> {
         _showSnackBar("Habit added successfully!", isSuccess: true);
         Navigator.pop(context);
       } else {
-        print("❌ Submit Error Body: ${response.body}");
         _showSnackBar("Not registered: ${response.statusCode}");
       }
     } catch (e) {
-      _showSnackBar("connection error");
+      _showSnackBar("Connection error");
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -248,7 +239,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        backgroundColor: isSuccess ? AppTheme.success : AppTheme.error,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -260,8 +251,6 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     _descCtl.dispose();
     super.dispose();
   }
-
-
 
   InputDecoration _fieldDecoration({String? hint}) {
     return InputDecoration(
@@ -294,6 +283,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     return Form(
       key: _formKey,
       child: Column(
@@ -326,7 +316,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
           Text('Frequency', style: _labelStyle()),
           SizedBox(height: 8.h),
           DropdownButtonFormField<String>(
-            initialValue: _frequency,
+            value: _frequency,
             decoration: _fieldDecoration(),
             items: _frequencies.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
             onChanged: (v) {
@@ -343,18 +333,18 @@ class _AddHabitFormState extends State<_AddHabitForm> {
               ? Center(child: Padding(
             padding: EdgeInsets.all(10.h),
             child: SizedBox(
-                height: 20.h, width: 20.w,
-                child: const CircularProgressIndicator(strokeWidth: 2)
+              height: 20.h, width: 20.w,
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary),
             ),
           ))
               : _errorMessage != null
-              ? Text(_errorMessage!, style: TextStyle(color: Colors.red, fontSize: 12.sp))
+              ? Text(_errorMessage!, style: TextStyle(color: AppTheme.error, fontSize: 12.sp))
               : DropdownButtonFormField<CategoryModel>(
-            initialValue: _selectedCategory,
+            value: _selectedCategory,
             decoration: _fieldDecoration(),
             items: _categories.map((c) => DropdownMenuItem(
                 value: c,
-                child: Text(c.name)
+                child: Text(c.name, style: TextStyle(color: AppTheme.textPrimary))
             )).toList(),
             onChanged: (v) {
               if (v == null) return;

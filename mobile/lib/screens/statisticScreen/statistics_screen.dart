@@ -6,12 +6,16 @@ import 'package:habit_tracker/screens/statisticScreen/widgets/filter_tabs.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/header.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/summary_card.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/tasks_item.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/theme_provider.dart';
 
 class StatisticScreen extends StatelessWidget {
   const StatisticScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(

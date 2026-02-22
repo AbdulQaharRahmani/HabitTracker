@@ -154,9 +154,9 @@ class UserData {
 }
 
 final Map<String, TaskCategoryUI> taskCategoryMapByName = {
-  'study': const TaskCategoryUI(icon: Icons.school_outlined, color: AppTheme.primary),
-  'sport': const TaskCategoryUI(icon: Icons.fitness_center, color: AppTheme.success),
-  'work': const TaskCategoryUI(icon: Icons.work_outline, color: AppTheme.warning),
-  'health': const TaskCategoryUI(icon: Icons.favorite_outline, color: AppTheme.error),
-  'personal': const TaskCategoryUI(icon: Icons.task_alt, color: AppTheme.primary),
+  'study':  TaskCategoryUI(icon: Icons.school_outlined, color: AppTheme.primary),
+  'sport':  TaskCategoryUI(icon: Icons.fitness_center, color: AppTheme.success),
+  'work':  TaskCategoryUI(icon: Icons.work_outline, color: AppTheme.warning),
+  'health':  TaskCategoryUI(icon: Icons.favorite_outline, color: AppTheme.error),
+  'personal': TaskCategoryUI(icon: Icons.task_alt, color: AppTheme.primary),
 };
