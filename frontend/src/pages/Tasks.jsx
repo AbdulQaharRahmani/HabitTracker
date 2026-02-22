@@ -59,7 +59,6 @@ function Tasks() {
     setModalOpen(true);
   };
 
-  // Keyboard Navigation Logic
   useHotkeys("up, down, left, right", (e) => {
     const active = document.activeElement;
     if (!active || !active.hasAttribute('data-task-card')) return;
@@ -67,7 +66,6 @@ function Tasks() {
     e.preventDefault();
     const currentId = active.getAttribute('data-id');
 
-    // Find coordinates
     let colIndex = -1;
     let rowIndex = -1;
 
@@ -87,11 +85,9 @@ function Tasks() {
     if (e.key === "ArrowLeft") nextCol--;
     if (e.key === "ArrowRight") nextCol++;
 
-    // Bound checking for columns
     if (nextCol < 0) nextCol = 0;
     if (nextCol >= groupedArray.length) nextCol = groupedArray.length - 1;
 
-    // Bound checking for rows
     const targetGroup = groupedArray[nextCol];
     if (nextRow < 0) nextRow = 0;
     if (nextRow >= targetGroup.items.length) nextRow = targetGroup.items.length - 1;

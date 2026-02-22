@@ -50,8 +50,6 @@ export default function TaskCard({
       setIsDeleting(false);
     }
   }
-
-  // Handle Enter key to open edit modal when focused
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       openEditModal(_id);
