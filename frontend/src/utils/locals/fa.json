@@ -215,6 +215,13 @@
  "habit_update_failed": "به‌روزرسانی عادت انجام نشد. دوباره تلاش کنید.",
 
  "Language": "زبان",
-  "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید"
+  "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید",
+  "Log Details": "جزئیات لاگ",
+  "Request Path": "مسیر درخواست",
+  "Request Details (Headers & Body)": "جزئیات درخواست (هدرها و بدنه)",
+  "Response Details": "جزئیات پاسخ",
+  "System Metadata": "متادیتای سیستم",
+  "Error Information": "اطلاعات خطا",
+  "Close Details": "بستن جزئیات"
 }
 

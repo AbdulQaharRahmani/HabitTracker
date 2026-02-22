@@ -2,16 +2,19 @@ import { useTranslation } from "react-i18next";
 import useLogsStore from "../store/useLogsStore";
 import { FaExclamationTriangle, FaSearch } from "react-icons/fa";
 import {formatDate} from "../utils/dateFormatter"
+import LogsDetailsModal from "./LogsDetailsModal";
+import { useState } from "react";
 export default function LogTable({ filteredList }) {
   const { t } = useTranslation();
 const tableError = useLogsStore((state)=> state.tableError)
 const tableLoading = useLogsStore((state)=> state.tableLoading)
+const [isModalOpen, setModalOpen] = useState(false)
 
   if (tableError) {
     return (
       <div className="w-full py-16 flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
         <FaExclamationTriangle className="text-red-500 mb-3" size={24} />
-        <p className="font-bold text-red-600 tracking-tight">{error}</p>
+        <p className="font-bold text-red-600 tracking-tight">{tableError}</p>
       </div>
     );
   }
@@ -71,7 +74,9 @@ const tableLoading = useLogsStore((state)=> state.tableLoading)
               <td className="px-5 py-3.5 font-bold text-gray-700 dark:text-gray-200 text-[13px]">
                 {log.method}
               </td>
-              <td className="px-5 py-3.5 text-[14px] font-medium text-indigo-600 dark:text-indigo-400">
+              <td className="px-5 py-3.5 text-[14px] cursor-pointer font-medium text-indigo-600 dark:text-indigo-400"
+              onClick={()=> setModalOpen(true)}
+              >
                 {log.path}
               </td>
               <td className="px-5 py-3.5">
@@ -94,6 +99,7 @@ const tableLoading = useLogsStore((state)=> state.tableLoading)
           ))}
         </tbody>
       </table>
+      <LogsDetailsModal isOpen={isModalOpen} onClose={()=> setModalOpen(false)}></LogsDetailsModal>
     </div>
   );
 }
