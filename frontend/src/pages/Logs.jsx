@@ -5,6 +5,7 @@ import {
   FaArrowRight,
   FaArrowLeft,
 } from "react-icons/fa";
+import { HiOutlineViewList } from "react-icons/hi";
 import { useTranslation } from "react-i18next";
 import useLogsStore from "../store/useLogsStore";
 import Search from "../components/Search";
@@ -16,23 +17,22 @@ export default function Logs() {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() === "rtl";
 
-  const {
-    logsData,
-    getLogsData,
-    currentPage,
-    totalPages,
-    getNextPage,
-    getPrevPage,
-    tableLoading,
-    setCurrentPage,
-  } = useLogsStore();
+  const logsData = useLogsStore((state) => state.logsData);
+  const currentPage = useLogsStore((state) => state.currentPage);
+  const totalPages = useLogsStore((state) => state.totalPages);
+  const tableLoading = useLogsStore((state) => state.tableLoading);
+
+  const getLogsData = useLogsStore((state) => state.getLogsData);
+  const getNextPage = useLogsStore((state) => state.getNextPage);
+  const getPrevPage = useLogsStore((state) => state.getPrevPage);
+  const setCurrentPage = useLogsStore((state) => state.setCurrentPage);
 
   const [selectedLevel, setSelectedLevel] = useState("all levels");
   const [selectedMethod, setSelectedMethod] = useState("all methods");
   const [selectedDate, setSelectedDate] = useState("newest");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-
+  const [curentLimit, setCurrentLimit] = useState(20)
   const [appliedFilters, setAppliedFilters] = useState({
     level: "all levels",
     method: "all methods",
@@ -48,8 +48,8 @@ export default function Logs() {
   }, [searchTerm, setCurrentPage]);
 
   useEffect(() => {
-    getLogsData(currentPage, appliedFilters, debouncedSearchTerm);
-  }, [currentPage, appliedFilters, debouncedSearchTerm]);
+    getLogsData(currentPage, curentLimit, appliedFilters, debouncedSearchTerm);
+  }, [currentPage, appliedFilters, debouncedSearchTerm, curentLimit]);
 
   const handleFilter = () => {
     setCurrentPage(1);
@@ -88,7 +88,11 @@ export default function Logs() {
     ],
     [t],
   );
-
+  const limitOptions = [
+    { id: 20, name: `${getPersianNumber(20)}`, value: 20 },
+    { id: 50, name: `${getPersianNumber(50)}`, value: 50 },
+    { id: 100, name: `${getPersianNumber(100)}`, value: 100 },
+  ]
 
 
   return (
@@ -129,10 +133,10 @@ export default function Logs() {
           {/* Filter Section */}
           <div className="flex flex-col items-center justify-center gap-8 bg-white dark:bg-gray-900 p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
             <div className="w-full max-w-xl">
-              <Search  
+              <Search
                 placeholder={t("Search logs by route")}
                 searchTerm={searchTerm}
-                setSearchTerm={(e)=> {setSearchTerm(e.target.value)}}
+                setSearchTerm={(e) => { setSearchTerm(e.target.value) }}
               />
             </div>
 
@@ -174,6 +178,25 @@ export default function Logs() {
               >
                 {tableLoading ? t("Filtering...") : t("Apply filter")}
               </button>
+            </div>
+          </div>
+
+          {/* Items per page selector*/}
+          <div className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm w-fit mb-4">
+            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+              <HiOutlineViewList className="text-xl" />
+              <span className="font-bold text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                {t("Items Per Page")}:
+              </span>
+            </div>
+
+            <div className="w-[100px]">
+              <Dropdown
+                items={limitOptions}
+                value={curentLimit}
+                displayValue={getPersianNumber(curentLimit)}
+                getValue={setCurrentLimit}
+              />
             </div>
           </div>
 
