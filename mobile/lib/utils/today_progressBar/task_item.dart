@@ -54,6 +54,7 @@ class TaskItem {
   final String category;
   final IconData icon;
   final Color color;
+  final String? priority;
   final String sourceType; // 'task' | 'habit'
   final DateTime createdAt;
 
@@ -64,8 +65,9 @@ class TaskItem {
     required this.id,
     required this.title,
     required this.description,
-     this.frequency,
+      this.frequency,
     required this.category,
+    this.priority ,
     required this.icon,
     required this.color,
     required this.sourceType,
@@ -90,6 +92,7 @@ class TaskItem {
       description: json['description'] ?? '',
       frequency: json['frequency'] ?? 'daily',
       category: categoryName,
+      priority:json['priority'] ??'medium',
       icon: ui.icon,
       color: ui.color,
       sourceType: 'task',
@@ -119,6 +122,7 @@ class TaskItem {
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       frequency: json['frequency'] ?? 'daily',
+      priority:json['priority'] ??'',
       category: categoryName,
       icon: TaskItem.resolveIcon(apiIconName: json['icon'], categoryName: categoryName),
       color: TaskItem.resolveColor(apiHexColor: json['color'], categoryName: categoryName),
