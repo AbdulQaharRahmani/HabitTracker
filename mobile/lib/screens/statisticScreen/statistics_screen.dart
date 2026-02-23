@@ -1,56 +1,87 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/error_veiw.dart';
+import 'package:provider/provider.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import '../../../providers/theme_provider.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/completion_trend_card.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/consistency_heatmap.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/filter_tabs.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/header.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/summary_card.dart';
-import 'package:habit_tracker/screens/statisticScreen/widgets/tasks_item.dart';
-import 'package:provider/provider.dart';
-
-import '../../providers/theme_provider.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/shemer_heatmap.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/shemer_summary_cards.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/shimmer_chart.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/summary_cards.dart';
+import 'data/providers/consistency_provider.dart';
+import 'data/providers/statistic_provider.dart';
 
 class StatisticScreen extends StatelessWidget {
   const StatisticScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<ThemeProvider>(context);
+    final themeProv = Provider.of<ThemeProvider>(context);
+    final theme = themeProv.currentTheme;
+
+    final statisticProv = Provider.of<StatisticProvider>(context);
+    final consistencyProv = Provider.of<ConsistencyProvider>(context);
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ========== Header Section ==========
-              StatisticsHeader(),
-              const SizedBox(height: 24),
-              // ========== Filter Section ==========
-              FilterTabs(),
+        child: RefreshIndicator(
+          onRefresh: () => statisticProv.refreshAllScreenData(consistencyProv),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const StatisticsHeader(),
+                const SizedBox(height: 20),
 
-              const SizedBox(height: 24),
-              // ========== Progress Overview Cards ==========
-              SummaryCards(),
-              const SizedBox(height: 32),
+                // Dashboard Summary Section
+                if (statisticProv.isLoading)
+                  const ShimmerSummaryCards()
+                else if (statisticProv.error != null)
+                  ErrorView(
+                    errorMessage: statisticProv.error!,
+                    onRetry: () => statisticProv.fetchAllData(),
+                  )
+                else if (statisticProv.summary != null)
+                  SummaryCards(summary: statisticProv.summary!),
 
-              //========== Completion Trend Chart ==========
-              CompletionTrendCard(),
+                const SizedBox(height: 15),
 
-              const SizedBox(height: 24),
-              // Consistency Heatmap
-              ConsistencyHeatmap(),
-              const SizedBox(height: 32),
-              const Text(
-                'Top Performing',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
+                // Chart Section
+                if (statisticProv.isLoading)
+                  const ShimmerChart()
+                else if (statisticProv.error == null &&
+                    statisticProv.chartData != null)
+                  CompletionTrendCard(chartData: statisticProv.chartData!),
 
-              // ========== Top Performing Tasks ==========
-              TasksItem(),
-            ],
+                const SizedBox(height: 25),
+
+                //  Consistency Section (Stays Static during filter changes)
+                Text(
+                  'Consistency',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: theme.textTheme.bodyLarge?.color,
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                if (consistencyProv.isLoading)
+                  const ShimmerHeatmap()
+                else if (consistencyProv.error != null)
+                  ErrorView(
+                    errorMessage: consistencyProv.error!,
+                    onRetry: () => consistencyProv.fetchConsistency(),
+                  )
+                else if (consistencyProv.data != null)
+                  ProfessionalHeatmap(data: consistencyProv.data!),
+              ],
+            ),
           ),
         ),
       ),
