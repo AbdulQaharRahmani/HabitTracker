@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 import '../../utils/habits/habit.dart';
 import '../../utils/habits/habit_card.dart';
 import 'add_habit.dart';
@@ -21,16 +23,12 @@ class _HabitsScreenState extends State<HabitsScreen> {
   String? _errorMessage;
   String _searchQuery = '';
 
-  /* -------------------------------------------------------------------------- */
-  /* Reusable Styles                                                            */
-  /* -------------------------------------------------------------------------- */
-
-  final TextStyle _linkStyle = const TextStyle(
+  final TextStyle _linkStyle = TextStyle(
     color: AppTheme.primary,
     fontWeight: FontWeight.bold,
   );
 
-  final TextStyle _descriptionStyle = const TextStyle(
+  final TextStyle _descriptionStyle = TextStyle(
     color: AppTheme.textSecondary,
     fontSize: 14,
   );
@@ -40,10 +38,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
     super.initState();
     _fetchHabits();
   }
-
-  /* -------------------------------------------------------------------------- */
-  /* Logic Methods                                                              */
-  /* -------------------------------------------------------------------------- */
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -126,15 +120,15 @@ class _HabitsScreenState extends State<HabitsScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Habit deleted successfully'),
+          SnackBar(
+            content: const Text('Habit deleted successfully'),
             backgroundColor: AppTheme.success,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to delete habit'),
+          SnackBar(
+            content: const Text('Failed to delete habit'),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -153,8 +147,9 @@ class _HabitsScreenState extends State<HabitsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Habit'),
-        content: const Text('Edit feature will be implemented soon'),
+        title: Text('Edit Habit', style: TextStyle(color: AppTheme.textPrimary)),
+        content: Text('Edit feature will be implemented soon', style: TextStyle(color: AppTheme.textSecondary)),
+        backgroundColor: AppTheme.surface,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -178,10 +173,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
     }).toList();
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* Shimmer Loading Widget                                                     */
-  /* -------------------------------------------------------------------------- */
-
   Widget _buildShimmerLoading() {
     return ListView.builder(
       itemCount: 5,
@@ -194,7 +185,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             margin: const EdgeInsets.only(bottom: 12),
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.surface,
               borderRadius: BorderRadius.circular(16),
             ),
           ),
@@ -203,12 +194,9 @@ class _HabitsScreenState extends State<HabitsScreen> {
     );
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* UI Build                                                                   */
-  /* -------------------------------------------------------------------------- */
-
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -219,7 +207,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             children: [
               const SizedBox(height: 20),
               // ======= Header =======
-              const Text(
+              Text(
                 "My Habits",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -243,8 +231,8 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                         hintText: 'Search....',
-                        hintStyle: const TextStyle(color: AppTheme.textMuted),
-                        prefixIcon: const Icon(Icons.search, color: AppTheme.textMuted),
+                        hintStyle: TextStyle(color: AppTheme.textMuted),
+                        prefixIcon: Icon(Icons.search, color: AppTheme.textMuted),
                         fillColor: AppTheme.inputBackground,
                         filled: true,
                         enabledBorder: OutlineInputBorder(
@@ -253,7 +241,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: const BorderSide(color: AppTheme.primary, width: 1),
+                          borderSide: BorderSide(color: AppTheme.primary, width: 1),
                         ),
                       ),
                       onChanged: (value) {
@@ -280,8 +268,8 @@ class _HabitsScreenState extends State<HabitsScreen> {
                             },
                           );
                         },
-                        icon: const Icon(Icons.add, color: AppTheme.textWhite),
-                        label: const Text(
+                        icon: Icon(Icons.add, color: AppTheme.textWhite),
+                        label: Text(
                           'New Habit',
                           style: TextStyle(color: AppTheme.textWhite, fontWeight: FontWeight.w600),
                         ),
@@ -307,10 +295,11 @@ class _HabitsScreenState extends State<HabitsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(_errorMessage!, style: const TextStyle(color: AppTheme.textSecondary)),
+                        Text(_errorMessage!, style: TextStyle(color: AppTheme.textSecondary)),
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: _refreshHabits,
+                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
                           child: const Text('Retry'),
                         ),
                       ],
@@ -323,7 +312,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.inbox_outlined, size: 60, color: AppTheme.textMuted),
+                          Icon(Icons.inbox_outlined, size: 60, color: AppTheme.textMuted),
                           const SizedBox(height: 16),
                           Text(
                             _searchQuery.isNotEmpty

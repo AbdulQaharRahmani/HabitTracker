@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:habit_tracker/app/app_theme.dart';
 
 class FilterTabs extends StatefulWidget {
   const FilterTabs({super.key});
@@ -35,21 +36,21 @@ class _FilterTabsState extends State<FilterTabs> {
               duration: const Duration(milliseconds: 200),
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
               decoration: BoxDecoration(
-                color: isActive ? const Color(0xFF6C63FF) : Colors.white,
+                color: isActive ? AppTheme.filterActiveBackground : AppTheme.filterInactiveBackground,
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(
                   color: isActive
-                      ? const Color(0xFF6C63FF)
-                      : Colors.grey.shade300,
+                      ? AppTheme.filterActiveBackground
+                      : AppTheme.border,
                 ),
                 boxShadow: isActive
                     ? [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ]
+                  BoxShadow(
+                    color: AppTheme.shadow,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ]
                     : [],
               ),
               child: Text(
@@ -57,7 +58,7 @@ class _FilterTabsState extends State<FilterTabs> {
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
-                  color: isActive ? Colors.white : Colors.grey.shade600,
+                  color: isActive ? AppTheme.filterActiveText : AppTheme.filterInactiveText,
                 ),
               ),
             ),

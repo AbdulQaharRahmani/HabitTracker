@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 
 class TasksCardShimmer extends StatelessWidget {
   const TasksCardShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    Provider.of<ThemeProvider>(context);
 
-      margin: const EdgeInsets.fromLTRB(21,20, 21, 10),
+    return Card(
+      margin: const EdgeInsets.fromLTRB(21, 20, 21, 10),
       elevation: 0,
       color: AppTheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: AppTheme.border.withOpacity(0.5),
+          highlightColor: AppTheme.surface,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -26,7 +29,7 @@ class TasksCardShimmer extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.textMuted,
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -67,16 +70,12 @@ class TasksCardShimmer extends StatelessWidget {
     );
   }
 
-  Widget _line({
-    required double width,
-    required double height,
-    double radius = 6,
-  }) {
+  Widget _line({required double width, required double height, double radius = 6}) {
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.textMuted,
         borderRadius: BorderRadius.circular(radius),
       ),
     );
@@ -86,8 +85,8 @@ class TasksCardShimmer extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration:  BoxDecoration(
+        color: AppTheme.textMuted,
         shape: BoxShape.circle,
       ),
     );

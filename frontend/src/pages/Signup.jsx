@@ -118,7 +118,7 @@ function SignUp() {
       </div>
 
       <form
-        className="flex flex-col w-full max-w-[400px] gap-2 rounded-2xl border bg-white p-6 shadow-lg"
+        className="flex flex-col w-full max-w-[400px] gap-1 rounded-2xl border bg-white py-5 px-6 shadow-lg"
         onSubmit={signupUserHandler}
       >
         <div className="w-full">
@@ -130,7 +130,7 @@ function SignUp() {
           </label>
 
           <div
-            className={`mt-1 flex w-full items-center rounded-xl border bg-zinc-100/50 px-2 focus-within:border-indigo-500  transition ${
+            className={` flex w-full items-center rounded-xl border bg-zinc-100/50 px-2 focus-within:border-indigo-500  transition ${
               errors.username ? "border-red-500" : "border-gray-200"
             }`}
           >
@@ -169,7 +169,7 @@ function SignUp() {
             {t("email_address")}
           </label>
           <div
-            className={`flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 mt-1 focus-within:border-indigo-500  ${
+            className={`flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 focus-within:border-indigo-500  ${
               errors.email ? "border-red-500" : "border-gray-200"
             }`}
           >
@@ -206,7 +206,7 @@ function SignUp() {
             {t("password")}
           </label>
           <div
-            className={`flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 mt-1 focus-within:border-indigo-500 ${
+            className={`flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 focus-within:border-indigo-500 ${
               errors.password ? "border-red-500" : "border-gray-200"
             }`}
           >
@@ -297,7 +297,7 @@ function SignUp() {
           {loading ? "Creating account..." : t("sign_up")}
         </button>
 
-        <div className="w-full flex items-center gap-2 mt-2 text-xs sm:text-sm">
+        <div className="w-full flex items-center gap-2 mt-2 text-xs sm:text-sm  my-1">
           <div className="h-px flex-1 bg-gray-200"></div>
           <span className="text-gray-500 whitespace-nowrap">
             {t("or_continue_with")}
@@ -315,7 +315,7 @@ function SignUp() {
         </div>
       </form>
 
-      <div className="flex gap-1 items-center justify-center mt-5 text-xs sm:text-sm">
+      <div className="flex gap-1 items-center justify-center mt-3 text-xs sm:text-sm">
         <p className=" text-gray-500 font-medium">
           {t("already_have_account")}
         </p>
