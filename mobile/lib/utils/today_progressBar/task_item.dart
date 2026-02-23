@@ -16,19 +16,19 @@ class TaskCategoryUI {
 
 /// By category name (fallback-safe)
 final Map<String, TaskCategoryUI> taskCategoryMapByName = {
-  'study': const TaskCategoryUI(
+  'study':  TaskCategoryUI(
     icon: Icons.school_outlined,
     color: AppTheme.primary,
   ),
-  'sport': const TaskCategoryUI(
+  'sport':  TaskCategoryUI(
     icon: Icons.fitness_center,
     color: AppTheme.success,
   ),
-  'work': const TaskCategoryUI(
+  'work': TaskCategoryUI(
     icon: Icons.work_outline,
     color: AppTheme.warning,
   ),
-  'health': const TaskCategoryUI(
+  'health':  TaskCategoryUI(
     icon: Icons.favorite_outline,
     color: AppTheme.error,
   ),
@@ -39,7 +39,7 @@ final Map<String, TaskCategoryUI> taskCategoryMapByName = {
 };
 
 /// Default fallback
-const TaskCategoryUI defaultCategoryUI = TaskCategoryUI(
+ TaskCategoryUI defaultCategoryUI = TaskCategoryUI(
   icon: Icons.task_alt,
   color: AppTheme.primary,
 );
