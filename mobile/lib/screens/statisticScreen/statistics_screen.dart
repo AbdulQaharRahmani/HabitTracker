@@ -24,9 +24,6 @@ class StatisticScreen extends StatelessWidget {
     final statisticProv = Provider.of<StatisticProvider>(context);
     final consistencyProv = Provider.of<ConsistencyProvider>(context);
 
-    final bool isGlobalLoading = statisticProv.isLoading ||
-        consistencyProv.isLoading;
-
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -41,37 +38,29 @@ class StatisticScreen extends StatelessWidget {
                 const StatisticsHeader(),
                 const SizedBox(height: 20),
 
-                //  Dashboard Summary Section
-                if (isGlobalLoading)
+                // Dashboard Summary Section
+                if (statisticProv.isLoading)
                   const ShimmerSummaryCards()
-                else
-                  if (statisticProv.error != null)
-                    ErrorView(
-                      errorMessage: statisticProv.error!,
-                      onRetry: () =>
-                          statisticProv.refreshAllScreenData(consistencyProv),
-                    )
-                  else
-                    if (statisticProv.summary != null)
-                      SummaryCards(summary: statisticProv.summary!)
-                    else
-                      const Center(child: Text("No summary data available")),
+                else if (statisticProv.error != null)
+                  ErrorView(
+                    errorMessage: statisticProv.error!,
+                    onRetry: () => statisticProv.fetchAllData(),
+                  )
+                else if (statisticProv.summary != null)
+                  SummaryCards(summary: statisticProv.summary!),
 
                 const SizedBox(height: 15),
 
-                //  Chart Section
-                if (isGlobalLoading)
+                // Chart Section
+                if (statisticProv.isLoading)
                   const ShimmerChart()
-                else
-                  if (statisticProv.error == null &&
-                      statisticProv.chartData != null)
-                    CompletionTrendCard(chartData: statisticProv.chartData!)
-                  else
-                    const SizedBox.shrink(),
+                else if (statisticProv.error == null &&
+                    statisticProv.chartData != null)
+                  CompletionTrendCard(chartData: statisticProv.chartData!),
 
                 const SizedBox(height: 25),
 
-                //  Consistency Section
+                //  Consistency Section (Stays Static during filter changes)
                 Text(
                   'Consistency',
                   style: TextStyle(
@@ -82,20 +71,15 @@ class StatisticScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 15),
 
-                if (isGlobalLoading)
+                if (consistencyProv.isLoading)
                   const ShimmerHeatmap()
-                else
-                  if (consistencyProv.error != null)
-                    ErrorView(
-                      errorMessage: consistencyProv.error!,
-                      onRetry: () =>
-                          statisticProv.refreshAllScreenData(consistencyProv),
-                    )
-                  else
-                    if (consistencyProv.data != null)
-                      ProfessionalHeatmap(data: consistencyProv.data!)
-                    else
-                      const Center(child: Text("No consistency data found")),
+                else if (consistencyProv.error != null)
+                  ErrorView(
+                    errorMessage: consistencyProv.error!,
+                    onRetry: () => consistencyProv.fetchConsistency(),
+                  )
+                else if (consistencyProv.data != null)
+                  ProfessionalHeatmap(data: consistencyProv.data!),
               ],
             ),
           ),

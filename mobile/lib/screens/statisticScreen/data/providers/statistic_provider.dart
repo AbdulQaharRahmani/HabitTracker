@@ -28,8 +28,11 @@ class StatisticProvider extends ChangeNotifier {
   }
 
   void setFilter(ChartFilter newFilter) {
+    if (_filter == newFilter) return;
     _filter = newFilter;
     notifyListeners();
+
+    // Only reload Summary and Chart data, ignore Consistency
     fetchAllData();
   }
 
@@ -80,7 +83,7 @@ class StatisticProvider extends ChangeNotifier {
       message = message.replaceFirst('Exception:', '').trim();
     }
 
-    // Handle common network issues specifically
+    // Handle common network issues
     if (message.toLowerCase().contains('socketexception')) {
       return "Network error: Please check your internet connection.";
     }
@@ -94,16 +97,14 @@ class StatisticProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Triggering all APIs at once
-      await Future.wait([
+         await Future.wait([
         fetchAllData(),
         consistencyProv.fetchConsistency(),
       ]);
     } catch (e) {
       _error = _parseBackendError(e);
     } finally {
-      // Both providers will stop loading at the exact same time
-      _isLoading = false;
+         _isLoading = false;
       notifyListeners();
     }
   }
