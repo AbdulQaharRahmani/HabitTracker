@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/theme_provider.dart';
 
 class SettingProfileCard extends StatelessWidget {
   const SettingProfileCard({
@@ -15,6 +18,7 @@ class SettingProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: _boxDecoration(),
@@ -39,12 +43,12 @@ class SettingProfileCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   email,
-                  style: const TextStyle(color: AppTheme.textMuted),
+                  style:  TextStyle(color: AppTheme.textMuted),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: AppTheme.textMuted),
+         Icon(Icons.chevron_right, color: AppTheme.textMuted),
         ],
       ),
     );

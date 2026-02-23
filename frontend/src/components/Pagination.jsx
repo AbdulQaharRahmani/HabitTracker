@@ -42,7 +42,7 @@ function Pagination({
           disabled={currentPage === 1}
           className="p-2 rounded-full border border-gray-500 text-gray-900 hover:bg-gray-100 disabled:opacity-40"
         >
-          <VscChevronLeft className="text-gray-900" />
+          <VscChevronLeft className="text-gray-100" />
         </button>
 
         {paginationRange.map((page, index) => {
@@ -80,7 +80,7 @@ function Pagination({
           disabled={currentPage === totalPages}
           className="p-2 rounded-full border border-gray-500 text-gray-900 hover:bg-gray-100 disabled:opacity-40"
         >
-          <VscChevronRight className="text-gray-900" />
+          <VscChevronRight className="text-gray-100" />
         </button>
       </nav>
     </div>

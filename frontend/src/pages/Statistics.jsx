@@ -44,45 +44,60 @@ function Statistics() {
     return String(value);
   }
 
-  if(loading){
-    return (
-     <div className="text-center text-gray-500 ">{t("Loading")}</div>
-    )
-  }
   if(error){
     return (
       <div className="text-center text-red-500">{error}</div>
     )
   }
-  return (
-    <div
-      className="px-4 lg:px-9"
-      dir={isRTL ? "rtl" : "ltr"}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Header
-          title={t("Your Progress")}
-          subtitle={t("Overview of your consistency and growth.")}
-        />
-        <ExportData />
-      </div>
-
-      <div className="my-4">
-        <div className="flex items-center sm:mr-0 lg:flex lg:gap-6  md:gap-2 sm:gap-2 md:grid-rows-3 xxs:grid xxs:grid-rows-3 xxs:gap-4">
-          <TotalHabitsStatics totalHabits={formatNumber(totalHabits)} />
-          <CurrentStreakStatics currentStreak={formatNumber(currentStreak)} />
-          <CompletionRateStatics completionRate={formatNumber(completionRate)} />
-        </div>
-      </div>
-
-      {/* Charts */}
-      <div className="space-y-2">
-        <DailyConsistency/>
-        <StatisticsChart />
-      </div>
+return (
+  <div
+    className="px-4 lg:px-9"
+    dir={isRTL ? "rtl" : "ltr"}
+  >
+    {/* Header always visible */}
+    <div className="flex items-center justify-between">
+      <Header
+        title={t("Your Progress")}
+        subtitle={t("Overview of your consistency and growth.")}
+      />
+      <ExportData />
     </div>
-  );
+
+    {/* Loading State */}
+      {loading && (
+        <div className="animate-pulse space-y-4 mt-6">
+          <div className="h-24 bg-gray-200 rounded-lg"></div>
+          <div className="h-64 bg-gray-200 rounded-lg"></div>
+        </div>
+      )}
+
+    {/* Error */}
+    {error && (
+      <div className="my-6 text-center text-red-500">
+        {error}
+      </div>
+    )}
+
+    {/* Show content only when not loading and no error */}
+    {!loading && !error && (
+      <>
+        <div className="my-4">
+          <div className="flex items-center sm:mr-0 lg:flex lg:gap-6 md:gap-2 sm:gap-2 md:grid-rows-3 xxs:grid xxs:grid-rows-3 xxs:gap-4">
+            <TotalHabitsStatics totalHabits={formatNumber(totalHabits)} />
+            <CurrentStreakStatics currentStreak={formatNumber(currentStreak)} />
+            <CompletionRateStatics completionRate={formatNumber(completionRate)} />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <DailyConsistency />
+          <StatisticsChart />
+        </div>
+      </>
+    )}
+  </div>
+);
+
 }
 
 export default Statistics
