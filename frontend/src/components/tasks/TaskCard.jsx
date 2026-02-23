@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaRegCircle, FaCircle, FaCheckCircle } from "react-icons/fa";
+import { FaRegCircle, FaCheckCircle } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
 import ConfirmationModal from '../modals/ConfirmationModal';
@@ -49,10 +49,27 @@ export default function TaskCard({
     } finally {
       setIsDeleting(false);
     }
-  }
+  };
+
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      openEditModal(_id);
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    switch (e.key) {
+      case 'Enter':
+        e.preventDefault();
+        openEditModal(_id);
+        break;
+      case ' ':
+        e.preventDefault();
+        completeTask(_id);
+        break;
+      case 'Delete':
+      case 'Backspace':
+        e.preventDefault();
+        setIsModalOpen(true);
+        break;
+      default:
+        break;
     }
   };
 
@@ -67,8 +84,8 @@ export default function TaskCard({
           group bg-white dark:bg-gray-800 rounded-md p-2.5 outline-none
           transition-all duration-150 shadow-md dark:border-gray-700
           hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm
-          focus:ring-2 focus:ring-indigo-200 focus:ring-inset
-          ${priorityBorder[priority] ?? "-l-4 border-l-2 border-gray-400"}
+          focus:ring-2 focus:ring-indigo-300 focus:ring-inset
+          ${priorityBorder[priority] ?? "border-l-2 border-gray-400"}
           ${status === "done" ? "opacity-75" : ""}
         `}
       >
@@ -93,6 +110,7 @@ export default function TaskCard({
 
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                 <button
+                  tabIndex={-1}
                   onClick={(e) => { e.stopPropagation(); openEditModal(_id); }}
                   className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                   aria-label={t("Edit task")}
@@ -100,6 +118,7 @@ export default function TaskCard({
                   <CiEdit size={16} className="text-gray-400 hover:text-indigo-500 transition-colors" />
                 </button>
                 <button
+                  tabIndex={-1}
                   onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }}
                   className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                   aria-label={t("Delete task")}
