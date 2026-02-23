@@ -206,10 +206,10 @@ const useHabitStore = create((set, get) => ({
       set({ loading: false });
     }
   },
-  addUserCategory: async (category, color) => {
+  addUserCategory: async (category, color, icon) => {
     const newCategoryData = {
       name: category,
-      icon: "",
+      icon: icon,
       backgroundColor: color,
     };
     try {

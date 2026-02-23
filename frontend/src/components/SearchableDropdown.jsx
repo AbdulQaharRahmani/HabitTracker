@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { HiChevronDown, HiCheck, HiPlus } from "react-icons/hi";
 import useClickOutside from "../hooks/useClickOutside";
+import Dropdown from "./Dropdown";
+import { iconCategories } from "../utils/icons";
+import { useTranslation } from "react-i18next";
 
 export default function SearchableDropdown({
   items,
@@ -13,6 +16,8 @@ export default function SearchableDropdown({
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState(items);
   const [selectedColor, setSelectedColor] = useState("#7B68EE");
+  const [selectedCategory, setSelectedCategory] = useState("work");
+  const [selectedIcon, setSelectedIcon] = useState("");
 
   useEffect(() => {
     const results = items.filter((item) =>
@@ -21,15 +26,26 @@ export default function SearchableDropdown({
     setFilteredItems(results);
   }, [searchTerm, items]);
 
-  const selectedItem = items.find((item) => item.value === value);
-  const displayValue = isDropdownOpen ? searchTerm : selectedItem?.name || "";
-
   const handleSelect = (item) => {
     getValue(item.value);
     setSearchTerm("");
     setDropdownOpen(false);
   };
   const dropdownRef = useClickOutside(() => setDropdownOpen(false));
+  
+  const { t } = useTranslation();
+
+  const categories = Object.keys(iconCategories);
+  const selectedItem = items.find(item => item.value === value);
+  const displayValue = isDropdownOpen ? searchTerm : selectedItem?.name || "";
+  const rawIcons = iconCategories[selectedCategory] || [];
+
+  const categoryIcons = rawIcons.map((item, index) => ({
+    id: `${selectedCategory}-${index}`,
+    name: item.name,
+    value: item.name,
+    icon: item.icon,
+  }));
 
   return (
     <div className="w-full relative" ref={dropdownRef}>
@@ -76,12 +92,49 @@ export default function SearchableDropdown({
               </li>
             ))
           ) : (
-            <li className="p-4 flex flex-col items-center gap-3">
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                "{searchTerm}" not found
-              </p>
+            <li className="p-4">
+              <div className="my-2">
+                <div className="flex flex-row items-center bg-gray-50 dark:bg-gray-900/50 justify-start text-md text-gray-500 dark:text-gray-400 rounded-lg py-2 border border-dashed border-gray-200 mb-2">
+                  <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400">Category Name:</p>
+                  <input 
+                    className="first-letter:uppercase p-2 px-0 outline-none bg-gray-50" 
+                    placeholder={searchTerm}
+                  />
+                </div>
+                <div
+                  className="text-sm text-gray-500 dark:text-gray-400 border border-dashed border-gray-200 rounded-lg bg-gray-50 py-2"
+                >
+                  <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400 my-4">Pick icon:</p>
+                  <div className="flex gap-2 overflow-x-auto pb-3 mb-3 scrollbar-hide mx-2.5 mt-2">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`
+                          whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all
+                          ${
+                            selectedCategory === cat
+                              ? "bg-[#7B68EE] text-white"
+                              : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200"
+                          }
+                        `}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mx-2.5">
+                    <Dropdown 
+                      items={categoryIcons}
+                      placeholder={t("Choose Icon")}
+                      value={selectedIcon}
+                      getValue={(value) => setSelectedIcon(value)}
+                    />
+                  </div>
+                </div>
+              </div>
 
-              <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg w-full border border-dashed border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg w-full border border-dashed border-gray-200 dark:border-gray-700 mb-3">
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400">
                   Pick Color:
                 </label>
@@ -101,7 +154,7 @@ export default function SearchableDropdown({
               <button
                 type="button"
                 onClick={() => {
-                  onAdd(searchTerm, selectedColor);
+                  onAdd(searchTerm, selectedColor, selectedIcon);
                   setSearchTerm("");
                   setDropdownOpen(false);
                 }}

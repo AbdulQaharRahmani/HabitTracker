@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
 import toast from "react-hot-toast";
-import i18n from "../../utils/i18n";
 import { useHotkeys } from "react-hotkeys-hook";
 import TaskModal from "./TaskModal"
 
@@ -48,8 +47,6 @@ export default function AddTask() {
     }
   };
 
-  if (!isModalOpen) return null;
-
   useHotkeys(
     "ctrl+s, meta+s",
     (e) => {
@@ -68,6 +65,8 @@ export default function AddTask() {
     },
     { enabled: isModalOpen }
   );
+
+  if (!isModalOpen) return null;
 
   return (
     <TaskModal
