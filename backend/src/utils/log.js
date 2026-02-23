@@ -64,62 +64,7 @@ export const getTop = (items, key, limit = 5) => {
 };
 
 //  replaces secrets fields (passwords, tokens,...) with [REDACTED] value, for logs security
-// export const sanitizeSensitiveData = (value) => {
-//   if (Array.isArray(value)) return value.map(sanitizeSensitiveData);
-
-//   if (!value || typeof value !== 'object') return value;
-
-//   const obj = {};
-//   for (const [k, v] of Object.entries(value)) {
-//     obj[k] = SENSITIVE_KEYS.has(k) ? '[REDACTED]' : sanitizeSensitiveData(v);
-//   }
-
-//   return obj;
-// };
-
-// export const sanitizeSensitiveData = (
-//   value,
-//   options = { maxDepth: 6, maxItems: 50 }
-// ) => {
-//   const seen = new WeakSet();
-
-//   const sanitize = (current, depth) => {
-//     if (current === null || current === undefined) return current;
-//     if (typeof current !== 'object') return current;
-
-//     if (depth >= options.maxDepth) return '[TRUNCATED_DEPTH]';
-
-//     if (seen.has(current)) return '[CIRCULAR]';
-//     seen.add(current);
-
-//     if (Array.isArray(current)) {
-//       const limited = current.slice(0, options.maxItems);
-//       const sanitized = limited.map((item) => sanitize(item, depth + 1));
-//       if (current.length > options.maxItems) {
-//         sanitized.push(
-//           `[TRUNCATED_ITEMS:${current.length - options.maxItems}]`
-//         );
-//       }
-//       return sanitized;
-//     }
-
-//     const entries = Object.entries(current);
-//     const limitedEntries = entries.slice(0, options.maxItems);
-//     const obj = {};
-
-//     for (const [k, v] of limitedEntries) {
-//       obj[k] = SENSITIVE_KEYS.has(k) ? '[REDACTED]' : sanitize(v, depth + 1);
-//     }
-
-//     if (entries.length > options.maxItems) {
-//       obj.__truncatedKeys = entries.length - options.maxItems;
-//     }
-
-//     return obj;
-//   };
-
-//   return sanitize(value, 0);
-// };
+// Handle Large nested data that prevent from crashing the app and better performance
 
 export function sanitizeSensitiveData(data, maxDepth = 6, maxItems = 50) {
   const seen = new WeakSet(); // WeakSet is like Set but better for memory
