@@ -86,17 +86,11 @@ export const loginUser = async (req, res) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
-  const existingToken = await refreshTokenModel.findOne({ userId: user._id });
-
-  if (existingToken) {
-    await existingToken.set({ token: hashedToken, expiresAt }).save();
-  } else {
-    await refreshTokenModel.create({
-      userId: user._id,
-      token: hashedToken,
-      expiresAt: expiresAt,
-    });
-  }
+  await refreshTokenModel.findOneAndUpdate(
+    { userId: user._id },
+    { token: hashedToken, expiresAt: expiresAt },
+    { upsert: true, new: true }
+  );
 
   const isProduction = process.env.NODE_ENV === 'production';
   // send token in cookie
@@ -180,17 +174,11 @@ export const googleLogin = async (req, res) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
-  const existingToken = await refreshTokenModel.findOne({ userId: user._id });
-
-  if (existingToken) {
-    await existingToken.set({ token: hashedToken, expiresAt }).save();
-  } else {
-    await refreshTokenModel.create({
-      userId: user._id,
-      token: hashedToken,
-      expiresAt: expiresAt,
-    });
-  }
+  await refreshTokenModel.findOneAndUpdate(
+    { userId: user._id },
+    { token: hashedToken, expiresAt: expiresAt },
+    { upsert: true, new: true }
+  );
 
   const isProduction = process.env.NODE_ENV === 'production';
   // send token in cookie
@@ -224,9 +212,7 @@ export const refreshAccessToken = async (req, res) => {
   if (storeToken.expiresAt <= new Date())
     throw new AppError('Refresh token expired', 403, ERROR_CODES.FORBIDDEN);
 
-  await refreshTokenModel.deleteOne({ token: hashedToken }); //delete previous hashed token
-
-  const user = await UserModel.findById({ _id: storeToken.userId });
+  const user = await UserModel.findById(storeToken.userId);
   if (!user) throw unauthorized();
 
   const accessToken = generateAccessToken(user);
@@ -235,11 +221,14 @@ export const refreshAccessToken = async (req, res) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
-  await refreshTokenModel.create({
-    userId: storeToken.userId,
-    token: hashRefreshToken(refreshToken),
-    expiresAt: expiresAt,
-  });
+  await refreshTokenModel.findOneAndUpdate(
+    { userId: user._id },
+    { token: hashRefreshToken(refreshToken), expiresAt: expiresAt },
+    {
+      upsert: true,
+      new: true,
+    }
+  );
 
   const isProduction = process.env.NODE_ENV === 'production';
   // send token in cookie
