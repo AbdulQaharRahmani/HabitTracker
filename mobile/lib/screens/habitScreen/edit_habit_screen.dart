@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/app_theme.dart';
+import '../../services/category_cache.dart';
 import '../../utils/category/category_model.dart';
 import '../../utils/habits/habit.dart';
 
@@ -52,62 +53,46 @@ class _EditHabitPageState extends State<EditHabitPage> {
   }
 
   Future<void> _fetchCategories() async {
-    final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/categories');
+    // First try synchronous cache
+    final cached = CategoryCache().getCachedCategoriesSync();
+    if (cached != null) {
+      _processCategories(cached);
+      return;
+    }
 
+    // Otherwise fetch
     setState(() {
       _isLoadingCategories = true;
       _errorMessage = null;
     });
 
     try {
-      final token = await _getToken();
-
-      if (token == null) {
-        setState(() {
-          _errorMessage = "Error: Please relogin to account, token not found";
-          _isLoadingCategories = false;
-        });
-        return;
-      }
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 30));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> decodedData = jsonDecode(response.body);
-        final List<dynamic> categoriesJson = decodedData['data'];
-
-        setState(() {
-          _categories = categoriesJson.map((item) => CategoryModel.fromJson(item)).toList();
-           if (_selectedCategory != null) {
-            final existing = _categories.firstWhere(
-                  (cat) => cat.id == _selectedCategory!.id,
-              orElse: () => _selectedCategory!,
-            );
-            if (!_categories.contains(existing)) {
-              _categories.add(existing);
-            }
-            _selectedCategory = existing;
-          }
-          _isLoadingCategories = false;
-        });
-      } else {
-        setState(() {
-          _errorMessage = "Server Error: ${response.statusCode}";
-          _isLoadingCategories = false;
-        });
-      }
+      final fetched = await CategoryCache().getCategories();
+      _processCategories(fetched);
     } catch (e) {
+      print("❌ Cache Error: $e");
       setState(() {
-        _errorMessage = "Error with connecting to network";
+        _errorMessage = "Failed to load categories";
         _isLoadingCategories = false;
       });
     }
+  }
+
+  void _processCategories(List<CategoryModel> list) {
+    setState(() {
+      _categories = List.from(list);
+      if (_selectedCategory != null) {
+        final existing = _categories.firstWhere(
+              (cat) => cat.id == _selectedCategory!.id,
+          orElse: () => _selectedCategory!,
+        );
+        if (!_categories.contains(existing)) {
+          _categories.add(existing);
+        }
+        _selectedCategory = existing;
+      }
+      _isLoadingCategories = false;
+    });
   }
 
   Future<void> _updateHabit() async {
@@ -138,16 +123,24 @@ class _EditHabitPageState extends State<EditHabitPage> {
           "frequency": _frequency.toLowerCase(),
           "categoryId": _selectedCategory!.id,
         }),
-      ).timeout(const Duration(seconds: 20));
+      ).timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         _showSnackBar("Habit updated successfully!", isSuccess: true);
-        Navigator.pop(context, true);
+
+        try {
+          final Map<String, dynamic> decodedData = jsonDecode(response.body);
+          final updatedHabit = Habit.fromJson(decodedData['data']);
+          Navigator.pop(context, updatedHabit);
+        } catch (_) {
+          Navigator.pop(context, true);
+        }
       } else {
         _showSnackBar("Failed to update: ${response.statusCode}");
       }
     } catch (e) {
-      _showSnackBar("Connection error");
+      print("❌ Update Exception: $e");
+      _showSnackBar("Connection error: $e");
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -299,7 +292,6 @@ class _EditHabitPageState extends State<EditHabitPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
@@ -308,7 +300,6 @@ class _EditHabitPageState extends State<EditHabitPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Title
               Text('Title', style: _labelStyle()),
               SizedBox(height: 8.h),
               TextFormField(
@@ -319,7 +310,6 @@ class _EditHabitPageState extends State<EditHabitPage> {
               ),
               SizedBox(height: 14.h),
 
-              // Description
               Text('Description', style: _labelStyle()),
               SizedBox(height: 8.h),
               TextFormField(
@@ -331,7 +321,6 @@ class _EditHabitPageState extends State<EditHabitPage> {
               ),
               SizedBox(height: 14.h),
 
-              // Frequency
               Text('Frequency', style: _labelStyle()),
               SizedBox(height: 8.h),
               DropdownButtonFormField<String>(
@@ -347,13 +336,11 @@ class _EditHabitPageState extends State<EditHabitPage> {
               ),
               SizedBox(height: 14.h),
 
-              // Category
               Text('Category', style: _labelStyle()),
               SizedBox(height: 8.h),
               _buildCategoryDropdown(),
               SizedBox(height: 30.h),
 
-              // Update button
               SizedBox(
                 height: 50.h,
                 child: ElevatedButton(
@@ -381,7 +368,6 @@ class _EditHabitPageState extends State<EditHabitPage> {
 
               SizedBox(height: 16.h),
 
-              // Cancel button
               SizedBox(
                 height: 50.h,
                 child: TextButton(

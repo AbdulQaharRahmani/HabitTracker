@@ -20,13 +20,14 @@ class HabitsScreen extends StatefulWidget {
 class _HabitsScreenState extends State<HabitsScreen> {
   List<Habit> _habits = [];
   bool _isLoading = true;
+  bool _isLoadMoreRunning = false;
+  bool _hasNextPage = true;
+  int _page = 1;
+  final int _limit = 8;
+  late ScrollController _scrollController;
   String? _errorMessage;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
-
-  /* -------------------------------------------------------------------------- */
-  /* Reusable Styles                                                            */
-  /* -------------------------------------------------------------------------- */
 
   final TextStyle _linkStyle = const TextStyle(
     color: AppTheme.primary,
@@ -42,17 +43,16 @@ class _HabitsScreenState extends State<HabitsScreen> {
   void initState() {
     super.initState();
     _fetchHabits();
+    _scrollController = ScrollController()..addListener(_loadMoreHabits);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.removeListener(_loadMoreHabits);
+    _scrollController.dispose();
     super.dispose();
   }
-
-  /* -------------------------------------------------------------------------- */
-  /* Logic Methods                                                              */
-  /* -------------------------------------------------------------------------- */
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -60,59 +60,84 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   Future<void> _fetchHabits() async {
-    final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits');
-
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
+      _page = 1;
+      _hasNextPage = true;
     });
 
     try {
       final token = await _getToken();
+      final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits?page=$_page&limit=$_limit');
 
-      if (token == null) {
-        setState(() {
-          _errorMessage = "Please login again (token not found)";
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 30));
+      final response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedData = jsonDecode(response.body);
+        final List<dynamic> habitsJson = decodedData['data'];
 
-        if (decodedData['success'] == true) {
-          final List<dynamic> habitsJson = decodedData['data'];
+        // معکوس کردن لیست برای نمایش جدیدترین‌ها در بالا
+        final reversedList = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
 
-          setState(() {
-            _habits = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
-            _isLoading = false;
-          });
-        } else {
-          setState(() {
-            _errorMessage = "Failed to load habits";
-            _isLoading = false;
-          });
-        }
+        setState(() {
+          _habits = reversedList;
+          _isLoading = false;
+          if (habitsJson.length < _limit) _hasNextPage = false;
+        });
       } else {
         setState(() {
-          _errorMessage = "Server error: ${response.statusCode}";
+          _errorMessage = "Failed to load habits (${response.statusCode})";
           _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = "Network error: $e";
+        _errorMessage = "Network error: Make sure you are connected.";
         _isLoading = false;
       });
+    }
+  }
+
+  void _loadMoreHabits() async {
+    if (_hasNextPage && !_isLoading && !_isLoadMoreRunning &&
+        _scrollController.position.extentAfter < 300) {
+
+      setState(() => _isLoadMoreRunning = true);
+      _page++;
+
+      try {
+        final token = await _getToken();
+        final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits?page=$_page&limit=$_limit');
+
+        final response = await http.get(url, headers: {
+          'Authorization': 'Bearer $token',
+        }).timeout(const Duration(seconds: 30));
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> decodedData = jsonDecode(response.body);
+          final List<dynamic> habitsJson = decodedData['data'];
+
+          if (habitsJson.isNotEmpty) {
+            // معکوس کردن صفحه جدید (چون آیتم‌های جدیدتر هستند) و درج در ابتدای لیست
+            final reversedNewPage = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
+            setState(() {
+              _habits.insertAll(0, reversedNewPage);
+            });
+          } else {
+            setState(() => _hasNextPage = false);
+          }
+        } else {
+          setState(() => _hasNextPage = false);
+        }
+      } catch (e) {
+        debugPrint("Error loading more: $e");
+        setState(() => _hasNextPage = false);
+      }
+
+      setState(() => _isLoadMoreRunning = false);
     }
   }
 
@@ -127,7 +152,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-      );
+      ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -164,16 +189,18 @@ class _HabitsScreenState extends State<HabitsScreen> {
       MaterialPageRoute(builder: (_) => EditHabitPage(habit: habit)),
     );
 
-    if (result == true) {
+    if (result != null && result is Habit) {
+      setState(() {
+        final index = _habits.indexWhere((h) => h.id == result.id);
+        if (index != -1) {
+          _habits[index] = result;
+        }
+      });
+    } else if (result == true) {
       await _refreshHabits();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Habit updated successfully!'),
-          backgroundColor: AppTheme.success,
-        ),
-      );
     }
   }
+
   Future<void> _refreshHabits() async {
     await _fetchHabits();
   }
@@ -186,10 +213,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
           habit.category.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
   }
-
-  /* -------------------------------------------------------------------------- */
-  /* Shimmer Loading Widget                                                     */
-  /* -------------------------------------------------------------------------- */
 
   Widget _buildShimmerLoading() {
     return ListView.builder(
@@ -212,10 +235,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
     );
   }
 
-  /* -------------------------------------------------------------------------- */
-  /* UI Build                                                                   */
-  /* -------------------------------------------------------------------------- */
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -223,7 +242,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // HEADER SECTION
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
               child: Column(
@@ -249,7 +267,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
               ),
             ),
 
-            // SEARCH AND BUTTON SECTION
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
@@ -292,8 +309,15 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       onPressed: () {
                         AddHabitDialog.show(
                           context,
-                          onSubmit: (data) {
-                            _refreshHabits();
+                          onSubmit: (newHabit) {
+                            if (newHabit != null) {
+                              setState(() {
+                                // جدیدترین عادت در بالای لیست (ایندکس ۰) درج شود
+                                _habits.insert(0, newHabit);
+                              });
+                            } else {
+                              _refreshHabits();
+                            }
                           },
                         );
                       },
@@ -316,7 +340,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
 
             SizedBox(height: 16.h),
 
-            // HABITS LIST SECTION
             Expanded(
               child: RefreshIndicator(
                 color: AppTheme.primary,
@@ -400,6 +423,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
     }
 
     return ListView.builder(
+      controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.only(
         bottom: 20.h,
@@ -407,8 +431,17 @@ class _HabitsScreenState extends State<HabitsScreen> {
         left: 20.w,
         right: 20.w,
       ),
-      itemCount: _filteredHabits.length,
+      itemCount: _filteredHabits.length + (_isLoadMoreRunning ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index == _filteredHabits.length) {
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
         final habit = _filteredHabits[index];
         return HabitCard(
           habit: habit,

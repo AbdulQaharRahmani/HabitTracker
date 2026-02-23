@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import '../../services/category_cache.dart';
 import '../../utils/category/category_model.dart';
 
 /// =======================
@@ -800,7 +801,7 @@ class _CreateCategoryState extends State<CreateCategory> {
       _showErrorSnackbar('Please fill all fields');
       return;
     }
-
+    CategoryCache().clear();
      final color = appColors.firstWhere((e) => e.id == selectedColorId!);
     final backgroundColor = color.id.replaceAll('_', '');
 
