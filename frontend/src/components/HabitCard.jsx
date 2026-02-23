@@ -1,8 +1,11 @@
+import {useState} from 'react';
 import { FaCheckCircle, FaCircle } from "react-icons/fa";
 import { LuPencil } from "react-icons/lu";
 import HabitCardIcon from "./HabitCardIcon";
 import { MdDeleteOutline } from "react-icons/md";
 import useHabitStore from "../store/useHabitStore";
+import ConfirmationModal from './modals/ConfirmationModal';
+
 import { useTranslation } from "react-i18next";
 
 export default function HabitCard({
@@ -21,7 +24,26 @@ export default function HabitCard({
   const deleteHabit = useHabitStore((state) => state.deleteHabit);
   const { t } = useTranslation();
 
+  const [isModalOpen,setIsModalOpen]=useState(false);
+  const [isDeleting,setIsDeleting]=useState(false);
+
+
+  const handleDelete=async()=>{
+    try{
+      setIsDeleting(true);
+      await deleteHabit(_id,t);
+      setIsModalOpen(false);
+
+    }catch(err){
+      console.error("Failed to delete habit:", err);
+    }finally{
+      setIsDeleting(false);
+    }
+  }
+
+
   return (
+    <>
     <div
       className={`
         mx-auto p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm
@@ -76,7 +98,7 @@ export default function HabitCard({
               })
             }
           />
-          <button onClick={() => deleteHabit(_id,t)}>
+          <button onClick={() => setIsModalOpen(true)}>
             <MdDeleteOutline
               size={20}
               className="
@@ -88,5 +110,17 @@ export default function HabitCard({
         </div>
       </div>
     </div>
+
+    <ConfirmationModal
+    isOpen={isModalOpen}
+    onClose={()=>setIsModalOpen(false)}
+    onConfirm={handleDelete}
+    title={t("delete_habit")}
+    description={t("delete_habit_description")}
+    confirmText={t("delete_confirmText")}
+    type="danger"
+    isLoading={isDeleting}
+    />
+    </>
   );
 }

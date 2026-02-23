@@ -15,6 +15,7 @@ import helmet from 'helmet';
 import { logMiddleware } from './middleware/logger.js';
 import { privateLimiter, publicLimiter } from './middleware/rateLimiter.js';
 import { sanitizeKeys } from './middleware/sanitizer.js';
+import { authorizeRoles } from './middleware/authorizeRoles.js';
 
 const app = express();
 
@@ -58,12 +59,51 @@ app.use('/api/auth', publicLimiter, authRoutes);
 
 // Protect routes
 
-app.use('/api/categories', authMiddleware, privateLimiter, categoryRoutes);
-app.use('/api/habits', authMiddleware, privateLimiter, habitRoutes);
-app.use('/api/tasks', authMiddleware, privateLimiter, taskRoutes);
-app.use('/api/users', authMiddleware, privateLimiter, userRoutes);
-app.use('/api/offline-data', authMiddleware, privateLimiter, syncRoutes);
-app.use('/api/logs', authMiddleware, privateLimiter, logRoutes);
+// Role: Admin & User
+app.use(
+  '/api/categories',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  categoryRoutes
+);
+app.use(
+  '/api/habits',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  habitRoutes
+);
+app.use(
+  '/api/tasks',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  taskRoutes
+);
+app.use(
+  '/api/users',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  userRoutes
+);
+app.use(
+  '/api/offline-data',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  syncRoutes
+);
+
+// Role: Admin
+app.use(
+  '/api/logs',
+  authMiddleware,
+  authorizeRoles('admin'),
+  privateLimiter,
+  logRoutes
+);
 
 //#endregion
 
