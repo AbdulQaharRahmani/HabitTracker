@@ -107,7 +107,6 @@ export const getLogById = async (req, res) => {
     .filter((file) => file.startsWith('application-'))
     .sort()
     .reverse();
-  console.log(files);
 
   for (const file of files) {
     const content = fs.readFileSync(path.join(logsDir, file), 'utf-8');
