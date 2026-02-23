@@ -4,7 +4,7 @@ import { defineResetPasswordEmailJobs } from './jobs/emailJobs.js';
 
 async function startWorker() {
   //Initial Jobs
-  defineResetPasswordEmailJobs(agenda);
+  await defineResetPasswordEmailJobs(agenda);
 
   agenda.on('retry', (job, details) => {
     console.log(`Job ${job.attrs.name} retry # ${details.attempt}`);

@@ -323,6 +323,6 @@ export const resetPassword = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: 'Password update successfully',
+    message: 'Password updated successfully',
   });
 };
