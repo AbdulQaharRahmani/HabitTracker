@@ -71,6 +71,14 @@ const handleAddNewTaskToCategory = (catId) => {
     "ctrl+k, meta+k",
     (e) => {
       e.preventDefault();
+
+      // Reset form
+      setTaskData("title", "");
+      setTaskData("description", "");
+      setTaskData("dueDate", null);
+      setTaskData("priority", "medium");
+      setTaskData("category", null);
+
         setModalOpen(true);
       },
       { enabled: !isModalOpen }
