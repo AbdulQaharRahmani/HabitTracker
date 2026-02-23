@@ -105,6 +105,7 @@ const seed = async () => {
     username: 'Test',
     email: 'test@gmail.com',
     password: hashedPassword,
+    role: 'admin',
   });
 
   const defaultCategories = getDefaultCategories(user._id);
