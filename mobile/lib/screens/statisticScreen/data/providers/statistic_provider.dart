@@ -31,8 +31,6 @@ class StatisticProvider extends ChangeNotifier {
     if (_filter == newFilter) return;
     _filter = newFilter;
     notifyListeners();
-
-    // Only reload Summary and Chart data, ignore Consistency
     fetchAllData();
   }
 
@@ -67,8 +65,7 @@ class StatisticProvider extends ChangeNotifier {
       _summary = results[0] as DashboardSummaryModel;
       _chartData = results[1] as ChartData;
     } catch (e) {
-      // e.toString() here will contain the exact message thrown by repository
-      _error = _parseBackendError(e);
+           _error = _parseBackendError(e);
     } finally {
       _isLoading = false;
       notifyListeners();
