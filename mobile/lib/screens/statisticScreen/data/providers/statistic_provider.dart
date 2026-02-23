@@ -1,119 +1,116 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter/material.dart';
 import '../../widgets/filter_enum.dart';
 import '../models/chart_data_model.dart';
 import '../models/dashboard_summary_model.dart';
 import '../repositories/statistics_repository.dart';
+import 'consistency_provider.dart';
 
-// ==============================
-// Repository Provider
-// ==============================
-final statisticsRepositoryProvider = Provider<StatisticsRepository>((ref) {
-  return StatisticsRepository(
+class StatisticProvider extends ChangeNotifier {
+  final StatisticsRepository _repository = StatisticsRepository(
     baseUrl: "https://habit-tracker-17sr.onrender.com/api",
   );
-});
 
+  ChartFilter _filter = ChartFilter.month;
+  ChartData? _chartData;
+  DashboardSummaryModel? _summary;
+  bool _isLoading = false;
+  String? _error;
 
-final summaryProvider =
-AsyncNotifierProvider<SummaryNotifier, DashboardSummaryModel>(
-    SummaryNotifier.new);
+  // Getters
+  ChartFilter get filter => _filter;
+  ChartData? get chartData => _chartData;
+  DashboardSummaryModel? get summary => _summary;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
-class SummaryNotifier extends AsyncNotifier<DashboardSummaryModel> {
-  @override
-  Future<DashboardSummaryModel> build() async {
-    final repo = ref.watch(statisticsRepositoryProvider);
-    final range = ref.watch(dateRangeProvider);
-    return repo.getDashboardSummary(startDate: range.start, endDate: range.end);
-
+  StatisticProvider() {
+    fetchAllData();
   }
 
-  // SummaryNotifier
-  Future<void> reloadSummary() async {
-    final repo = ref.read(statisticsRepositoryProvider);
-    final range = ref.read(dateRangeProvider);
-    state = await AsyncValue.guard(() => repo.getDashboardSummary(startDate: range.start, endDate: range.end));
+  void setFilter(ChartFilter newFilter) {
+    _filter = newFilter;
+    notifyListeners();
+    fetchAllData();
   }
 
+  DateRange get dateRange {
+    final now = DateTime.now();
+    switch (_filter) {
+      case ChartFilter.week:
+        return DateRange(now.subtract(const Duration(days: 6)), now);
+      case ChartFilter.month:
+        return DateRange(DateTime(now.year, now.month, 1), now);
+      case ChartFilter.lastMonth:
+        return DateRange(DateTime(now.year, now.month - 1, 1), DateTime(now.year, now.month, 0));
+      case ChartFilter.year:
+        return DateRange(DateTime(now.year, 1, 1), now);
+    }
+  }
+
+  Future<void> fetchAllData() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final range = dateRange;
+
+      // Concurrently fetch summary and chart data
+      final results = await Future.wait([
+        _repository.getDashboardSummary(startDate: range.start, endDate: range.end),
+        _repository.getChartData(startDate: range.start, endDate: range.end),
+      ]);
+
+      _summary = results[0] as DashboardSummaryModel;
+      _chartData = results[1] as ChartData;
+    } catch (e) {
+      // e.toString() here will contain the exact message thrown by repository
+      _error = _parseBackendError(e);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Extracts the clean message from the backend exception
+  String _parseBackendError(dynamic e) {
+    String message = e.toString();
+    // Remove 'Exception: ' prefix if present to show a clean message to the user
+    if (message.startsWith('Exception:')) {
+      message = message.replaceFirst('Exception:', '').trim();
+    }
+
+    // Handle common network issues specifically
+    if (message.toLowerCase().contains('socketexception')) {
+      return "Network error: Please check your internet connection.";
+    }
+
+    return message;
+  }
+
+  Future<void> refreshAllScreenData(ConsistencyProvider consistencyProv) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      // Triggering all APIs at once
+      await Future.wait([
+        fetchAllData(),
+        consistencyProv.fetchConsistency(),
+      ]);
+    } catch (e) {
+      _error = _parseBackendError(e);
+    } finally {
+      // Both providers will stop loading at the exact same time
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
-
-final chartProvider =
-AsyncNotifierProvider<ChartNotifier, ChartData>(
-    ChartNotifier.new);
-
-class ChartNotifier extends AsyncNotifier<ChartData> {
-  @override
-  Future<ChartData> build() async {
-    final repo = ref.watch(statisticsRepositoryProvider); // watch
-    final range = ref.watch(dateRangeProvider); // watch
-    return repo.getChartData(startDate: range.start, endDate: range.end);
-  }
-
-
-
-  Future<void> reloadChart() async {
-    final repo = ref.read(statisticsRepositoryProvider);
-    final range = ref.read(dateRangeProvider);
-
-    state = await AsyncValue.guard(() async {
-      return repo.getChartData(
-        startDate: range.start,
-        endDate: range.end,
-      );
-    });
-  }
-}
-
-
-
-
-
-
-
-// ==============================
-// Chart Filter StateProvider
-// ==============================
-
-final chartFilterProvider = StateProvider<ChartFilter>((ref) => ChartFilter.month);
-
 
 class DateRange {
   final DateTime start;
   final DateTime end;
-
   DateRange(this.start, this.end);
 }
-
-final dateRangeProvider = Provider<DateRange>((ref) {
-  final filter = ref.watch(chartFilterProvider);
-  final now = DateTime.now();
-
-  switch (filter) {
-    case ChartFilter.week:
-      return DateRange(
-        now.subtract(const Duration(days: 6)),
-        now,
-      );
-
-    case ChartFilter.month:
-      return DateRange(
-        DateTime(now.year, now.month, 1),
-        now,
-      );
-
-    case ChartFilter.lastMonth:
-      final lastMonth = DateTime(now.year, now.month - 1, 1);
-      return DateRange(
-        lastMonth,
-        DateTime(now.year, now.month, 0),
-      );
-
-    case ChartFilter.year:
-      return DateRange(
-        DateTime(now.year, 1, 1),
-        now,
-      );
-  }
-});
-
-

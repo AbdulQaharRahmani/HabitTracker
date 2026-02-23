@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/theme_provider.dart';
 import '../data/models/daily_consistency.dart';
 
 class ProfessionalHeatmap extends StatefulWidget {
@@ -12,14 +14,16 @@ class ProfessionalHeatmap extends StatefulWidget {
 }
 
 class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
+
   late PageController _pageController;
   // LateInitializationError
-  late final DateTime now = DateTime.now();
+  DateTime get now => DateTime.now();
 
   static const double cellSize = 24;
   static const double cellSpacing = 5;
 
   late List<int> months;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -39,12 +43,28 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
     super.dispose();
   }
 
+  Future<void> _refresh() async {
+    final currentIndex = _currentPage;
+
+    setState(() {
+      months = List.generate(now.month, (index) => index + 1);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (currentIndex < months.length) {
+        _pageController.jumpToPage(currentIndex);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final themeProv = Provider.of<ThemeProvider>(context);
+    final theme = themeProv.currentTheme;
     return Container(
       height: 300,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(15),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -66,6 +86,9 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
+                    onPageChanged: (index) {
+                      _currentPage = index;
+                    },
                     itemCount: months.length,
                     itemBuilder: (context, index) {
                       final month = months[index];
@@ -82,9 +105,10 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
                                   Center(
                                     child: Text(
                                       "${_monthName(month)} ${now.year}",
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
+                                       color:theme.textTheme.bodyLarge?.color,
                                       ),
                                     ),
                                   ),
@@ -103,14 +127,13 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
                                           ),
                                           child: Column(
                                             children: week
-                                                .map((day) => _buildCell(day))
+                                                .map((day) => _buildCell(day,theme))
                                                 .toList(),
                                           ),
                                         );
                                       }).toList(),
                                     ),
                                   ),
-
                                 ],
                               ),
                             ),
@@ -124,7 +147,7 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
             ),
           ),
 
-          Expanded(flex: 1, child: _buildLegend()),
+          Expanded(flex: 1, child: _buildLegend(theme)),
         ],
       ),
     );
@@ -187,7 +210,7 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
     return weeks;
   }
 
-  Widget _buildCell(HabitDay day) {
+  Widget _buildCell(HabitDay day, ThemeData theme) {
     final isToday =
         day.date.year == now.year &&
         day.date.month == now.month &&
@@ -200,9 +223,12 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
       child: Container(
         width: cellSize,
         height: cellSize,
-        margin: const EdgeInsets.only(bottom: cellSpacing,left:cellSpacing-4 ),
+        margin: const EdgeInsets.only(
+          bottom: cellSpacing,
+          left: cellSpacing - 4,
+        ),
         decoration: BoxDecoration(
-          color: _colorScale(day.completed),
+          color: _colorScale(day.completed, theme),
           borderRadius: BorderRadius.circular(5),
           border: isToday
               ? Border.all(color: Colors.black26, width: 1.5)
@@ -232,9 +258,17 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
     );
   }
 
-  Color _colorScale(int value) {
+  Color _colorScale(int value, ThemeData theme) {
     if (value == -1) return Colors.transparent;
-    if (value == 0) return AppTheme.heatLow;
+
+    if (value == 0) {
+      // در حالت دارک مود، خانه‌های خالی باید تیره‌تر باشند
+      return theme.brightness == Brightness.dark
+          ? Colors.grey.shade800
+          : Colors.grey.shade200;
+    }
+
+    // استفاده از متغیرهای AppTheme که با تغییر تم مقدارشان عوض می‌شود
     if (value == 1) return AppTheme.heatLow;
     if (value == 2) return AppTheme.heatMedium;
     return AppTheme.heatHigh;
@@ -259,7 +293,7 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
     return months[month];
   }
 
-  Widget _buildLegend() {
+  Widget _buildLegend(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(top: 0, right: 30, bottom: 10),
       child: Row(
@@ -276,7 +310,8 @@ class _ProfessionalHeatmapState extends State<ProfessionalHeatmap> {
               height: cellSize - 4,
               margin: const EdgeInsets.symmetric(horizontal: 3),
               decoration: BoxDecoration(
-                color: _colorScale(index),
+                // اصلاح شده: حالا هر دو ورودی پاس داده می‌شود
+                color: _colorScale(index + 1, theme),
                 borderRadius: BorderRadius.circular(4),
               ),
             );

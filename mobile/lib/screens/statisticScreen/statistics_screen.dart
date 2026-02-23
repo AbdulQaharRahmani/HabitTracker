@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/screens/statisticScreen/widgets/error_veiw.dart';
+import 'package:provider/provider.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import '../../../providers/theme_provider.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/completion_trend_card.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/consistency_heatmap.dart';
 import 'package:habit_tracker/screens/statisticScreen/widgets/header.dart';
@@ -11,67 +13,89 @@ import 'package:habit_tracker/screens/statisticScreen/widgets/summary_cards.dart
 import 'data/providers/consistency_provider.dart';
 import 'data/providers/statistic_provider.dart';
 
-class StatisticScreen extends ConsumerWidget {
+class StatisticScreen extends StatelessWidget {
   const StatisticScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final summaryAsync = ref.watch(summaryProvider);
-    final chartAsync = ref.watch(chartProvider);
-    final consistencyAsync = ref.watch(consistencyDataProvider);
+  Widget build(BuildContext context) {
+    final themeProv = Provider.of<ThemeProvider>(context);
+    final theme = themeProv.currentTheme;
+
+    final statisticProv = Provider.of<StatisticProvider>(context);
+    final consistencyProv = Provider.of<ConsistencyProvider>(context);
+
+    final bool isGlobalLoading = statisticProv.isLoading ||
+        consistencyProv.isLoading;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () async {
-            ref.invalidate(summaryProvider);
-            ref.read(chartProvider.notifier).reloadChart();
-          },
+          onRefresh: () => statisticProv.refreshAllScreenData(consistencyProv),
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                StatisticsHeader(),
-                // const SizedBox(height: 24),
-                // FilterTabs(),
+                const StatisticsHeader(),
                 const SizedBox(height: 20),
 
-                // Summary
-                summaryAsync.when(
-                  data: (summary) => SummaryCards(summary: summary),
-                  loading: () => const ShimmerSummaryCards(),
-                  error: (err, _) => Text("Error: $err"),
-                ),
+                //  Dashboard Summary Section
+                if (isGlobalLoading)
+                  const ShimmerSummaryCards()
+                else
+                  if (statisticProv.error != null)
+                    ErrorView(
+                      errorMessage: statisticProv.error!,
+                      onRetry: () =>
+                          statisticProv.refreshAllScreenData(consistencyProv),
+                    )
+                  else
+                    if (statisticProv.summary != null)
+                      SummaryCards(summary: statisticProv.summary!)
+                    else
+                      const Center(child: Text("No summary data available")),
 
                 const SizedBox(height: 15),
 
-                // Chart
-                chartAsync.when(
-                  data: (chartData) =>
-                      CompletionTrendCard(chartData: chartData),
-                  loading: () => const ShimmerChart(),
-                  error: (err, _) => Text("Error: $err"),
-                ),
+                //  Chart Section
+                if (isGlobalLoading)
+                  const ShimmerChart()
+                else
+                  if (statisticProv.error == null &&
+                      statisticProv.chartData != null)
+                    CompletionTrendCard(chartData: statisticProv.chartData!)
+                  else
+                    const SizedBox.shrink(),
 
-                const SizedBox(height: 20),
-                const Text(
+                const SizedBox(height: 25),
+
+                //  Consistency Section
+                Text(
                   'Consistency',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: theme.textTheme.bodyLarge?.color,
+                  ),
                 ),
                 const SizedBox(height: 15),
 
-                //  consistency
-
-                consistencyAsync.when(
-                  data: (data) => ProfessionalHeatmap(data: data),
-                  loading: () => const ShimmerHeatmap(),
-                  error: (err, _) => Text("Error: $err"),
-                ),
-
-
+                if (isGlobalLoading)
+                  const ShimmerHeatmap()
+                else
+                  if (consistencyProv.error != null)
+                    ErrorView(
+                      errorMessage: consistencyProv.error!,
+                      onRetry: () =>
+                          statisticProv.refreshAllScreenData(consistencyProv),
+                    )
+                  else
+                    if (consistencyProv.data != null)
+                      ProfessionalHeatmap(data: consistencyProv.data!)
+                    else
+                      const Center(child: Text("No consistency data found")),
               ],
             ),
           ),

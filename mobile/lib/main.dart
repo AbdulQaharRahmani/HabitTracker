@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:habit_tracker/providers/theme_provider.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/providers/consistency_provider.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/providers/statistic_provider.dart';
+import 'package:provider/provider.dart';
 import 'features/routes.dart';
 
 void main() {
-  runApp(ProviderScope(child: const MyApp()));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        // اضافه کردن پرووایدرهای بخش آمار
+        ChangeNotifierProvider(create: (_) => StatisticProvider()),
+        ChangeNotifierProvider(create: (_) => ConsistencyProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

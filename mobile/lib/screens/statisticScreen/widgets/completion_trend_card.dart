@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 import 'package:habit_tracker/screens/statisticScreen/data/models/chart_data_model.dart';
 import '../data/providers/statistic_provider.dart';
 import 'chart_mapper.dart';
 import 'filter_enum.dart';
 
-class CompletionTrendCard extends ConsumerWidget {
+class CompletionTrendCard extends StatelessWidget {
   final ChartData chartData;
-
   const CompletionTrendCard({super.key, required this.chartData});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final filter = ref.watch(chartFilterProvider);
+  Widget build(BuildContext context) {
+    // استفاده از Provider.of به جای ref.watch
+    final statisticProv = Provider.of<StatisticProvider>(context);
+    final filter = statisticProv.filter;
 
-    // Generate FlSpot list for the chart using the mapper.
     final spots = ChartMapper.generateSpots(filter: filter, data: chartData);
-    // Get the visible data for label generation.
-    final visibleData = ChartMapper.getVisibleData(
-      filter: filter,
-      data: chartData,
-    );
-
+    final visibleData = ChartMapper.getVisibleData(filter: filter, data: chartData);
     final percentChange = _calculatePercentChange(filter, chartData);
+
     return _buildCompletionTrend(spots, visibleData, percentChange, filter);
   }
 
