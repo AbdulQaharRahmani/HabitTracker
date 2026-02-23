@@ -45,7 +45,6 @@ export const getHabitById = async (req, res) => {
   const habit = await HabitModel.findOne({
     _id: req.params.id,
     userId: req.user._id,
-    isDeleted: false,
   }).populate('categoryId', 'name backgroundColor icon');
 
   if (!habit) throw notFound('Habit');
