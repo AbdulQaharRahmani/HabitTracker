@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
+import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 import 'habit.dart';
 
 class HabitCard extends StatelessWidget {
@@ -19,18 +23,22 @@ class HabitCard extends StatelessWidget {
 
     final Color color = habit.category.backgroundColor;
     final IconData icon = habit.category.icon;
+    Provider.of<ThemeProvider>(context);
+
+    final Color categoryColor = habit.getColor();
+    final IconData icon = habit.getIcon();
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(18.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 6.r,
-            offset: Offset(0, 2.h),
+            color: AppTheme.shadow,
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
@@ -42,12 +50,12 @@ class HabitCard extends StatelessWidget {
             width: 48.r,
             height: 48.r,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: categoryColor.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              color: color,
+              color: categoryColor,
               size: 26.sp,
             ),
           ),
@@ -66,7 +74,7 @@ class HabitCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF111827),
+                    color: AppTheme.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -80,7 +88,7 @@ class HabitCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: const Color(0xFF6B7280),
+                    color: AppTheme.textSecondary,
                   ),
                 ),
                 SizedBox(height: 8.h),
@@ -100,7 +108,7 @@ class HabitCard extends StatelessWidget {
                         vertical: 4.h,
                       ),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.15),
+                        color: categoryColor.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(6.r),
                       ),
                       child: Text(
@@ -108,7 +116,7 @@ class HabitCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10.sp,
                           fontWeight: FontWeight.bold,
-                          color: color,
+                          color: categoryColor,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
