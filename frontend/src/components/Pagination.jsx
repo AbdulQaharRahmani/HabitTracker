@@ -37,13 +37,19 @@ function Pagination({
       </div>
       <nav className="flex items-center gap-1.5 sm:justify-end">
         {/* Prev */}
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="p-2 rounded-full border border-gray-500 text-gray-900 hover:bg-gray-100 disabled:opacity-40"
-        >
-          <VscChevronLeft className="text-gray-100" />
-        </button>
+     <button
+      onClick={() => onPageChange(currentPage - 1)}
+      disabled={currentPage === 1}
+      className="p-2 rounded-full border
+                border-gray-500 dark:border-gray-500 dark:enabled:hover:border-gray-700
+                text-gray-700 dark:text-gray-200
+                enabled:hover:border-gray-300
+                enabled:hover:bg-gray-200
+                dark:enabled:hover:bg-gray-700
+                disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <VscChevronLeft />
+    </button>
 
         {paginationRange.map((page, index) => {
           if (page === DOTS) {
@@ -60,14 +66,17 @@ function Pagination({
           const isActive = page === currentPage;
 
           return (
-            <button
+           <button
               key={page}
               onClick={() => onPageChange(page)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                isActive
-                  ? "bg-indigo-600 text-white"
-                  : " text-gray-700 hover:bg-gray-100"
-              }`}
+              disabled={isActive}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors
+                ${
+                  isActive
+                    ? "bg-indigo-600 text-white dark:bg-indigo-500"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                }
+                disabled:cursor-default`}
             >
               {page}
             </button>
@@ -75,13 +84,19 @@ function Pagination({
         })}
 
         {/* Next */}
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="p-2 rounded-full border border-gray-500 text-gray-900 hover:bg-gray-100 disabled:opacity-40"
-        >
-          <VscChevronRight className="text-gray-100" />
-        </button>
+       <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="p-2 rounded-full border
+                border-gray-500 dark:border-gray-500 dark:enabled:hover:border-gray-700
+                text-gray-700 dark:text-gray-200
+                enabled:hover:border-gray-300
+                enabled:hover:bg-gray-200
+                dark:enabled:hover:bg-gray-700
+                disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <VscChevronRight />
+      </button>
       </nav>
     </div>
   );
