@@ -72,7 +72,6 @@ export const getTaskById = async (req, res) => {
   const task = await TaskModel.findOne({
     _id: req.params.id,
     userId: req.user._id,
-    isDeleted: false,
   }).populate('categoryId', 'name icon backgroundColor');
 
   if (!task) throw notFound('Task');
