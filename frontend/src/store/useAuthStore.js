@@ -9,53 +9,51 @@ const useAuthStore = create(
       user: null,
       isAuthLoading: false,
       isAuthenticated: false,
-      login: (token, userData) => {
+      login: (token, userData, userEmail) => {
         set((state) => ({
           token,
+          email: userEmail,
           user: userData ? userData : state.user,
           isAuthLoading: false,
-          isAuthenticated: true
+          isAuthenticated: true,
         }));
       },
-
-
-
 
       updateUserName: (newUserName) => {
         set((state) => {
           if (!state.user) {
-            return state
+            return state;
           }
           return {
             user: {
               ...state.user,
-              username: newUserName
-            }
-          }
-        })
+              username: newUserName,
+            },
+          };
+        });
       },
       logout: async () => {
         try {
-          await logout()
+          await logout();
         } catch (error) {
-          console.log(error)
+          console.log(error);
         } finally {
           set({
             token: null,
             user: null,
-            isAuthenticated: false
+            email: null,
+            isAuthenticated: false,
           });
-          localStorage.removeItem("userData-storage")
+          localStorage.removeItem("userData-storage");
         }
-
       },
     }),
     {
       name: "userData-storage",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ user: state.user }), // just store the user data (id, username) not the token
-    }
-  )
+      partialize: (state) => ({ user: state.user, email: state.email }), // just store the user data (id, username) not the token
+    },
+  ),
 );
 
 export default useAuthStore;

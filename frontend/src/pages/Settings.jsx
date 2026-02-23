@@ -7,7 +7,8 @@ import { useDebounce } from "../hooks/useDebounce";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import useSettingStore from "../store/useSettingStore";
-import LanguageSwitcher from "../components/internationalization"
+import LanguageSwitcher from "../components/internationalization";
+import useAuthStore from "../store/useAuthStore";
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -32,7 +33,6 @@ const Settings = () => {
   const hasInitialized = useRef(false);
 
   const [username, setUsername] = useState("");
-  const [email] = useState("test@gmail.com");
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
@@ -41,6 +41,8 @@ const Settings = () => {
   const [newPasswordType, setNewPasswordType] = useState("password");
 
   const [isSaving, setIsSaving] = useState(false);
+
+  const email = useAuthStore((state) => state.email);
 
   useEffect(() => {
     fetchUserPreferences();
@@ -323,8 +325,7 @@ const Settings = () => {
                   </p>
                 </div>
                 <div className=" py-2">
-                  <div
-                  >
+                  <div>
                     <LanguageSwitcher />
                   </div>
                 </div>
