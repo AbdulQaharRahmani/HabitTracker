@@ -12,7 +12,7 @@ export default function DarkMode() {
         rounded-full p-2
         bg-gray-100 hover:bg-gray-200
         dark:bg-gray-700 dark:hover:bg-gray-600
-        transition-colors shadow-md
+        transition-colors shadow-md me-24 rtl:me-[5rem]
       "
     >
       {isDark ? (

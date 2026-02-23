@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/app_theme.dart';
 import '../../services/category_cache.dart';
@@ -148,9 +149,9 @@ class _AddHabitFormState extends State<_AddHabitForm> {
         _isLoadingCategories = false;
       });
     } catch (e) {
-      print("❌ Cache Exception: $e");
+      print("❌ Connection Exception: $e");
       setState(() {
-        _errorMessage = "Failed to load categories";
+        _errorMessage = "Error with connecting to network";
         _isLoadingCategories = false;
       });
     }
@@ -201,6 +202,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
       } else {
         print("❌ Submit Error Body: ${response.body}");
         _showSnackBar("Error: ${response.statusCode}");
+        _showSnackBar("Not registered: ${response.statusCode}");
       }
     } catch (e) {
       print("❌ Submit Exception: $e");
@@ -227,6 +229,8 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     _descCtl.dispose();
     super.dispose();
   }
+
+
 
   InputDecoration _fieldDecoration({String? hint}) {
     return InputDecoration(
@@ -257,93 +261,6 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     );
   }
 
-  Widget _buildCategoryDropdown() {
-    if (_isLoadingCategories) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(10.h),
-          child: SizedBox(
-            height: 20.h,
-            width: 20.w,
-            child: const CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-      );
-    }
-
-    if (_errorMessage != null) {
-      return Text(
-        _errorMessage!,
-        style: TextStyle(color: Colors.red, fontSize: 12.sp),
-      );
-    }
-
-    if (_categories.isEmpty) {
-      return const Text(
-        'No categories available',
-        style: TextStyle(color: Colors.grey),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppTheme.border, width: 1),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<CategoryModel>(
-          value: _selectedCategory,
-          isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-          dropdownColor: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          items: _categories.map((cat) => DropdownMenuItem<CategoryModel>(
-            value: cat,
-            child: Row(
-              children: [
-                Container(
-                  width: 34.w,
-                  height: 34.h,
-                  decoration: BoxDecoration(
-                    color: cat.backgroundColor,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: cat.backgroundColor.withOpacity(0.4),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(cat.icon, color: Colors.white, size: 18.sp),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Text(
-                    cat.name,
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.textPrimary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          )).toList(),
-          onChanged: (val) {
-            if (val != null) {
-              setState(() => _selectedCategory = val);
-            }
-          },
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -351,6 +268,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Title
           Text('Title', style: _labelStyle()),
           SizedBox(height: 8.h),
           TextFormField(
@@ -361,6 +279,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
           ),
           SizedBox(height: 14.h),
 
+          // Description
           Text('Description', style: _labelStyle()),
           SizedBox(height: 8.h),
           TextFormField(
@@ -372,14 +291,13 @@ class _AddHabitFormState extends State<_AddHabitForm> {
           ),
           SizedBox(height: 14.h),
 
+          // Frequency
           Text('Frequency', style: _labelStyle()),
           SizedBox(height: 8.h),
           DropdownButtonFormField<String>(
             initialValue: _frequency,
             decoration: _fieldDecoration(),
-            items: _frequencies
-                .map((f) => DropdownMenuItem(value: f, child: Text(f)))
-                .toList(),
+            items: _frequencies.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
             onChanged: (v) {
               if (v == null) return;
               setState(() => _frequency = v);
@@ -387,11 +305,35 @@ class _AddHabitFormState extends State<_AddHabitForm> {
           ),
           SizedBox(height: 14.h),
 
+          // Category (Dynamic Loading)
           Text('Category', style: _labelStyle()),
           SizedBox(height: 8.h),
-          _buildCategoryDropdown(),
+          _isLoadingCategories
+              ? Center(child: Padding(
+            padding: EdgeInsets.all(10.h),
+            child: SizedBox(
+                height: 20.h, width: 20.w,
+                child: const CircularProgressIndicator(strokeWidth: 2)
+            ),
+          ))
+              : _errorMessage != null
+              ? Text(_errorMessage!, style: TextStyle(color: Colors.red, fontSize: 12.sp))
+              : DropdownButtonFormField<CategoryModel>(
+            initialValue: _selectedCategory,
+            decoration: _fieldDecoration(),
+            items: _categories.map((c) => DropdownMenuItem(
+                value: c,
+                child: Text(c.name)
+            )).toList(),
+            onChanged: (v) {
+              if (v == null) return;
+              setState(() => _selectedCategory = v);
+            },
+            validator: (v) => v == null ? 'Select a category' : null,
+          ),
           SizedBox(height: 20.h),
 
+          // Save button
           SizedBox(
             height: 50.h,
             child: ElevatedButton(
@@ -419,6 +361,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
 
           SizedBox(height: 8.h),
 
+          // Cancel
           TextButton(
             onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
             style: TextButton.styleFrom(

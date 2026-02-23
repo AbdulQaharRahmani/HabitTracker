@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
-import '../../services/category_cache.dart';
+import 'package:provider/provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../utils/category/category_model.dart';
 
 /// =======================
@@ -24,7 +25,7 @@ class AppColor {
 /// Static Data (Expanded options)
 /// =======================
 final List<AppIcon> appIcons = [
- // 📚 Education and Study
+  // 📚 Education and Study
   AppIcon('school', Icons.school, category: '📚 Education'),
   AppIcon('menu_book', Icons.menu_book, category: '📚 Education'),
   AppIcon('library_books', Icons.library_books, category: '📚 Education'),
@@ -45,14 +46,14 @@ final List<AppIcon> appIcons = [
   AppIcon('store', Icons.store, category: '🛒 Shopping'),
   AppIcon('local_mall', Icons.local_mall, category: '🛒 Shopping'),
 
-// 🏠 Home
+  // 🏠 Home
   AppIcon('home', Icons.home, category: '🏠 Home'),
   AppIcon('house', Icons.house, category: '🏠 Home'),
   AppIcon('home_work', Icons.home_work, category: '🏠 Home'),
   AppIcon('cottage', Icons.cottage, category: '🏠 Home'),
   AppIcon('bed', Icons.bed, category: '🏠 Home'),
 
-// 🏥 Health
+  // 🏥 Health
   AppIcon('health_and_safety', Icons.health_and_safety, category: '🏥 Health'),
   AppIcon('medical_services', Icons.medical_services, category: '🏥 Health'),
   AppIcon('local_hospital', Icons.local_hospital, category: '🏥 Health'),
@@ -80,7 +81,7 @@ final List<AppIcon> appIcons = [
   AppIcon('elderly', Icons.elderly, category: '👨‍👩‍👧‍👦 Personal'),
   AppIcon('pets', Icons.pets, category: '👨‍👩‍👧‍👦 Personal'),
 
-// 💰 Finance
+  // 💰 Finance
   AppIcon('account_balance', Icons.account_balance, category: '💰 Finance'),
   AppIcon('payments', Icons.payments, category: '💰 Finance'),
   AppIcon('savings', Icons.savings, category: '💰 Finance'),
@@ -122,7 +123,7 @@ final List<AppIcon> appIcons = [
   AppIcon('explore', Icons.explore, category: '📍 Locations'),
   AppIcon('pin_drop', Icons.pin_drop, category: '📍 Locations'),
 
-// 💡 Ideas and Projects
+  // 💡 Ideas and Projects
   AppIcon('lightbulb', Icons.lightbulb, category: '💡 Projects'),
   AppIcon('lightbulb_outline', Icons.lightbulb_outline, category: '💡 Projects'),
   AppIcon('inventory', Icons.inventory, category: '💡 Projects'),
@@ -143,14 +144,14 @@ final List<AppIcon> appIcons = [
   AppIcon('engineering', Icons.engineering, category: '⚙ Tools'),
   AppIcon('biotech', Icons.biotech, category: '⚙ Tools'),
 
-// 📊 Analytics and Statistics
+  // 📊 Analytics and Statistics
   AppIcon('analytics', Icons.analytics, category: '📊 Analytics'),
   AppIcon('assessment', Icons.assessment, category: '📊 Analytics'),
   AppIcon('trending_up', Icons.trending_up, category: '📊 Analytics'),
   AppIcon('show_chart', Icons.show_chart, category: '📊 Analytics'),
   AppIcon('bar_chart', Icons.bar_chart, category: '📊 Analytics'),
 
-// 📋 General
+  // 📋 General
   AppIcon('task', Icons.task, category: '📋 General'),
   AppIcon('task_alt', Icons.task_alt, category: '📋 General'),
   AppIcon('check_circle', Icons.check_circle, category: '📋 General'),
@@ -269,11 +270,9 @@ class _CreateCategoryState extends State<CreateCategory> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
+    Provider.of<ThemeProvider>(context);
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.background : Colors.grey[50],
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: const Text(
           'Create New Category',
@@ -282,7 +281,7 @@ class _CreateCategoryState extends State<CreateCategory> {
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
-        foregroundColor: isDark ? Colors.white : Colors.black,
+        foregroundColor: AppTheme.textPrimary,
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -341,14 +340,14 @@ class _CreateCategoryState extends State<CreateCategory> {
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: Colors.blue),
+        Icon(icon, size: 20, color: AppTheme.primary),
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: AppTheme.textPrimary,
           ),
         ),
       ],
@@ -358,11 +357,11 @@ class _CreateCategoryState extends State<CreateCategory> {
   Widget _buildNameInput() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:  0.05),
+            color: AppTheme.shadow,
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -373,13 +372,13 @@ class _CreateCategoryState extends State<CreateCategory> {
         onChanged: (_) => setState(() {}),
         decoration: InputDecoration(
           hintText: 'Enter category name (e.g., Work, Study, Shopping)',
-          hintStyle: const TextStyle(color: Colors.grey),
+          hintStyle: TextStyle(color: AppTheme.textMuted),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-          prefixIcon: const Icon(Icons.edit, color: Colors.blueGrey),
+          prefixIcon: Icon(Icons.edit, color: AppTheme.textSecondary),
           suffixIcon: _titleController.text.isNotEmpty
               ? IconButton(
-            icon: const Icon(Icons.clear, color: Colors.grey),
+            icon: Icon(Icons.clear, color: AppTheme.textMuted),
             onPressed: () {
               _titleController.clear();
               setState(() {});
@@ -387,7 +386,7 @@ class _CreateCategoryState extends State<CreateCategory> {
           )
               : null,
         ),
-        style: const TextStyle(fontSize: 16),
+        style: TextStyle(fontSize: 16, color: AppTheme.textPrimary),
         maxLength: 30,
       ),
     );
@@ -409,7 +408,7 @@ class _CreateCategoryState extends State<CreateCategory> {
               label: Text(
                 category.replaceAll(RegExp(r'[^\w\s]'), ''),
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black87,
+                  color: isSelected ? AppTheme.textWhite : AppTheme.textPrimary,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -420,17 +419,15 @@ class _CreateCategoryState extends State<CreateCategory> {
                   selectedIconCategory = category;
                 });
               },
-              backgroundColor: Colors.white,
+              backgroundColor: AppTheme.surface,
               selectedColor: AppTheme.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
-                  color: isSelected ? Colors.blue : Colors.grey[300]!,
+                  color: isSelected ? AppTheme.primary : AppTheme.border,
                   width: 1,
                 ),
               ),
-              // avatar: isSelected ? const Icon(Icons.check, size: 16, color: Colors.green) : null,
-
             ),
           );
         },
@@ -443,11 +440,11 @@ class _CreateCategoryState extends State<CreateCategory> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:  0.05),
+            color: AppTheme.shadow,
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -479,15 +476,15 @@ class _CreateCategoryState extends State<CreateCategory> {
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
               decoration: BoxDecoration(
-                color: isSelected ? Colors.blue.withValues(alpha:  0.1) : Colors.grey[50],
+                color: isSelected ? AppTheme.primary.withOpacity(0.1) : AppTheme.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? Colors.blue : Colors.grey[300]!,
+                  color: isSelected ? AppTheme.primary : AppTheme.border,
                   width: isSelected ? 2 : 1,
                 ),
                 boxShadow: isSelected ? [
                   BoxShadow(
-                    color: Colors.blue.withValues(alpha:  0.2),
+                    color: AppTheme.primary.withOpacity(0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -498,7 +495,7 @@ class _CreateCategoryState extends State<CreateCategory> {
                 children: [
                   Icon(
                     item.icon,
-                    color: isSelected ? Colors.blue : Colors.grey[700],
+                    color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
                     size: 22,
                   ),
                   const SizedBox(height: 4),
@@ -506,8 +503,8 @@ class _CreateCategoryState extends State<CreateCategory> {
                     Container(
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
+                      decoration:  BoxDecoration(
+                        color: AppTheme.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -523,11 +520,11 @@ class _CreateCategoryState extends State<CreateCategory> {
   Widget _buildColorPicker() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:  0.05),
+            color: AppTheme.shadow,
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -558,25 +555,25 @@ class _CreateCategoryState extends State<CreateCategory> {
                   color: c.color,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected ? Colors.white : Colors.transparent,
+                    color: isSelected ? AppTheme.surface : Colors.transparent,
                     width: isSelected ? 3 : 0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha:  0.1),
+                      color: AppTheme.shadow,
                       blurRadius: 6,
                       offset: const Offset(0, 3),
                     ),
                     if (isSelected)
                       BoxShadow(
-                        color: c.color.withValues(alpha:  0.4),
+                        color: c.color.withOpacity(0.4),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),
                   ],
                 ),
                 child: isSelected
-                    ? const Icon(Icons.check, color: Colors.white, size: 20)
+                    ? Icon(Icons.check, color: AppTheme.textWhite, size: 20)
                     : null,
               ),
             ),
@@ -590,11 +587,11 @@ class _CreateCategoryState extends State<CreateCategory> {
     if (selectedIconId == null || selectedColorId == null || _titleController.text.isEmpty) {
       return Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha:  0.1),
+              color: AppTheme.shadow,
               blurRadius: 20,
               offset: const Offset(0, 5),
             ),
@@ -603,7 +600,7 @@ class _CreateCategoryState extends State<CreateCategory> {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            const Icon(Icons.visibility, color: Colors.blueGrey, size: 30),
+            Icon(Icons.visibility, color: AppTheme.textSecondary, size: 30),
             const SizedBox(width: 15),
             Expanded(
               child: Column(
@@ -615,7 +612,7 @@ class _CreateCategoryState extends State<CreateCategory> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -623,7 +620,7 @@ class _CreateCategoryState extends State<CreateCategory> {
                     'Complete the form to see preview',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[500],
+                      color: AppTheme.textMuted,
                     ),
                   ),
                 ],
@@ -639,12 +636,12 @@ class _CreateCategoryState extends State<CreateCategory> {
 
     return Container(
       decoration: BoxDecoration(
-        color: color.withValues(alpha:  0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha:  0.3), width: 2),
+        border: Border.all(color: color.withOpacity(0.3), width: 2),
         boxShadow: [
           BoxShadow(
-            color: color.withValues( alpha:  0.2),
+            color: color.withOpacity(0.2),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -662,13 +659,13 @@ class _CreateCategoryState extends State<CreateCategory> {
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha:  0.4),
+                  color: color.withOpacity(0.4),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: Icon(icon, color: Colors.white, size: 30),
+            child: Icon(icon, color: AppTheme.textWhite, size: 30),
           ),
           const SizedBox(width: 20),
           Expanded(
@@ -678,10 +675,10 @@ class _CreateCategoryState extends State<CreateCategory> {
               children: [
                 Text(
                   _titleController.text,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppTheme.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -691,24 +688,22 @@ class _CreateCategoryState extends State<CreateCategory> {
                   'Icon: ${appIcons.firstWhere((e) => e.id == selectedIconId!).id}',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                 ),
                 Text(
                   'Color: ${appColors.firstWhere((e) => e.id == selectedColorId!).displayName}',
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.arrow_forward_ios, color: Colors.blueGrey),
-            onPressed: () {
-
-            },
+            icon: Icon(Icons.arrow_forward_ios, color: AppTheme.textSecondary),
+            onPressed: () {},
           ),
         ],
       ),
@@ -730,14 +725,14 @@ class _CreateCategoryState extends State<CreateCategory> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              side: BorderSide(color: Colors.grey[400]!),
+              side: BorderSide(color: AppTheme.border),
+              foregroundColor: AppTheme.textPrimary,
             ),
-            child: const Text(
+            child: Text(
               'Cancel',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
               ),
             ),
           ),
@@ -752,7 +747,7 @@ class _CreateCategoryState extends State<CreateCategory> {
               boxShadow: isFormComplete
                   ? [
                 BoxShadow(
-                  color: Colors.blue.withValues(alpha:  0.3),
+                  color: AppTheme.primary.withOpacity(0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -762,8 +757,8 @@ class _CreateCategoryState extends State<CreateCategory> {
             child: ElevatedButton(
               onPressed: isFormComplete ? _submit : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isFormComplete ? AppTheme.primary : Colors.grey[400],
-                foregroundColor: Colors.white,
+                backgroundColor: isFormComplete ? AppTheme.primary : AppTheme.textMuted,
+                foregroundColor: AppTheme.textWhite,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -773,7 +768,6 @@ class _CreateCategoryState extends State<CreateCategory> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(width: 8),
                   const Text(
                     'Create Category',
                     style: TextStyle(
@@ -783,7 +777,6 @@ class _CreateCategoryState extends State<CreateCategory> {
                   ),
                   if (!isFormComplete) ...[
                     const SizedBox(width: 8),
-
                   ],
                 ],
               ),
@@ -801,8 +794,8 @@ class _CreateCategoryState extends State<CreateCategory> {
       _showErrorSnackbar('Please fill all fields');
       return;
     }
-    CategoryCache().clear();
-     final color = appColors.firstWhere((e) => e.id == selectedColorId!);
+
+    final color = appColors.firstWhere((e) => e.id == selectedColorId!);
     final backgroundColor = color.id.replaceAll('_', '');
 
     Navigator.pop(
@@ -820,12 +813,12 @@ class _CreateCategoryState extends State<CreateCategory> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline, color: Colors.white),
+            Icon(Icons.error_outline, color: AppTheme.textWhite),
             const SizedBox(width: 10),
-            Expanded(child: Text(message)),
+            Expanded(child: Text(message, style: TextStyle(color: AppTheme.textWhite))),
           ],
         ),
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -840,36 +833,33 @@ class _CreateCategoryState extends State<CreateCategory> {
       builder: (context) => AlertDialog(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: const [
-            Icon(Icons.help, color: Colors.blue,size: 25,),
-            const SizedBox(
-              width: 5,
-            ),
+          children: [
+            Icon(Icons.help, color: AppTheme.primary, size: 25),
+            const SizedBox(width: 5),
             Text(
               'How to create a category',
-              style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: AppTheme.textPrimary),
             ),
-
           ],
         ),
-
-        content: const Column(
+        backgroundColor: AppTheme.surface,
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('1. Enter a descriptive name for your category'),
-            SizedBox(height: 8),
-            Text('2. Choose an icon that represents your category'),
-            SizedBox(height: 8),
-            Text('3. Select a color for your category'),
-            SizedBox(height: 8),
-            Text('4. Preview your category and save it'),
+            Text('1. Enter a descriptive name for your category', style: TextStyle(color: AppTheme.textSecondary)),
+            const SizedBox(height: 8),
+            Text('2. Choose an icon that represents your category', style: TextStyle(color: AppTheme.textSecondary)),
+            const SizedBox(height: 8),
+            Text('3. Select a color for your category', style: TextStyle(color: AppTheme.textSecondary)),
+            const SizedBox(height: 8),
+            Text('4. Preview your category and save it', style: TextStyle(color: AppTheme.textSecondary)),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Got it!'),
+            child: Text('Got it!', style: TextStyle(color: AppTheme.primary)),
           ),
         ],
       ),

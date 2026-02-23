@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/app/app_theme.dart';
 
 class TasksItem extends StatelessWidget {
   const TasksItem({super.key});
@@ -9,28 +10,27 @@ class TasksItem extends StatelessWidget {
   }
 }
 
-// ========== Top Performing Habits ==========
 Widget _buildTopPerforming() {
   final habits = [
     {
       'name': 'Morning Jog',
       'category': 'HEALTH',
       'percentage': 95,
-      'color': const Color(0xFF10B981),
+      'color': AppTheme.success,
       'icon': Icons.directions_run,
     },
     {
       'name': 'Read 10 pages',
       'category': 'LEARNING',
       'percentage': 80,
-      'color': const Color(0xFF3B82F6),
+      'color': AppTheme.primary,
       'icon': Icons.menu_book,
     },
     {
       'name': 'Drink Water',
       'category': 'HEALTH',
       'percentage': 75,
-      'color': const Color(0xFF8B5CF6),
+      'color': AppTheme.productivityText,
       'icon': Icons.water_drop,
     },
   ];
@@ -39,16 +39,16 @@ Widget _buildTopPerforming() {
     children: habits
         .map(
           (habit) => Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: _buildHabitItem(
-              name: habit['name'] as String,
-              category: habit['category'] as String,
-              percentage: habit['percentage'] as int,
-              color: habit['color'] as Color,
-              icon: habit['icon'] as IconData,
-            ),
-          ),
-        )
+        padding: const EdgeInsets.only(bottom: 16),
+        child: _buildHabitItem(
+          name: habit['name'] as String,
+          category: habit['category'] as String,
+          percentage: habit['percentage'] as int,
+          color: habit['color'] as Color,
+          icon: habit['icon'] as IconData,
+        ),
+      ),
+    )
         .toList(),
   );
 }
@@ -63,11 +63,11 @@ Widget _buildHabitItem({
   return Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppTheme.surface,
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.05),
+          color: AppTheme.shadow,
           blurRadius: 10,
           offset: const Offset(0, 4),
         ),
@@ -85,7 +85,7 @@ Widget _buildHabitItem({
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
+                color: color.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: color),
@@ -99,9 +99,10 @@ Widget _buildHabitItem({
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -111,7 +112,7 @@ Widget _buildHabitItem({
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.12),
+                      color: color.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -145,7 +146,7 @@ Widget _buildHabitItem({
         Container(
           height: 6,
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            color: AppTheme.progressTrack,
             borderRadius: BorderRadius.circular(3),
           ),
           child: FractionallySizedBox(

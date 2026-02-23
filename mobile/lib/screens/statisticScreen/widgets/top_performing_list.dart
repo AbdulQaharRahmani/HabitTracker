@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/app/app_theme.dart';
 
 class TopPerformingList extends StatelessWidget {
   const TopPerformingList({super.key});
@@ -7,15 +8,19 @@ class TopPerformingList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
           "Top Performing",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: AppTheme.textPrimary,
+          ),
         ),
-        SizedBox(height: 12),
-        _HabitTile("Morning Jog", "HEALTH", 0.95, Colors.green),
-        _HabitTile("Read 10 pages", "LEARNING", 0.80, Colors.blue),
-        _HabitTile("Drink Water", "HEALTH", 0.75, Colors.purple),
+        const SizedBox(height: 12),
+        _HabitTile("Morning Jog", "HEALTH", 0.95, AppTheme.success),
+        _HabitTile("Read 10 pages", "LEARNING", 0.80, AppTheme.primary),
+        _HabitTile("Drink Water", "HEALTH", 0.75, AppTheme.productivityText),
       ],
     );
   }
@@ -35,11 +40,11 @@ class _HabitTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadow,
             blurRadius: 10,
           ),
         ],
@@ -53,9 +58,10 @@ class _HabitTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
               ),
@@ -70,7 +76,7 @@ class _HabitTile extends StatelessWidget {
             value: progress,
             minHeight: 6,
             color: color,
-            backgroundColor: color.withValues(alpha: 0.2),
+            backgroundColor: color.withOpacity(0.2),
             borderRadius: BorderRadius.circular(6),
           ),
         ],
@@ -90,8 +96,7 @@ class _CategoryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        // borderRadius: BorderRadius.circular(10),
+        color: color.withOpacity(0.15),
       ),
       child: Text(
         text,

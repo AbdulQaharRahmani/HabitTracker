@@ -29,12 +29,12 @@ class _HabitsScreenState extends State<HabitsScreen> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
-  final TextStyle _linkStyle = const TextStyle(
+  final TextStyle _linkStyle = TextStyle(
     color: AppTheme.primary,
     fontWeight: FontWeight.bold,
   );
 
-  final TextStyle _descriptionStyle = const TextStyle(
+  final TextStyle _descriptionStyle = TextStyle(
     color: AppTheme.textSecondary,
     fontSize: 14,
   );
@@ -158,14 +158,14 @@ class _HabitsScreenState extends State<HabitsScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+           SnackBar(
             content: Text('Habit deleted successfully'),
             backgroundColor: AppTheme.success,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+           SnackBar(
             content: Text('Failed to delete habit'),
             backgroundColor: AppTheme.error,
           ),
@@ -246,7 +246,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                   Text(
                     "My Habits",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -279,12 +279,12 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       child: Row(
                         children: [
                           SizedBox(width: 12.w),
-                          const Icon(Icons.search, color: AppTheme.textMuted),
+                           Icon(Icons.search, color: AppTheme.textMuted),
                           SizedBox(width: 10.w),
                           Expanded(
                             child: TextField(
                               controller: _searchController,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 hintText: 'Search habits...',
                                 border: InputBorder.none,
                                 hintStyle: TextStyle(color: AppTheme.textMuted),
@@ -364,7 +364,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             children: [
               Text(
                 _errorMessage!,
-                style: const TextStyle(color: AppTheme.textSecondary),
+                style:  TextStyle(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20.h),

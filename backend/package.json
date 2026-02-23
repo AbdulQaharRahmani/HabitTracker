@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/AbdulQaharRahmani/HabitTracker#readme",
   "dependencies": {
-    "@exortek/express-mongo-sanitize": "^1.1.1",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -40,10 +39,10 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.2",
     "multer": "^2.0.2",
+    "uuid": "^13.0.0",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "winston-mongodb": "^7.0.1",
-    "uuid": "^13.0.0"
+    "winston-mongodb": "^7.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^2.0.0",

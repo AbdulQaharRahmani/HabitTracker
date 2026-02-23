@@ -12,24 +12,16 @@ import syncRoutes from './routes/sync.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authMiddleware } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
-import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
-import mongoSanitize from '@exortek/express-mongo-sanitize';
 import { logMiddleware } from './middleware/logger.js';
+import { privateLimiter, publicLimiter } from './middleware/rateLimiter.js';
+import { sanitizeKeys } from './middleware/sanitizer.js';
+import { authorizeRoles } from './middleware/authorizeRoles.js';
 
 const app = express();
 
 //#region Normal Midlleware
 
 app.use(express.json());
-
-const limiter = rateLimit({
-  keyGenerator: (req) => {
-    return req.user ? req.user._id.toString() : ipKeyGenerator(req);
-  },
-  windowMs: 15 * 60 * 1000,
-  limit: (req) => (req.user ? 100 : 50),
-  message: 'Too many requests, please try again later.',
-});
 
 app.use(
   cors({
@@ -39,8 +31,17 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(mongoSanitize());
-app.use(helmet());
+app.use((req, res, next) => {
+  req.body = sanitizeKeys(req.body);
+  req.params = sanitizeKeys(req.params);
+  next();
+});
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
 app.use(logMiddleware);
 //#endregion
 
@@ -54,16 +55,55 @@ app.get('/api/health', (req, res) => {
 
 // Public routes
 
-app.use('/api/auth', limiter, authRoutes);
+app.use('/api/auth', publicLimiter, authRoutes);
 
 // Protect routes
 
-app.use('/api/categories', authMiddleware, limiter, categoryRoutes);
-app.use('/api/habits', authMiddleware, limiter, habitRoutes);
-app.use('/api/tasks', authMiddleware, limiter, taskRoutes);
-app.use('/api/users', authMiddleware, limiter, userRoutes);
-app.use('/api/offline-data', authMiddleware, limiter, syncRoutes);
-app.use('/api/logs', authMiddleware, limiter, logRoutes);
+// Role: Admin & User
+app.use(
+  '/api/categories',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  categoryRoutes
+);
+app.use(
+  '/api/habits',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  habitRoutes
+);
+app.use(
+  '/api/tasks',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  taskRoutes
+);
+app.use(
+  '/api/users',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  userRoutes
+);
+app.use(
+  '/api/offline-data',
+  authMiddleware,
+  authorizeRoles('admin', 'user'),
+  privateLimiter,
+  syncRoutes
+);
+
+// Role: Admin
+app.use(
+  '/api/logs',
+  authMiddleware,
+  authorizeRoles('admin'),
+  privateLimiter,
+  logRoutes
+);
 
 //#endregion
 
