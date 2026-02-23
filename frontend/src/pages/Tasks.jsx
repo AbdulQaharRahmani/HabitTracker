@@ -118,7 +118,9 @@ function Tasks() {
               tabIndex="0"
               className={`flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border
                border-gray-200 dark:border-gray-800 transition-all duration-200
-               focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 relative`}
+               focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500 relative
+               focus-visible:shadow-[0_0_20px_rgba(99,102,241,0.4)]
+                dark:focus-visible:shadow-[0_0_25px_rgba(129,140,248,0.3)]`}
               style={{ height: "530px", minHeight: "420px" }}
             >
               <div className="relative">
