@@ -44,6 +44,7 @@ const tableLoading = useLogsStore((state)=> state.tableLoading)
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Timestamp")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Level")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Method")}</th>
+            <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Message")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Route")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Status")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t('User ID')}</th>
@@ -70,6 +71,9 @@ const tableLoading = useLogsStore((state)=> state.tableLoading)
               </td>
               <td className="px-5 py-3.5 font-bold text-gray-700 dark:text-gray-200 text-[13px]">
                 {log.method}
+              </td>
+              <td className="px-5 py-3.5 text-gray-700 dark:text-gray-200 text-[13px]">
+                {log.message}
               </td>
               <td className="px-5 py-3.5 text-[14px] font-medium text-indigo-600 dark:text-indigo-400">
                 {log.path}

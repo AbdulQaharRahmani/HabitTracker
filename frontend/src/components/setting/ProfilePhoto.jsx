@@ -12,7 +12,7 @@ function ProfilePhoto() {
   const { userProfileUrl, fetchProfilePhoto, uploadProfilePhoto, loading } =
     useProfilePhotoStore();
 
-  const userId = useAuthStore((state) => state.userId);
+  const userId = useAuthStore((state) => state.user?.userId);
 
 
   useEffect(() => {

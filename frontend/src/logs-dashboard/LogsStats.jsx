@@ -3,7 +3,7 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import useLogsStore from "../store/useLogsStore";
 
-import TopDevices from "./TopDevicesCard";
+
 import LogsStatsCard from "./LogsStatsCard";
 import TopRoutesCard from "./TopRoutesCard";
 
@@ -48,7 +48,6 @@ const LogsStatistics = ()=> {
     <div className="flex flex-col gap-6">
       <LogsStatsCard />
       <TopRoutesCard />
-      <TopDevices />
     </div>
   );
 }

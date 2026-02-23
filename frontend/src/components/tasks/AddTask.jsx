@@ -48,7 +48,6 @@ export default function AddTask() {
     }
   };
 
-  if (!isModalOpen) return null;
 
   useHotkeys(
     "ctrl+s, meta+s",
@@ -68,6 +67,7 @@ export default function AddTask() {
     },
     { enabled: isModalOpen }
   );
+  if (!isModalOpen) return null;
 
   return (
     <TaskModal

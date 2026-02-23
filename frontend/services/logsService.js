@@ -1,6 +1,6 @@
 import api from "./api";
 
-export const fetchLogs = async (page = 1, limit = 10, filters = {}, search = "") => {
+export const fetchLogs = async (page = 1, limit = 20, filters = {}, search = "") => {
     const { level, method, sortOrder } = filters;
 
     let url = `/logs?page=${page}&limit=${limit}`;
