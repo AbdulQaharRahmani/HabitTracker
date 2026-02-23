@@ -79,7 +79,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
         final Map<String, dynamic> decodedData = jsonDecode(response.body);
         final List<dynamic> habitsJson = decodedData['data'];
 
-        // معکوس کردن لیست برای نمایش جدیدترین‌ها در بالا
         final reversedList = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
 
         setState(() {
@@ -121,7 +120,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
           final List<dynamic> habitsJson = decodedData['data'];
 
           if (habitsJson.isNotEmpty) {
-            // معکوس کردن صفحه جدید (چون آیتم‌های جدیدتر هستند) و درج در ابتدای لیست
             final reversedNewPage = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
             setState(() {
               _habits.insertAll(0, reversedNewPage);
@@ -312,8 +310,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                           onSubmit: (newHabit) {
                             if (newHabit != null) {
                               setState(() {
-                                // جدیدترین عادت در بالای لیست (ایندکس ۰) درج شود
-                                _habits.insert(0, newHabit);
+                                 _habits.insert(0, newHabit);
                               });
                             } else {
                               _refreshHabits();
