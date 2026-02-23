@@ -3,6 +3,10 @@ import logger from '../utils/logger.js';
 import { randomUUID } from 'crypto';
 
 export const logMiddleware = (req, res, next) => {
+  if (req.originalUrl.startsWith('/api/logs')) {
+    return next();
+  }
+
   const start = Date.now();
 
   // Save the original res.json function so we can call it later
@@ -14,7 +18,8 @@ export const logMiddleware = (req, res, next) => {
 
   // Override res.json to save a copy of the response before send it
   res.json = (body) => {
-    res.locals.responseBody = body; // store the body for logging
+    res.locals.responseBody =
+      typeof body?.toJSON === 'function' ? body.toJSON() : body; // store the body for logging
     return originalJson(body); // call the original res.json to actually send the response
   };
 
