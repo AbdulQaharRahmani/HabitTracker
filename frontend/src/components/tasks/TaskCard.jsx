@@ -67,7 +67,7 @@ export default function TaskCard({
           group bg-white dark:bg-gray-800 rounded-md p-2.5 outline-none
           transition-all duration-150 shadow-md dark:border-gray-700
           hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm
-          focus:ring-2 focus:ring-indigo-500 focus:ring-inset
+          focus:ring-2 focus:ring-indigo-200 focus:ring-inset
           ${priorityBorder[priority] ?? "-l-4 border-l-2 border-gray-400"}
           ${status === "done" ? "opacity-75" : ""}
         `}
