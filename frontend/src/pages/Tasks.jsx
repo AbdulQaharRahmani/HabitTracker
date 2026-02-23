@@ -34,6 +34,7 @@ function Tasks() {
   }, [fetchCategories]);
 
   const { t } = useTranslation();
+  const isRTL = i18n.language === "fa";
 
   const groupedArray = useMemo(() => {
     const groups = tasks.reduce((acc, task) => {
@@ -77,18 +78,26 @@ function Tasks() {
       }
     });
 
+    if (colIndex === -1) return;
+
     let nextCol = colIndex;
     let nextRow = rowIndex;
 
     if (e.key === "ArrowUp") nextRow--;
     if (e.key === "ArrowDown") nextRow++;
-    if (e.key === "ArrowLeft") nextCol--;
-    if (e.key === "ArrowRight") nextCol++;
+
+    if (e.key === "ArrowLeft") {
+      isRTL ? nextCol++ : nextCol--;
+    }
+    if (e.key === "ArrowRight") {
+      isRTL ? nextCol-- : nextCol++;
+    }
 
     if (nextCol < 0) nextCol = 0;
     if (nextCol >= groupedArray.length) nextCol = groupedArray.length - 1;
 
     const targetGroup = groupedArray[nextCol];
+
     if (nextRow < 0) nextRow = 0;
     if (nextRow >= targetGroup.items.length) nextRow = targetGroup.items.length - 1;
 
@@ -97,7 +106,10 @@ function Tasks() {
       const nextEl = document.querySelector(`[data-id="${nextTask._id}"]`);
       nextEl?.focus();
     }
-  }, { enableOnFormTags: false });
+  }, {
+    enableOnFormTags: false,
+    dependencies: [groupedArray, isRTL]
+  });
 
   useHotkeys("ctrl+k, meta+k", (e) => {
     e.preventDefault();
@@ -105,7 +117,7 @@ function Tasks() {
   }, { enabled: !isModalOpen });
 
   return (
-    <div className={`pb-10 px-4 md:px-6 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen ${i18n.language === "fa" ? "rtl" : "ltr"}`}>
+    <div className={`pb-10 px-4 md:px-6 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen ${isRTL ? "rtl" : "ltr"}`}>
       <EditTask />
       <AddTask />
 
