@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/theme_provider.dart';
 
 class TopHabitTile extends StatelessWidget {
   final IconData icon;
@@ -19,13 +22,15 @@ class TopHabitTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
+        boxShadow:  [
           BoxShadow(color: AppTheme.shadow, blurRadius: 10),
         ],
       ),
