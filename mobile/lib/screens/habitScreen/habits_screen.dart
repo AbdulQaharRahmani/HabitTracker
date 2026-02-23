@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 import '../../app/app_theme.dart';
+import '../../providers/theme_provider.dart';
 import '../../utils/habits/habit.dart';
 import '../../utils/habits/habit_card.dart';
 import 'add_habit.dart';
@@ -224,7 +226,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             margin: const EdgeInsets.only(bottom: 12),
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.surface,
               borderRadius: BorderRadius.circular(16),
             ),
           ),
@@ -235,6 +237,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(

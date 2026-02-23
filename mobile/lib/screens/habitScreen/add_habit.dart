@@ -8,6 +8,9 @@ import '../../app/app_theme.dart';
 import '../../services/category_cache.dart';
 import '../../utils/category/category_model.dart';
 import '../../utils/habits/habit.dart';
+import '../../features/add_habit_model.dart';
+import '../../providers/theme_provider.dart';
+
 
 class AddHabitDialog {
   static Future<void> show(
@@ -149,9 +152,8 @@ class _AddHabitFormState extends State<_AddHabitForm> {
         _isLoadingCategories = false;
       });
     } catch (e) {
-      print("❌ Connection Exception: $e");
       setState(() {
-        _errorMessage = "Error with connecting to network";
+        _errorMessage = "Network connection error";
         _isLoadingCategories = false;
       });
     }
@@ -217,7 +219,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        backgroundColor: isSuccess ? AppTheme.success : AppTheme.error,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -229,8 +231,6 @@ class _AddHabitFormState extends State<_AddHabitForm> {
     _descCtl.dispose();
     super.dispose();
   }
-
-
 
   InputDecoration _fieldDecoration({String? hint}) {
     return InputDecoration(
@@ -263,6 +263,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context);
     return Form(
       key: _formKey,
       child: Column(
@@ -295,7 +296,7 @@ class _AddHabitFormState extends State<_AddHabitForm> {
           Text('Frequency', style: _labelStyle()),
           SizedBox(height: 8.h),
           DropdownButtonFormField<String>(
-            initialValue: _frequency,
+            value: _frequency,
             decoration: _fieldDecoration(),
             items: _frequencies.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
             onChanged: (v) {
@@ -312,18 +313,18 @@ class _AddHabitFormState extends State<_AddHabitForm> {
               ? Center(child: Padding(
             padding: EdgeInsets.all(10.h),
             child: SizedBox(
-                height: 20.h, width: 20.w,
-                child: const CircularProgressIndicator(strokeWidth: 2)
+              height: 20.h, width: 20.w,
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary),
             ),
           ))
               : _errorMessage != null
-              ? Text(_errorMessage!, style: TextStyle(color: Colors.red, fontSize: 12.sp))
+              ? Text(_errorMessage!, style: TextStyle(color: AppTheme.error, fontSize: 12.sp))
               : DropdownButtonFormField<CategoryModel>(
-            initialValue: _selectedCategory,
+            value: _selectedCategory,
             decoration: _fieldDecoration(),
             items: _categories.map((c) => DropdownMenuItem(
                 value: c,
-                child: Text(c.name)
+                child: Text(c.name, style: TextStyle(color: AppTheme.textPrimary))
             )).toList(),
             onChanged: (v) {
               if (v == null) return;
