@@ -136,7 +136,7 @@ const Settings = () => {
                     </label>
                     <input
                       type="text"
-                      placeholder={t("User Name")}
+                      placeholder={authUsername || t("Enter your name")}
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       onBlur={handleUsernameBlur}
