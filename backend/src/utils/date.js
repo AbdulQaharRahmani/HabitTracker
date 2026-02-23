@@ -87,8 +87,8 @@ export class DateHelper {
   }
 
   static validateDateRange(date) {
-    const today = dayjs().startOf('day').utc(true)
-    const selectedDate =  date ? dayjs(date).startOf('day').utc(true): today;
+    const today = dayjs().startOf('day').utc(true);
+    const selectedDate = date ? dayjs(date).startOf('day').utc(true) : today;
 
     if (date && !selectedDate.isValid())
       throw new AppError(
