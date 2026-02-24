@@ -18,82 +18,42 @@ import {
   FaGraduationCap,
 } from "react-icons/fa";
 
-// export const iconCategories = {
-//   work: [
-//     {icon: FaBriefcase},
-//     {icon: FaBuilding},
-//     {icon: FaLaptop},
-//     {icon: FaClipboardList},
-//   ],
-
-//   home: [
-//     {icon: FaHome},
-//     {icon: FaBroom},
-//     {icon: FaCouch},
-//   ],
-
-//   shopping: [
-//     {icon: FaShoppingCart},
-//     {icon: FaStore},
-//   ],
-
-//   health: [
-//     {icon: FaHeartbeat},
-//     {icon: FaDumbbell},
-//   ],
-
-//   travel: [
-//     {icon: FaPlane},
-//     {icon: FaMap},
-//   ],
-
-//   entertainment: [
-//     {icon: FaFilm},
-//     {icon: FaGamepad},
-//   ],
-
-//   education: [
-//     {icon: FaBook},
-//     {icon: FaGraduationCap},
-//   ],
-// };
-
 export const iconCategories = {
   work: [
-    { name: "FaBriefcase", icon: FaBriefcase },
-    { name: "FaBuilding", icon: FaBuilding },
-    { name: "FaLaptop", icon: FaLaptop },
-    { name: "FaClipboardList", icon: FaClipboardList },
+    { label: "Briefcase", value: "briefcase", icon: FaBriefcase },
+    { label: "Office", value: "building", icon: FaBuilding },
+    { label: "Laptop", value: "laptop", icon: FaLaptop },
+    { label: "Tasks", value: "tasks", icon: FaClipboardList },
   ],
 
   home: [
-    { name: "FaHome", icon: FaHome },
-    { name: "FaBroom", icon: FaBroom },
-    { name: "FaCouch", icon: FaCouch },
+    { label: "Home", value: "home", icon: FaHome },
+    { label: "Cleaning", value: "cleaning", icon: FaBroom },
+    { label: "Living Room", value: "couch", icon: FaCouch },
   ],
 
   shopping: [
-    { name: "FaShoppingCart", icon: FaShoppingCart },
-    { name: "FaStore", icon: FaStore },
+    { label: "Cart", value: "cart", icon: FaShoppingCart },
+    { label: "Store", value: "store", icon: FaStore },
   ],
 
   health: [
-    { name: "FaHeartbeat", icon: FaHeartbeat },
-    { name: "FaDumbbell", icon: FaDumbbell },
+    { label: "Heartbeat", value: "heartbeat", icon: FaHeartbeat },
+    { label: "Workout", value: "workout", icon: FaDumbbell },
   ],
 
   travel: [
-    { name: "FaPlane", icon: FaPlane },
-    { name: "FaMap", icon: FaMap },
+    { label: "Plane", value: "plane", icon: FaPlane },
+    { label: "Map", value: "map", icon: FaMap },
   ],
 
   entertainment: [
-    { name: "FaFilm", icon: FaFilm },
-    { name: "FaGamepad", icon: FaGamepad },
+    { label: "Movie", value: "movie", icon: FaFilm },
+    { label: "Gaming", value: "gaming", icon: FaGamepad },
   ],
 
   education: [
-    { name: "FaBook", icon: FaBook },
-    { name: "FaGraduationCap", icon: FaGraduationCap },
+    { label: "Book", value: "book", icon: FaBook },
+    { label: "Graduate", value: "graduate", icon: FaGraduationCap },
   ],
 };
