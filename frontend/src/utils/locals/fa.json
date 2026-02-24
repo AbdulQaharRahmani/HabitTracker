@@ -218,6 +218,8 @@
 
  "Language": "زبان",
   "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید",
-  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید"
+  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
+  "No habits for current date!": "برای تاریخ انتخاب شده هیچ عادتی ندارید!",
+  "Loading habits...": "در حال بارگذاری عادت ها..."
 }
 
