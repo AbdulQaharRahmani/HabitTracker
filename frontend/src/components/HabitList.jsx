@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import HabitCard from "./HabitCard";
 import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
@@ -48,7 +47,6 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
               description={habit.description}
               categoryId={habit.categoryId }
               frequency={habit.frequency}
-              duration={habit.duration}
             />
           ))
         )}

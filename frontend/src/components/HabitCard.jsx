@@ -13,7 +13,6 @@ export default function HabitCard({
   description,
   categoryId,
   frequency,
-  duration,
   viewMode,
   _id,
 }) {
@@ -75,8 +74,6 @@ export default function HabitCard({
 
             <span className="flex items-center text-[12px] text-gray-500 dark:text-gray-400">
               {frequency || "No frequency"}
-              <FaCircle className="mx-2 text-[5px]" />
-              {duration || "No Duration"}
             </span>
           </div>
         </div>
