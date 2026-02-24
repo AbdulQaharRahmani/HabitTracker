@@ -42,8 +42,8 @@ export default function SearchableDropdown({
 
   const categoryIcons = rawIcons.map((item, index) => ({
     id: `${selectedCategory}-${index}`,
-    name: item.name,
-    value: item.name,
+    name: item.label, 
+    value: item.value,
     icon: item.icon,
   }));
 
