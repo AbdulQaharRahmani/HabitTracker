@@ -29,13 +29,13 @@ export default function HabitModal() {
     fetchCategories,
     addUserCategory,
     submitHabit,
-    fetchHabits,
+    fetchHabitsPage,
   } = useHabitStore();
 
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (isModalOpen) {
+    if (isModalOpen && isEditingMode) {
       fetchCategories();
     }
   }, [isModalOpen, fetchCategories]);
@@ -63,14 +63,13 @@ export default function HabitModal() {
   );
 
   const handleHabitDataSubmission = async (e) => {
-    e?.preventDefault();
+    e.preventDefault();
 
     if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
       return toast.error("Title, Category, and Frequency are required");
     }
     await submitHabit(habitData, isEditingMode, currentHabitID);
-    fetchHabits();
-    setModalOpen(false)
+    fetchHabitsPage();
   }
 
   const handleAddCategory = async (name, color) => {
