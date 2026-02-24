@@ -42,7 +42,9 @@ const Settings = () => {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const email = useAuthStore((state) => state.email);
+  const email = useAuthStore((state)=>state.email);
+
+  console.log(email)
 
   useEffect(() => {
     fetchUserPreferences();

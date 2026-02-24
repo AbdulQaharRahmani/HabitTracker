@@ -7,12 +7,13 @@ const useAuthStore = create(
     (set) => ({
       token: null,
       user: null,
+      email:null,
       isAuthLoading: false,
       isAuthenticated: false,
       login: (token, userData, userEmail) => {
         set((state) => ({
           token,
-          email: userEmail,
+          email:userEmail ?? state.email,
           user: userData ? userData : state.user,
           isAuthLoading: false,
           isAuthenticated: true,
@@ -32,26 +33,26 @@ const useAuthStore = create(
           };
         });
       },
-      logout: async () => {
-        try {
-          await logout();
-        } catch (error) {
-          console.log(error);
-        } finally {
-          set({
-            token: null,
-            user: null,
-            email: null,
-            isAuthenticated: false,
-          });
-          localStorage.removeItem("userData-storage");
-        }
-      },
-    }),
-    {
+ logout: async () => {
+  try {
+    await logout();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    set({
+      token: null,
+      user: null,
+      email: null,
+      isAuthenticated: false,
+    });
+    localStorage.removeItem("userData-storage");
+  }
+},
+  }),
+  {
       name: "userData-storage",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ user: state.user, email: state.email }), // just store the user data (id, username) not the token
+     partialize: (state) => ({ user: state.user, email: state.email }),
     },
   ),
 );
