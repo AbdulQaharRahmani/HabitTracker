@@ -96,7 +96,7 @@ export default function TaskCard({
             aria-label={status === "done" ? t("Mark as incomplete") : t("Mark as complete")}
           >
             {status === "done" ? (
-              <FaCheckCircle size={14} className="text-green-500" />
+              <FaCheckCircle size={14} className="text-green-400" />
             ) : (
               <FaRegCircle size={14} className="text-gray-400 hover:text-green-500 transition-colors" />
             )}
