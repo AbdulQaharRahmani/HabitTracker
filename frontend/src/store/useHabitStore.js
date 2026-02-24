@@ -132,8 +132,8 @@ const useHabitStore = create((set, get) => ({
         toast.success(i18next.t("habit_completed"));
       }
     } catch (err) {
-      console.log(err)
-      toast.error(err.response?.data?.message || i18next.t("habit_update_failed"))
+      let errorMessage = err.response?.data?.message
+      toast.error(i18next.t(errorMessage)|| i18next.t("habit_update_failed"))
       set(state => ({
         habits: state.habits.map(h =>
           h._id === id ? { ...h, completed: prevState } : h
