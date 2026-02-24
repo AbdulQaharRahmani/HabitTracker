@@ -19,18 +19,15 @@ export default function Habits() {
     searchTerm,
     setSearchTerm,
     fetchHabitsPage,
-    fetchHabitsByDate,
-    selectedDate,
     isModalOpen,
     setModalOpen,
   } = useHabitStore();
 
   const debounceRef = useRef(null);
-
-  useEffect(() => {
-    fetchHabitsByDate(selectedDate);
-  }, [selectedDate]);
   const ITEMS_PER_PAGE = 10;
+  useEffect(() => {
+    fetchHabitsPage(currentPage, ITEMS_PER_PAGE);
+  }, [currentPage]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;

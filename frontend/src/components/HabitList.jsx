@@ -4,14 +4,9 @@ import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
 
 export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
-  const { habits, loading, error, totalCount, fetchHabitsPage } =
+  const { habits, loading, error, totalCount } =
     useHabitStore();
   const ITEMS_PER_PAGE = 10;
-
-  useEffect(() => {
-    fetchHabitsPage(currentPage, ITEMS_PER_PAGE);
-  }, [currentPage]);
-
   if (loading && habits.length === 0) {
     return (
       <p className="text-gray-400 dark:text-gray-500 text-lg font-semibold my-4 text-center">
