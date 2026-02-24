@@ -49,7 +49,7 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
               viewMode={viewMode}
               title={habit.title}
               description={habit.description}
-              categoryId={habit.categoryId}
+              categoryId={habit.categoryId || habit.category}
               frequency={habit.frequency}
               duration={habit.duration}
             />

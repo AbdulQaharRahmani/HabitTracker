@@ -46,7 +46,7 @@ export default function AddTask() {
       toast.error(t("Error saving task"));
     }
   };
-
+  
   useHotkeys(
     "ctrl+s, meta+s",
     (e) => {
@@ -65,7 +65,6 @@ export default function AddTask() {
     },
     { enabled: isModalOpen }
   );
-
   if (!isModalOpen) return null;
 
   return (
