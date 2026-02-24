@@ -65,6 +65,7 @@ export default function AddTask() {
     },
     { enabled: isModalOpen }
   );
+  
   if (!isModalOpen) return null;
 
   return (
