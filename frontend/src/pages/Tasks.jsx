@@ -8,6 +8,7 @@ import i18n from "../utils/i18n";
 import EditTask from "../components/tasks/EditTask";
 import { useHotkeys } from "react-hotkeys-hook";
 import { LuPlus } from "react-icons/lu";
+import "../App.css";
 
 function Tasks() {
   const {
@@ -121,24 +122,44 @@ function Tasks() {
     },
   );
 
-  const categoryRef = useRef();
+  const categoryRef = useRef([]);
+
+  const setActiveCategory = (categoryEl) => {
+    categoryRef.current.forEach((el) => {
+      el?.classList.remove("category-active");
+    });
+
+    categoryEl?.classList.add("category-active");
+  };
 
   useHotkeys(
     "tab",
     (e) => {
-      const currentIndex = categoryRef.current.findIndex(
-        (el) => el === document.activeElement,
-      );
-
-      if (currentIndex === -1) return;
-
       e.preventDefault();
 
-      const nextIndex = (currentIndex + 1) % groupedArray.length;
+      const active = document.activeElement;
 
-      const nextElement = categoryRef.current[nextIndex];
+      const currentIndex = categoryRef.current.findIndex((el) =>
+        el?.contains(active),
+      );
 
-      nextElement?.focus();
+      const nextIndex =
+        currentIndex === -1
+          ? 0
+          : (currentIndex + 1) % categoryRef.current.length;
+
+      const nextCategory = categoryRef.current[nextIndex];
+      if (!nextCategory) return;
+
+      const firstTask = nextCategory.querySelector("[data-task-card]");
+
+      if (firstTask) {
+        firstTask.focus();
+        setActiveCategory(nextCategory);
+      } else {
+        nextCategory.focus();
+        setActiveCategory(nextCategory);
+      }
     },
     {
       enableOnFormTags: false,
@@ -174,13 +195,22 @@ function Tasks() {
           {groupedArray.map((group, index) => (
             <div
               key={group.id}
-              ref={(el) => (categoryRef.current[index] = el)}
+              ref={(el) => {
+                if (!categoryRef.current) return;
+                categoryRef.current[index] = el;
+              }}
               tabIndex="0"
               className={`flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border
-               border-gray-200 dark:border-gray-800 transition-all duration-200
-               focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500 relative
-               focus-visible:shadow-[0_0_20px_rgba(99,102,241,0.4)]
-                dark:focus-visible:shadow-[0_0_25px_rgba(129,140,248,0.3)]`}
+              border-gray-200 dark:border-gray-800 transition-all duration-200
+              focus:outline-none
+
+              focus-within:ring-2
+              focus-within:ring-indigo-500/40
+              focus-within:border-indigo-500
+              focus-within:shadow-[0_0_25px_rgba(99,102,241,0.35)]
+              dark:focus-within:shadow-[0_0_30px_rgba(129,140,248,0.35)]
+
+              relative`}
               style={{ height: "530px", minHeight: "420px" }}
             >
               <div className="relative">
