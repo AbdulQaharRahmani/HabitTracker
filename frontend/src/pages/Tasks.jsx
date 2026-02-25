@@ -70,7 +70,6 @@ function Tasks() {
     let colIndex = -1;
     let rowIndex = -1;
 
-<<<<<<< HEAD
     useHotkeys(
     "ctrl+k, meta+k",
     (e) => {
@@ -87,7 +86,6 @@ function Tasks() {
       },
       { enabled: !isModalOpen }
   );
-=======
     groupedArray.forEach((group, cIdx) => {
       const rIdx = group.items.findIndex(item => item._id === currentId);
       if (rIdx !== -1) {
@@ -95,7 +93,6 @@ function Tasks() {
         rowIndex = rIdx;
       }
     });
->>>>>>> main
 
     if (colIndex === -1) return;
 
