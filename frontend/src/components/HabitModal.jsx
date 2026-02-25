@@ -35,7 +35,7 @@ const frequencyItems = [
 ];
 
   useEffect(() => {
-    if (isModalOpen && isEditingMode) {
+    if (isModalOpen) {
       fetchCategories();
     }
   }, [isModalOpen, fetchCategories]);
