@@ -8,6 +8,7 @@ import i18n from "../utils/i18n";
 import EditTask from "../components/tasks/EditTask";
 import { useHotkeys } from "react-hotkeys-hook";
 import { LuPlus } from "react-icons/lu";
+import AddCategory from "../components/tasks/AddCategory";
 
 function Tasks() {
   const {
@@ -33,41 +34,46 @@ function Tasks() {
   }, [fetchCategories]);
 
   const { t } = useTranslation();
+  const { categories } = useTaskCardStore((state) => state);
 
-  const groupedTasks = useMemo(() => {
-    return tasks.reduce((acc, task) => {
-      const catId = task.categoryId?._id || "uncategorized";
-      const categoryName = task.categoryId?.name || t("Uncategorized");
-      const categoryColor = task.categoryId?.backgroundColor || "#6b7280";
+  const groupedArray = useMemo(() => {
+    const groups = {};
 
+    categories.forEach((cat) => {
+      groups[cat.id] = {
+        id: cat.id,
+        name: cat.name,
+        color: cat.color,
+        icon: cat.icon,
+        items: [],
+      };
+    });
 
-      if (!acc[catId]) {
-        acc[catId] = {
-          id: catId,
-          name: categoryName,
-          color: categoryColor,
-          items: []
-        };
+    tasks.forEach((task) => {
+      const catId = task.categoryId?._id;
+
+      if (catId && groups[catId]) {
+        groups[catId].items.push(task);
       }
-      acc[catId].items.push(task);
-      return acc;
-    }, {});
-  }, [tasks, t]);
+    });
 
-const handleAddNewTaskToCategory = (catId) => {
-  console.log("Clicking + for Category ID:", catId);
+    return groups;
+  }, [tasks, categories]);
 
-  setTaskData("title", "");
-  setTaskData("description", "");
-  setTaskData("dueDate", null);
-  setTaskData("priority", "medium");
+  const handleAddNewTaskToCategory = (catId) => {
+    console.log("Clicking + for Category ID:", catId);
 
-  setTaskData("category", catId === "uncategorized" ? null : catId);
+    setTaskData("title", "");
+    setTaskData("description", "");
+    setTaskData("dueDate", null);
+    setTaskData("priority", "medium");
 
-  setModalOpen(true);
-};
+    setTaskData("category", catId === "uncategorized" ? null : catId);
 
-    useHotkeys(
+    setModalOpen(true);
+  };
+
+  useHotkeys(
     "ctrl+k, meta+k",
     (e) => {
       e.preventDefault();
@@ -75,7 +81,6 @@ const handleAddNewTaskToCategory = (catId) => {
       },
       { enabled: !isModalOpen }
   );
-
 
   return (
     <div className={`pb-10 px-4 md:px-6 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen ${i18n.language === "fa" ? "rtl" : "ltr"}`}>
@@ -88,7 +93,7 @@ const handleAddNewTaskToCategory = (catId) => {
 
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-          {Object.values(groupedTasks).map((group) => (
+          {Object.values(groupedArray).map((group) => (
             <div
               key={group.id}
               className="flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800"
@@ -130,6 +135,7 @@ const handleAddNewTaskToCategory = (catId) => {
               </div>
             </div>
           ))}
+          <AddCategory />
         </div>
       )}
     </div>
