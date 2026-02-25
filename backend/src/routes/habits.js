@@ -9,6 +9,7 @@ import {
   reorderHabits,
   completeHabit,
   uncompleteHabit,
+  getHabitById,
 } from '../controllers/habitsController.js';
 import {
   createHabitValidator,
@@ -47,6 +48,11 @@ router.delete(
   validate,
   asyncHandler(uncompleteHabit)
 );
+router.put('/reorder', asyncHandler(reorderHabits));
+
+router.get('/dashboard', asyncHandler(getHabitsDashboard));
+router.get('/dashboard/chart-data', asyncHandler(getHabitChartData));
+
 router
   .route('/:id')
   .put(
@@ -55,11 +61,7 @@ router
     validate,
     asyncHandler(updateHabit)
   )
-  .delete(habitIdValidator, validate, asyncHandler(deleteHabit));
-
-router.put('/reorder', asyncHandler(reorderHabits));
-
-router.get('/dashboard', asyncHandler(getHabitsDashboard));
-router.get('/dashboard/chart-data', asyncHandler(getHabitChartData));
+  .delete(habitIdValidator, validate, asyncHandler(deleteHabit))
+  .get(habitIdValidator, validate, asyncHandler(getHabitById));
 
 export default router;
