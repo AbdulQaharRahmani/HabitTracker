@@ -69,6 +69,7 @@ export default function Dropdown({ items, value, getValue,displayValue, placehol
                 hover:text-[#7B68EE] dark:hover:text-[#7B68EE]
               "
             >
+              {item.icon && <item.icon size={18} />}               
               <span className="font-medium ps-4">{item.name}</span>
               <HiCheck
                 size={18}
