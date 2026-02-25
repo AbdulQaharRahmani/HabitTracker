@@ -318,7 +318,7 @@ const useHabitStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const result = await getHabitsChartData(startDate, endDate);
-      console.log(result);
+
       if (result.success) {
         set({ consistencyData: result.data.daily, loading: false });
       } else {

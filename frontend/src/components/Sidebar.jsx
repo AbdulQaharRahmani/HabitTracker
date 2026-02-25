@@ -89,8 +89,9 @@ const [isLoggingOut, setIsLoggingOut] = useState(false);
 };
 
 useEffect(()=>{
-  console.log(isRtl);
+  console.log('isRTl',isRtl);
 },[isRtl]);
+
 
 
    useHotkeys(
