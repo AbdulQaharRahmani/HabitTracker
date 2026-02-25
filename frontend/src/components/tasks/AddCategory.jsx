@@ -157,9 +157,9 @@ export default function AddCategory() {
                                     setSelectedIcon("");
                                     setIsOpen(false);
                                 }}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-indigo-500 hover:bg-indigo-600 rounded-lg transition-colors"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 font-semibold text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl transition-all active:scale-[0.98]"
                             >
-                                <HiPlus size={16} /> Add Category
+                                <HiPlus size={16} /> {t("Add Category")}
                             </button>
                             <button
                                 type="button"
@@ -168,7 +168,7 @@ export default function AddCategory() {
                                     setCategoryName("");
                                     setSelectedIcon("");
                                 }}
-                                className="my-3 w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                className="my-3 w-full py-2 text-gray-500 dark:text-gray-400 font-semibold rounded-xl border-2 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-[0.98]"
                             >
                                 {t("Cancel")}
                             </button>
