@@ -87,11 +87,11 @@ export default function AddCategory() {
                 <LuPlus size={40} className="text-gray-500 mb-4" />
 
                 <h3 className="font-semibold text-gray-400">
-                {t("Add New Category")}
+                    {t("Add New Category")}
                 </h3>
 
                 <p className="text-xs text-gray-400 mt-2 text-center px-6">
-                {t("Create a new task category")}
+                    {t("Create a new task category")}
                 </p>
             </div>
             {isOpen && (
@@ -109,18 +109,18 @@ export default function AddCategory() {
                             </div>
                             <div className="my-2">
                                 <div className="flex flex-row items-center bg-gray-50 dark:bg-gray-900/50 justify-start text-md text-gray-500 dark:text-gray-400 rounded-lg py-2 border border-dashed border-gray-200 mb-2">
-                                    <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400">Category Name:</p>
+                                    <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400">{t("Category Name")}:</p>
                                     <input 
                                         value={categoryName}
                                         onChange={(e) => setCategoryName(e.target.value)}
                                         className={`p-2 ${isRTL ? "pl-6" : "pr-6"} outline-none bg-gray-50`} 
-                                        placeholder={t("category name...")}
+                                        placeholder={t("Enter category name...")}
                                     />
                                 </div>
                                 <div
                                     className="text-sm text-gray-500 dark:text-gray-400 border border-dashed border-gray-200 rounded-lg bg-gray-50 py-2"
                                 >
-                                    <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400 my-4">Pick icon:</p>
+                                    <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400 my-4">{t("Pick icon")}:</p>
                                     <div className="flex gap-2 overflow-x-auto pb-3 mb-3 scrollbar-hide mx-2.5 mt-2">
                                         {categories.map((cat) => (
                                             <button
@@ -139,10 +139,10 @@ export default function AddCategory() {
                                     </div>
                                     <div className="mx-2.5">
                                         <Dropdown 
-                                        items={categoryIcons}
-                                        placeholder={t("Choose Icon")}
-                                        value={selectedIcon}
-                                        getValue={(value) => setSelectedIcon(value)}
+                                            items={categoryIcons}
+                                            placeholder={t("Choose Icon")}
+                                            value={selectedIcon}
+                                            getValue={(value) => setSelectedIcon(value)}
                                         />
                                     </div>
                                 </div>
@@ -150,7 +150,7 @@ export default function AddCategory() {
 
                             <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg w-full border border-dashed border-gray-200 dark:border-gray-700 mb-3">
                                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400">
-                                    Pick Color:
+                                    {t("Pick Color")}:
                                 </label>
                                 <div className="relative flex items-center justify-center w-8 h-8 rounded-full overflow-hidden border-2 border-white dark:border-gray-800 shadow-sm ring-1 ring-gray-200 dark:ring-gray-700">
                                     <input
