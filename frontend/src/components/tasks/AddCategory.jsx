@@ -30,6 +30,42 @@ export default function AddCategory() {
         icon: item.icon,
     }));
 
+    const handleAddCategory = async () => {
+        try{
+            if (!categoryName) {
+                toast.error(t("Category Name is required!"));
+                return;
+            }
+
+            if (!selectedIcon) {
+                toast.error(t("Icon Name is required!"));
+                return;
+            }
+            const newCategoryPaylod = {
+                name: categoryName,
+                backgroundColor: selectedColor,
+                icon: selectedIcon,
+            }
+
+            await createCategory(newCategoryPaylod, t);
+
+        } catch(err) {
+            console.error("Failed to create category:", err);
+        } finally{
+            setCategoryName("");
+            setSelectedIcon("");
+            setIsOpen(false);
+            setSelectedColor("#6366f1");
+        }
+    }
+
+    function handleCloseModal () {
+        setIsOpen(false);
+        setCategoryName("");
+        setSelectedIcon("");
+        setSelectedColor("#6366f1");
+    }
+
     return (
         <div>
             <div
@@ -67,11 +103,7 @@ export default function AddCategory() {
                                     {t("Add Category")}
                                 </h2>
                                 <FaTimes
-                                    onClick={() => {
-                                        setIsOpen(false);
-                                        setCategoryName("");
-                                        setSelectedIcon("");
-                                    }}
+                                    onClick={handleCloseModal}
                                     className="cursor-pointer"
                                 />
                             </div>
@@ -135,39 +167,14 @@ export default function AddCategory() {
 
                             <button
                                 type="button"
-                                onClick={() => {
-                                    if (!categoryName) {
-                                        toast.error(t("Category Name is required!"));
-                                        return;
-                                    }
-
-                                    if (!selectedIcon) {
-                                        toast.error(t("Icon Name is required!"));
-                                        return;
-                                    }
-
-                                    createCategory({
-                                        _id: crypto.randomUUID(),
-                                        name: categoryName,
-                                        backgroundColor: selectedColor,
-                                        icon: selectedIcon,
-                                    });
-
-                                    setCategoryName("");
-                                    setSelectedIcon("");
-                                    setIsOpen(false);
-                                }}
+                                onClick={handleAddCategory}
                                 className="w-full flex items-center justify-center gap-2 px-4 py-2 font-semibold text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl transition-all active:scale-[0.98]"
                             >
                                 <HiPlus size={16} /> {t("Add Category")}
                             </button>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setIsOpen(false);
-                                    setCategoryName("");
-                                    setSelectedIcon("");
-                                }}
+                                onClick={handleCloseModal}
                                 className="my-3 w-full py-2 text-gray-500 dark:text-gray-400 font-semibold rounded-xl border-2 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-[0.98]"
                             >
                                 {t("Cancel")}
