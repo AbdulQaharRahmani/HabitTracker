@@ -7,14 +7,6 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { useHotkeys } from "react-hotkeys-hook"
 
-const frequencyItems = [
-  { id: "f1", name: "Daily", value: "daily" },
-  { id: "f2", name: "Every Other Day", value: "every-other-day" },
-  { id: "f3", name: "Weekly", value: "weekly" },
-  { id: "f4", name: "Biweekly", value: "biweekly" },
-  { id: "f5", name: "Weekdays", value: "weekdays" },
-  { id: "f6", name: "Weekends", value: "weekends" },
-];
 
 export default function HabitModal() {
   const {
@@ -33,6 +25,14 @@ export default function HabitModal() {
   } = useHabitStore();
 
   const { t } = useTranslation();
+const frequencyItems = [
+  { id: "f1", name: t("daily"), value: "daily" },
+  { id: "f2", name: t("every-other-day"), value: "every-other-day" },
+  { id: "f3", name: t("weekly"), value: "weekly" },
+  { id: "f4", name: t("biweekly"), value: "biweekly" },
+  { id: "f5", name: t("weekdays"), value: "weekdays" },
+  { id: "f6", name: t("weekends"), value: "weekends" },
+];
 
   useEffect(() => {
     if (isModalOpen && isEditingMode) {
@@ -76,6 +76,10 @@ export default function HabitModal() {
     await addUserCategory(name, color);
     await fetchCategories();
   };
+  const translatedCategories= categories.map((category)=> ({
+    ...category,
+   name:t(category.name)
+  }))
 
   return (
     <>
@@ -142,6 +146,7 @@ export default function HabitModal() {
                     placeholder={t("Choose Frequency")}
                     value={habitData.frequency}
                     getValue={(value) => setHabitData("frequency", value)}
+                    displayValue={frequencyItems.find((item)=> item.value === habitData.frequency)?.name}
                   />
                 </div>
 
@@ -150,8 +155,8 @@ export default function HabitModal() {
                     {t("Category")} <span className="text-red-600">*</span>
                   </label>
                   <SearchableDropdown
-                    items={categories}
-                    value={habitData.categoryId}
+                    items={translatedCategories}
+                    value={t(habitData.categoryId)}
                     badgeColor={
                       categories.find((c) => c.id === habitData.categoryId)
                         ?.color || "#dbd6f9"

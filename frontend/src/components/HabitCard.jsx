@@ -26,7 +26,6 @@ export default function HabitCard({
   const [isModalOpen,setIsModalOpen]=useState(false);
   const [isDeleting,setIsDeleting]=useState(false);
 
-
   const handleDelete=async()=>{
     try{
       setIsDeleting(true);
@@ -69,11 +68,11 @@ export default function HabitCard({
               className="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md"
               style={{ backgroundColor: bgColor, color }}
             >
-              {categoryId?.name || "No Category"}
+              {t(categoryId?.name) || "No Category"}
             </span>
 
             <span className="flex items-center text-[12px] text-gray-500 dark:text-gray-400">
-              {frequency || "No frequency"}
+              {t(frequency) || "No frequency"}
             </span>
           </div>
         </div>

@@ -221,5 +221,15 @@
   "Message": "پیام",
   "Items Per Page": "تعداد نمایش در هر صفحه",
 
-  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید"
+  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
+  "daily": "روزانه",
+  "every-other-day": "یک روز در میان",
+  "biweekly": "دو هفته یک‌بار",
+  "weekdays": "روزهای کاری",
+  "weekends": "آخر هفته‌ها",
+  "weekly": "هفته وار",
+  "health": "صحت",
+  "sport": "ورزش",
+  "work": "کار",
+  "study": "درس"
 }
