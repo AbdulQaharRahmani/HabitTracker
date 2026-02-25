@@ -1,5 +1,6 @@
 import { VscChevronLeft, VscChevronRight } from "react-icons/vsc";
 import { usePagination, DOTS } from "../hooks/usePagination";
+import {useTranslation} from 'react-i18next';
 
 function Pagination({
   onPageChange,
@@ -15,27 +16,49 @@ function Pagination({
     pageSize,
   });
 
+
+  const {i18n,t} = useTranslation();
+  const isRTL=i18n.language === 'fa';
+
+ ;
+
+ const toPersianNumber = (num,lang) =>{
+  return  new Intl.NumberFormat(lang === "fa" ? "fa-IR" : "en-US").format(num);
+  };
+
+
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  if (currentPage === 0 || paginationRange.length < 2) return null;
 
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
+
+
+  if (currentPage === 0 || paginationRange.length < 2) return null;
+
+
+
   return (
-    <div className="flex flex-col justify-between items-center gap-5 pt-5 pb-10 mx-auto">
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between mr-8">
-        <p className="text-sm text-gray-700">
-          Displaying
-          <span className="font-medium"> {startItem} </span>
-          to
-          <span className="font-medium"> {endItem} </span>
-          out of
-          <span className="font-medium"> {totalCount} </span>
-          results
+    <div dir={isRTL ? "rtl": "ltr"} className="flex flex-col justify-center items-center gap-5 pt-5 pb-10 mx-auto">
+      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-center">
+        <p className="text-sm text-gray-700 text-center">
+          {t('displaying')}
+          <span className="font-medium mx-1">
+             {isRTL ? toPersianNumber(startItem,'fa') : startItem}
+          </span>
+         {t("to")}
+          <span className="font-medium mx-1">
+            {isRTL ? toPersianNumber(endItem,'fa') : endItem}
+          </span>
+         {t("outOf")}
+          <span className="font-medium mx-1">
+            { isRTL ? toPersianNumber(totalCount,'fa') : totalCount
+          } </span>
+        {t("results")}
         </p>
       </div>
-      <nav className="flex items-center gap-1.5 sm:justify-end">
+      <nav className="flex items-center gap-1.3 sm:gap-1.5 sm:justify-end">
         {/* Prev */}
      <button
       onClick={() => onPageChange(currentPage - 1)}
@@ -48,7 +71,10 @@ function Pagination({
                 dark:enabled:hover:bg-gray-700
                 disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      <VscChevronLeft />
+      {
+        isRTL ? <VscChevronRight/> : <VscChevronLeft/>
+      }
+
     </button>
 
         {paginationRange.map((page, index) => {
@@ -78,7 +104,7 @@ function Pagination({
                 }
                 disabled:cursor-default`}
             >
-              {page}
+              {isRTL ? toPersianNumber(page,'fa') : page}
             </button>
           );
         })}
@@ -95,7 +121,9 @@ function Pagination({
                 dark:enabled:hover:bg-gray-700
                 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <VscChevronRight />
+        {
+        isRTL ? <VscChevronLeft /> : <VscChevronRight/>
+      }
       </button>
       </nav>
     </div>
