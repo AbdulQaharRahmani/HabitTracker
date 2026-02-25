@@ -218,6 +218,18 @@
 
  "Language": "زبان",
   "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید",
-  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید"
+  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
+
+  "Add Category": "اضافه کردن کتگوری",
+  "Category Name is required!": "اسم کتگوری الزامی است!",
+  "Icon Name is required!": "نماد الزامی است!",
+  "Add New Category": "کتگوری جدید اضافه کنید",
+  "Create a new task category": "یک کتگوری جدید برای عملیات هایتان اضافه کنید",
+  "Category Name": "نام کتگوری",
+  "Enter category name...": "نام کتگوری را وارد کنید...",
+  "Pick icon": "نماد تان را بردارید",
+  "Choose Icon": "انتخاب نماد",
+  "Pick Color": "رنک را بردارید",
+  "Category created!" : "کتگوری ساخته شد!"
 }
 

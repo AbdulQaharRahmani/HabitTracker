@@ -187,5 +187,17 @@
   "logout_title": "Logout",
   "logout_description": "Are you sure you want to logout?",
   "logout_confirmText": "Confirm",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+
+  "Add Category": "Add Category",
+  "Category Name is required!": "Category Name is required!",
+  "Icon Name is required!": "Icon Name is required!",
+  "Add New Category": "Add New Category",
+  "Create a new task category": "Create a new task category",
+  "Category Name": "Category Name",
+  "Enter category name...": "Enter category name...",
+  "Pick icon": "Pick icon",
+  "Choose Icon": "Choose Icon",
+  "Pick Color": "Pick Color",
+  "Category created!" : "Category created!"
 }
