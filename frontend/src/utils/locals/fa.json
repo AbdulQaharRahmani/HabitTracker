@@ -221,5 +221,10 @@
   "Message": "پیام",
   "Items Per Page": "تعداد نمایش در هر صفحه",
 
-  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید"
+  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
+
+  "displaying": "نمایش",
+  "to": "تا",
+  "outOf": "از",
+  "results": "نتیجه"
 }
