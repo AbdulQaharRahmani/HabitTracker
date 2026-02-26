@@ -221,5 +221,22 @@
   "Message": "پیام",
   "Items Per Page": "تعداد نمایش در هر صفحه",
 
-  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید"
+  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
+
+  "Category Name is required!": "اسم کتگوری الزامی است!",
+  "Icon Name is required!": "نماد الزامی است!",
+  "Category Name": "نام کتگوری",
+  "Pick icon": "نماد تان را بردارید",
+  "Choose Icon": "انتخاب نماد",
+  "Pick Color": "رنک را بردارید",
+  "Successfully Added the Category": "کتگوری موفقانه اضافه شد",
+  "categoryGroups": {
+    "work": "کاری",
+    "home": "خانه",
+    "shopping": "خریداری",
+    "health": "سلامتی",
+    "travel": "سفر",
+    "entertainment": "سرگرمی",
+    "education": "آموزشی"
+  }
 }

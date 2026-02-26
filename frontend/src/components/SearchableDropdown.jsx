@@ -4,6 +4,8 @@ import useClickOutside from "../hooks/useClickOutside";
 import Dropdown from "./Dropdown";
 import { iconCategories } from "../utils/icons";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
+import {useHabitStore} from "../store/useHabitStore";
 
 export default function SearchableDropdown({
   items,
@@ -46,6 +48,35 @@ export default function SearchableDropdown({
     value: item.value,
     icon: item.icon,
   }));
+  const {addUserCategory} = useHabitStore()
+  const handleAddCategory = async () => {
+    try{
+      if (!searchTerm.trim()) {
+        toast.error(t("Category Name is required!"));
+        return;
+      }
+
+      if (!selectedIcon) {
+        toast.error(t("Icon Name is required!"));
+        return;
+      }
+
+      const newCategoryPayload = {
+        name: searchTerm,
+        backgroundColor: selectedColor,
+        icon: selectedIcon,
+      };
+
+      await addUserCategory(newCategoryPayload, t);
+    } catch(err) {
+      console.error("Failed to create category:", err);
+    } finally{
+      setSearchTerm("");
+      setSelectedIcon("");
+      setDropdownOpen(false);
+      setSelectedColor("#6366f1");
+    }
+  }
 
   return (
     <div className="w-full relative" ref={dropdownRef}>
@@ -95,7 +126,7 @@ export default function SearchableDropdown({
             <li className="p-4">
               <div className="my-2">
                 <div className="flex flex-row items-center bg-gray-50 dark:bg-gray-900/50 justify-start text-md text-gray-500 dark:text-gray-400 rounded-lg py-2 border border-dashed border-gray-200 mb-2">
-                  <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400">Category Name:</p>
+                  <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400">{t("Category Name")}:</p>
                   <input 
                     className="first-letter:uppercase p-2 px-0 outline-none bg-gray-50" 
                     placeholder={searchTerm}
@@ -104,7 +135,7 @@ export default function SearchableDropdown({
                 <div
                   className="text-sm text-gray-500 dark:text-gray-400 border border-dashed border-gray-200 rounded-lg bg-gray-50 py-2"
                 >
-                  <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400 my-4">Pick icon:</p>
+                  <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400 my-4">{t("Pick icon")}:</p>
                   <div className="flex gap-2 overflow-x-auto pb-3 mb-3 scrollbar-hide mx-2.5 mt-2">
                     {categories.map((cat) => (
                       <button
@@ -119,7 +150,7 @@ export default function SearchableDropdown({
                           }
                         `}
                       >
-                        {cat}
+                        {t(`categoryGroups.${cat}`)}
                       </button>
                     ))}
                   </div>
@@ -136,7 +167,7 @@ export default function SearchableDropdown({
 
               <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg w-full border border-dashed border-gray-200 dark:border-gray-700 mb-3">
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400">
-                  Pick Color:
+                  {t("Pick Color")}:
                 </label>
                 <div className="relative flex items-center justify-center w-8 h-8 rounded-full overflow-hidden border-2 border-white dark:border-gray-800 shadow-sm ring-1 ring-gray-200 dark:ring-gray-700">
                   <input
@@ -153,14 +184,10 @@ export default function SearchableDropdown({
 
               <button
                 type="button"
-                onClick={() => {
-                  onAdd(searchTerm, selectedColor, selectedIcon);
-                  setSearchTerm("");
-                  setDropdownOpen(false);
-                }}
+                onClick={handleAddCategory}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#7B68EE] rounded-lg hover:bg-[#6A5ACD] transition-colors"
               >
-                <HiPlus size={16} /> Add Category
+                <HiPlus size={16} />{t("Add Category")}
               </button>
             </li>
           )}

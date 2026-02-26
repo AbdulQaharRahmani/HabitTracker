@@ -209,15 +209,10 @@ const useHabitStore = create((set, get) => ({
       set({ loading: false });
     }
   },
-  addUserCategory: async (category, color, icon) => {
-    const newCategoryData = {
-      name: category,
-      icon: icon,
-      backgroundColor: color,
-    };
+  addUserCategory: async (newCategory, t) => {
     try {
-      await api.post("/categories", newCategoryData);
-      toast.success("Successfully Added the Category");
+      await api.post("/categories", newCategory);
+      toast.success(t("Successfully Added the Category"));
     } catch (error) {
       const message = error.response?.data?.error || "Something went wrong";
       toast.error(message);
