@@ -215,7 +215,6 @@
 
   "Language": "زبان",
   "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید",
-<<<<<<< HEAD
   "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
 
   "Add Category": "اضافه کردن کتگوری",
@@ -237,14 +236,12 @@
     "travel": "سفر",
     "entertainment": "سرگرمی",
     "education": "آموزشی"
-  }
-=======
+  },
+
   "User Name": "نام کاربری",
   "Password updated. please log in again": "رمز عبور به روزرسانی شده. لطفا دوباره وارد شوید",
   "Password update failed": "بروزرسانی رمز عبور ناموفق بود",
   "Message": "پیام",
-  "Items Per Page": "تعداد نمایش در هر صفحه",
+  "Items Per Page": "تعداد نمایش در هر صفحه"
 
-  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید"
->>>>>>> ac30441bcdaa05c5cd1f87612dfef04dd0a085ca
 }
