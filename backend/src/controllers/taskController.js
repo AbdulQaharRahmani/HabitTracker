@@ -66,6 +66,22 @@ export const getTasks = async (req, res) => {
   });
 };
 
+export const getTaskById = async (req, res) => {
+  if (!req.user) throw unauthorized();
+
+  const task = await TaskModel.findOne({
+    _id: req.params.id,
+    userId: req.user._id,
+  }).populate('categoryId', 'name icon backgroundColor');
+
+  if (!task) throw notFound('Task');
+
+  res.status(200).json({
+    success: true,
+    data: task,
+  });
+};
+
 export const deleteTask = async (req, res) => {
   if (!req.user) throw unauthorized();
 
