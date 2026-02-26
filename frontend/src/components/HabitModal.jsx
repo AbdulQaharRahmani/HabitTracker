@@ -76,10 +76,6 @@ const frequencyItems = [
     await addUserCategory(name, color);
     await fetchCategories();
   };
-  const translatedCategories= categories.map((category)=> ({
-    ...category,
-   name:t(category.name)
-  }))
 
   return (
     <>
@@ -155,7 +151,7 @@ const frequencyItems = [
                     {t("Category")} <span className="text-red-600">*</span>
                   </label>
                   <SearchableDropdown
-                    items={translatedCategories}
+                    items={categories}
                     value={t(habitData.categoryId)}
                     badgeColor={
                       categories.find((c) => c.id === habitData.categoryId)
