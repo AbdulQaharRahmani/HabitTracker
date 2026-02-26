@@ -91,7 +91,7 @@ export default function AddCategory() {
                 </h3>
 
                 <p className="text-xs text-gray-400 mt-2 text-center px-6">
-                    {t("Create a new task category")}
+                    {t("Create a new category for your tasks")}
                 </p>
             </div>
             {isOpen && (
