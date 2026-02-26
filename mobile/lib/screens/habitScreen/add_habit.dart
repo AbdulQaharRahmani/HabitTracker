@@ -5,27 +5,17 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/app_theme.dart';
+import '../../services/category_cache.dart';
+import '../../utils/category/category_model.dart';
+import '../../utils/habits/habit.dart';
 import '../../features/add_habit_model.dart';
 import '../../providers/theme_provider.dart';
 
-class CategoryModel {
-  final String id;
-  final String name;
-
-  CategoryModel({required this.id, required this.name});
-
-  factory CategoryModel.fromJson(Map<String, dynamic> json) {
-    return CategoryModel(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
-    );
-  }
-}
 
 class AddHabitDialog {
   static Future<void> show(
       BuildContext context, {
-        required void Function(HabitData data) onSubmit,
+        required void Function(Habit? newHabit) onSubmit,
         bool barrierDismissible = true,
       }) async {
     final maxWidth = MediaQuery.of(context).size.width * 0.92;
@@ -82,8 +72,8 @@ class AddHabitDialog {
                     child: SingleChildScrollView(
                       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
                       child: _AddHabitForm(
-                        onSubmit: (data) {
-                          onSubmit(data);
+                        onSubmit: (newHabit) {
+                          onSubmit(newHabit);
                         },
                       ),
                     ),
@@ -100,11 +90,9 @@ class AddHabitDialog {
 }
 
 class _AddHabitForm extends StatefulWidget {
-  final void Function(HabitData data) onSubmit;
+  final void Function(Habit? newHabit) onSubmit;
 
-  const _AddHabitForm({
-    required this.onSubmit,
-  });
+  const _AddHabitForm({required this.onSubmit});
 
   @override
   State<_AddHabitForm> createState() => _AddHabitFormState();
@@ -137,46 +125,32 @@ class _AddHabitFormState extends State<_AddHabitForm> {
   }
 
   Future<void> _fetchCategories() async {
-    final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/categories');
+    // First try to get cached categories synchronously
+    final cached = CategoryCache().getCachedCategoriesSync();
+    if (cached != null && cached.isNotEmpty) {
+      setState(() {
+        _categories = List.from(cached);
+        _selectedCategory = _categories.first;
+        _isLoadingCategories = false;
+      });
+      return;
+    }
 
+    // Otherwise fetch from network
     setState(() {
       _isLoadingCategories = true;
       _errorMessage = null;
     });
 
     try {
-      final token = await _getToken();
-      if (token == null) {
-        setState(() {
-          _errorMessage = "Error: Please relogin to account, token not found";
-          _isLoadingCategories = false;
-        });
-        return;
-      }
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 30));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> decodedData = jsonDecode(response.body);
-        final List<dynamic> categoriesJson = decodedData['data'];
-
-        setState(() {
-          _categories = categoriesJson.map((item) => CategoryModel.fromJson(item)).toList();
-          if (_categories.isNotEmpty) _selectedCategory = _categories.first;
-          _isLoadingCategories = false;
-        });
-      } else {
-        setState(() {
-          _errorMessage = "Server error: ${response.statusCode}";
-          _isLoadingCategories = false;
-        });
-      }
+      final fetchedCategories = await CategoryCache().getCategories();
+      setState(() {
+        _categories = List.from(fetchedCategories);
+        if (_categories.isNotEmpty) {
+          _selectedCategory = _categories.first;
+        }
+        _isLoadingCategories = false;
+      });
     } catch (e) {
       setState(() {
         _errorMessage = "Network connection error";
@@ -213,22 +187,28 @@ class _AddHabitFormState extends State<_AddHabitForm> {
           "frequency": _frequency.toLowerCase(),
           "categoryId": _selectedCategory!.id,
         }),
-      ).timeout(const Duration(seconds: 20));
+      ).timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        widget.onSubmit(HabitData(
-          title: _titleCtl.text,
-          description: _descCtl.text,
-          frequency: _frequency,
-          category: _selectedCategory!.name,
-        ));
         _showSnackBar("Habit added successfully!", isSuccess: true);
-        Navigator.pop(context);
+
+        try {
+          final Map<String, dynamic> decodedData = jsonDecode(response.body);
+          final newHabit = Habit.fromJson(decodedData['data']);
+          widget.onSubmit(newHabit);
+        } catch (_) {
+          widget.onSubmit(null);
+        }
+
+        if (mounted) Navigator.pop(context);
       } else {
+        print("❌ Submit Error Body: ${response.body}");
+        _showSnackBar("Error: ${response.statusCode}");
         _showSnackBar("Not registered: ${response.statusCode}");
       }
     } catch (e) {
-      _showSnackBar("Connection error");
+      print("❌ Submit Exception: $e");
+      _showSnackBar("Connection error: $e");
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }

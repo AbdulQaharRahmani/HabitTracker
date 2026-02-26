@@ -2,6 +2,7 @@ import { create } from "zustand";
 import api from "../../services/api";
 import toast from "react-hot-toast";
 import useAuthStore from "./useAuthStore";
+import i18n from "../utils/i18n";
 
 const useSettingStore = create((set) => ({
   username: "",
@@ -30,10 +31,14 @@ const useSettingStore = create((set) => ({
         newPassword: newPassword.trim(),
       });
 
-      toast.success("Password updated successfully");
+      toast.success(i18n.t("Password updated. please log in again"));
+      useAuthStore.getState().logout();
+
       return true;
     } catch (err) {
-      toast.error(err.response?.data?.message || "Password update failed");
+      toast.error(
+        err.response?.data?.message || i18n.t("Password update failed"),
+      );
       return false;
     }
   },
