@@ -20,12 +20,11 @@ function Tasks() {
     isEditModalOpen,
     fetchCategories,
     setModalOpen,
-    setTaskData
-  } = useTaskCardStore((state) => state);
+    setTaskData } =
+    useTaskCardStore((state) => state);
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
-
   useEffect(() => {
     fetchTasks(ITEMS_PER_PAGE, page);
   }, [page, isModalOpen, isEditModalOpen, fetchTasks]);
@@ -36,127 +35,55 @@ function Tasks() {
 
   const { t } = useTranslation();
   const { categories } = useTaskCardStore((state) => state);
-  const isRTL = i18n.language === "fa";
 
   const groupedArray = useMemo(() => {
     const groups = {};
 
-    // 1️⃣ First create groups from categories
     categories.forEach((cat) => {
-      groups[cat._id] = {
-        id: cat._id,
+      groups[cat.id] = {
+        id: cat.id,
         name: cat.name,
-        color: cat.backgroundColor,
+        color: cat.color,
         icon: cat.icon,
         items: [],
       };
     });
 
-    // 2️⃣ Add Uncategorized group
-    groups["uncategorized"] = {
-      id: "uncategorized",
-      name: t("Uncategorized"),
-      color: "#6b7280",
-      items: [],
-    };
-
-    // 3️⃣ Distribute tasks
     tasks.forEach((task) => {
       const catId = task.categoryId?._id;
 
       if (catId && groups[catId]) {
         groups[catId].items.push(task);
-      } else {
-        groups["uncategorized"].items.push(task);
       }
     });
 
-    return Object.values(groups);
-  }, [tasks, categories, t]);
-
-
-  // const groupedArray = useMemo(() => {
-  //   const groups = tasks.reduce((acc, task) => {
-  //     const catId = task.categoryId?._id || "uncategorized";
-  //     const categoryName = task.categoryId?.name || t("Uncategorized");
-  //     const categoryColor = task.categoryId?.backgroundColor || "#6b7280";
-
-  //     if (!acc[catId]) {
-  //       acc[catId] = { id: catId, name: categoryName, color: categoryColor, items: [] };
-  //     }
-  //     acc[catId].items.push(task);
-  //     return acc;
-  //   }, {});
-  //   return Object.values(groups);
-  // }, [tasks, t]);
+    return groups;
+  }, [tasks, categories]);
 
   const handleAddNewTaskToCategory = (catId) => {
+    console.log("Clicking + for Category ID:", catId);
+
     setTaskData("title", "");
     setTaskData("description", "");
     setTaskData("dueDate", null);
     setTaskData("priority", "medium");
+
     setTaskData("category", catId === "uncategorized" ? null : catId);
+
     setModalOpen(true);
   };
 
-  useHotkeys("up, down, left, right", (e) => {
-    const active = document.activeElement;
-    if (!active || !active.hasAttribute('data-task-card')) return;
-
-    e.preventDefault();
-    const currentId = active.getAttribute('data-id');
-
-    let colIndex = -1;
-    let rowIndex = -1;
-
-    groupedArray.forEach((group, cIdx) => {
-      const rIdx = group.items.findIndex(item => item._id === currentId);
-      if (rIdx !== -1) {
-        colIndex = cIdx;
-        rowIndex = rIdx;
-      }
-    });
-
-    if (colIndex === -1) return;
-
-    let nextCol = colIndex;
-    let nextRow = rowIndex;
-
-    if (e.key === "ArrowUp") nextRow--;
-    if (e.key === "ArrowDown") nextRow++;
-
-    if (e.key === "ArrowLeft") {
-      isRTL ? nextCol++ : nextCol--;
-    }
-    if (e.key === "ArrowRight") {
-      isRTL ? nextCol-- : nextCol++;
-    }
-
-    if (nextCol < 0) nextCol = 0;
-    if (nextCol >= groupedArray.length) nextCol = groupedArray.length - 1;
-
-    const targetGroup = groupedArray[nextCol];
-
-    if (nextRow < 0) nextRow = 0;
-    if (nextRow >= targetGroup.items.length) nextRow = targetGroup.items.length - 1;
-
-    const nextTask = targetGroup.items[nextRow];
-    if (nextTask) {
-      const nextEl = document.querySelector(`[data-id="${nextTask._id}"]`);
-      nextEl?.focus();
-    }
-  }, {
-    enableOnFormTags: false,
-    dependencies: [groupedArray, isRTL]
-  });
-
-  useHotkeys("ctrl+k, meta+k", (e) => {
-    e.preventDefault();
-    setModalOpen(true);
-  }, { enabled: !isModalOpen });
+  useHotkeys(
+    "ctrl+k, meta+k",
+    (e) => {
+      e.preventDefault();
+        setModalOpen(true);
+      },
+      { enabled: !isModalOpen }
+  );
 
   return (
-    <div className={`pb-10 px-4 md:px-6 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen ${isRTL ? "rtl" : "ltr"}`}>
+    <div className={`pb-10 px-4 md:px-6 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen ${i18n.language === "fa" ? "rtl" : "ltr"}`}>
       <EditTask />
       <AddTask />
 
@@ -166,7 +93,7 @@ function Tasks() {
 
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-          {groupedArray.map((group) => (
+          {Object.values(groupedArray).map((group) => (
             <div
               key={group.id}
               className="flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800"
@@ -214,5 +141,4 @@ function Tasks() {
     </div>
   );
 }
-
 export default Tasks;
