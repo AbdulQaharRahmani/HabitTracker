@@ -40,25 +40,39 @@ function Tasks() {
     const groups = {};
 
     categories.forEach((cat) => {
-      groups[cat.id] = {
-        id: cat.id,
+      const id = cat._id || cat.id;
+
+      groups[id] = {
+        id,
         name: cat.name,
-        color: cat.color,
+        color: cat.backgroundColor || cat.color || "#6b7280",
         icon: cat.icon,
         items: [],
       };
     });
 
+    groups["uncategorized"] = {
+      id: "uncategorized",
+      name: t("Uncategorized"),
+      color: "#6b7280",
+      items: [],
+    };
+
     tasks.forEach((task) => {
-      const catId = task.categoryId?._id;
+      const catId =
+        typeof task.categoryId === "object"
+          ? task.categoryId?._id
+          : task.categoryId;
 
       if (catId && groups[catId]) {
         groups[catId].items.push(task);
+      } else {
+        groups["uncategorized"].items.push(task);
       }
     });
 
-    return groups;
-  }, [tasks, categories]);
+    return Object.values(groups);
+  }, [tasks, categories, t]);
 
   const handleAddNewTaskToCategory = (catId) => {
     console.log("Clicking + for Category ID:", catId);
