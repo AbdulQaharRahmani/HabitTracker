@@ -8,16 +8,15 @@ class AuthenticatedHttpClient {
   static const String baseUrl = "https://habit-tracker-17sr.onrender.com/api";
 
   // Prevent multiple simultaneous refresh calls
-  static bool _isRefreshing = false;
-  static final List<Function> _refreshQueue = [];
+  static Future<bool>? _refreshingTask;
 
   /// Make authenticated GET request with auto-refresh
   static Future<http.Response> get(
-    String endpoint, {
-    Map<String, String>? headers,
-  }) async {
+      String endpoint, {
+        Map<String, String>? headers,
+      }) async {
     return _makeRequest(
-      () async {
+          () async {
         final token = await AuthManager.getToken();
         final finalHeaders = {
           'Content-Type': 'application/json',
@@ -31,12 +30,12 @@ class AuthenticatedHttpClient {
 
   /// Make authenticated POST request with auto-refresh
   static Future<http.Response> post(
-    String endpoint, {
-    Map<String, String>? headers,
-    Object? body,
-  }) async {
+      String endpoint, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async {
     return _makeRequest(
-      () async {
+          () async {
         final token = await AuthManager.getToken();
         final finalHeaders = {
           'Content-Type': 'application/json',
@@ -54,12 +53,12 @@ class AuthenticatedHttpClient {
 
   /// Make authenticated PUT request with auto-refresh
   static Future<http.Response> put(
-    String endpoint, {
-    Map<String, String>? headers,
-    Object? body,
-  }) async {
+      String endpoint, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async {
     return _makeRequest(
-      () async {
+          () async {
         final token = await AuthManager.getToken();
         final finalHeaders = {
           'Content-Type': 'application/json',
@@ -77,12 +76,12 @@ class AuthenticatedHttpClient {
 
   /// Make authenticated PATCH request with auto-refresh
   static Future<http.Response> patch(
-    String endpoint, {
-    Map<String, String>? headers,
-    Object? body,
-  }) async {
+      String endpoint, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async {
     return _makeRequest(
-      () async {
+          () async {
         final token = await AuthManager.getToken();
         final finalHeaders = {
           'Content-Type': 'application/json',
@@ -100,12 +99,12 @@ class AuthenticatedHttpClient {
 
   /// Make authenticated DELETE request with auto-refresh
   static Future<http.Response> delete(
-    String endpoint, {
-    Map<String, String>? headers,
-    Object? body,
-  }) async {
+      String endpoint, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async {
     return _makeRequest(
-      () async {
+          () async {
         final token = await AuthManager.getToken();
         final finalHeaders = {
           'Content-Type': 'application/json',
@@ -123,8 +122,8 @@ class AuthenticatedHttpClient {
 
   /// Core request handler with automatic token refresh
   static Future<http.Response> _makeRequest(
-    Future<http.Response> Function() requestFunction,
-  ) async {
+      Future<http.Response> Function() requestFunction,
+      ) async {
     try {
       // Make initial request
       final response = await requestFunction();
@@ -154,16 +153,23 @@ class AuthenticatedHttpClient {
 
   /// Refresh access token using refresh token
   static Future<bool> _refreshToken() async {
-    // Prevent multiple simultaneous refresh calls
-    if (_isRefreshing) {
-      debugPrint('⏳ Refresh already in progress, queuing...');
-      // Wait for ongoing refresh to complete
-      await Future.delayed(const Duration(milliseconds: 100));
-      return await AuthManager.getToken() != null;
+    if (_refreshingTask != null) {
+      debugPrint('⏳ Waiting for ongoing refresh...');
+      return await _refreshingTask!;
     }
 
-    _isRefreshing = true;
+    debugPrint('🔄 Starting token refresh...');
+    _refreshingTask = _performRefresh();
 
+    try {
+      final success = await _refreshingTask!;
+      return success;
+    } finally {
+      _refreshingTask = null;
+    }
+  }
+
+  static Future<bool> _performRefresh() async {
     try {
       final refreshToken = await AuthManager.getRefreshToken();
 
@@ -186,12 +192,12 @@ class AuthenticatedHttpClient {
         if (data['success'] == true && data['data'] != null) {
           final newAccessToken = data['data']['accessToken'] ?? data['data']['token'];
 
-          if (newAccessToken != null && newAccessToken.toString().isNotEmpty) {
+          if (newAccessToken != null && newAccessToken.isNotEmpty) {
             await AuthManager.saveToken(newAccessToken);
 
             // Save new refresh token if provided
             final newRefreshToken = data['data']['refreshToken'];
-            if (newRefreshToken != null && newRefreshToken.toString().isNotEmpty) {
+            if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
               await AuthManager.saveRefreshToken(newRefreshToken);
             }
 
@@ -201,15 +207,13 @@ class AuthenticatedHttpClient {
         }
       }
 
-      debugPrint('❌ Refresh token invalid or expired');
+      debugPrint('❌ Refresh failed: ${response.statusCode} ${response.body}');
       await _handleRefreshFailure();
       return false;
     } catch (e) {
       debugPrint('❌ Token refresh error: $e');
       await _handleRefreshFailure();
       return false;
-    } finally {
-      _isRefreshing = false;
     }
   }
 
