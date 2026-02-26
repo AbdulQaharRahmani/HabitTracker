@@ -39,6 +39,22 @@ export const getHabits = async (req, res) => {
   });
 };
 
+export const getHabitById = async (req, res) => {
+  if (!req.user) throw unauthorized();
+
+  const habit = await HabitModel.findOne({
+    _id: req.params.id,
+    userId: req.user._id,
+  }).populate('categoryId', 'name backgroundColor icon');
+
+  if (!habit) throw notFound('Habit');
+
+  res.status(200).json({
+    success: true,
+    data: habit,
+  });
+};
+
 // Get all user habits for selected date
 export const getHabitsByDate = async (req, res) => {
   if (!req.user) throw unauthorized();
@@ -275,10 +291,11 @@ export const completeHabit = async (req, res) => {
     );
 
   //Check if date is before habit created date
-  const createdAt = dayjs(habit.createdAt).startOf('day');
-  if (selectedDate.isBefore(createdAt, 'day'))
+  const startDate = dayjs(habit.startDate);
+
+  if (selectedDate.isBefore(startDate, 'day'))
     throw new AppError(
-      'You cannot modify habits before their creation date',
+      'You can not complete habits before their creation date',
       400,
       ERROR_CODES.VALIDATION_ERROR
     );
@@ -332,11 +349,11 @@ export const uncompleteHabit = async (req, res) => {
       ERROR_CODES.RESOURCE_ALREADY_REMOVED
     );
 
-  const createdAt = dayjs(habit.createdAt).startOf('day');
+  const startDate = dayjs(habit.startDate);
   //Check if date is before habit created date
-  if (selectedDate.isBefore(createdAt, 'day'))
+  if (selectedDate.isBefore(startDate, 'day'))
     throw new AppError(
-      'You cannot modify habits before their creation date',
+      'You can not uncomplete habits before their creation date',
       400,
       ERROR_CODES.VALIDATION_ERROR
     );

@@ -1,45 +1,58 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { logout } from "../../services/authServices";
 
 const useAuthStore = create(
   persist(
     (set) => ({
       token: null,
-      userId: null,
-      username: null,
+      user: null,
+      email:null,
+      isAuthLoading: false,
       isAuthenticated: false,
-
-      // 🔹 login
-      login: (token, id, username) => {
-        set({
-          token,
-          userId: id,
-          username,
-          isAuthenticated: true,
-        });
-      },
-
-      // 🔹 update username (used by Settings)
-      updateUsername: (username) => {
+      login: (token, userData, userEmail) => {
         set((state) => ({
-          ...state,
-          username,
+          token,
+          email:userEmail ?? state.email,
+          user: userData ? userData : state.user,
+          isAuthLoading: false,
+          isAuthenticated: true,
         }));
       },
 
-      // 🔹 logout
-      logout: () => {
-        set({
-          token: null,
-          userId: null,
-          username: null,
-          isAuthenticated: false,
+      updateUserName: (newUserName) => {
+        set((state) => {
+          if (!state.user) {
+            return state;
+          }
+          return {
+            user: {
+              ...state.user,
+              username: newUserName,
+            },
+          };
         });
-        localStorage.removeItem("auth-data");
       },
-    }),
-    {
-      name: "auth-data",
+ logout: async () => {
+  try {
+    await logout();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    set({
+      token: null,
+      user: null,
+      email: null,
+      isAuthenticated: false,
+    });
+    localStorage.removeItem("userData-storage");
+  }
+},
+  }),
+  {
+      name: "userData-storage",
+      storage: createJSONStorage(() => localStorage),
+     partialize: (state) => ({ user: state.user, email: state.email }),
     },
   ),
 );
