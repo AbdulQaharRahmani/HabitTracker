@@ -203,10 +203,10 @@ const useHabitStore = create((set, get) => ({
     try {
       if (isEditingMode) {
         await api.put(`/habits/${currentHabitID}`, data);
-        toast.success("Successfuly Updated the Habit!");
+        toast.success(i18next.t("Habit Updated Successfully!"));
       } else {
         await api.post("/habits", data);
-        toast.success("Habit Added Successfully!");
+        toast.success(i18next.t("Habit Added Successfully!"));
       }
       set({
         isModalOpen: false,
