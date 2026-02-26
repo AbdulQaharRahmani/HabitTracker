@@ -5,9 +5,9 @@ import HabitCardIcon from "./HabitCardIcon";
 import { MdDeleteOutline } from "react-icons/md";
 import useHabitStore from "../store/useHabitStore";
 import ConfirmationModal from './modals/ConfirmationModal';
+import { iconCategories } from '../utils/icons';
 
 import { useTranslation } from "react-i18next";
-import * as FaIcons from "react-icons/fa";
 
 export default function HabitCard({
   title,
@@ -20,11 +20,6 @@ export default function HabitCard({
 }) {
   const color = categoryId?.backgroundColor || "#6366F1";
   const bgColor = `${color}15`;
-  
-  const Icon = categoryId?.icon
-    ? FaIcons[categoryId.icon]
-    : null;
-  
   const { openEditHabitModal } = useHabitStore();
   const deleteHabit = useHabitStore((state) => state.deleteHabit);
   const { t } = useTranslation();
@@ -46,7 +41,22 @@ export default function HabitCard({
     }
   }
 
+  const getIconComponent = (iconValue) => {
+    if (!iconValue) return null;
 
+    for (const category in iconCategories) {
+      const found = iconCategories[category].find(
+        (item) => item.value === iconValue
+      );
+
+      if (found) return found.icon;
+    }
+
+    return null;
+  };
+
+  const Icon =  getIconComponent(categoryId?.icon) || FaCheckCircle;
+  
   return (
     <>
     <div
