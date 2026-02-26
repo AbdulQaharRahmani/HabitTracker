@@ -64,7 +64,15 @@ export const registerUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, deviceId } = req.body;
+
+  if (!deviceId) {
+    throw new AppError(
+      'Device ID is required',
+      400,
+      ERROR_CODES.DEVICE_ID_REQUIRED
+    );
+  }
 
   const user = await UserModel.findOne({ email });
   if (!user) {
@@ -88,7 +96,7 @@ export const loginUser = async (req, res) => {
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
   await refreshTokenModel.findOneAndUpdate(
-    { userId: user._id },
+    { userId: user._id, deviceId: deviceId },
     { token: hashedToken, expiresAt: expiresAt },
     { upsert: true, new: true }
   );
@@ -116,8 +124,16 @@ export const loginUser = async (req, res) => {
 };
 
 export const googleLogin = async (req, res) => {
-  const { id_token } = req.body;
+  const { id_token, deviceId } = req.body;
   if (!id_token) throw new AppError('Token missing', 400);
+
+  if (!deviceId) {
+    throw new AppError(
+      'Device ID is required',
+      400,
+      ERROR_CODES.DEVICE_ID_REQUIRED
+    );
+  }
 
   const googleUserinfo = await verifyGoogleToken(id_token);
   if (!googleUserinfo) throw new AppError('Invalid google token', 401);
@@ -176,7 +192,7 @@ export const googleLogin = async (req, res) => {
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
   await refreshTokenModel.findOneAndUpdate(
-    { userId: user._id },
+    { userId: user._id, deviceId: deviceId },
     { token: hashedToken, expiresAt: expiresAt },
     { upsert: true, new: true }
   );
@@ -223,7 +239,7 @@ export const refreshAccessToken = async (req, res) => {
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
   await refreshTokenModel.findOneAndUpdate(
-    { userId: user._id },
+    { userId: user._id, deviceId: storeToken.deviceId },
     { token: hashToken(refreshToken), expiresAt: expiresAt },
     {
       upsert: true,
