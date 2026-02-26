@@ -33,6 +33,13 @@ export const loginValidator = [
     .withMessage('Please enter a valid email')
     .normalizeEmail(),
   body('password').notEmpty().withMessage('Password is required').trim(),
+  body('deviceId')
+    .notEmpty()
+    .withMessage('Device ID is required')
+    .isString()
+    .isLength({ min: 4 })
+    .withMessage('Invalid device Id')
+    .trim(),
 ];
 
 export const changePasswordValidator = [
