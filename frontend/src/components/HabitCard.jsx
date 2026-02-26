@@ -68,7 +68,7 @@ export default function HabitCard({
               className="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md"
               style={{ backgroundColor: bgColor, color }}
             >
-              {t(categoryId?.name) || "No Category"}
+              {categoryId?.name || "No Category"}
             </span>
 
             <span className="flex items-center text-[12px] text-gray-500 dark:text-gray-400">
