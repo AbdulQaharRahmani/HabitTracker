@@ -9,20 +9,20 @@ import { useHotkeys } from "react-hotkeys-hook"
 
 
 export default function HabitModal() {
-  const {
-    isModalOpen,
-    setModalOpen,
-    habitData,
-    setHabitData,
-    isEditingMode,
-    currentHabitID,
-    loading,
-    categories,
-    fetchCategories,
-    addUserCategory,
-    submitHabit,
-    fetchHabitsPage,
-  } = useHabitStore();
+
+const isModalOpen = useHabitStore((state) => state.isModalOpen);
+const habitData = useHabitStore((state) => state.habitData);
+const isEditingMode = useHabitStore((state) => state.isEditingMode);
+const loading = useHabitStore((state) => state.loading);
+const categories = useHabitStore((state) => state.categories);
+const currentHabitID = useHabitStore((state)=> state.currentHabitID)
+
+const setModalOpen = useHabitStore((state) => state.setModalOpen);
+const setHabitData = useHabitStore((state) => state.setHabitData);
+const fetchCategories = useHabitStore((state) => state.fetchCategories);
+const addUserCategory = useHabitStore((state) => state.addUserCategory);
+const submitHabit = useHabitStore((state) => state.submitHabit);
+const fetchHabitsPage  = useHabitStore((state)=> state.fetchHabitsPage)
 
   const { t } = useTranslation();
 const frequencyItems = [

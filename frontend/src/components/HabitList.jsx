@@ -5,11 +5,8 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 
 export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
-  const { habits, loading, error, totalCount, fetchHabitsPage } =
-    useHabitStore();
-  useEffect(()=>{
-    fetchHabitsPage()
-  }, [fetchHabitsPage])
+  const { habits, loading, error, totalCount } =
+  useHabitStore();
   const ITEMS_PER_PAGE = 10;
   const {t} = useTranslation()
   if (loading && habits.length === 0) {
