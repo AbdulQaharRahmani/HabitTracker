@@ -199,5 +199,14 @@
   "Pick icon": "Pick icon",
   "Choose Icon": "Choose Icon",
   "Pick Color": "Pick Color",
-  "Category created!" : "Category created!"
+  "Category created!" : "Category created!",
+  "categoryGroups": {
+    "work": "Work",
+    "home": "Home",
+    "shopping": "Shopping",
+    "health": "Health",
+    "travel": "Travel",
+    "entertainment": "Entertainment",
+    "education": "Education"
+  }
 }

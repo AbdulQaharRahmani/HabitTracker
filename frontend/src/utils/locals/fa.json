@@ -230,6 +230,15 @@
   "Pick icon": "نماد تان را بردارید",
   "Choose Icon": "انتخاب نماد",
   "Pick Color": "رنک را بردارید",
-  "Category created!" : "کتگوری ساخته شد!"
+  "Category created!" : "کتگوری ساخته شد!",
+  "categoryGroups": {
+    "work": "کاری",
+    "home": "خانه",
+    "shopping": "خریداری",
+    "health": "سلامتی",
+    "travel": "سفر",
+    "entertainment": "سرگرمی",
+    "education": "آموزشی"
+  }
 }
 
