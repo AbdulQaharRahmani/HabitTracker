@@ -2,7 +2,6 @@ const pendingDeletes = new Map();
 
 export const schedulePendingDelete = (id, deleteFn, delay = 5000) => {
   cancelPendingDelete(id);
-
   const timer = setTimeout(async () => {
     try {
       await deleteFn();

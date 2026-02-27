@@ -168,19 +168,16 @@ deleteTask: async (id, t) => {
   const taskToDelete = get().tasks.find((tk) => tk._id === id);
   if (!taskToDelete) return;
 
-  // ✅ Push action for undo tracking
   pushAction({
     type: ActionTypes.DELETE_TASK,
     id,
     taskData: taskToDelete,
   });
 
-  // ✅ Remove from UI immediately
   set((state) => ({
     tasks: state.tasks.filter((task) => task._id !== id),
   }));
 
-  // ✅ Schedule backend delete OUTSIDE of zustand
   schedulePendingDelete(id, () => deleteTask(id));
 
   toast.success(t("Task deleted successfully!"));

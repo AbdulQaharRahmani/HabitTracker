@@ -48,10 +48,8 @@ export const undoLastAction = async () => {
 
     case ActionTypes.DELETE_HABIT:
     case ActionTypes.DELETE_TASK: {
-      // ✅ Simply cancel the pending timer — no state updates here
       const cancelled = cancelPendingDelete(action.id);
       if (!cancelled) {
-        // Already deleted on backend — can't undo
         redoStack.pop();
         throw new Error("ALREADY_DELETED");
       }
@@ -68,9 +66,7 @@ export const undoLastAction = async () => {
 export const redoLastAction = async () => {
   const action = redoStack.pop();
   if (!action) return null;
-
   actionHistory.push(action);
-
   switch (action.type) {
     case ActionTypes.TOGGLE_HABIT: {
       if (action.wasCompleted) {
@@ -80,27 +76,21 @@ export const redoLastAction = async () => {
       }
       break;
     }
-
     case ActionTypes.COMPLETE_TASK: {
       await updateTaskStatus(action.id, action.newStatus);
       break;
     }
-
     case ActionTypes.DELETE_HABIT: {
-      // Re-schedule backend delete
       schedulePendingDelete(action.id, () => deleteHabitApi(action.id));
       break;
     }
-
     case ActionTypes.DELETE_TASK: {
       schedulePendingDelete(action.id, () => deleteTask(action.id));
       break;
     }
-
     default:
       console.warn("Unknown action type:", action.type);
   }
-
   return action;
 };
 
