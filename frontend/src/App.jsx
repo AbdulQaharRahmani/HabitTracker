@@ -18,19 +18,15 @@ import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Logs from "./pages/Logs";
 import { useEffect, useState } from "react";
-import api from "../services/api";
 import useAuthStore from "./store/useAuthStore";
 import { refreshToken } from "../services/authServices";
 
 import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
 import { useTranslation } from "react-i18next";
 import { useUndoRedo } from "./hooks/useUndoRedo";
-import { DebugUndo } from "./hooks/DebugUndo";
 
 
 function App() {
-
-
   const {t} = useTranslation()
   const[initialLoading, setInitialLoading] = useState(true)
   const login = useAuthStore((state) => state.login)
@@ -66,7 +62,6 @@ function App() {
   }
   return (
     <>
-      {/* <DebugUndo/> */}
       <Toaster
       position="top-center"
       reverseOrder={false}

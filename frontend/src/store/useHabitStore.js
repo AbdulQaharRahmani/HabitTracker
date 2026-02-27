@@ -122,7 +122,6 @@ const useHabitStore = create(
   const prevState = habitToToggle.completed;
   const date = formatDate(get().selectedDate);
 
-  // ✅ Push action BEFORE set()
   pushAction({
     type: ActionTypes.TOGGLE_HABIT,
     id,
@@ -161,15 +160,11 @@ const useHabitStore = create(
 deleteHabit: async (id, t) => {
   const habitToDelete = get().habits.find((h) => h._id === id);
   if (!habitToDelete) return;
-
-  // ✅ Push action for undo tracking
   pushAction({
     type: ActionTypes.DELETE_HABIT,
     id,
     habitData: habitToDelete,
   });
-
-  // ✅ Remove from UI immediately
   set((state) => ({
     habits: state.habits.filter((h) => h._id !== id),
     habitCompletions:
@@ -177,7 +172,6 @@ deleteHabit: async (id, t) => {
   }));
 
   schedulePendingDelete(id, () => deleteHabitApi(id));
-
   toast.success(t("habit deleted successfully!"));
 },
 
@@ -218,7 +212,6 @@ deleteHabit: async (id, t) => {
             toast.success("Successfully Updated the Habit!");
           } else {
             const res = await api.post("/habits", data);
-            // ✅ Track new habit creation for undo
             const newId = res.data.data?._id || res.data._id;
             pushAction({
               type: ActionTypes.ADD_HABIT,
