@@ -49,7 +49,7 @@ const HabitSchema = new mongoose.Schema(
   }
 );
 
-HabitSchema.index({ userId: 1, isDeleted: 1, order: 1 });
+HabitSchema.index({ userId: 1, isDeleted: 1, createdAt: 1 });
 HabitSchema.index({ userId: 1, title: 1 }, { unique: true });
 
 //Return the query object that can be awaited
