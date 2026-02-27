@@ -7,10 +7,6 @@ const refreshTokenSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    deviceId: {
-      type: String,
-      required: true,
-    },
     token: {
       type: String,
       required: true,
@@ -24,8 +20,6 @@ const refreshTokenSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-refreshTokenSchema.index({ userId: 1, deviceId: 1 }, { unique: true });
 
 export const refreshTokenModel = mongoose.model(
   'RefreshToken',
