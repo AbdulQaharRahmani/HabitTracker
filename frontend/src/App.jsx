@@ -18,12 +18,12 @@ import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Logs from "./pages/Logs";
 import { useEffect, useState } from "react";
-import api from "../services/api";
 import useAuthStore from "./store/useAuthStore";
 import { refreshToken } from "../services/authServices";
 
 import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
 import { useTranslation } from "react-i18next";
+import { useUndoRedo } from "./hooks/useUndoRedo";
 
 
 function App() {
@@ -49,6 +49,7 @@ function App() {
     }
     getAccessToken()
   }, [])
+  useUndoRedo();
   if(initialLoading){
     return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
