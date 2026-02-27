@@ -16,6 +16,7 @@ import {
   resetPasswordValidator,
 } from '../validators/validateUser.js';
 import { validate } from '../middleware/validate.js';
+import { forgotPasswordLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.post(
 router.post('/login', loginValidator, validate, asyncHandler(loginUser));
 router.post(
   '/forgotPassword',
+  forgotPasswordLimiter,
   forgotPasswordValidator,
   validate,
   asyncHandler(forgotPassword)
