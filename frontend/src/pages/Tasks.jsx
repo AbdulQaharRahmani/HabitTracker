@@ -26,6 +26,8 @@ function Tasks() {
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
 
+  const [activeCategoryId,setActiveCategoryId]=useState(null);
+
   useEffect(() => {
     fetchTasks(ITEMS_PER_PAGE, page);
   }, [page, isModalOpen, isEditModalOpen, fetchTasks]);
@@ -66,6 +68,17 @@ function Tasks() {
     setModalOpen(true);
   };
 
+  const categoryRef = useRef([]);
+
+  const setActiveCategory = (categoryEl) => {
+    categoryRef.current.forEach((el) => {
+      el?.classList.remove("category-active");
+    });
+
+    categoryEl?.classList.add("category-active");
+  };
+
+  // Arrow keys
   useHotkeys(
     "up, down, left, right",
     (e) => {
@@ -78,29 +91,7 @@ function Tasks() {
       let colIndex = -1;
       let rowIndex = -1;
 
-<<<<<<< HEAD
-    useHotkeys(
-    "ctrl+k, meta+k",
-    (e) => {
-      e.preventDefault();
 
-      // Reset form
-      setTaskData("title", "");
-      setTaskData("description", "");
-      setTaskData("dueDate", null);
-      setTaskData("priority", "medium");
-      setTaskData("category", null);
-
-        setModalOpen(true);
-      },
-      { enabled: !isModalOpen }
-  );
-    groupedArray.forEach((group, cIdx) => {
-      const rIdx = group.items.findIndex(item => item._id === currentId);
-      if (rIdx !== -1) {
-        colIndex = cIdx;
-        rowIndex = rIdx;
-=======
       groupedArray.forEach((group, cIdx) => {
         const rIdx = group.items.findIndex((item) => item._id === currentId);
         if (rIdx !== -1) {
@@ -119,7 +110,6 @@ function Tasks() {
 
       if (e.key === "ArrowLeft") {
         isRTL ? nextCol++ : nextCol--;
->>>>>>> Enable-tab-navigation-to-catagory-cards-HRI-#346
       }
       if (e.key === "ArrowRight") {
         isRTL ? nextCol-- : nextCol++;
@@ -146,16 +136,33 @@ function Tasks() {
     },
   );
 
-  const categoryRef = useRef([]);
+  // ctrl + k
+    useHotkeys(
+    "ctrl+k, meta+k",
+    (e) => {
+      e.preventDefault();
 
-  const setActiveCategory = (categoryEl) => {
-    categoryRef.current.forEach((el) => {
-      el?.classList.remove("category-active");
-    });
 
-    categoryEl?.classList.add("category-active");
-  };
+    const selectedCategory = activeCategoryId !== 'uncategorized' ? activeCategoryId : null;
 
+    if(!selectedCategory) return;
+
+      // Reset form
+      setTaskData("title", "");
+      setTaskData("description", "");
+      setTaskData("dueDate", null);
+      setTaskData("priority", "medium");
+      setTaskData("category",selectedCategory);
+
+        setModalOpen(true);
+      },
+      { enabled: !isModalOpen,
+        dependencies:[activeCategoryId]
+
+       }
+  );
+
+  // tab
   useHotkeys(
     "tab",
     (e) => {
@@ -175,6 +182,9 @@ function Tasks() {
       const nextCategory = categoryRef.current[nextIndex];
       if (!nextCategory) return;
 
+      const selectedGroup=groupedArray[nextIndex];
+      setActiveCategoryId(selectedGroup.id);
+
       const firstTask = nextCategory.querySelector("[data-task-card]");
 
       if (firstTask) {
@@ -191,14 +201,11 @@ function Tasks() {
     },
   );
 
-  useHotkeys(
-    "ctrl+k, meta+k",
-    (e) => {
-      e.preventDefault();
-      setModalOpen(true);
-    },
-    { enabled: !isModalOpen },
-  );
+
+
+
+
+
 
   return (
     <div
