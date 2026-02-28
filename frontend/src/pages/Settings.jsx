@@ -93,6 +93,7 @@ const Settings = () => {
         setNewPassword("");
       }
     } catch (err) {
+      toast.dismiss();
       toast.error(t("Failed to change password"));
     }
   };

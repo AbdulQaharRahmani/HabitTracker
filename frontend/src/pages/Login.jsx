@@ -20,7 +20,10 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email.trim() || !password.trim())
+    {
+      toast.dismiss();
       return toast.error("Please fill all fields!");
+    }
     setLoading(true);
     try {
       const response = await api.post("/auth/login", { email, password });
@@ -32,6 +35,7 @@ export default function Login() {
       };
       if (token && id) {
         login(token, userData, userEmail);
+        toast.dismiss();
         toast.success("Welcome again!");
         navigate("/");
       }
@@ -41,6 +45,7 @@ export default function Login() {
         error.response?.data?.message ||
         error.response?.data?.error ||
         "Unknown Error";
+      toast.dismiss();
       toast.error(`${JSON.stringify(message)}`);
     } finally {
       setLoading(false);

@@ -33,11 +33,13 @@ export default function AddCategory() {
     const handleAddCategory = async () => {
         try{
             if (!categoryName) {
+                toast.dismiss();
                 toast.error(t("Category Name is required!"));
                 return;
             }
 
             if (!selectedIcon) {
+                toast.dismiss();
                 toast.error(t("Icon Name is required!"));
                 return;
             }
@@ -110,10 +112,10 @@ export default function AddCategory() {
                             <div className="my-2">
                                 <div className="flex flex-row items-center bg-gray-50 dark:bg-gray-900/50 justify-start text-md text-gray-500 dark:text-gray-400 rounded-lg py-2 border border-dashed border-gray-200 mb-2">
                                     <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400">{t("Category Name")}:</p>
-                                    <input 
+                                    <input
                                         value={categoryName}
                                         onChange={(e) => setCategoryName(e.target.value)}
-                                        className={`p-2 ${isRTL ? "pl-6" : "pr-6"} outline-none bg-gray-50`} 
+                                        className={`p-2 ${isRTL ? "pl-6" : "pr-6"} outline-none bg-gray-50`}
                                         placeholder={t("Enter category name...")}
                                     />
                                 </div>
@@ -139,7 +141,7 @@ export default function AddCategory() {
                                         ))}
                                     </div>
                                     <div className="mx-2.5">
-                                        <Dropdown 
+                                        <Dropdown
                                             items={categoryIcons}
                                             placeholder={t("Choose Icon")}
                                             value={selectedIcon}

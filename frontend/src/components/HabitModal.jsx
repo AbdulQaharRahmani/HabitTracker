@@ -66,6 +66,7 @@ export default function HabitModal() {
     e?.preventDefault();
 
     if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
+      toast.dismiss();
       return toast.error("Title, Category, and Frequency are required");
     }
     await submitHabit(habitData, isEditingMode, currentHabitID);
