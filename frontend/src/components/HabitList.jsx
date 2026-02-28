@@ -2,11 +2,14 @@ import { useEffect } from "react";
 import HabitCard from "./HabitCard";
 import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
+import { useTranslation } from "react-i18next";
 
 export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
   const { habits, loading, error, totalCount, fetchHabitsPage } =
     useHabitStore();
   const ITEMS_PER_PAGE = 10;
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchHabitsPage(currentPage, ITEMS_PER_PAGE);
@@ -15,7 +18,7 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
   if (loading && habits.length === 0) {
     return (
       <p className="text-gray-400 dark:text-gray-500 text-lg font-semibold my-4 text-center">
-        Loading Habits ...
+        {t("Loading Habits ...")}
       </p>
     );
   }
@@ -39,7 +42,7 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
       >
         {habits.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400 text-lg">
-            No habits found.
+            {t("No habits found.")}
           </p>
         ) : (
           habits.map((habit) => (
