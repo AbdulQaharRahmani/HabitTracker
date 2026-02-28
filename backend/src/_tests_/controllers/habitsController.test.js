@@ -179,12 +179,12 @@ describe('Get Habits', () => {
   });
 
   it('1. Get all Habits with (empty list) -> return Empty list', async () => {
-    HabitModel.findByUserAndSortByOrder.mockResolvedValue([]);
+    HabitModel.findByUserAndSortByCreationTime.mockResolvedValue([]);
     HabitModel.countDocuments.mockResolvedValue(0);
 
     await getHabits(req, res);
 
-    expect(HabitModel.findByUserAndSortByOrder).toHaveBeenCalledWith(
+    expect(HabitModel.findByUserAndSortByCreationTime).toHaveBeenCalledWith(
       0,
       8,
       expect.objectContaining({ userId: 'user123', isDeleted: false })
@@ -198,7 +198,7 @@ describe('Get Habits', () => {
   });
 
   it('2. Get all Habits with (with data) -> Return data list', async () => {
-    HabitModel.findByUserAndSortByOrder.mockResolvedValue([
+    HabitModel.findByUserAndSortByCreationTime.mockResolvedValue([
       {
         _id: 'habit1',
         userId: 'user123',
@@ -219,7 +219,7 @@ describe('Get Habits', () => {
     HabitModel.countDocuments.mockResolvedValue(2);
 
     await getHabits(req, res);
-    expect(HabitModel.findByUserAndSortByOrder).toHaveBeenCalledWith(
+    expect(HabitModel.findByUserAndSortByCreationTime).toHaveBeenCalledWith(
       0,
       8,
       expect.objectContaining({ userId: 'user123', isDeleted: false })
