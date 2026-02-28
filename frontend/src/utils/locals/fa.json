@@ -221,5 +221,13 @@
   "Message": "پیام",
   "Items Per Page": "تعداد نمایش در هر صفحه",
 
-  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید"
+  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
+  "Enter your name": "نام خود را وارد کنید",
+  "View": "دیدن",
+  "Edit Habit": "ویرایش عادت",
+  "Daily": "روزانه",
+  "Every Other Day": "یک روز در میان",
+  "Biweekly": "دوهفته یکبار",
+  "Weekdays": "روزهای هفته",
+  "Weekends": "آخر هفته‌ها"
 }

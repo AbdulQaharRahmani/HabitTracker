@@ -1,7 +1,10 @@
 import { IoGrid } from "react-icons/io5";
 import { FaThList } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export default function View({ viewMode, setViewMode }) {
+  const { t } = useTranslation();
+
   return (
     <div
       className="
@@ -12,7 +15,9 @@ export default function View({ viewMode, setViewMode }) {
       transition-colors
     "
     >
-      <span className="text-gray-600 dark:text-gray-400 text-lg">View |</span>
+      <span className="text-gray-600 dark:text-gray-400 text-lg">
+        {t("View")} |
+      </span>
 
       <div className="inline-flex gap-2">
         <button
