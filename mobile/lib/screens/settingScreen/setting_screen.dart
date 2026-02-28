@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
 import '../../providers/theme_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/token_storage.dart';
+import '../../utils/profile/profile_model.dart';
 import '../../utils/setting_utils/setting_card.dart';
 import '../../utils/setting_utils/setting_header.dart';
 import '../../utils/setting_utils/setting_items.dart';
 import '../../utils/setting_utils/setting_profile_card.dart';
 import '../../utils/setting_utils/setting_section.dart';
+import 'change_password_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -19,6 +23,61 @@ class _SettingScreenState extends State<SettingScreen> {
   bool streakAlerts = true;
   bool weeklySummary = false;
 
+  String _userName = 'Alex Doe';
+  String _userEmail = 'alex.doe@example.com';
+  String? _userImageUrl;
+  bool _isLoadingProfile = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    if (!mounted) return;
+    setState(() => _isLoadingProfile = true);
+
+    try {
+      final savedName = await AuthManager.getUserName();
+
+      final authService = AuthService();
+      final profileRes = await authService.getUserProfile();
+
+      UserData? userData;
+      if (profileRes['data'] != null) {
+        userData = UserData.fromJson(profileRes['data']);
+      }
+
+      String name = (savedName?.trim().isNotEmpty == true)
+          ? savedName!
+          : (userData?.userId.trim().isNotEmpty == true)
+          ? userData!.userId
+          : 'Habit Tracker User';
+
+      String email = (userData?.userId.trim().isNotEmpty == true)
+          ? userData!.userId
+          : 'user@example.com';
+
+     String? imageUrl = userData?.profileImage;
+
+      if (mounted) {
+        setState(() {
+          _userName = name;
+          _userEmail = email;
+          _userImageUrl = imageUrl;
+          _isLoadingProfile = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('خطا در بارگذاری پروفایل: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingProfile = false;
+        });
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -34,12 +93,16 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: ListView(
                   children: [
                     const SizedBox(height: 16),
-                    const SettingProfileCard(
-                      name: "Alex Doe",
-                      email: "alex.doe@example.com",
-                      imageUrl:
-                      "https://lh3.googleusercontent.com/aida-public/AB6AXuCsHroUVx7WfTW3EqTo3FDmeV0mF9BJlGzPy4kuwgthgEHiyndN0G8c92r6fJlRjsKm5ukqvEG9U0_i_m-NeA4JkKFrkp9Wekm8jc96DSBkoEBe2ifwENLUuvgN9Dotxc5-jKdhjO_1k23P4A4tMGH1JmxQ9qClSMnFOoXGtaCaPNfXlXSO1QgAo-ZbEF7cmwdnHwEjDXVdpuaDpXjLGrf2smvQSzG6QcWICqyV-DhcQS46zA9-xvHQw7_8wHwDk8xIERYA-TfRWco",
-                    ),
+
+                    if (_isLoadingProfile)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      SettingProfileCard(
+                        name: _userName,
+                        email: _userEmail,
+                        imageUrl: "",
+                      ),
+
                     const SizedBox(height: 24),
                     const SettingSection(title: "General"),
                     SettingCard(
@@ -58,6 +121,7 @@ class _SettingScreenState extends State<SettingScreen> {
                           color: Colors.orange,
                           title: "Start Week On",
                           subtitle: "Monday",
+                          onTab: () {},
                         ),
                       ],
                     ),
@@ -94,11 +158,21 @@ class _SettingScreenState extends State<SettingScreen> {
                           icon: Icons.lock_reset,
                           color: Colors.indigo,
                           title: "Change Password",
+                          onTab: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                const ChangePasswordScreen(),
+                              ),
+                            );
+                          },
                         ),
                         SettingNavItem(
                           icon: Icons.download,
                           color: Colors.grey,
                           title: "Export Data",
+                          onTab: () {},
                         ),
                         SettingDangerItem(
                           onTap: () {
