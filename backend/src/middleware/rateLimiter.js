@@ -8,7 +8,7 @@ export const publicLimiter = rateLimit({
   max: 50,
   keyGenerator: (req) => {
     const ip = req.ip || ipKeyGenerator(req);
-    console.log('Limiter IP:', ip); // log on render to check IP of unauthenticated users for security
+    if (process.env.NODE_ENV === 'production') console.log('Limiter IP:', ip); // log on render to check IP of unauthenticated users for security
     return ip;
   },
   message: 'Too many authentication attempts, try again later.',

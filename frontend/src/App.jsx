@@ -21,13 +21,13 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import useAuthStore from "./store/useAuthStore";
 import { refreshToken } from "../services/authServices";
-
 import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
 import { useTranslation } from "react-i18next";
 
 
 function App() {
   const {t} = useTranslation()
+    const { i18n } = useTranslation();
   const[initialLoading, setInitialLoading] = useState(true)
   const login = useAuthStore((state) => state.login)
   const logout = useAuthStore((state) => state.logout)
@@ -49,6 +49,14 @@ function App() {
     }
     getAccessToken()
   }, [])
+  useEffect(()=>{
+    const currentLang = i18n.language
+    const savedLanguage = localStorage.getItem("language")
+    const direction = currentLang === "fa" ? "rtl": "ltr"
+    document.documentElement.dir = direction
+    document.documentElement.lang = savedLanguage
+    localStorage.setItem("language", currentLang)
+  }, [i18n.language])
   if(initialLoading){
     return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
