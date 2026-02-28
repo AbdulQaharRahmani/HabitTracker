@@ -26,12 +26,14 @@ export default function AddTask() {
     console.log("Current TaskData:", taskData);
 
     if (!taskData.title) {
+      toast.dismiss();
       toast.error(t("Title is required!"));
       return;
     }
 
     // Safety check: ensure category is present
     if (!taskData.category) {
+      toast.dismiss();
       toast.error(t("Category selection is missing. Please try again."));
       return;
     }
@@ -53,13 +55,15 @@ export default function AddTask() {
       setTaskData("category", "");
 
       setModalOpen(false);
+      toast.dismiss();
       toast.success(t("Task added successfully!"));
     } catch (error) {
+      toast.dismiss();
       toast.error(t("Error saving task"));
       console.log('error', error);
     }
   };
-  
+
   useHotkeys(
     "ctrl+s, meta+s",
     (e) => {
@@ -78,7 +82,7 @@ export default function AddTask() {
     },
     { enabled: isModalOpen }
   );
-  
+
   if (!isModalOpen) return null;
 
   return (

@@ -50,6 +50,7 @@ export const useTaskCardStore = create((set, get) => ({
       set({ categories: formatted });
     } catch (error) {
       const message = error.response?.data?.error || "Something went wrong";
+      toast.dismiss();
       toast.error(message);
       console.error("Failed to fetch categories", error);
     } finally {
@@ -147,6 +148,7 @@ export const useTaskCardStore = create((set, get) => ({
         tasks: state.tasks.filter((task) => task._id !== id),
       }));
 
+      toast.dismiss();
       toast.success(t("Task deleted successfully!"))
 
     } catch (error) {
@@ -154,6 +156,7 @@ export const useTaskCardStore = create((set, get) => ({
         "Sorry! task deletion failed:",
         error.response?.data || error.message,
       );
+      toast.dismiss();
       toast.error(t("failed_to_delete_task"))
       set({ error: "Failed to delete task" });
     }

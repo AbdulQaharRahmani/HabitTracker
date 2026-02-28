@@ -34,7 +34,7 @@ export default function SearchableDropdown({
     setDropdownOpen(false);
   };
   const dropdownRef = useClickOutside(() => setDropdownOpen(false));
-  
+
   const { t } = useTranslation();
 
   const categories = Object.keys(iconCategories);
@@ -44,7 +44,7 @@ export default function SearchableDropdown({
 
   const categoryIcons = rawIcons.map((item, index) => ({
     id: `${selectedCategory}-${index}`,
-    name: item.label, 
+    name: item.label,
     value: item.value,
     icon: item.icon,
   }));
@@ -52,11 +52,13 @@ export default function SearchableDropdown({
   const handleAddCategory = async () => {
     try{
       if (!searchTerm.trim()) {
+        toast.dismiss();
         toast.error(t("Category Name is required!"));
         return;
       }
 
       if (!selectedIcon) {
+        toast.dismiss();
         toast.error(t("Icon Name is required!"));
         return;
       }
@@ -127,8 +129,8 @@ export default function SearchableDropdown({
               <div className="my-2">
                 <div className="flex flex-row items-center bg-gray-50 dark:bg-gray-900/50 justify-start text-md text-gray-500 dark:text-gray-400 rounded-lg py-2 border border-dashed border-gray-200 mb-2">
                   <p className="mx-3 text-xs font-bold text-gray-500 dark:text-gray-400">{t("Category Name")}:</p>
-                  <input 
-                    className="first-letter:uppercase p-2 px-0 outline-none bg-gray-50" 
+                  <input
+                    className="first-letter:uppercase p-2 px-0 outline-none bg-gray-50"
                     placeholder={searchTerm}
                   />
                 </div>
@@ -156,7 +158,7 @@ export default function SearchableDropdown({
                     ))}
                   </div>
                   <div className="mx-2.5">
-                    <Dropdown 
+                    <Dropdown
                       items={categoryIcons}
                       placeholder={t("Choose Icon")}
                       value={selectedIcon}
