@@ -1,17 +1,16 @@
-import { useEffect } from "react";
 import HabitCard from "./HabitCard";
 import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
+import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 
 export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
-  const { habits, loading, error, totalCount, fetchHabitsPage } =
-    useHabitStore();
+  const habits = useHabitStore((state)=> state.habits)
+  const loading = useHabitStore((state)=> state.loading)
+  const error = useHabitStore((state)=> state.error)
+  const totalCount = useHabitStore((state)=> state.totalCount)
   const ITEMS_PER_PAGE = 10;
-
-  useEffect(() => {
-    fetchHabitsPage(currentPage, ITEMS_PER_PAGE);
-  }, [currentPage]);
-
+  const {t} = useTranslation()
   if (loading && habits.length === 0) {
     return (
       <div className="animate-pulse space-y-4 mt-6">
@@ -25,7 +24,7 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
   if (error) {
     return (
       <p className="text-rose-400 dark:text-rose-500 text-lg font-semibold text-center my-4">
-        Error: {error}
+        {t("Error")}: {error}
       </p>
     );
   }
@@ -51,9 +50,8 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
               viewMode={viewMode}
               title={habit.title}
               description={habit.description}
-              categoryId={habit.categoryId || habit.category}
+              categoryId={habit.categoryId }
               frequency={habit.frequency}
-              duration={habit.duration}
             />
           ))
         )}
