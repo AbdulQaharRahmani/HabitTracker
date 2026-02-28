@@ -111,12 +111,6 @@ const useHabitStore = create((set, get) => ({
     }
   },
   toggleHabit: async (id) => {
-    const formatDate = (date) =>
-      date.toISOString().split("T")[0];
-    if (get().selectedDate.toDateString() !== new Date().toDateString()) {
-      return toast.error("You can only mark today's habit as completed or uncompleted")
-    }
-
     const habitToToggle = get().habits.find(h => h._id === id)
     if (!habitToToggle) return
 
@@ -138,8 +132,8 @@ const useHabitStore = create((set, get) => ({
         toast.success(i18next.t("habit_completed"));
       }
     } catch (err) {
-      console.log(err)
-      toast.error(err.response?.data?.error || i18next.t("habit_update_failed"))
+      let errorMessage = err.response?.data?.message
+      toast.error(i18next.t(errorMessage)|| i18next.t("habit_update_failed"))
       set(state => ({
         habits: state.habits.map(h =>
           h._id === id ? { ...h, completed: prevState } : h

@@ -221,11 +221,16 @@
 
   "Language": "زبان",
   "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید",
+  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
+  "No habits for current date!": "برای تاریخ انتخاب شده هیچ عادتی ندارید!",
+  "Loading habits...": "در حال بارگذاری عادت ها...",
+  "You can only modify habits up to 7 days ago": "شما فقط تا هفت روز گذشته می توانید حالت عادت های تان را به تکمیل یا ناتکمیل تغییر دهید!",
+  "You cannot complete or uncomplete future habits": "شما نمی توانید حالت عادت های آینده تان را به تکمیل یا ناتکمیل تغییر دهید!",
   "User Name": "نام کاربری",
   "Password updated. please log in again": "رمز عبور به روزرسانی شده. لطفا دوباره وارد شوید",
   "Password update failed": "بروزرسانی رمز عبور ناموفق بود",
   "Message": "پیام",
-  "Items Per Page": "تعداد نمایش در هر صفحه",
+  "Items Per Page": "تعداد نمایش در هر صفحه"
 
   "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
   "daily": "روزانه",
