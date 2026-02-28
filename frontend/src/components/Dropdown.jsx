@@ -2,7 +2,13 @@ import { useState } from "react";
 import { HiChevronDown, HiCheck } from "react-icons/hi";
 import useClickOutside from "../hooks/useClickOutside";
 
-export default function Dropdown({ items, value, getValue,displayValue, placeholder }) {
+export default function Dropdown({
+  items,
+  value,
+  getValue,
+  displayValue,
+  placeholder,
+}) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const handleDropdownVisibility = () => setDropdownOpen(!isDropdownOpen);
@@ -22,7 +28,11 @@ export default function Dropdown({ items, value, getValue,displayValue, placehol
           type="text"
           placeholder={placeholder}
           readOnly
-          value={displayValue || value}
+          value={
+            displayValue ||
+            items.find((item) => item.value === value)?.name ||
+            ""
+          }
           onClick={handleDropdownVisibility}
           className="
             w-full cursor-pointer rounded-xl border
