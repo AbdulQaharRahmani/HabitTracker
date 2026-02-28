@@ -231,5 +231,16 @@
   "Weekends": "اخر هفته ها",
   "Title, Category, and Frequency are required": "عنوان، دسته بندی و تعداد دفعات ارسال الزامی است",
   "Edit Habit": "ویرایش عادت",
-  "Failed to delete habit!": "عادت حذف نشد:"
+  "Failed to delete habit!": "عادت حذف نشد:",
+  "Displaying": "نمایش",
+  "to": "تا",
+  "out of": "از",
+  "results": "نتیجه",
+  "No habits for current date!": "هیچ عادتی برای قرار فعلی وجود ندارد!",
+  "Please fill all fields": "لطفا همه فیلدها را پر کنید!",
+  "Welcome again!": "دوباره خوش آمدید!",
+  "Login": "وارد شوید",
+  "Your Email": "ایمیل شما",
+  "Your Password": "رمز عبور شما",
+  "Logging in...": "ورود به سیستم..."
 }

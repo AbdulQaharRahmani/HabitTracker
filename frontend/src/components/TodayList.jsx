@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import TodayCard from "./TodayCard";
 import useHabitStore from "../store/useHabitStore";
-import toast from 'react-hot-toast';
-import {useTranslation} from 'react-i18next';
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const iconMap = {
   Health: "🏋️‍♂️",
@@ -18,31 +18,31 @@ const TodayList = () => {
   const { habits, loading, error, fetchHabitsByDate, toggleHabit } =
     useHabitStore();
 
-    const {t} = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchHabitsByDate();
   }, [fetchHabitsByDate]);
 
-  const handleToggleComplete = async(habit)=>{
+  const handleToggleComplete = async (habit) => {
     toast.dismiss();
 
-    try{
+    try {
       await toggleHabit(habit._id);
-    }catch(error){
-       console.log(error);
+    } catch (error) {
+      console.log(error);
     }
-  }
-  if(habits.length === 0){
-    return(
-        <div
+  };
+  if (habits.length === 0) {
+    return (
+      <div
         className="p-10 text-center font-medium
         text-slate-600 dark:text-gray-400
         transition-colors"
       >
-        No habits for current date!
+        {t("No habits for current date!")}
       </div>
-    )
+    );
   }
   if (loading)
     return (
@@ -83,7 +83,7 @@ const TodayList = () => {
           }
           color={habit.categoryId?.backgroundColor || "blue"}
           completed={habit.completed}
-          onToggleComplete={()=>handleToggleComplete(habit)}
+          onToggleComplete={() => handleToggleComplete(habit)}
           progress={habit.completed ? 100 : 0}
         />
       ))}

@@ -1,5 +1,6 @@
 import { VscChevronLeft, VscChevronRight } from "react-icons/vsc";
 import { usePagination, DOTS } from "../hooks/usePagination";
+import { useTranslation } from "react-i18next";
 
 function Pagination({
   onPageChange,
@@ -14,6 +15,7 @@ function Pagination({
     siblingCount,
     pageSize,
   });
+  const { t } = useTranslation();
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -26,13 +28,13 @@ function Pagination({
     <div className="flex flex-col justify-between items-center gap-5 pt-5 pb-10 mx-auto">
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between mr-8">
         <p className="text-sm text-gray-700">
-          Displaying
+          {t("Displaying")}
           <span className="font-medium"> {startItem} </span>
-          to
+          {t("to")}
           <span className="font-medium"> {endItem} </span>
-          out of
+          {t("out of")}
           <span className="font-medium"> {totalCount} </span>
-          results
+          {t("results")}
         </p>
       </div>
       <nav className="flex items-center gap-1.5 sm:justify-end">

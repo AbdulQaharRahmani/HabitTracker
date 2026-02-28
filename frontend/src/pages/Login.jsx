@@ -5,12 +5,15 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import toast from "react-hot-toast";
 import useAuthStore from "../store/useAuthStore";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const [passwordType, setPasswordType] = useState("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { t } = useTranslation();
 
   const handlePasswordVisibility = () => {
     setPasswordType((prev) => (prev === "password" ? "text" : "password"));
@@ -20,11 +23,11 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email.trim() || !password.trim())
-      return toast.error("Please fill all fields!");
+      return toast.error(t("Please fill all fields!"));
     setLoading(true);
     try {
       const response = await api.post("/auth/login", { email, password });
-      const { token, id, username, email:userEmail } = response.data.data;
+      const { token, id, username, email: userEmail } = response.data.data;
       console.log(response.data.data);
       const userData = {
         userId: id,
@@ -32,7 +35,7 @@ export default function Login() {
       };
       if (token && id) {
         login(token, userData, userEmail);
-        toast.success("Welcome again!");
+        toast.success(t("Welcome again!"));
         navigate("/");
       }
     } catch (error) {
@@ -62,7 +65,7 @@ export default function Login() {
             <FaUser className="text-white text-4xl" />
           </div>
           <h1 className="text-3xl font-black uppercase text-gray-800 dark:text-white">
-            Login
+            {t("Login")}
           </h1>
         </div>
 
@@ -75,7 +78,7 @@ export default function Login() {
               <input
                 type="email"
                 required
-                placeholder="Your Email"
+                placeholder={t("Your Email")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 rounded-2xl font-medium outline-none
@@ -95,7 +98,7 @@ export default function Login() {
               <input
                 type={passwordType}
                 required
-                placeholder="Your Password"
+                placeholder={t("Your Password")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-12 pr-12 py-4 rounded-2xl font-medium outline-none
@@ -128,7 +131,7 @@ export default function Login() {
                 bg-[#7B68EE] hover:bg-[#6a56e0]
                 disabled:bg-gray-400 dark:disabled:bg-gray-700"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? t("Logging in...") : t("Login")}
             </button>
           </fieldset>
         </form>
