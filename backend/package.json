@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node ./src/server.js",
-    "dev": "nodemon ./src/server.js",
+    "dev": "concurrently \"npm run start:api\" \"npm run start:worker\"",
     "start:api": "nodemon ./src/server.js",
     "start:worker": "nodemon ./src/worker.js",
     "seed": "node ./src/seeders/index.js",
