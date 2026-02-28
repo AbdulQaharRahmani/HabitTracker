@@ -10,18 +10,20 @@ class SettingNavItem extends StatelessWidget {
   final Color color;
   final String title;
   final String? subtitle;
+  final Function()  onTab;
 
-  const SettingNavItem({
+   const SettingNavItem({
     super.key,
     required this.icon,
     required this.color,
     required this.title,
     this.subtitle,
+     required this.onTab,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return ListTile(onTap: onTab,
       leading: SettingIcon(icon: icon, color: color),
       title: Text(title, style: const TextStyle(fontSize: 17)),
       subtitle: subtitle != null ? Text(subtitle!) : null,

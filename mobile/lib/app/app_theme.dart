@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // ──────────────────────────────────────────────────────────────
-  // رنگ‌های دینامیک (در زمان اجرا تغییر می‌کنند)
-  // ──────────────────────────────────────────────────────────────
   static Color background = const Color(0xFFEFF2F6);
   static Color surface = const Color(0xFFFFFFFF);
   static Color inputBackground = const Color(0xFFF9FAFB);
@@ -63,9 +60,7 @@ class AppTheme {
   static Color fabIcon = const Color(0xFFFFFFFF);
   static Color fabShadow = const Color(0x506366F1);
 
-  // ──────────────────────────────────────────────────────────────
-  // رنگ‌های دارک جدید (بر اساس کد HTML که دادی)
-  // ──────────────────────────────────────────────────────────────
+  // ───────────────────────────────────────────────────────────
   static const Color darkBackground = Color(0xFF111827);     // page-bg
   static const Color darkSurface = Color(0xFF1F2937);        // card-bg
   static const Color darkSurfaceHover = Color(0xFF374151);   // search-bg / input
@@ -76,7 +71,6 @@ class AppTheme {
   static const Color darkTextSecondary = Color(0xFF9CA3AF);  // text-sub
   static const Color darkTextMuted = Color(0xFF9CA3AF);      // text-sub
 
-  // بقیه رنگ‌های دارک (بدون تغییر یا بهبود یافته)
   static const Color successDark = Color(0xFF4ADE80);
   static const Color successBackgroundDark = Color(0x334ADE80);
   static const Color warningDark = Color(0xFFFB923C);
@@ -111,8 +105,6 @@ class AppTheme {
   static const Color fabIconDark = Colors.white;
   static const Color fabShadowDark = Color(0x506366F1);
 
-  // ──────────────────────────────────────────────────────────────
-  // متد سوئیچ تم (به‌روزرسانی شده)
   // ──────────────────────────────────────────────────────────────
   static void setTheme(bool isDark) {
     if (isDark) {
@@ -175,7 +167,7 @@ class AppTheme {
       fabIcon = fabIconDark;
       fabShadow = fabShadowDark;
     } else {
-      // Light Theme (بدون تغییر)
+
       background = const Color(0xFFEFF2F6);
       surface = const Color(0xFFFFFFFF);
       inputBackground = const Color(0xFFF9FAFB);
@@ -237,7 +229,6 @@ class AppTheme {
     }
   }
 
-  // ThemeData دینامیک (بدون تغییر)
   static ThemeData get currentTheme {
     final isDark = background == darkBackground;
     return isDark ? _darkThemeData : _lightThemeData;
