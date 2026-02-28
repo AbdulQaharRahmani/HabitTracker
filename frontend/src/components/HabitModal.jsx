@@ -5,15 +5,16 @@ import { FaTimes } from "react-icons/fa";
 import SearchableDropdown from "./SearchableDropdown";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { useHotkeys } from "react-hotkeys-hook"
+import { useHotkeys } from "react-hotkeys-hook";
+import i18n from "../utils/i18n";
 
-const frequencyItems = [
-  { id: "f1", name: "Daily", value: "daily" },
-  { id: "f2", name: "Every Other Day", value: "every-other-day" },
-  { id: "f3", name: "Weekly", value: "weekly" },
-  { id: "f4", name: "Biweekly", value: "biweekly" },
-  { id: "f5", name: "Weekdays", value: "weekdays" },
-  { id: "f6", name: "Weekends", value: "weekends" },
+const frequencyItems = () => [
+  { id: "f1", name: i18n.t("Daily"), value: "daily" },
+  { id: "f2", name: i18n.t("Every Other Day"), value: "every-other-day" },
+  { id: "f3", name: i18n.t("Weekly"), value: "weekly" },
+  { id: "f4", name: i18n.t("Biweekly"), value: "biweekly" },
+  { id: "f5", name: i18n.t("Weekdays"), value: "weekdays" },
+  { id: "f6", name: i18n.t("Weekends"), value: "weekends" },
 ];
 
 export default function HabitModal() {
@@ -42,36 +43,35 @@ export default function HabitModal() {
 
   const formRef = useRef(null);
 
-
   useHotkeys(
     "ctrl+s, meta+s",
     (e) => {
       e.preventDefault();
       handleHabitDataSubmission(e);
     },
-    { enabled: isModalOpen }
+    { enabled: isModalOpen },
   );
 
   useHotkeys(
     "esc",
     () => {
-      if(isModalOpen) {
+      if (isModalOpen) {
         setModalOpen(false);
       }
     },
-    { enabled: isModalOpen }
+    { enabled: isModalOpen },
   );
 
   const handleHabitDataSubmission = async (e) => {
     e?.preventDefault();
 
     if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
-      return toast.error("Title, Category, and Frequency are required");
+      return toast.error(t("Title, Category, and Frequency are required"));
     }
     await submitHabit(habitData, isEditingMode, currentHabitID);
     fetchHabits();
-    setModalOpen(false)
-  }
+    setModalOpen(false);
+  };
 
   const handleAddCategory = async (name, color) => {
     await addUserCategory(name, color);
@@ -139,7 +139,7 @@ export default function HabitModal() {
                     {t("Frequency")} <span className="text-red-600">*</span>
                   </label>
                   <Dropdown
-                    items={frequencyItems}
+                    items={frequencyItems()}
                     placeholder={t("Choose Frequency")}
                     value={habitData.frequency}
                     getValue={(value) => setHabitData("frequency", value)}

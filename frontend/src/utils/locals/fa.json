@@ -222,5 +222,12 @@
   "Items Per Page": "تعداد نمایش در هر صفحه",
 
   "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
-  "Enter your name": "نام خود را وارد کنید"
+  "Enter your name": "نام خود را وارد کنید",
+  "View": "دیدن",
+  "Daily": "روزانه",
+  "Every Other Day": "روز در میان",
+  "Biweekly": "دو هفته ای",
+  "Weekdays": "روز های هفته",
+  "Weekends": "اخر هفته ها",
+  "Title, Category, and Frequency are required": "عنوان، دسته بندی و تعداد دفعات ارسال الزامی است"
 }
