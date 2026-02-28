@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 import 'app/app_theme.dart';
 import 'features/routes.dart';
 
-void main() {
+void main() { WidgetsFlutterBinding.ensureInitialized();
   runApp(ChangeNotifierProvider(
     create: (context) => ThemeProvider(),
     child: const MyApp(),
   ),);
-}
+ 
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
