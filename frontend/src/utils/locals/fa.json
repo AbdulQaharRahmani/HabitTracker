@@ -230,5 +230,6 @@
   "Weekdays": "روز های هفته",
   "Weekends": "اخر هفته ها",
   "Title, Category, and Frequency are required": "عنوان، دسته بندی و تعداد دفعات ارسال الزامی است",
-  "Edit Habit": "ویرایش عادت"
+  "Edit Habit": "ویرایش عادت",
+  "Failed to delete habit!": "عادت حذف نشد:"
 }
