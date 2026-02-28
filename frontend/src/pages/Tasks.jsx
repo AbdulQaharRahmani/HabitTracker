@@ -51,13 +51,6 @@ function Tasks() {
       };
     });
 
-    groups["uncategorized"] = {
-      id: "uncategorized",
-      name: t("Uncategorized"),
-      color: "#6b7280",
-      items: [],
-    };
-
     tasks.forEach((task) => {
       const catId =
         typeof task.categoryId === "object"
