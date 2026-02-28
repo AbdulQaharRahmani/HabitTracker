@@ -89,8 +89,9 @@ const [isLoggingOut, setIsLoggingOut] = useState(false);
 };
 
 useEffect(()=>{
-  console.log(isRtl);
+  console.log('isRTl',isRtl);
 },[isRtl]);
+
 
 
    useHotkeys(
@@ -126,10 +127,11 @@ useEffect(()=>{
       {/* --- Sidebar ---*/}
       <aside
         className={`
-          fixed top-0 left-0 md:relative h-screen z-40
+          fixed top-0 md:relative ${isRtl ? "right-0" : "left-0"
+          }  h-screen z-40
           bg-white dark:bg-gray-900
           transition-all duration-300 ease-in-out position-relative
-          ${screenMode === "mobile" && !isOpen ? "-translate-x-full" : "translate-x-0"}
+          ${screenMode === "mobile" && !isOpen ? (isRtl ? "translate-x-full" : "-translate-x-full") : "translate-x-0"}
           ${screenMode === "desktop" ? "pt-10" : ""}
 
           ${isOpen ? "md:w-64 w-64" : "md:w-20 w-64"}

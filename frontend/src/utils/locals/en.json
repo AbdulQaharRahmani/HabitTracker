@@ -208,5 +208,10 @@
     "entertainment": "Entertainment",
     "education": "Education"
   },
-  "No tasks here": "No tasks here"
+  "No tasks here": "No tasks here",
+  
+  "displaying": "Displaying",
+  "to": "to",
+  "outOf": "out of",
+  "results": "results"
 }
