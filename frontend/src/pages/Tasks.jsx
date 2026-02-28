@@ -226,6 +226,8 @@ function Tasks() {
           {groupedArray.map((group, index) => (
             <div
               key={group.id}
+              onClick={()=>setActiveCategoryId(group.id)}
+              onFocus={()=>setActiveCategoryId(group.id)}
               ref={(el) => {
                 if (!categoryRef.current) return;
                 categoryRef.current[index] = el;
@@ -240,8 +242,9 @@ function Tasks() {
               focus-within:border-indigo-500
               focus-within:shadow-[0_0_25px_rgba(99,102,241,0.35)]
               dark:focus-within:shadow-[0_0_30px_rgba(129,140,248,0.35)]
-
-              relative`}
+              relative
+              ${activeCategoryId === group.id ? 'category-active' : ""}
+              `}
               style={{ height: "530px", minHeight: "420px" }}
             >
               <div className="relative">
