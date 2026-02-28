@@ -186,5 +186,10 @@
   "logout_title": "Logout",
   "logout_description": "Are you sure you want to logout?",
   "logout_confirmText": "Confirm",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+
+  "displaying": "Displaying",
+  "to": "to",
+  "outOf": "out of",
+  "results": "results"
 }
