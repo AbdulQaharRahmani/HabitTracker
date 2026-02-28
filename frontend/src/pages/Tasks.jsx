@@ -59,8 +59,6 @@ function Tasks() {
 
       if (catId && groups[catId]) {
         groups[catId].items.push(task);
-      } else {
-        groups["uncategorized"].items.push(task);
       }
     });
 
