@@ -44,8 +44,6 @@ const Settings = () => {
 
   const email = useAuthStore((state)=>state.email);
 
-  console.log(email)
-
   useEffect(() => {
     fetchUserPreferences();
   }, []);

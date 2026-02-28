@@ -1,5 +1,6 @@
 import { VscChevronLeft, VscChevronRight } from "react-icons/vsc";
 import { usePagination, DOTS } from "../hooks/usePagination";
+import { useTranslation } from "react-i18next";
 
 function Pagination({
   onPageChange,
@@ -14,6 +15,7 @@ function Pagination({
     siblingCount,
     pageSize,
   });
+  const { t } = useTranslation();
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -22,65 +24,73 @@ function Pagination({
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
+  const navBtnBase = "p-2 rounded-full border transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed";
+  const navBtnColors = "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800";
+
   return (
-    <div className="flex flex-col justify-between items-center gap-5 pt-5 pb-10 mx-auto">
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between mr-8">
-        <p className="text-sm text-gray-700">
-          Displaying
-          <span className="font-medium"> {startItem} </span>
-          to
-          <span className="font-medium"> {endItem} </span>
-          out of
-          <span className="font-medium"> {totalCount} </span>
-          results
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-5 pt-5 pb-10 w-full px-4">
+      <div className="flex items-center">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t("Displaying")}
+          <span className="font-semibold text-gray-900 dark:text-white"> {startItem} </span>
+          {t("to")}
+          <span className="font-semibold text-gray-900 dark:text-white"> {endItem} </span>
+          {t("out of")}
+          <span className="font-semibold text-gray-900 dark:text-white"> {totalCount} </span>
+          {t("results")}
         </p>
       </div>
-      <nav className="flex items-center gap-1.5 sm:justify-end">
-        {/* Prev */}
+
+      <nav className="flex items-center gap-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="p-2 rounded-full border border-gray-500 text-gray-900 hover:bg-gray-100 disabled:opacity-40"
+          className={`${navBtnBase} ${navBtnColors}`}
+          aria-label="Previous Page"
         >
-          <VscChevronLeft className="text-gray-100" />
+          <VscChevronLeft className="w-5 h-5" />
         </button>
 
-        {paginationRange.map((page, index) => {
-          if (page === DOTS) {
+        {/* Page Numbers */}
+        <div className="flex items-center gap-1">
+          {paginationRange.map((page, index) => {
+            if (page === DOTS) {
+              return (
+                <span
+                  key={`dots-${index}`}
+                  className="px-2 text-gray-400 dark:text-gray-600 select-none"
+                >
+                  &hellip;
+                </span>
+              );
+            }
+
+            const isActive = page === currentPage;
+
             return (
-              <span
-                key={`dots-${index}`}
-                className="px-3 text-gray-400 select-none"
+              <button
+                key={page}
+                onClick={() => onPageChange(page)}
+                className={`min-w-[40px] h-10 flex items-center justify-center rounded-full text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                }`}
               >
-                …
-              </span>
+                {page}
+              </button>
             );
-          }
+          })}
+        </div>
 
-          const isActive = page === currentPage;
-
-          return (
-            <button
-              key={page}
-              onClick={() => onPageChange(page)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                isActive
-                  ? "bg-indigo-600 text-white"
-                  : " text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              {page}
-            </button>
-          );
-        })}
-
-        {/* Next */}
+        {/* Next Button */}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="p-2 rounded-full border border-gray-500 text-gray-900 hover:bg-gray-100 disabled:opacity-40"
+          className={`${navBtnBase} ${navBtnColors}`}
+          aria-label="Next Page"
         >
-          <VscChevronRight className="text-gray-100" />
+          <VscChevronRight className="w-5 h-5" />
         </button>
       </nav>
     </div>

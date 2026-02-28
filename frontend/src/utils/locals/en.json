@@ -188,6 +188,7 @@
   "logout_confirmText": "Confirm",
   "cancel": "Cancel",
 
+<<<<<<< HEAD
   "Add Category": "Add Category",
   "Category Name is required!": "Category Name is required!",
   "Icon Name is required!": "Icon Name is required!",
@@ -208,4 +209,10 @@
     "entertainment": "Entertainment",
     "education": "Education"
   }
+=======
+  "displaying": "Displaying",
+  "to": "to",
+  "outOf": "out of",
+  "results": "results"
+>>>>>>> main
 }

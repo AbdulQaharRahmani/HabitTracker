@@ -1,13 +1,24 @@
 import { useTranslation } from "react-i18next";
+import {useEffect,useRef} from 'react';
 import { useTaskCardStore } from "../../store/useTaskCardStore";
 import toast from "react-hot-toast";
-import i18n from "../../utils/i18n";
 import { useHotkeys } from "react-hotkeys-hook";
 import TaskModal from "./TaskModal"
+
 
 export default function AddTask() {
   const { t } = useTranslation();
   const { isModalOpen, setModalOpen, taskData, setTaskData, addTask } = useTaskCardStore();
+
+  const inputRef=useRef(null);
+
+  useEffect(()=>{
+    if(isModalOpen){
+        setTimeout(()=>{
+          inputRef.current?.focus();
+        },50);
+    }
+  },[isModalOpen]);
 
   const HandleTaskCreation = async (e) => {
     e.preventDefault();
@@ -49,6 +60,7 @@ export default function AddTask() {
     } catch (error) {
       toast.dismiss();
       toast.error(t("Error saving task"));
+      console.log('error', error);
     }
   };
 
@@ -79,6 +91,7 @@ export default function AddTask() {
       modalTitle={t("Add new Task")}
       close={() => setModalOpen(false)}
       open={isModalOpen}
+      ref={inputRef}
     />
   );
 }
