@@ -162,15 +162,26 @@ const useHabitStore = create((set, get) => ({
       set({ loading: false });
     }
   },
-    addUserCategory: async (category, color) => {
-    const newCategoryData = {
-      name: category,
-      icon: "",
-      backgroundColor: color,
-    };
+  addUserCategory: async (newCategory, t) => {
     try {
-      await api.post("/categories", newCategoryData);
-      toast.success("Successfully Added the Category");
+      const res = await api.post("/categories", newCategory);
+
+      const categoryCreated = res.data.data;
+
+      const category = {
+        id: categoryCreated._id,
+        name: categoryCreated.name,
+        value: categoryCreated._id,
+        color: categoryCreated.backgroundColor || "#dbd6f9",
+      };
+
+      set((state) => ({
+        categories: [...state.categories, category],
+      }));
+
+      toast.success(t("Successfully Added the Category"));
+
+      return category;
     } catch (error) {
       const message = error.response?.data?.error || "Something went wrong";
       toast.error(message);
@@ -215,6 +226,20 @@ const useHabitStore = create((set, get) => ({
       const message = error.response?.data?.message || "Something went wrong";
       toast.error(message);
       console.log("Failed to add habit", error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  allhabits: [],
+  fetchHabits: async () => {
+    set({ loading: true, error: null });
+    try {
+      const response = await api.get("/habits");
+      const data = response.data;
+      set({ allhabits: Array.isArray(data) ? data : data.data || [] });
+    } catch (err) {
+      const message = err.response?.data?.message || "Failed to fetch habits";
+      set({ error: message });
     } finally {
       set({ loading: false });
     }

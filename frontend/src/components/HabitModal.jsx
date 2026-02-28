@@ -72,8 +72,8 @@ const frequencyItems = [
     fetchHabitsPage();
   }
 
-  const handleAddCategory = async (name, color) => {
-    await addUserCategory(name, color);
+  const handleAddCategory = async (name, color, icon) => {
+    await addUserCategory(name, color, icon);
     await fetchCategories();
   };
 
@@ -159,7 +159,7 @@ const frequencyItems = [
                     }
                     getValue={(value) => setHabitData("categoryId", value)}
                     onAdd={handleAddCategory}
-                    placeholder={t("Choose Category")}
+                    placeholder={t("choose an avaliable category or make a new one")}
                   />
                 </div>
 

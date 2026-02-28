@@ -188,6 +188,23 @@
   "logout_confirmText": "Confirm",
   "cancel": "Cancel",
 
+  "Category Name is required!": "Category Name is required!",
+  "Icon Name is required!": "Icon Name is required!",
+  "Category Name": "Category Name",
+  "Pick icon": "Pick icon",
+  "Choose Icon": "Choose Icon",
+  "Pick Color": "Pick Color",
+  "Successfully Added the Category": "Successfully Added the Category",
+  "categoryGroups": {
+    "work": "Work",
+    "home": "Home",
+    "shopping": "Shopping",
+    "health": "Health",
+    "travel": "Travel",
+    "entertainment": "Entertainment",
+    "education": "Education"
+  },
+  
   "displaying": "Displaying",
   "to": "to",
   "outOf": "out of",
