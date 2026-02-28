@@ -51,7 +51,7 @@ const TodayList = () => {
         text-slate-600 dark:text-gray-400
         transition-colors"
       >
-        Loading habits...
+        {t("Loading habits...")}
       </div>
     );
 
