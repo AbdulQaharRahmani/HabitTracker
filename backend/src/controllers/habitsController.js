@@ -39,6 +39,22 @@ export const getHabits = async (req, res) => {
   });
 };
 
+export const getHabitById = async (req, res) => {
+  if (!req.user) throw unauthorized();
+
+  const habit = await HabitModel.findOne({
+    _id: req.params.id,
+    userId: req.user._id,
+  }).populate('categoryId', 'name backgroundColor icon');
+
+  if (!habit) throw notFound('Habit');
+
+  res.status(200).json({
+    success: true,
+    data: habit,
+  });
+};
+
 // Get all user habits for selected date
 export const getHabitsByDate = async (req, res) => {
   if (!req.user) throw unauthorized();

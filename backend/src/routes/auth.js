@@ -6,10 +6,14 @@ import {
   googleLogin,
   refreshAccessToken,
   logOutUser,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/authController.js';
 import {
+  forgotPasswordValidator,
   loginValidator,
   registerValidator,
+  resetPasswordValidator,
 } from '../validators/validateUser.js';
 import { validate } from '../middleware/validate.js';
 
@@ -22,6 +26,18 @@ router.post(
   asyncHandler(registerUser)
 );
 router.post('/login', loginValidator, validate, asyncHandler(loginUser));
+router.post(
+  '/forgotPassword',
+  forgotPasswordValidator,
+  validate,
+  asyncHandler(forgotPassword)
+);
+router.put(
+  '/resetPassword/:resetToken',
+  resetPasswordValidator,
+  validate,
+  asyncHandler(resetPassword)
+);
 
 //Google routes
 router.post('/google', asyncHandler(googleLogin));
