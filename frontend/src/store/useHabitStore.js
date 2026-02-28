@@ -111,12 +111,6 @@ const useHabitStore = create((set, get) => ({
     }
   },
   toggleHabit: async (id) => {
-    const formatDate = (date) =>
-      date.toISOString().split("T")[0];
-    if (get().selectedDate.toDateString() !== new Date().toDateString()) {
-      return toast.error("You can only mark today's habit as completed or uncompleted")
-    }
-
     const habitToToggle = get().habits.find(h => h._id === id)
     if (!habitToToggle) return
 
@@ -138,14 +132,49 @@ const useHabitStore = create((set, get) => ({
         toast.success(i18next.t("habit_completed"));
       }
     } catch (err) {
-      console.log(err)
-      toast.error(err.response?.data?.error || i18next.t("habit_update_failed"))
+      let errorMessage = err.response?.data?.message
+      toast.error(i18next.t(errorMessage)|| i18next.t("habit_update_failed"))
       set(state => ({
         habits: state.habits.map(h =>
           h._id === id ? { ...h, completed: prevState } : h
         ),
         habitCompletions: state.habitCompletions + (prevState ? 1 : -1)
       }))
+    }
+  },
+
+  fetchCategories: async () => {
+    set({ loading: true });
+    try {
+      const response = await api.get("/categories");
+      const formatted = response.data.data.map((cat) => ({
+        id: cat._id,
+        name: cat.name,
+        value: cat._id,
+        color: cat.backgroundColor || "#dbd6f9",
+      }));
+      set({ categories: formatted });
+    } catch (error) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+      console.error("Failed to fetch categories", error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+    addUserCategory: async (category, color) => {
+    const newCategoryData = {
+      name: category,
+      icon: "",
+      backgroundColor: color,
+    };
+    try {
+      await api.post("/categories", newCategoryData);
+      toast.success("Successfully Added the Category");
+    } catch (error) {
+      const message = error.response?.data?.error || "Something went wrong";
+      toast.error(message);
+      console.log("Failed to add user category", error);
     }
   },
   isModalOpen: false,
@@ -163,46 +192,27 @@ const useHabitStore = create((set, get) => ({
   setModalOpen: () => {
     set((state) => ({ isModalOpen: !state.isModalOpen }));
   },
-  fetchCategories: async () => {
-    set({ loading: true });
-    try {
-      const response = await api.get("/categories");
-      const formatted = response.data.data.map((cat) => ({
-        id: cat._id,
-        name: cat.name,
-        value: cat._id,
-        color: cat.backgroundColor || "#dbd6f9",
-      }));
-      set({ categories: formatted });
-    } catch (error) {
-      const message = error.response?.data?.error || "Something went wrong";
-      toast.error(message);
-      console.error("Failed to fetch categories", error);
-    } finally {
-      set({ loading: false });
-    }
-  },
   submitHabit: async (data, isEditingMode, currentHabitID) => {
     set({ loading: true });
     try {
       if (isEditingMode) {
         await api.put(`/habits/${currentHabitID}`, data);
-        toast.success("Successfuly Updated the Habit!");
+        toast.success(i18next.t("Habit Updated Successfully!"));
       } else {
         await api.post("/habits", data);
-        toast.success("Habit Added Successfully!");
+        toast.success(i18next.t("Habit Added Successfully!"));
       }
       set({
         isModalOpen: false,
         habitData: {
           title: "",
           description: "",
-          frequency: null,
-          categoryId: null,
+          frequency: "",
+          categoryId: "",
         },
       });
     } catch (error) {
-      const message = error.response?.data?.error || "Something went wrong";
+      const message = error.response?.data?.message || "Something went wrong";
       toast.error(message);
       console.log("Failed to add habit", error);
     } finally {
@@ -233,6 +243,7 @@ const useHabitStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+
   openAddHabitModal: () => {
     set({
       isModalOpen: true,
@@ -313,7 +324,7 @@ const useHabitStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const result = await getHabitsChartData(startDate, endDate);
-      console.log(result);
+
       if (result.success) {
         set({ consistencyData: result.data.daily, loading: false });
       } else {
@@ -330,7 +341,6 @@ const useHabitStore = create((set, get) => ({
 
     set((state) => ({
       habits: state.habits.filter((h) => h._id !== id),
-      allhabits: state.allhabits.filter((h) => h._id !== id),
     }));
 
     toast.success(t("habit deleted successfully!"));

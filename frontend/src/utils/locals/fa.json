@@ -37,7 +37,9 @@
   "Weekly Summary Email": "ایمیل خلاصه هفتگی",
   "Receive a weekly report of your progress": "گزارش هفتگی پیشرفت خود را دریافت کنید",
   "New Task": "عملیات جدید",
-  "habit deleted successfully!": "عادت موفقانه حذف شد!",
+  "Habit Updated Successfully!": "!عادت موفقانه به روز شد",
+  "Habit Added Successfully!": "!عادت موفقانه اضافه شد",
+  "habit deleted successfully!": "!عادت موفقانه حذف شد",
   "Faild to delete habit!": "خطا در حذف عادت",
   "Manage your daily goals and todos.": "اهداف و کار های روزانه خود را مدیریت کنید.",
   "Due": "موعد",
@@ -163,6 +165,10 @@
   "PATCH": "PATCH",
   "DELETE": "DELETE",
   "GET": "GET",
+  "Displaying": "نمایش",
+  "to": "تا",
+  "out of": "از مجموع",
+  "results": "نتیجه‌ها",
   "Newest": "جدیدترین",
   "Oldest": "قدیمی‌ترین",
   "Loading logs": "در حال بارگذاری لاگ ها...",
@@ -215,13 +221,16 @@
 
   "Language": "زبان",
   "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید",
+  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
+  "No habits for current date!": "برای تاریخ انتخاب شده هیچ عادتی ندارید!",
+  "Loading habits...": "در حال بارگذاری عادت ها...",
+  "You can only modify habits up to 7 days ago": "شما فقط تا هفت روز گذشته می توانید حالت عادت های تان را به تکمیل یا ناتکمیل تغییر دهید!",
+  "You cannot complete or uncomplete future habits": "شما نمی توانید حالت عادت های آینده تان را به تکمیل یا ناتکمیل تغییر دهید!",
   "User Name": "نام کاربری",
   "Password updated. please log in again": "رمز عبور به روزرسانی شده. لطفا دوباره وارد شوید",
   "Password update failed": "بروزرسانی رمز عبور ناموفق بود",
   "Message": "پیام",
   "Items Per Page": "تعداد نمایش در هر صفحه",
-
-  "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
 
   "Category Name is required!": "اسم کتگوری الزامی است!",
   "Icon Name is required!": "نماد الزامی است!",
@@ -238,5 +247,14 @@
     "travel": "سفر",
     "entertainment": "سرگرمی",
     "education": "آموزشی"
-  }
+  },
+
+  "displaying": "نمایش",
+  "outOf": "از",
+  "daily": "روزانه",
+  "every-other-day": "یک روز در میان",
+  "biweekly": "دو هفته یک‌بار",
+  "weekdays": "روزهای کاری",
+  "weekends": "آخر هفته‌ها",
+  "weekly": "هفته وار"
 }

@@ -14,7 +14,6 @@ export default function HabitCard({
   description,
   categoryId,
   frequency,
-  duration,
   viewMode,
   _id,
 }) {
@@ -26,7 +25,6 @@ export default function HabitCard({
 
   const [isModalOpen,setIsModalOpen]=useState(false);
   const [isDeleting,setIsDeleting]=useState(false);
-
 
   const handleDelete=async()=>{
     try{
@@ -89,9 +87,7 @@ export default function HabitCard({
             </span>
 
             <span className="flex items-center text-[12px] text-gray-500 dark:text-gray-400">
-              {frequency || "No frequency"}
-              <FaCircle className="mx-2 text-[5px]" />
-              {duration || "No Duration"}
+              {t(frequency) || "No frequency"}
             </span>
           </div>
         </div>

@@ -9,17 +9,13 @@ function LanguageSwitcher() {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    document.documentElement.lang = i18n.language;
-    document.documentElement.dir = i18n.language === "fa" ? "rtl" : "ltr";
-    localStorage.setItem("language", i18n.language);
-
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target))
         setIsOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [i18n.language]);
+  },[]);
 
   const languages = [
     { code: "en", label: "English", flag: "🇺🇸" },
