@@ -22,7 +22,7 @@ export default function Dropdown({ items, value, getValue,displayValue, placehol
           type="text"
           placeholder={placeholder}
           readOnly
-          value={displayValue || value}
+          value={displayValue || value || null}
           onClick={handleDropdownVisibility}
           className="
             w-full cursor-pointer rounded-xl border
