@@ -5,7 +5,7 @@ import Dropdown from "./Dropdown";
 import { iconCategories } from "../utils/icons";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
-import {useHabitStore} from "../store/useHabitStore";
+import useHabitStore from "../store/useHabitStore";
 
 export default function SearchableDropdown({
   items,
@@ -17,7 +17,7 @@ export default function SearchableDropdown({
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState(items);
-  const [selectedColor, setSelectedColor] = useState("#7B68EE");
+  const [selectedColor, setSelectedColor] = useState("#6a68ee");
   const [selectedCategory, setSelectedCategory] = useState("work");
   const [selectedIcon, setSelectedIcon] = useState("");
 
@@ -118,7 +118,7 @@ export default function SearchableDropdown({
                 )}
                 <span className="px-2">{item.name}</span>
                 {value === item.value && (
-                  <HiCheck size={18} className="ms-auto text-[#7B68EE]" />
+                  <HiCheck size={18} className="ms-auto text-indigo-500" />
                 )}
               </li>
             ))
@@ -139,13 +139,14 @@ export default function SearchableDropdown({
                   <div className="flex gap-2 overflow-x-auto pb-3 mb-3 scrollbar-hide mx-2.5 mt-2">
                     {categories.map((cat) => (
                       <button
+                        type="button"
                         key={cat}
                         onClick={() => setSelectedCategory(cat)}
                         className={`
                           whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all
                           ${
                             selectedCategory === cat
-                              ? "bg-[#7B68EE] text-white"
+                              ? "bg-indigo-500 text-white"
                               : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200"
                           }
                         `}
@@ -185,7 +186,7 @@ export default function SearchableDropdown({
               <button
                 type="button"
                 onClick={handleAddCategory}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#7B68EE] rounded-lg hover:bg-[#6A5ACD] transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 transition-colors"
               >
                 <HiPlus size={16} />{t("Add Category")}
               </button>
