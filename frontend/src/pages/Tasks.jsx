@@ -73,7 +73,7 @@ function Tasks() {
     setTaskData("dueDate", null);
     setTaskData("priority", "medium");
 
-    setTaskData("category", catId === "uncategorized" ? null : catId);
+    setTaskData("category", catId);
 
     setModalOpen(true);
   };
