@@ -159,6 +159,7 @@ const useHabitStore = create((set, get) => ({
       set({ categories: formatted });
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong";
+      toast.dismiss();
       toast.error(message);
       console.error("Failed to fetch categories", error);
     } finally {
@@ -182,11 +183,13 @@ const useHabitStore = create((set, get) => ({
         categories: [...state.categories, category],
       }));
 
+      toast.dismiss();
       toast.success(t("Successfully Added the Category"));
 
       return category;
     } catch (error) {
       const message = error.response?.data?.error || "Something went wrong";
+      toast.dismiss();
       toast.error(message);
       console.log("Failed to add user category", error);
     }
