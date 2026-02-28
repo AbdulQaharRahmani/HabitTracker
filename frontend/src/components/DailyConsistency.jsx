@@ -3,25 +3,26 @@ import useHabitStore from "../store/useHabitStore";
 import { useTranslation } from "react-i18next";
 
 const DailyConsistency = () => {
-  const { consistencyData, loading, error, getConsistencyData } = useHabitStore();
+  const { consistencyData, loading, error, getConsistencyData } =
+    useHabitStore();
   const { t } = useTranslation();
-const dates = useMemo(() => {
+  const dates = useMemo(() => {
     const end = new Date();
     const start = new Date();
     start.setDate(end.getDate() - 365);
-    const formatDate = (date) => date.toISOString().split('T')[0];
+    const formatDate = (date) => date.toISOString().split("T")[0];
 
     return {
       startStr: formatDate(start),
-      endStr: formatDate(end)
+      endStr: formatDate(end),
     };
   }, []);
 
   const daysLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-useEffect(() => {
+  useEffect(() => {
     getConsistencyData(dates.startStr, dates.endStr);
-}, [getConsistencyData, dates.startStr, dates.endStr])
+  }, [getConsistencyData, dates.startStr, dates.endStr]);
 
   const getColorClass = (completed) => {
     if (completed === 0) return "bg-slate-100 dark:bg-gray-800";
@@ -33,11 +34,11 @@ useEffect(() => {
   const { weeks, monthsLabels } = useMemo(() => {
     if (!consistencyData) return { weeks: [], monthsLabels: [] };
 
- const dataToProcess = consistencyData?.daily || consistencyData;
+    const dataToProcess = consistencyData?.daily || consistencyData;
 
-  if (!dataToProcess || !Array.isArray(dataToProcess)) {
-    return { weeks: [], monthsLabels: [] };
-  }
+    if (!dataToProcess || !Array.isArray(dataToProcess)) {
+      return { weeks: [], monthsLabels: [] };
+    }
 
     const weeksArr = [];
     let currentWeek = Array(7).fill(null);
@@ -60,8 +61,10 @@ useEffect(() => {
       currentWeek[dayOfWeek] = {
         ...dayItem,
         formattedDate: dateObj.toLocaleDateString("en-US", {
-          month: 'short', day: 'numeric', year: 'numeric'
-        })
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
       };
 
       if (dayOfWeek === 6) {
@@ -70,36 +73,45 @@ useEffect(() => {
       }
     });
 
-    if (currentWeek.some(d => d !== null)) {
+    if (currentWeek.some((d) => d !== null)) {
       weeksArr.push(currentWeek);
     }
 
     return { weeks: weeksArr, monthsLabels: tempMonths };
   }, [consistencyData]);
 
-  if (loading) return (
-    <div className="w-full h-48 flex items-center justify-center bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800">
-      <div className="animate-pulse text-slate-400 text-sm font-medium">Loading Habits..</div>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="w-full h-48 flex items-center justify-center bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800">
+        <div className="animate-pulse text-slate-400 text-sm font-medium">
+          {t("Loading Habits..")}
+        </div>
+      </div>
+    );
 
-  if (error) return (
-    <div className="w-full p-8 text-center text-red-500 bg-red-50 dark:bg-red-900/10 rounded-3xl border border-red-100 dark:border-red-900/20">
-      {error}
-    </div>
-  );
+  if (error)
+    return (
+      <div className="w-full p-8 text-center text-red-500 bg-red-50 dark:bg-red-900/10 rounded-3xl border border-red-100 dark:border-red-900/20">
+        {error}
+      </div>
+    );
 
   return (
     <div className="w-full max-w-full p-6 rounded-3xl border bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-sm transition-all">
       {/* Header & Legend */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 className="text-lg font-bold text-slate-800 dark:text-gray-100">{t("Consistency")}</h2>
+        <h2 className="text-lg font-bold text-slate-800 dark:text-gray-100">
+          {t("Consistency")}
+        </h2>
         <div className="flex gap-2 items-center text-[10px] text-slate-400 font-medium">
-          <span>Less</span>
+          <span>{t("Less")}</span>
           {[0, 2, 5, 8].map((val) => (
-            <div key={val} className={`w-3.5 h-3.5 rounded-[3px] ${getColorClass(val)}`} />
+            <div
+              key={val}
+              className={`w-3.5 h-3.5 rounded-[3px] ${getColorClass(val)}`}
+            />
           ))}
-          <span>More</span>
+          <span>{t("More")}</span>
         </div>
       </div>
 
@@ -108,7 +120,9 @@ useEffect(() => {
           {/* Day Labels */}
           <div className="flex flex-col justify-between pt-7 pb-1 text-[10px] font-bold text-slate-400">
             {daysLabels.map((day, i) => (
-              <span key={day} className={i % 2 === 0 ? "invisible" : ""}>{day}</span>
+              <span key={day} className={i % 2 === 0 ? "invisible" : ""}>
+                {day}
+              </span>
             ))}
           </div>
 
@@ -116,7 +130,11 @@ useEffect(() => {
             {/* Months Header */}
             <div className="relative h-5 mb-1 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
               {monthsLabels.map((m, i) => (
-                <span key={i} className="absolute" style={{ left: `${m.index * 15}px` }}>
+                <span
+                  key={i}
+                  className="absolute"
+                  style={{ left: `${m.index * 15}px` }}
+                >
                   {m.name}
                 </span>
               ))}
@@ -128,7 +146,11 @@ useEffect(() => {
                   {week.map((day, rowIdx) => (
                     <div
                       key={rowIdx}
-                      title={day ? `${day.formattedDate}: ${day.completed} Tasks` : ""}
+                      title={
+                        day
+                          ? `${day.formattedDate}: ${day.completed} Tasks`
+                          : ""
+                      }
                       className={`w-[11px] h-[11px] rounded-[2px] transition-all duration-200
                         ${!day ? "bg-transparent" : getColorClass(day.completed)}
                         ${day ? "hover:scale-125 hover:z-10 cursor-pointer" : ""}
