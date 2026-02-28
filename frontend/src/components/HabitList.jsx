@@ -13,9 +13,11 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
   const {t} = useTranslation()
   if (loading && habits.length === 0) {
     return (
-      <p className="text-gray-400 dark:text-gray-500 text-lg font-semibold my-4 text-center">
-       {t("Loading habits...}")}
-      </p>
+      <div className="animate-pulse space-y-4 mt-6">
+          <div className="h-24 bg-gray-200 rounded-lg"></div>
+          <div className="h-24 bg-gray-200 rounded-lg"></div>
+          <div className="h-24 bg-gray-200 rounded-lg"></div>
+       </div>
     );
   }
 
