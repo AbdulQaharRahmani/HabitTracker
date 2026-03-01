@@ -283,5 +283,8 @@
   "Edit Habit": "ویرایش عادت",
   "No habits found.": "هیچ عادتی پیدا نشد",
   "failed_to_delete_task": "حذف_وظیفه_ناموفق",
-  "Save Task": "ذخیره وظیفه"
+  "Save Task": "ذخیره وظیفه",
+  "Please fill all fields!": "لطفا همه فیلدها را پر کنید!",
+  "Welcome again!": "دوباره خوش آمدید!",
+  "Processing...": "درحال پردازش..."
 }
