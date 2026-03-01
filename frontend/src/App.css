@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 .profile-container {
   width: 100px;
   height: 100px;
@@ -11,4 +10,13 @@
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid #fff;
+}
+
+.category-active {
+  @apply ring-1 ring-indigo-500/50 border-indigo-500
+         shadow-[0_0_20px_rgba(99,102,241,0.4)];
+}
+
+.dark .category-active {
+  box-shadow: 0 0 25px rgba(129, 140, 248, 0.3);
 }
