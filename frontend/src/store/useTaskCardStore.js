@@ -244,6 +244,49 @@ export const useTaskCardStore = create((set, get) => ({
       throw error;
     }
   },
+
+  // new category modal
+  isCategoryModalOpen: false,
+
+  openCategoryModal: () => 
+    set({
+      isCategoryModalOpen: true,
+    }),
+  
+  closeCategoryModal: () =>
+    set({ 
+      isCategoryModalOpen: false
+    }),
+  
+  createCategory: async (newCategory, t) => {
+    try {
+      const res = await api.post("/categories", {
+        name: newCategory.name,
+        backgroundColor: newCategory.backgroundColor,
+        icon: newCategory.icon,
+      });
+
+      const category = res.data.data;
+
+      set((state) => ({
+        categories: [
+          ...state.categories,
+          {
+            id: category._id,
+            name: category.name,
+            value: category._id,
+            color: category.backgroundColor,
+            icon: category.icon,
+          },
+        ],
+      }));
+      toast.success(t("Category created!"));
+    } catch (error) {
+      console.error("Create category failed:", error);
+      toast.error(t("Failed to create category"));
+    }
+  },
+        
 }));
 
 const normalizePriorityToEnglish = (value) => {

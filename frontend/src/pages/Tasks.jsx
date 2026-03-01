@@ -8,6 +8,7 @@ import i18n from "../utils/i18n";
 import EditTask from "../components/tasks/EditTask";
 import { useHotkeys } from "react-hotkeys-hook";
 import { LuPlus } from "react-icons/lu";
+import AddCategory from "../components/tasks/AddCategory";
 import "../App.css";
 
 function Tasks() {
@@ -37,38 +38,53 @@ function Tasks() {
   }, [fetchCategories]);
 
   const { t } = useTranslation();
-  const isRTL = i18n.language === "fa";
+  const { categories } = useTaskCardStore((state) => state);
+  const isRTL = i18n.language === "fa"
 
   const groupedArray = useMemo(() => {
-    const groups = tasks.reduce((acc, task) => {
-      const catId = task.categoryId?._id || "uncategorized";
-      const categoryName = task.categoryId?.name || t("Uncategorized");
-      const categoryColor = task.categoryId?.backgroundColor || "#6b7280";
+    const groups = {};
 
-      if (!acc[catId]) {
-        acc[catId] = {
-          id: catId,
-          name: categoryName,
-          color: categoryColor,
-          items: [],
-        };
+    categories.forEach((cat) => {
+      const id = cat._id || cat.id;
+
+      groups[id] = {
+        id,
+        name: cat.name,
+        color: cat.backgroundColor || cat.color || "#6b7280",
+        icon: cat.icon,
+        items: [],
+      };
+    });
+
+    tasks.forEach((task) => {
+      const catId =
+        typeof task.categoryId === "object"
+          ? task.categoryId?._id
+          : task.categoryId;
+
+      if (catId && groups[catId]) {
+        groups[catId].items.push(task);
       }
-      acc[catId].items.push(task);
-      return acc;
-    }, {});
+    });
+
     return Object.values(groups);
-  }, [tasks, t]);
+  }, [tasks, categories, t]);
 
   const handleAddNewTaskToCategory = (catId) => {
+    console.log("Clicking + for Category ID:", catId);
+
     setTaskData("title", "");
     setTaskData("description", "");
     setTaskData("dueDate", null);
     setTaskData("priority", "medium");
-    setTaskData("category", catId === "uncategorized" ? null : catId);
+
+    setTaskData("category", catId);
+
     setModalOpen(true);
   };
 
   const categoryRef = useRef([]);
+  const addCategoryRef = useRef(null);
 
   const setActiveCategory = (categoryEl) => {
     categoryRef.current.forEach((el) => {
@@ -162,6 +178,7 @@ function Tasks() {
        }
   );
 
+
   // tab
   useHotkeys(
     "tab",
@@ -182,8 +199,12 @@ function Tasks() {
       const nextCategory = categoryRef.current[nextIndex];
       if (!nextCategory) return;
 
-      const selectedGroup=groupedArray[nextIndex];
-      setActiveCategoryId(selectedGroup.id);
+      if (nextIndex < groupedArray.length) {
+        const selectedGroup = groupedArray[nextIndex];
+        setActiveCategoryId(selectedGroup.id);
+      } else {
+        setActiveCategoryId(null);
+      }
 
       const firstTask = nextCategory.querySelector("[data-task-card]");
 
@@ -201,12 +222,6 @@ function Tasks() {
     },
   );
 
-
-
-
-
-
-
   return (
     <div
       className={`pb-10 px-4 md:px-6 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen ${isRTL ? "rtl" : "ltr"}`}
@@ -223,7 +238,7 @@ function Tasks() {
 
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-          {groupedArray.map((group, index) => (
+          {Object.values(groupedArray).map((group, index) => (
             <div
               key={group.id}
               onClick={()=>setActiveCategoryId(group.id)}
@@ -293,10 +308,33 @@ function Tasks() {
               </div>
             </div>
           ))}
+          <div
+            ref={(el) => {
+              addCategoryRef.current = el;
+              categoryRef.current[groupedArray.length] = el;
+            }}
+            tabIndex="0"
+            className="flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border
+              border-gray-200 dark:border-gray-800 transition-all duration-200
+              focus:outline-none
+              focus-within:ring-2
+              focus-within:ring-indigo-500/40
+              focus-within:border-indigo-500
+              relative"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                addCategoryRef.current
+                  ?.querySelector("[data-open-category]")
+                  ?.click();
+              }
+            }}
+          >
+            <AddCategory />
+          </div>
         </div>
       )}
     </div>
   );
 }
-
 export default Tasks;
