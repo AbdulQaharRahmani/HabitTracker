@@ -41,7 +41,6 @@ function Tasks() {
   const { categories } = useTaskCardStore((state) => state);
   const isRTL = i18n.language === "fa"
 
-
   const groupedArray = useMemo(() => {
     const groups = {};
 
@@ -85,6 +84,7 @@ function Tasks() {
   };
 
   const categoryRef = useRef([]);
+  const addCategoryRef = useRef(null);
 
   const setActiveCategory = (categoryEl) => {
     categoryRef.current.forEach((el) => {
@@ -199,8 +199,12 @@ function Tasks() {
       const nextCategory = categoryRef.current[nextIndex];
       if (!nextCategory) return;
 
-      const selectedGroup=groupedArray[nextIndex];
-      setActiveCategoryId(selectedGroup.id);
+      if (nextIndex < groupedArray.length) {
+        const selectedGroup = groupedArray[nextIndex];
+        setActiveCategoryId(selectedGroup.id);
+      } else {
+        setActiveCategoryId(null);
+      }
 
       const firstTask = nextCategory.querySelector("[data-task-card]");
 
@@ -304,7 +308,30 @@ function Tasks() {
               </div>
             </div>
           ))}
-          <AddCategory />
+          <div
+            ref={(el) => {
+              addCategoryRef.current = el;
+              categoryRef.current[groupedArray.length] = el;
+            }}
+            tabIndex="0"
+            className="flex flex-col bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border
+              border-gray-200 dark:border-gray-800 transition-all duration-200
+              focus:outline-none
+              focus-within:ring-2
+              focus-within:ring-indigo-500/40
+              focus-within:border-indigo-500
+              relative"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                addCategoryRef.current
+                  ?.querySelector("[data-open-category]")
+                  ?.click();
+              }
+            }}
+          >
+            <AddCategory />
+          </div>
         </div>
       )}
     </div>
