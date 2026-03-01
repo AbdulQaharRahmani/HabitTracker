@@ -42,6 +42,16 @@ const frequencyItems = [
 
   const formRef = useRef(null);
 
+  const handleHabitDataSubmission = async (e) => {
+    e.preventDefault();
+
+    if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
+      toast.dismiss();
+      return toast.error("Title, Category, and Frequency are required");
+    }
+    await submitHabit(habitData, isEditingMode, currentHabitID);
+    fetchHabitsPage();
+  }
 
   useHotkeys(
     "ctrl+s, meta+s",
@@ -62,18 +72,10 @@ const frequencyItems = [
     { enabled: isModalOpen }
   );
 
-  const handleHabitDataSubmission = async (e) => {
-    e.preventDefault();
 
-    if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
-      return toast.error("Title, Category, and Frequency are required");
-    }
-    await submitHabit(habitData, isEditingMode, currentHabitID);
-    fetchHabitsPage();
-  }
 
-  const handleAddCategory = async (name, color) => {
-    await addUserCategory(name, color);
+  const handleAddCategory = async (name, color, icon) => {
+    await addUserCategory(name, color, icon);
     await fetchCategories();
   };
 
@@ -159,7 +161,7 @@ const frequencyItems = [
                     }
                     getValue={(value) => setHabitData("categoryId", value)}
                     onAdd={handleAddCategory}
-                    placeholder={t("Choose Category")}
+                    placeholder={t("choose an avaliable category or make a new one")}
                   />
                 </div>
 

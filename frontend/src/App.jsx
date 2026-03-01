@@ -18,11 +18,11 @@ import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Logs from "./pages/Logs";
 import { useEffect, useState } from "react";
-import api from "../services/api";
 import useAuthStore from "./store/useAuthStore";
 import { refreshToken } from "../services/authServices";
 import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
 import { useTranslation } from "react-i18next";
+import AdminRoute from "./components/AdminRoute";
 
 
 function App() {
@@ -37,14 +37,12 @@ function App() {
         useAuthStore.setState({ isAuthLoading: true })
         let token = await refreshToken()
         login(token, null)
-
       } catch (error) {
         console.log(error)
         logout()
       } finally {
         useAuthStore.setState({ isAuthLoading: false })
         setInitialLoading(false)
-
       }
     }
     getAccessToken()
@@ -93,7 +91,8 @@ function App() {
         <Route element={<AuthRedirectRoute/>}>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-        </Route>
+          </Route>
+
         <Route element={<ProtectedRoute />}>
         <Route
           element={
@@ -107,9 +106,13 @@ function App() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/logs" element={<Logs />} />
+
+          <Route element={<AdminRoute />}>
+            <Route path="/logs" element={<Logs />} />
+          </Route>
+
         </Route>
-        </Route>
+      </Route>
         <Route path="*" element={<>not found</>} />
       </Routes>
     </Router>

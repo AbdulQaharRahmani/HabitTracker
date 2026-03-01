@@ -126,13 +126,16 @@ const useHabitStore = create((set, get) => ({
     try {
       if (prevState) {
         await unCompleteHabit(id, { date })
+        toast.dismiss();
         toast.success(i18next.t("habit_incomplete"));
       } else {
         await completeHabit(id, { date })
+        toast.dismiss();
         toast.success(i18next.t("habit_completed"));
       }
     } catch (err) {
-      let errorMessage = err.response?.data?.message
+      let errorMessage = err.response?.data?.message;
+      toast.dismiss();
       toast.error(i18next.t(errorMessage)|| i18next.t("habit_update_failed"))
       set(state => ({
         habits: state.habits.map(h =>
@@ -156,23 +159,37 @@ const useHabitStore = create((set, get) => ({
       set({ categories: formatted });
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong";
+      toast.dismiss();
       toast.error(message);
       console.error("Failed to fetch categories", error);
     } finally {
       set({ loading: false });
     }
   },
-    addUserCategory: async (category, color) => {
-    const newCategoryData = {
-      name: category,
-      icon: "",
-      backgroundColor: color,
-    };
+  addUserCategory: async (newCategory, t) => {
     try {
-      await api.post("/categories", newCategoryData);
-      toast.success("Successfully Added the Category");
+      const res = await api.post("/categories", newCategory);
+
+      const categoryCreated = res.data.data;
+
+      const category = {
+        id: categoryCreated._id,
+        name: categoryCreated.name,
+        value: categoryCreated._id,
+        color: categoryCreated.backgroundColor || "#dbd6f9",
+      };
+
+      set((state) => ({
+        categories: [...state.categories, category],
+      }));
+
+      toast.dismiss();
+      toast.success(t("Successfully Added the Category"));
+
+      return category;
     } catch (error) {
       const message = error.response?.data?.error || "Something went wrong";
+      toast.dismiss();
       toast.error(message);
       console.log("Failed to add user category", error);
     }
@@ -197,9 +214,11 @@ const useHabitStore = create((set, get) => ({
     try {
       if (isEditingMode) {
         await api.put(`/habits/${currentHabitID}`, data);
+        toast.dismiss();
         toast.success(i18next.t("Habit Updated Successfully!"));
       } else {
         await api.post("/habits", data);
+        toast.dismiss();
         toast.success(i18next.t("Habit Added Successfully!"));
       }
       set({
@@ -213,8 +232,23 @@ const useHabitStore = create((set, get) => ({
       });
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong";
+      toast.dismiss();
       toast.error(message);
       console.log("Failed to add habit", error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  allhabits: [],
+  fetchHabits: async () => {
+    set({ loading: true, error: null });
+    try {
+      const response = await api.get("/habits");
+      const data = response.data;
+      set({ allhabits: Array.isArray(data) ? data : data.data || [] });
+    } catch (err) {
+      const message = err.response?.data?.message || "Failed to fetch habits";
+      set({ error: message });
     } finally {
       set({ loading: false });
     }
@@ -318,9 +352,10 @@ const useHabitStore = create((set, get) => ({
     set((state) => ({
       habits: state.habits.filter((h) => h._id !== id),
     }));
-
+    toast.dismiss();
     toast.success(t("habit deleted successfully!"));
   } catch (error) {
+    toast.dismiss();
     toast.error(t("Failed to delete habit!"));
     console.error(
       "Delete habit failed:",

@@ -2,7 +2,7 @@ import HabitCard from "./HabitCard";
 import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+
 
 export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
   const habits = useHabitStore((state)=> state.habits)
