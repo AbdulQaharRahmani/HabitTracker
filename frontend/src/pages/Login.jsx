@@ -22,14 +22,14 @@ export default function Login() {
         if (!email.trim() || !password.trim()) return toast.error("Please fill all fields!");
         setLoading(true);
         try {
-            const response = await api.post("/auth/login", { email, password })
-            const token = response.data.data.token
-            if(token){
-            login(token)
-            toast.success("Welcome again!");
-            navigate("/")
-            }
-
+        const response = await api.post("/auth/login", { email, password })
+        const { token, id } = response.data.data;
+        console.log(token,id);
+        if (token && id) {
+        login(token, id);
+        toast.success("Welcome again!");
+        navigate("/");
+       }
         } catch (error) {
             console.log(`Could not login ${error}`);
             const message = error.response?.data?.message || error.response?.data?.error || "Unknown Error";
