@@ -56,16 +56,27 @@ function App() {
     document.documentElement.lang = savedLanguage
     localStorage.setItem("language", currentLang)
   }, [i18n.language])
-  if(initialLoading){
+
+  useEffect(() => {
+  if (isRateLimited) {
+    const timer = setTimeout(() => {
+      useAuthStore.getState().setRateLimited(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }
+  }, [isRateLimited]);
+
     if (isRateLimited) {
-      return (
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
-          <p className="text-red-500 font-semibold text-lg">
-            Too many requests. Please wait some seconds...
-          </p>
-        </div>
-      );
-    }
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
+        <p className="text-red-500 font-semibold text-lg">
+          Too many requests. Please wait some seconds...
+        </p>
+      </div>
+    );
+  }
+  if(initialLoading){
     return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
       <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
@@ -75,8 +86,6 @@ function App() {
     </div>
   );
   }
-  
-
 
   return (
     <>
