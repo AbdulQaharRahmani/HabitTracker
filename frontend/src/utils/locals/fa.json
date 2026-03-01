@@ -241,7 +241,6 @@
   "Select your preferred Language": "زبان مورد نظر خود را انتخاب کنید",
   "Please Wait a Moment...": "لطفا چند لحظه صبر نمایید",
 
-  "Add Category": "اضافه کردن کتگوری",
   "Category Name is required!": "اسم کتگوری الزامی است!",
   "Icon Name is required!": "نماد الزامی است!",
   "Add New Category": "کتگوری جدید اضافه کنید",
@@ -271,12 +270,7 @@
   "Password updated. please log in again": "رمز عبور به روزرسانی شده. لطفا دوباره وارد شوید",
   "Password update failed": "بروزرسانی رمز عبور ناموفق بود",
   "Message": "پیام",
-  "Items Per Page": "تعداد نمایش در هر صفحه",
-  "Please agree to terms": "لطفاً با شرایط موافقت کنید",
-  "Passwords do not match": "رمزهای عبور با هم مطابقت ندارند",
   
-  "Successfully Added the Category": "کتگوری موفقانه اضافه شد",
-
   "displaying": "نمایش",
   "outOf": "از",
   "daily": "روزانه",
