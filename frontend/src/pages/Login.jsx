@@ -26,10 +26,11 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await api.post("/auth/login", { email, password });
-      const { token, id, username, email:userEmail } = response.data.data;
+      const { token, id, username, email:userEmail,role } = response.data.data;
       console.log(response.data.data);
       const userData = {
         userId: id,
+        role:role,
         username: username,
       };
       if (token && id) {
