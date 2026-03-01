@@ -18,8 +18,6 @@ function Tasks() {
     loading,
     error,
     isModalOpen,
-    isEditModalOpen,
-    fetchCategories,
     setModalOpen,
     setTaskData,
   } = useTaskCardStore((state) => state);
@@ -31,11 +29,8 @@ function Tasks() {
 
   useEffect(() => {
     fetchTasks(ITEMS_PER_PAGE, page);
-  }, [page, isModalOpen, isEditModalOpen, fetchTasks]);
+  }, [page, isModalOpen ]);
 
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
 
   const { t } = useTranslation();
   const { categories } = useTaskCardStore((state) => state);

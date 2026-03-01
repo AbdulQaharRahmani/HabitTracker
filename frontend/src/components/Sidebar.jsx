@@ -48,10 +48,9 @@ const Sidebar = ({ children }) => {
 
   const navigate = useNavigate();
 
-const [isLogoutOpen, setIsLogoutOpen] = useState(false);
-const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  console.log("role in sidebar",user.role)
 
   /* --- Profile photo --- */
   useEffect(() => {
@@ -84,12 +83,6 @@ const [isLoggingOut, setIsLoggingOut] = useState(false);
     setIsLogoutOpen(false);
   }
 };
-
-useEffect(()=>{
-  console.log('isRTl',isRtl);
-},[isRtl]);
-
-
 
    useHotkeys(
     "ctrl+b, meta+b",
