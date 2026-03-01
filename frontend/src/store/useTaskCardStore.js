@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { deleteTask, getTasks, updateTaskStatus } from "../../services/tasksService";
 import api from "../../services/api";
 import toast from "react-hot-toast";
-import { useTransition } from "react";
 
 export const useTaskCardStore = create((set, get) => ({
   tasks: [],
