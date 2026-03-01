@@ -8,9 +8,10 @@ import { HiPlus } from "react-icons/hi";
 import Dropdown from "../Dropdown";
 import toast from "react-hot-toast";
 import i18n from "../../utils/i18n";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export default function AddCategory() {
-    const { createCategory } = useTaskCardStore();
+    const { createCategory} = useTaskCardStore();
     const { t } = useTranslation();
     const isRTL = i18n.language === "fa";
 
@@ -66,9 +67,21 @@ export default function AddCategory() {
         setSelectedColor("#6366f1");
     }
 
+    useHotkeys(
+        "esc",
+        (e) => {
+            e.preventDefault();
+            handleCloseModal();
+        },
+        {
+            enabled: isOpen,
+        }
+    );
+
     return (
         <div>
             <div
+                data-open-category
                 onClick={() => setIsOpen(true)}
                 className="
                 flex flex-col items-center justify-center
