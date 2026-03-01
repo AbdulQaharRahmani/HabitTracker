@@ -142,14 +142,14 @@
   "Enter your Email": "آدرس ایمیل خود را وارد کنید",
   "Enter your Name": "اسم خود را وارد کنید",
   "or_continue_with": "یا ادامه دهید با",
-  "Confirm password":"تایید رمز عبور",
+  "Confirm password": "تایید رمز عبور",
   "I agree to the": "من موافقم به",
   "terms & policy": "شرایط خدمات ",
   "Sign in with Google": "ورود با حساب گوگل",
-  "Sign In":"ورود",
+  "Sign In": "ورود",
   "Sign in with Apple": "ورود با حساب اپل",
   "google": "گوگل",
-  "forgot password":"رمز را فراموش کردید",
+  "forgot password": "رمز را فراموش کردید",
   "apple": "اپل",
   "Welcome back": "خوش آمدید",
   "Have an account": "قبلاً حساب دارید؟",
@@ -276,5 +276,6 @@
   "biweekly": "دو هفته یک‌بار",
   "weekdays": "روزهای کاری",
   "weekends": "آخر هفته‌ها",
-  "weekly": "هفته وار"
+  "weekly": "هفته وار",
+  "Enter your name": "نام خود را وارد کنید"
 }

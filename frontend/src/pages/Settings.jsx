@@ -42,7 +42,7 @@ const Settings = () => {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const email = useAuthStore((state)=>state.email);
+  const email = useAuthStore((state) => state.email);
 
   useEffect(() => {
     fetchUserPreferences();
@@ -306,13 +306,13 @@ const Settings = () => {
                   }
                   className="px-4 py-2 text-sm transition-all border outline-none bg-slate-50 border-slate-200 rounded-lg min-w-[180px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
                 >
-                  <option value="saturday">Saturday</option>
-                  <option value="sunday">Sunday</option>
-                  <option value="monday">Monday</option>
-                  <option value="tuesday">Tuesday</option>
-                  <option value="wednesday">Wednesday</option>
-                  <option value="thursday">Thursday</option>
-                  <option value="friday">Friday</option>
+                  <option value="saturday">{t("Saturday")}</option>
+                  <option value="sunday">{t("Sunday")}</option>
+                  <option value="monday">{t("Monday")}</option>
+                  <option value="tuesday">{t("Tuesday")}</option>
+                  <option value="wednesday">{t("Wednesday")}</option>
+                  <option value="thursday">{t("Thursday")}</option>
+                  <option value="friday">{t("Friday")}</option>
                 </select>
               </div>
 
