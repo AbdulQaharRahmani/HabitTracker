@@ -4,6 +4,11 @@ const VALIDATION_ERROR = 'ValidationError';
 export const errorHandler = (err, req, res, next) => {
   console.warn(err);
 
+  res.locals.errorData = {
+    message: err.message,
+    stack: err.stack ? err.stack.split('\n').slice(0, 4).join('\n') : undefined,
+  };
+
   if (err.isOperational) {
     return res.status(err.status).json({
       code: err.code,

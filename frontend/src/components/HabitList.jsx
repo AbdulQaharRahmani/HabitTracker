@@ -1,29 +1,29 @@
-import { useEffect } from "react";
 import HabitCard from "./HabitCard";
 import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
+import { useTranslation } from "react-i18next";
 
 export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
-  const { habits, loading, error, totalCount, fetchHabitsPage } =
-    useHabitStore();
+  const habits = useHabitStore((state) => state.habits);
+  const loading = useHabitStore((state) => state.loading);
+  const error = useHabitStore((state) => state.error);
+  const totalCount = useHabitStore((state) => state.totalCount);
   const ITEMS_PER_PAGE = 10;
-
-  useEffect(() => {
-    fetchHabitsPage(currentPage, ITEMS_PER_PAGE);
-  }, [currentPage]);
-
+  const { t } = useTranslation();
   if (loading && habits.length === 0) {
     return (
-      <p className="text-gray-400 dark:text-gray-500 text-lg font-semibold my-4 text-center">
-        Loading Habits ...
-      </p>
+      <div className="animate-pulse space-y-4 mt-6">
+        <div className="h-24 bg-gray-200 rounded-lg"></div>
+        <div className="h-24 bg-gray-200 rounded-lg"></div>
+        <div className="h-24 bg-gray-200 rounded-lg"></div>
+      </div>
     );
   }
 
   if (error) {
     return (
       <p className="text-rose-400 dark:text-rose-500 text-lg font-semibold text-center my-4">
-        Error: {error}
+        {t("Error")}: {error}
       </p>
     );
   }
@@ -39,7 +39,7 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
       >
         {habits.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400 text-lg">
-            No habits found.
+            {t("No habits found.")}
           </p>
         ) : (
           habits.map((habit) => (
@@ -49,9 +49,8 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
               viewMode={viewMode}
               title={habit.title}
               description={habit.description}
-              categoryId={habit.categoryId || habit.category}
+              categoryId={habit.categoryId}
               frequency={habit.frequency}
-              duration={habit.duration}
             />
           ))
         )}

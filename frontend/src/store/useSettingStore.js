@@ -15,10 +15,12 @@ const useSettingStore = create((set) => ({
 
       useAuthStore.getState().updateUserName(newUsername);
 
+      toast.dismiss();
       toast.success("Username updated successfully");
       return true;
     } catch (err) {
       console.log(err)
+      toast.dismiss();
       toast.error(err.response?.data?.message || "Could not update username");
       return false;
     }
@@ -31,11 +33,13 @@ const useSettingStore = create((set) => ({
         newPassword: newPassword.trim(),
       });
 
+      toast.dismiss();
       toast.success(i18n.t("Password updated. please log in again"));
       useAuthStore.getState().logout();
 
       return true;
     } catch (err) {
+      toast.dismiss();
       toast.error(
         err.response?.data?.message || i18n.t("Password update failed"),
       );

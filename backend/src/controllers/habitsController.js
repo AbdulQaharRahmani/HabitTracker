@@ -30,7 +30,11 @@ export const getHabits = async (req, res) => {
 
   const totalPages = Math.ceil(habitsTotal / limit);
 
-  const habits = await HabitModel.findByUserAndSortByOrder(skip, limit, query);
+  const habits = await HabitModel.findByUserAndSortByCreationTime(
+    skip,
+    limit,
+    query
+  );
 
   res.status(200).json({
     success: true,

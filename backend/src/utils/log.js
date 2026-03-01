@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import dayjs from 'dayjs';
+import { SENSITIVE_KEYS } from './constant.js';
 
 const logsDir = path.join(process.cwd(), 'logs');
 
@@ -61,3 +62,53 @@ export const getTop = (items, key, limit = 5) => {
     .sort((a, b) => b.count - a.count)
     .slice(0, limit);
 };
+
+//  replaces secrets fields (passwords, tokens,...) with [REDACTED] value, for logs security
+// Handle Large nested data that prevent from crashing the app and better performance
+
+export function sanitizeSensitiveData(data, maxDepth = 6, maxItems = 50) {
+  const seen = new WeakSet(); // WeakSet is like Set but better for memory
+
+  function clean(value, depth = 0) {
+    if (value === null || typeof value !== 'object') return value;
+    if (depth >= maxDepth) return '[TRUNCATED_DEPTH]';
+    if (seen.has(value)) return '[CIRCULAR]';
+
+    seen.add(value);
+
+    if (Array.isArray(value)) {
+      const result = [];
+
+      for (let i = 0; i < Math.min(value.length, maxItems); i++) {
+        result.push(clean(value[i], depth + 1));
+      }
+
+      if (value.length > maxItems) {
+        result.push(`[TRUNCATED_ITEMS:${value.length - maxItems}]`);
+      }
+
+      return result;
+    }
+
+    const result = {};
+    const keys = Object.keys(value);
+
+    for (let i = 0; i < Math.min(keys.length, maxItems); i++) {
+      const key = keys[i];
+
+      if (SENSITIVE_KEYS.has(key)) {
+        result[key] = '[REDACTED]';
+      } else {
+        result[key] = clean(value[key], depth + 1);
+      }
+    }
+
+    if (keys.length > maxItems) {
+      result.__truncatedKeys = keys.length - maxItems;
+    }
+
+    return result;
+  }
+
+  return clean(data);
+}

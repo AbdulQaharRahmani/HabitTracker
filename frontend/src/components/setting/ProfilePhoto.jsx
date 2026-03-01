@@ -32,6 +32,7 @@ function ProfilePhoto() {
     if (!file || !userId) return;
 
     if (!file.type.startsWith("image/")) {
+      toast.dismiss();
       toast.error(t("image_invalid_file"));
       return;
     }
@@ -41,9 +42,10 @@ function ProfilePhoto() {
 
     try{
       await uploadProfilePhoto(file, userId);
+      toast.dismiss();
       toast.success(t("profile_photo_updated"));
     }catch(error){
-      console.log(error);
+      toast.dismiss();
       toast.error(t("profile_photo_update_failed"));
     }finally{
       setPreview(null);
