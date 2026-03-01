@@ -24,13 +24,14 @@ import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
 import { useTranslation } from "react-i18next";
 import AdminRoute from "./components/AdminRoute";
 
-
 function App() {
   const {t} = useTranslation()
-    const { i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const[initialLoading, setInitialLoading] = useState(true)
   const login = useAuthStore((state) => state.login)
   const logout = useAuthStore((state) => state.logout)
+  const isRateLimited = useAuthStore((state) => state.isRateLimited);
+
   useEffect(() => {
     const getAccessToken = async () => {
       try {
@@ -56,6 +57,15 @@ function App() {
     localStorage.setItem("language", currentLang)
   }, [i18n.language])
   if(initialLoading){
+    if (isRateLimited) {
+      return (
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
+          <p className="text-red-500 font-semibold text-lg">
+            Too many requests. Please wait some seconds...
+          </p>
+        </div>
+      );
+    }
     return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
       <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
@@ -65,6 +75,9 @@ function App() {
     </div>
   );
   }
+  
+
+
   return (
     <>
       <Toaster

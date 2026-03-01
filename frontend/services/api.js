@@ -47,9 +47,21 @@ api.interceptors.response.use(
       }
 
     }
-    return Promise.reject(error)
+    if (error?.response?.status === 429) {
+      const { setRateLimited } = useAuthStore.getState();
 
+      setRateLimited(true);
+
+      setTimeout(() => {
+        setRateLimited(false);
+        window.location.href = "/";
+      }, 5000);
+
+    return new Promise(() => {});    
   }
+    return Promise.reject(error)
+  }
+  
 
 )
 
