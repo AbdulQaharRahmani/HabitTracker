@@ -1,46 +1,48 @@
 import { useState } from "react";
-import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa";
-import { MdEmail, MdLock } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import toast from "react-hot-toast";
 import useAuthStore from "../store/useAuthStore";
 
+import { FaApple } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { useTranslation } from "react-i18next";
+
 export default function Login() {
-  const [passwordType, setPasswordType] = useState("password");
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const handlePasswordVisibility = () => {
-    setPasswordType((prev) => (prev === "password" ? "text" : "password"));
-  };
-  const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()){
+    if (!email.trim() || !password.trim()) {
       toast.dismiss();
-      return toast.error("Please fill all fields!");
+      return toast.error(t("Please fill all fields!"));
     }
+
     setLoading(true);
     try {
       const response = await api.post("/auth/login", { email, password });
-      const { token, id, username, email:userEmail,role } = response.data.data;
-      console.log(response.data.data);
+      const { token, id, username, email: userEmail, role } = response.data.data;
+
       const userData = {
         userId: id,
-        role:role,
+        role: role,
         username: username,
       };
+
       if (token && id) {
         login(token, userData, userEmail);
         toast.dismiss();
-        toast.success("Welcome again!");
+        toast.success(t("Welcome again!"));
         navigate("/");
       }
     } catch (error) {
-      console.log(`Could not login ${error}`);
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||
@@ -53,90 +55,102 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#F0F8FF] dark:bg-gray-950 transition-colors duration-300">
-      <div
-        className="bg-white dark:bg-gray-900 p-10 rounded-[2rem] w-full max-w-md
-        shadow-[0_20px_50px_rgba(123,104,238,0.2),_0_-10px_30px_rgba(0,212,170,0.1)]
-        dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
-        hover:shadow-[0_30px_60px_rgba(123,104,238,0.3),_0_-10px_30px_rgba(0,212,170,0.15)]
-        transition-all border border-transparent dark:border-gray-800"
-      >
-        {/* Header */}
-        <div className="flex flex-col items-center mb-10">
-          <div className="p-5 rounded-2xl mb-4 rotate-3 animate-bounce bg-[#7B68EE]">
-            <FaUser className="text-white text-4xl" />
-          </div>
-          <h1 className="text-3xl font-black uppercase text-gray-800 dark:text-white">
-            Login
-          </h1>
-        </div>
+    <div className="flex w-full min-h-screen bg-white">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 md:px-24 py-8">
+        <div className="max-w-md w-full mx-auto">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t("Log in")}</h1>
+          <p className="text-gray-600 font-semibold text-lg mb-1">{t("Welcome back")}</p>
+          <p className="text-gray-400 text-sm mb-8">{t("Enter your Credentials to access your account")}</p>
 
-        {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-6">
-          <fieldset disabled={loading} className="space-y-5">
-            {/* Email */}
-            <div className="relative">
-              <MdEmail className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-[#7B68EE]" />
+          <form className="flex flex-col gap-4" onSubmit={handleLogin}>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-bold text-gray-700">{t("Email Address")}</label>
               <input
                 type="email"
-                required
-                placeholder="Your Email"
+                disabled={loading}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl font-medium outline-none
-                  bg-gray-50 dark:bg-gray-800/50
-                  text-gray-800 dark:text-gray-100
-                  placeholder-gray-400 dark:placeholder-gray-500
-                  border-2 border-transparent
-                  focus:bg-white dark:focus:bg-gray-800
-                  focus:border-[#7B68EE]
-                  shadow-inner transition-all"
+                placeholder={t("Enter your Email")}
+                className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
-            {/* Password */}
-            <div className="relative">
-              <MdLock className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-[#7B68EE]" />
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-bold text-gray-700">{t("Password")}</label>
+                <Link to="/login" size="sm" className="text-[10px] font-bold text-blue-600 hover:underline uppercase">
+                  {t("forgot password")}
+                </Link>
+              </div>
               <input
-                type={passwordType}
-                required
-                placeholder="Your Password"
+                type="password"
+                disabled={loading}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-12 pr-12 py-4 rounded-2xl font-medium outline-none
-                  bg-gray-50 dark:bg-gray-800/50
-                  text-gray-800 dark:text-gray-100
-                  placeholder-gray-400 dark:placeholder-gray-500
-                  border-2 border-transparent
-                  focus:bg-white dark:focus:bg-gray-800
-                  focus:border-[#7B68EE]
-                  shadow-inner transition-all"
+                placeholder={t("Password")}
+                className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
-              <button
-                type="button"
-                onClick={handlePasswordVisibility}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#7B68EE] dark:text-gray-500 dark:hover:text-[#7B68EE]"
-              >
-                {passwordType === "password" ? (
-                  <FaEyeSlash size={22} />
-                ) : (
-                  <FaEye size={22} />
-                )}
-              </button>
             </div>
 
-            {/* Submit */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 accent-orange-500 cursor-pointer"
+              />
+              <label htmlFor="remember" className="text-xs text-gray-900 font-bold cursor-pointer">
+                {t("Remember for 30 days")}
+              </label>
+            </div>
+
             <button
               type="submit"
-              className="w-full py-4 rounded-2xl font-black uppercase
-                text-white transition-all transform active:scale-[0.98]
-                bg-[#7B68EE] hover:bg-[#6a56e0]
-                disabled:bg-gray-400 dark:disabled:bg-gray-700"
+              disabled={loading}
+              className={`w-full py-2 rounded-lg text-white font-bold transition-all mt-1 ${
+                loading ? "bg-orange-300" : "bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-md shadow-orange-100"
+              }`}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? t("Processing...") : t("Sign In")}
             </button>
-          </fieldset>
-        </form>
+
+            <div className="relative flex items-center justify-center my-2">
+              <div className="flex-grow border-t border-gray-200"></div>
+              <span className="flex-shrink mx-4 text-gray-400 text-[10px] font-bold uppercase">{t("Or")}</span>
+              <div className="flex-grow border-t border-gray-200"></div>
+            </div>
+
+            <div className="flex gap-4">
+              <button type="button" className="flex-1 flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg text-xs font-semibold hover:bg-gray-50 transition">
+                <FcGoogle size={18} /> {t("Sign in with Google")}
+              </button>
+              <button type="button" className="flex-1 flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg text-xs font-semibold hover:bg-gray-50 transition">
+                <FaApple size={18} /> {t("Sign in with Apple")}
+              </button>
+            </div>
+          </form>
+
+          {/* Footer Link */}
+          <div className="mt-6 text-center text-sm font-medium">
+            <span className="text-gray-900 font-bold">{t("Don't have an account")} </span>
+            <Link to="/signup" className="text-blue-600 font-bold hover:underline">
+              {t("Sign Up")}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden lg:block w-1/2 p-4">
+        <div
+          className="w-full h-full rounded-[2.5rem] bg-cover bg-center overflow-hidden flex items-end justify-center"
+          style={{
+            backgroundImage: `url('/signup-login.jpg')`,
+            backgroundColor: '#f3f4f6'
+          }}
+        >
+          <div className="bg-black/10 w-full h-full"></div>
+        </div>
       </div>
     </div>
   );
