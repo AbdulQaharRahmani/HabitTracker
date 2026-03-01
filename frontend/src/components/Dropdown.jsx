@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { HiChevronDown, HiCheck } from "react-icons/hi";
 import useClickOutside from "../hooks/useClickOutside";
+import { useTranslation } from "react-i18next";
 
-export default function Dropdown({ items, value, getValue,displayValue, placeholder }) {
+export default function Dropdown({
+  items,
+  value,
+  getValue,
+  displayValue,
+  placeholder,
+}) {
+  const { t } = useTranslation();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const handleDropdownVisibility = () => setDropdownOpen(!isDropdownOpen);
@@ -22,7 +30,7 @@ export default function Dropdown({ items, value, getValue,displayValue, placehol
           type="text"
           placeholder={placeholder}
           readOnly
-          value={displayValue || value}
+          value={displayValue || t(value) || null}
           onClick={handleDropdownVisibility}
           className="
             w-full cursor-pointer rounded-xl border
@@ -69,6 +77,7 @@ export default function Dropdown({ items, value, getValue,displayValue, placehol
                 hover:text-[#7B68EE] dark:hover:text-[#7B68EE]
               "
             >
+              {item.icon && <item.icon size={18} />}
               <span className="font-medium ps-4">{item.name}</span>
               <HiCheck
                 size={18}

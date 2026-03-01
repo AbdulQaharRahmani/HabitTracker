@@ -3,8 +3,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useEffect, useState } from "react";
 import { NavLink,useNavigate } from "react-router-dom";
 import ConfirmationModal from "./modals/ConfirmationModal";
-
-
 import {
   FaCalendarDay,
   FaChartLine,
@@ -18,7 +16,6 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import useSidebarStore from "../store/useSidebarStore";
 import { useProfilePhotoStore } from "../store/useProfilePhotoStore";
 import useAuthStore from "../store/useAuthStore";
-import { useTaskCardStore } from "../store/useTaskCardStore";
 
 const dashboardItems = [
   { id: "today", name: "Today", icon: <FaCalendarDay />, path: "/" },
@@ -47,21 +44,20 @@ const Sidebar = ({ children }) => {
     toggleSidebar,
     closeSidebar,
     setScreenMode,
-    isMobileOpen
   } = useSidebarStore();
 
   const navigate = useNavigate();
 
-const [isLogoutOpen, setIsLogoutOpen] = useState(false);
-const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const { isModalOpen, isEditModalOpen} = useTaskCardStore()
 
   /* --- Profile photo --- */
   useEffect(() => {
     if (!user?.userId) return;
     fetchProfilePhoto(user?.userId);
   }, [user?.userId, fetchProfilePhoto]);
+
 
   /* --- Screen resize sync --- */
   useEffect(() => {
@@ -87,11 +83,6 @@ const [isLoggingOut, setIsLoggingOut] = useState(false);
     setIsLogoutOpen(false);
   }
 };
-
-useEffect(()=>{
-  console.log(isRtl);
-},[isRtl]);
-
 
    useHotkeys(
     "ctrl+b, meta+b",
@@ -126,10 +117,11 @@ useEffect(()=>{
       {/* --- Sidebar ---*/}
       <aside
         className={`
-          fixed top-0 left-0 md:relative h-screen z-40
+          fixed top-0 md:relative ${isRtl ? "right-0" : "left-0"
+          }  h-screen z-40
           bg-white dark:bg-gray-900
           transition-all duration-300 ease-in-out position-relative
-          ${screenMode === "mobile" && !isOpen ? "-translate-x-full" : "translate-x-0"}
+          ${screenMode === "mobile" && !isOpen ? (isRtl ? "translate-x-full" : "-translate-x-full") : "translate-x-0"}
           ${screenMode === "desktop" ? "pt-10" : ""}
 
           ${isOpen ? "md:w-64 w-64" : "md:w-20 w-64"}
@@ -182,14 +174,19 @@ useEffect(()=>{
               {isOpen && (t("DASHBOARD"))}
             </h4>
 
-              <ul className="space-y-1">
-                {dashboardItems.map((item) => (
-                  <li key={item.id}>
+            <ul className="space-y-1">
+              {dashboardItems
+                .filter((item) => {
+                  if (item.id === "logs" && user?.role !== "admin") {
+                    return false;
+                  }
+                  return true;
+                }).map((item) => (
+              <li key={item.id}>
                     <NavLink
                       to={item.path}
                       end={item.path === "/"}
                       onClick={() =>{
-
                         screenMode === "mobile" && closeSidebar();
                       }}
                       className={({ isActive }) =>
@@ -206,10 +203,9 @@ useEffect(()=>{
 
                        )}
                     </NavLink>
-                  </li>
-                ))}
-              </ul>
-
+              </li>
+            ))}
+          </ul>
               <h4 className="text-xs font-semibold uppercase tracking-wider mt-6 mb-3 px-3 text-gray-500">
                  {isOpen && (t("Preferences"))}
               </h4>

@@ -2,13 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/auth.api";
 
-import { CiUser } from "react-icons/ci";
-import { AiOutlineMail } from "react-icons/ai";
-import { SlLock } from "react-icons/sl";
-import { FaEye, FaRegEyeSlash, FaApple } from "react-icons/fa";
+import { FaApple } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import useAuthStore from "../store/useAuthStore";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -16,20 +14,18 @@ function SignUp() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(null);
 
-  const [showPass, setShowPass] = useState(false);
   const [checked, setChecked] = useState(false);
-
   const [loading, setLoading] = useState(false);
-
   const [errors, setErrors] = useState({});
 
   const { t } = useTranslation();
   const { login } = useAuthStore();
+
   const signupUserHandler = async (e) => {
     e.preventDefault();
-
     if (loading) return;
     setMessage(null);
     if (!formValidation()) return;
@@ -43,7 +39,7 @@ function SignUp() {
 
       setMessage({ text: res.message, type: "success" });
       if (res.token) {
-        login(token);
+        login(res.token);
       }
       resetHandler();
       setTimeout(() => navigate("/"), 500);
@@ -60,29 +56,26 @@ function SignUp() {
   const formValidation = () => {
     let tempErrors = {};
     let isValid = true;
-    const usernameTrmd = username.trim();
-    const emailTrmd = email.trim();
-    const passwordTrmd = password.trim();
-    if (!usernameTrmd) {
-      tempErrors.username = "Full Name is required";
+    if (!username.trim()) {
+      tempErrors.username = "Name is required";
       isValid = false;
     }
-    if (!emailTrmd) {
-      tempErrors.email = "Email is required";
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(emailTrmd)) {
-      tempErrors.email = "Email is invalid";
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      tempErrors.email = "Valid email is required";
       isValid = false;
     }
-    if (!passwordTrmd) {
-      tempErrors.password = "Password is required";
-      isValid = false;
-    } else if (passwordTrmd.length < 6) {
+    if (password.length < 6) {
       tempErrors.password = "Password must be at least 6 characters";
       isValid = false;
     }
+    if (password !== confirmPassword) {
+      tempErrors.confirmPassword = "Passwords do not match";
+      toast.error(t("Passwords do not match"));
+      isValid = false;
+    }
     if (!checked) {
-      tempErrors.terms = "You must accept terms";
+      tempErrors.terms = "Please agree to terms";
+      toast.error(t("Please agree to terms"));
       isValid = false;
     }
     setErrors(tempErrors);
@@ -93,238 +86,128 @@ function SignUp() {
     setUsername("");
     setEmail("");
     setPassword("");
+    setConfirmPassword("");
     setChecked(false);
     setErrors({});
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen overflow-hidden bg-zinc-100 p-2 sm:p-3">
-      <div className="flex flex-col items-center justify-center text-center mb-4">
-        {message?.text && (
-          <p
-            className={`mb-4 py-2 rounded-md w-full  px-14 ${
-              message.type === "success"
-                ? "bg-green-100 text-green-500"
-                : " text-red-500"
-            }   `}
-          >
-            {message.text}
-          </p>
-        )}
-        <h1 className="text-xl font-bold">{t("create_account")}</h1>
-        <p className="text-xs sm:text-sm text-gray-500 max-w-xs">
-          {t("your_journey")}
-        </p>
-      </div>
+    <div className="flex w-full min-h-screen bg-white">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 md:px-24 py-8">
+        <div className="max-w-md w-full mx-auto">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t("Sign Up")}</h1>
+          <p className="text-gray-600 font-semibold text-lg mb-4">{t("Get Started Now")}</p>
 
-      <form
-        className="flex flex-col w-full max-w-[400px] gap-1 rounded-2xl border bg-white py-5 px-6 shadow-lg"
-        onSubmit={signupUserHandler}
-      >
-        <div className="w-full">
-          <label
-            htmlFor="full-name"
-            className="text-xs sm:text-sm font-medium text-gray-900"
-          >
-            {t("full_name")}
-          </label>
+          {message?.text && (
+            <div className={`mb-4 p-3 rounded text-sm ${message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+              {message.text}
+            </div>
+          )}
 
-          <div
-            className={` flex w-full items-center rounded-xl border bg-zinc-100/50 px-2 focus-within:border-indigo-500  transition ${
-              errors.username ? "border-red-500" : "border-gray-200"
-            }`}
-          >
-            <CiUser
-              className={`${
-                errors.username ? "text-red-500" : "text-gray-800"
-              }`}
-              size={15}
-            />
-            <input
-              id="full-name"
-              type="text"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                setErrors((prev) => ({ ...prev, username: "" }));
-              }}
-              placeholder={t("john_doe")}
-              className="w-full bg-transparent px-2 py-2 text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
-            />
-          </div>
+          <form className="flex flex-col gap-4" onSubmit={signupUserHandler}>
+            {/* Name */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-bold text-gray-700">{t("Full Name")}</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder={t("Enter your Name")}
+                className={`w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 ${errors.username ? "border-red-500" : "border-gray-300"}`}
+              />
+            </div>
 
-          <span
-            className={`block min-h-[10px] ml-2 text-[10px] font-medium transition-opacity duration-200 ${
-              errors.username ? "text-red-500 opacity-100" : "opacity-0"
-            }`}
-          >
-            {errors.username || " "}
-          </span>
-        </div>
-        <div className="w-full">
-          <label
-            htmlFor="email"
-            className="text-xs sm:text-sm font-medium text-gray-900 mt-2"
-          >
-            {t("email_address")}
-          </label>
-          <div
-            className={`flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 focus-within:border-indigo-500  ${
-              errors.email ? "border-red-500" : "border-gray-200"
-            }`}
-          >
-            <AiOutlineMail
-              className={`${errors.email ? "text-red-500" : "text-gray-800"}`}
-              size={15}
-            />
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setErrors((prev) => ({ ...prev, email: "" }));
-              }}
-              placeholder={t("hello_example")}
-              className="w-full bg-transparent px-2 py-2 text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
-            />
-          </div>
-          <span
-            className={`block min-h-[10px] ml-2 text-[10px] font-medium transition-opacity duration-200 ${
-              errors.email ? "text-red-500 opacity-100" : "opacity-0"
-            }`}
-          >
-            {errors.email || " "}
-          </span>
-        </div>
+            {/* Email */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-bold text-gray-700">{t("Email Address")}</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("Enter your Email")}
+                className={`w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 ${errors.email ? "border-red-500" : "border-gray-300"}`}
+              />
+            </div>
 
-        <div className="w-full">
-          <label
-            htmlFor="password"
-            className="text-xs sm:text-sm font-medium text-gray-900 mt-2"
-          >
-            {t("password")}
-          </label>
-          <div
-            className={`flex items-center w-full bg-zinc-100/50 border  rounded-xl px-2 focus-within:border-indigo-500 ${
-              errors.password ? "border-red-500" : "border-gray-200"
-            }`}
-          >
-            <SlLock
-              className={`${
-                errors.password ? "text-red-500" : "text-gray-800"
-              }`}
-              size={15}
-            />
-            <input
-              id="password"
-              type={showPass ? "text" : "password"}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setErrors((prev) => ({ ...prev, password: "" }));
-              }}
-              placeholder="••••••••"
-              className="w-full bg-transparent px-2 py-2 text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
-            />
-            <button type="button" onClick={() => setShowPass(!showPass)}>
-              {showPass ? (
-                <FaEye className="text-gray-500" size={13} />
-              ) : (
-                <FaRegEyeSlash className="text-gray-500" size={13} />
-              )}
-            </button>
-          </div>
-          <span
-            className={`block min-h-[10px] ml-2 text-[10px] font-medium transition-opacity duration-200 ${
-              errors.password ? "text-red-500 opacity-100" : "opacity-0"
-            }`}
-          >
-            {errors.password || " "}
-          </span>
-        </div>
+            {/* Password */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-bold text-gray-700">{t("Password")}</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t("Password")}
+                className={`w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 ${errors.password ? "border-red-500" : "border-gray-300"}`}
+              />
+            </div>
 
-        <div className="w-full flex flex-col items-start">
-          <label className="flex items-center cursor-pointer">
-            <div className="relative">
+            {/* Confirm Password */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-bold text-gray-700">{t("Confirm password")}</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder={t("Confirm password")}
+                className={`w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 ${errors.confirmPassword ? "border-red-500" : "border-gray-300"}`}
+              />
+            </div>
+
+            {/* Terms */}
+            <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={checked}
-                onChange={(e) => {
-                  setChecked(e.target.checked);
-                  setErrors((prev) => ({ ...prev, terms: "" }));
-                }}
-                className="sr-only"
+                onChange={(e) => setChecked(e.target.checked)}
+                className="w-4 h-4 accent-orange-500 cursor-pointer"
               />
-
-              <div
-                className={`w-3.5 h-3.5 border-[1.5px] ${
-                  checked ? "border-indigo-700" : "border-gray-400"
-                } rounded-full flex items-center justify-center transition-all`}
-              >
-                {checked && (
-                  <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full transition-all"></span>
-                )}
-              </div>
+              <span className="text-xs text-gray-700 font-medium">
+                {t("I agree to the")} <span className="underline cursor-pointer">{t("terms & policy")}</span>
+              </span>
             </div>
-            <span className="ml-2 text-xs sm:text-sm text-gray-500 font-medium hover:text-indigo-500">
-              {t("terms_agreement")}{" "}
-              <span className="text-indigo-500">{t("terms_of_service")}</span>{" "}
-              {t("and")} {"  "}
-              <span className="text-indigo-500">{t("privacy_policy")}</span>
-            </span>
-          </label>
-          <span
-            className={`block  ml-5 text-[10px] font-medium transition-opacity duration-200 ${
-              errors.terms ? "text-red-500 opacity-100" : "opacity-0"
-            }`}
-          >
-            {errors.terms || " "}
-          </span>
-        </div>
 
-        <button
-          className={`w-full mt-4 rounded-xl  py-2 text-xs sm:text-sm text-white font-medium
-            ${
-              loading
-                ? "bg-indigo-400 cursor-not-allowed"
-                : "bg-indigo-500 hover:bg-indigo-700"
-            }
-          `}
-          type="submit"
-          disabled={loading}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-2 rounded-lg text-white font-bold transition-all mt-1 ${
+                loading ? "bg-orange-300" : "bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700"
+              }`}
+            >
+              {loading ? "Processing..." : t("Sign Up")}
+            </button>
+
+            <div className="relative flex items-center justify-center my-2">
+              <div className="flex-grow border-t border-gray-200"></div>
+              <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase">{t("OR")}</span>
+              <div className="flex-grow border-t border-gray-200"></div>
+            </div>
+
+            <div className="flex gap-4">
+              <button type="button" className="flex-1 flex items-center justify-center gap-2 border border-gray-300 py-1 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
+                <FcGoogle size={18} /> {t("Sign in with Google")}
+              </button>
+              <button type="button" className="flex-1 flex items-center justify-center gap-2 border border-gray-300 py-1 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
+                <FaApple size={18} /> {t("Sign in with Apple")}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-8 text-center text-sm font-medium">
+            <span className="text-gray-900">{t("Have an account")}? </span>
+            <Link to="/login" className="text-orange-600 hover:underline">
+              {t("Sign In")}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden lg:block w-1/2 p-4">
+        <div
+          className="w-full h-full rounded-3xl bg-cover bg-center overflow-hidden flex items-end justify-center"
+          style={{ backgroundImage: `url('/signup-login.jpg')`, backgroundColor: '#f3f4f6' }}
         >
-          {loading ? "Creating account..." : t("sign_up")}
-        </button>
-
-        <div className="w-full flex items-center gap-2 mt-2 text-xs sm:text-sm  my-1">
-          <div className="h-px flex-1 bg-gray-200"></div>
-          <span className="text-gray-500 whitespace-nowrap">
-            {t("or_continue_with")}
-          </span>
-          <div className="h-px flex-1 bg-gray-200"></div>
+          <div className="bg-black/20 w-full h-full"></div>
         </div>
-
-        <div className="w-full flex gap-2">
-          <button className="text-xs sm:text-sm flex-1 flex items-center justify-center gap-1 rounded-xl border py-2  font-semibold hover:bg-indigo-500 hover:text-white">
-            <FcGoogle size={15} /> {t("google")}
-          </button>
-          <button className="text-xs sm:text-sm flex-1 flex items-center justify-center gap-1 rounded-xl border py-2  font-semibold hover:bg-indigo-500 hover:text-white">
-            <FaApple size={15} /> {t("apple")}
-          </button>
-        </div>
-      </form>
-
-      <div className="flex gap-1 items-center justify-center mt-3 text-xs sm:text-sm">
-        <p className=" text-gray-500 font-medium">
-          {t("already_have_account")}
-        </p>
-        <Link
-          to="/login"
-          className="text-indigo-700 font-medium hover:underline"
-        >
-          {t("log_in")}
-        </Link>
       </div>
     </div>
   );

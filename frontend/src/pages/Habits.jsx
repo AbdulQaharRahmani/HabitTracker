@@ -15,22 +15,17 @@ export default function Habits() {
   // NEW: Add page state
   const [currentPage, setCurrentPage] = useState(1);
 
-  const {
-    searchTerm,
-    setSearchTerm,
-    fetchHabitsPage,
-    fetchHabitsByDate,
-    selectedDate,
-    isModalOpen,
-    setModalOpen,
-  } = useHabitStore();
+  const searchTerm = useHabitStore((state)=> state.searchTerm)
+  const setSearchTerm = useHabitStore((state)=> state.setSearchTerm)
+  const fetchHabitsPage = useHabitStore((state)=> state.fetchHabitsPage)
+  const isModalOpen = useHabitStore((state)=> state.isModalOpen)
+  const setModalOpen = useHabitStore((state)=> state.setModalOpen)
 
   const debounceRef = useRef(null);
-
-  useEffect(() => {
-    fetchHabitsByDate(selectedDate);
-  }, [selectedDate]);
   const ITEMS_PER_PAGE = 10;
+  useEffect(() => {
+    fetchHabitsPage(currentPage, ITEMS_PER_PAGE);
+  }, []);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;

@@ -1,15 +1,16 @@
+
 import { FaTimes } from "react-icons/fa";
 import Dropdown from "../Dropdown";
 import { useTranslation } from "react-i18next";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 export default function TaskModal({
   modalTitle,
   modalFunctionality,
   open,
   close,
-}) {
+},ref) {
   const { t } = useTranslation();
   const { taskData, setTaskData } = useTaskCardStore();
 
@@ -53,6 +54,7 @@ export default function TaskModal({
                 id="title"
                 placeholder={t("Enter task title")}
                 value={taskData.title}
+                ref={ref}
                 onChange={(e) => setTaskData("title", e.target.value)}
                 className="border-2 rounded-md p-2 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-[#7B68EE] outline-none transition-all"
               />

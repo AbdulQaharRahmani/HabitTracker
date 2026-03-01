@@ -35,7 +35,6 @@ function CustomDatePicker() {
     <DatePicker
       selected={selectedDate}
       onChange={handleDateChange}
-      maxDate={new Date()}
       inline
       calendarClassName="custom-calendar"
       renderCustomHeader={CustomHeader}
