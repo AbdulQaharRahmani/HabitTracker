@@ -5,34 +5,32 @@ import { FaTimes } from "react-icons/fa";
 import SearchableDropdown from "./SearchableDropdown";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { useHotkeys } from "react-hotkeys-hook"
-
+import { useHotkeys } from "react-hotkeys-hook";
 
 export default function HabitModal() {
+  const isModalOpen = useHabitStore((state) => state.isModalOpen);
+  const habitData = useHabitStore((state) => state.habitData);
+  const isEditingMode = useHabitStore((state) => state.isEditingMode);
+  const loading = useHabitStore((state) => state.loading);
+  const categories = useHabitStore((state) => state.categories);
+  const currentHabitID = useHabitStore((state) => state.currentHabitID);
 
-const isModalOpen = useHabitStore((state) => state.isModalOpen);
-const habitData = useHabitStore((state) => state.habitData);
-const isEditingMode = useHabitStore((state) => state.isEditingMode);
-const loading = useHabitStore((state) => state.loading);
-const categories = useHabitStore((state) => state.categories);
-const currentHabitID = useHabitStore((state)=> state.currentHabitID)
-
-const setModalOpen = useHabitStore((state) => state.setModalOpen);
-const setHabitData = useHabitStore((state) => state.setHabitData);
-const fetchCategories = useHabitStore((state) => state.fetchCategories);
-const addUserCategory = useHabitStore((state) => state.addUserCategory);
-const submitHabit = useHabitStore((state) => state.submitHabit);
-const fetchHabitsPage  = useHabitStore((state)=> state.fetchHabitsPage)
+  const setModalOpen = useHabitStore((state) => state.setModalOpen);
+  const setHabitData = useHabitStore((state) => state.setHabitData);
+  const fetchCategories = useHabitStore((state) => state.fetchCategories);
+  const addUserCategory = useHabitStore((state) => state.addUserCategory);
+  const submitHabit = useHabitStore((state) => state.submitHabit);
+  const fetchHabitsPage = useHabitStore((state) => state.fetchHabitsPage);
 
   const { t } = useTranslation();
-const frequencyItems = [
-  { id: "f1", name: t("daily"), value: "daily" },
-  { id: "f2", name: t("every-other-day"), value: "every-other-day" },
-  { id: "f3", name: t("weekly"), value: "weekly" },
-  { id: "f4", name: t("biweekly"), value: "biweekly" },
-  { id: "f5", name: t("weekdays"), value: "weekdays" },
-  { id: "f6", name: t("weekends"), value: "weekends" },
-];
+  const frequencyItems = [
+    { id: "f1", name: t("daily"), value: "daily" },
+    { id: "f2", name: t("every-other-day"), value: "every-other-day" },
+    { id: "f3", name: t("weekly"), value: "weekly" },
+    { id: "f4", name: t("biweekly"), value: "biweekly" },
+    { id: "f5", name: t("weekdays"), value: "weekdays" },
+    { id: "f6", name: t("weekends"), value: "weekends" },
+  ];
 
   useEffect(() => {
     if (isModalOpen) {
@@ -47,11 +45,11 @@ const frequencyItems = [
 
     if (!habitData.title || !habitData.frequency || !habitData.categoryId) {
       toast.dismiss();
-      return toast.error("Title, Category, and Frequency are required");
+      return toast.error(t("Title, Category, and Frequency are required"));
     }
     await submitHabit(habitData, isEditingMode, currentHabitID);
     fetchHabitsPage();
-  }
+  };
 
   useHotkeys(
     "ctrl+s, meta+s",
@@ -59,20 +57,18 @@ const frequencyItems = [
       e.preventDefault();
       handleHabitDataSubmission(e);
     },
-    { enabled: isModalOpen }
+    { enabled: isModalOpen },
   );
 
   useHotkeys(
     "esc",
     () => {
-      if(isModalOpen) {
+      if (isModalOpen) {
         setModalOpen(false);
       }
     },
-    { enabled: isModalOpen }
+    { enabled: isModalOpen },
   );
-
-
 
   const handleAddCategory = async (name, color, icon) => {
     await addUserCategory(name, color, icon);
@@ -144,7 +140,11 @@ const frequencyItems = [
                     placeholder={t("Choose Frequency")}
                     value={habitData.frequency}
                     getValue={(value) => setHabitData("frequency", value)}
-                    displayValue={frequencyItems.find((item)=> item.value === habitData.frequency)?.name}
+                    displayValue={
+                      frequencyItems.find(
+                        (item) => item.value === habitData.frequency,
+                      )?.name
+                    }
                   />
                 </div>
 
@@ -161,7 +161,9 @@ const frequencyItems = [
                     }
                     getValue={(value) => setHabitData("categoryId", value)}
                     onAdd={handleAddCategory}
-                    placeholder={t("choose an avaliable category or make a new one")}
+                    placeholder={t(
+                      "choose an avaliable category or make a new one",
+                    )}
                   />
                 </div>
 

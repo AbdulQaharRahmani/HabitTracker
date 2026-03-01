@@ -24,19 +24,30 @@ function Pagination({
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
-  const navBtnBase = "p-2 rounded-full border transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed";
-  const navBtnColors = "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800";
+  const navBtnBase =
+    "p-2 rounded-full border transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed";
+  const navBtnColors =
+    "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800";
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-5 pt-5 pb-10 w-full px-4">
       <div className="flex items-center">
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {t("Displaying")}
-          <span className="font-semibold text-gray-900 dark:text-white"> {startItem} </span>
+          <span className="font-semibold text-gray-900 dark:text-white">
+            {" "}
+            {startItem}{" "}
+          </span>
           {t("to")}
-          <span className="font-semibold text-gray-900 dark:text-white"> {endItem} </span>
+          <span className="font-semibold text-gray-900 dark:text-white">
+            {" "}
+            {endItem}{" "}
+          </span>
           {t("out of")}
-          <span className="font-semibold text-gray-900 dark:text-white"> {totalCount} </span>
+          <span className="font-semibold text-gray-900 dark:text-white">
+            {" "}
+            {totalCount}{" "}
+          </span>
           {t("results")}
         </p>
       </div>
@@ -48,7 +59,7 @@ function Pagination({
           className={`${navBtnBase} ${navBtnColors}`}
           aria-label="Previous Page"
         >
-          <VscChevronLeft className="w-5 h-5" />
+          <VscChevronRight className="w-5 h-5" />
         </button>
 
         {/* Page Numbers */}
@@ -90,7 +101,7 @@ function Pagination({
           className={`${navBtnBase} ${navBtnColors}`}
           aria-label="Next Page"
         >
-          <VscChevronRight className="w-5 h-5" />
+          <VscChevronLeft className="w-5 h-5" />
         </button>
       </nav>
     </div>
