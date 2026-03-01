@@ -59,26 +59,26 @@ export default function Login() {
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 md:px-24 py-8">
         <div className="max-w-md w-full mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">{t("Log in")}</h1>
-          <p className="text-gray-600 font-semibold text-lg mb-1">{t("Welcome back!")}</p>
+          <p className="text-gray-600 font-semibold text-lg mb-1">{t("Welcome back")}</p>
           <p className="text-gray-400 text-sm mb-8">{t("Enter your Credentials to access your account")}</p>
 
           <form className="flex flex-col gap-4" onSubmit={handleLogin}>
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-bold text-gray-700">{t("Email address")}</label>
+              <label className="text-sm font-bold text-gray-700">{t("Email Address")}</label>
               <input
                 type="email"
                 disabled={loading}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={t("Enter your email")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
+                placeholder={t("Enter your Email")}
+                className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
             <div className="flex flex-col gap-1">
               <div className="flex justify-between items-center">
                 <label className="text-sm font-bold text-gray-700">{t("Password")}</label>
-                <Link to="/forgot-password" size="sm" className="text-[10px] font-bold text-blue-600 hover:underline uppercase">
+                <Link to="/login" size="sm" className="text-[10px] font-bold text-blue-600 hover:underline uppercase">
                   {t("forgot password")}
                 </Link>
               </div>
@@ -87,8 +87,8 @@ export default function Login() {
                 disabled={loading}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t("Name")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
+                placeholder={t("Password")}
+                className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
@@ -108,11 +108,11 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 rounded-lg text-white font-bold transition-all mt-2 ${
+              className={`w-full py-2 rounded-lg text-white font-bold transition-all mt-1 ${
                 loading ? "bg-orange-300" : "bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-md shadow-orange-100"
               }`}
             >
-              {loading ? t("Processing...") : t("Sign Up")}
+              {loading ? t("Processing...") : t("Sign In")}
             </button>
 
             <div className="relative flex items-center justify-center my-2">
@@ -132,8 +132,8 @@ export default function Login() {
           </form>
 
           {/* Footer Link */}
-          <div className="mt-8 text-center text-sm font-medium">
-            <span className="text-gray-900 font-bold">{t("Don't have an account")}? </span>
+          <div className="mt-6 text-center text-sm font-medium">
+            <span className="text-gray-900 font-bold">{t("Don't have an account")} </span>
             <Link to="/signup" className="text-blue-600 font-bold hover:underline">
               {t("Sign Up")}
             </Link>
