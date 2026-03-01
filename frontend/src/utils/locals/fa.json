@@ -281,5 +281,7 @@
   "View": "دیدین",
   "Title, Category, and Frequency are required": "عنوان، دسته بندی و تعداد دفعات ارسال الزامی است",
   "Edit Habit": "ویرایش عادت",
-  "No habits found.": "هیچ عادتی پیدا نشد"
+  "No habits found.": "هیچ عادتی پیدا نشد",
+  "failed_to_delete_task": "حذف_وظیفه_ناموفق",
+  "Save Task": "ذخیره وظیفه"
 }
