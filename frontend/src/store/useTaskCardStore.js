@@ -3,6 +3,7 @@ import { deleteTask, getTasks, updateTaskStatus } from "../../services/tasksServ
 import api from "../../services/api";
 import toast from "react-hot-toast";
 
+
 export const useTaskCardStore = create((set, get) => ({
   tasks: [],
   loading: false,
@@ -248,16 +249,16 @@ export const useTaskCardStore = create((set, get) => ({
   // new category modal
   isCategoryModalOpen: false,
 
-  openCategoryModal: () => 
+  openCategoryModal: () =>
     set({
       isCategoryModalOpen: true,
     }),
-  
+
   closeCategoryModal: () =>
-    set({ 
+    set({
       isCategoryModalOpen: false
     }),
-  
+
   createCategory: async (newCategory, t) => {
     try {
       const res = await api.post("/categories", {
@@ -286,7 +287,7 @@ export const useTaskCardStore = create((set, get) => ({
       toast.error(t("Failed to create category"));
     }
   },
-        
+
 }));
 
 const normalizePriorityToEnglish = (value) => {
