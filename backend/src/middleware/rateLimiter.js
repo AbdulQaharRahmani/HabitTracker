@@ -26,3 +26,17 @@ export const privateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+//Rate limiter for forgot password
+
+export const forgotPasswordLimiter = rateLimit({
+  windowMs: TIME_LIMIT,
+  max: 1,
+  skipFailedRequests: true,
+  keyGenerator: (req) => {
+    return req.body.email?.toLowerCase() || req.ip;
+  },
+  message: 'You can only request a password reset once per minute ',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
