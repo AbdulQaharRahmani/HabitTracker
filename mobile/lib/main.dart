@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/core/error/global_error_handler.dart';
 import 'package:habit_tracker/core/theme/app_theme.dart' as core_theme;
 import 'package:habit_tracker/providers/theme_provider.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/providers/consistency_provider.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/providers/statistic_provider.dart';
 import 'package:provider/provider.dart';
 import 'features/routes.dart';
 

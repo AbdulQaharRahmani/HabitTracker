@@ -1,54 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/app/app_theme.dart';
-
-class SummaryCards extends StatelessWidget {
-  const SummaryCards({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: SummaryCard(
-            title: 'Habits',
-            value: '12',
-            icon: Icons.checklist_outlined,
-            iconColor: AppTheme.primary,
-          ),
-        ),
-        const _Gap(),
-        Expanded(
-          child: SummaryCard(
-            title: 'Streak',
-            value: '5',
-            icon: Icons.local_fire_department,
-            iconColor: AppTheme.warning,
-          ),
-        ),
-        const _Gap(),
-        Expanded(
-          child: SummaryCard(
-            title: 'Rate',
-            value: '87%',
-            icon: Icons.percent,
-            iconColor: AppTheme.success,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Gap extends StatelessWidget {
-  const _Gap();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(width: 8.w);
-  }
-}
+import 'package:provider/provider.dart';
+import '../../../providers/theme_provider.dart'; // مسیر را چک کنید
 
 class SummaryCard extends StatelessWidget {
   final String title;
@@ -66,17 +19,24 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // دسترسی به تم جاری
+    final themeProv = Provider.of<ThemeProvider>(context);
+    final theme = themeProv.currentTheme;
+
     return Container(
+      width: 100.w,
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        // اصلاح: استفاده از رنگ کارتِ تم
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadow,
-            blurRadius: 6,
-            offset: Offset(0, 2.h),
-          ),
+          if (theme.brightness == Brightness.light)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
         ],
       ),
       child: Column(
@@ -91,14 +51,15 @@ class SummaryCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              // اصلاح: رنگ متن مقدار
+              color: theme.textTheme.bodyLarge?.color,
             ),
           ),
           Text(
             title.toUpperCase(),
             style: TextStyle(
               fontSize: 12.sp,
-              color: AppTheme.textMuted,
+              color: Colors.grey, // خاکستری معمولاً در هر دو تم خواناست
               fontWeight: FontWeight.bold,
             ),
           ),
