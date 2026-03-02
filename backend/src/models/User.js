@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -14,6 +15,12 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+  },
+  role: {
+    type: String,
+    required: true,
+    enum: ['admin', 'user'],
+    default: 'user',
   },
   password: {
     type: String,
@@ -31,6 +38,14 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  passwordResetToken: {
+    type: String,
+    default: null,
+  },
+  passwordResetExpires: {
+    type: Date,
+    default: null,
+  },
 });
 
 UserSchema.index(
@@ -43,4 +58,16 @@ UserSchema.index(
   }
 );
 
+UserSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
 export const UserModel = mongoose.model('User', UserSchema);

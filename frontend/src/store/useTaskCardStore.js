@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { deleteTask, getTasks, updateTaskStatus } from "../../services/tasksService";
 import api from "../../services/api";
 import toast from "react-hot-toast";
-import { useTransition } from "react";
 
 export const useTaskCardStore = create((set, get) => ({
   tasks: [],
@@ -50,6 +49,7 @@ export const useTaskCardStore = create((set, get) => ({
       set({ categories: formatted });
     } catch (error) {
       const message = error.response?.data?.error || "Something went wrong";
+      toast.dismiss();
       toast.error(message);
       console.error("Failed to fetch categories", error);
     } finally {
@@ -147,6 +147,7 @@ export const useTaskCardStore = create((set, get) => ({
         tasks: state.tasks.filter((task) => task._id !== id),
       }));
 
+      toast.dismiss();
       toast.success(t("Task deleted successfully!"))
 
     } catch (error) {
@@ -154,6 +155,7 @@ export const useTaskCardStore = create((set, get) => ({
         "Sorry! task deletion failed:",
         error.response?.data || error.message,
       );
+      toast.dismiss();
       toast.error(t("failed_to_delete_task"))
       set({ error: "Failed to delete task" });
     }
@@ -242,6 +244,49 @@ export const useTaskCardStore = create((set, get) => ({
       throw error;
     }
   },
+
+  // new category modal
+  isCategoryModalOpen: false,
+
+  openCategoryModal: () => 
+    set({
+      isCategoryModalOpen: true,
+    }),
+  
+  closeCategoryModal: () =>
+    set({ 
+      isCategoryModalOpen: false
+    }),
+  
+  createCategory: async (newCategory, t) => {
+    try {
+      const res = await api.post("/categories", {
+        name: newCategory.name,
+        backgroundColor: newCategory.backgroundColor,
+        icon: newCategory.icon,
+      });
+
+      const category = res.data.data;
+
+      set((state) => ({
+        categories: [
+          ...state.categories,
+          {
+            id: category._id,
+            name: category.name,
+            value: category._id,
+            color: category.backgroundColor,
+            icon: category.icon,
+          },
+        ],
+      }));
+      toast.success(t("Category created!"));
+    } catch (error) {
+      console.error("Create category failed:", error);
+      toast.error(t("Failed to create category"));
+    }
+  },
+        
 }));
 
 const normalizePriorityToEnglish = (value) => {

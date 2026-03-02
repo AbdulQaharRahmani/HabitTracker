@@ -3,6 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   createTask,
   getTasks,
+  getTaskById,
   filterTasks,
   toggleTaskStatus,
   deleteTask,
@@ -28,9 +29,10 @@ router
   .route('/')
   .post(createTaskValidator, validate, asyncHandler(createTask))
   .get(asyncHandler(getTasks));
-router.route('/:id').delete(IdValidator, validate, asyncHandler(deleteTask));
 router
   .route('/:id')
+  .get(IdValidator, validate, asyncHandler(getTaskById))
+  .delete(IdValidator, validate, asyncHandler(deleteTask))
   .put(IdValidator, updateTaskValidator, validate, asyncHandler(updateTask));
 
 router.patch(

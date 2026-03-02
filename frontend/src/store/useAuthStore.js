@@ -1,47 +1,75 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { logout as apiLogout } from "../../services/authServices";
 
 const useAuthStore = create(
   persist(
     (set) => ({
       token: null,
-      userId: null,
-      username: null,
+      user: null,
+      email: null,
+
+      isAuthLoading: false,
       isAuthenticated: false,
-
-      // 🔹 login
-      login: (token, id, username) => {
-        set({
-          token,
-          userId: id,
-          username,
-          isAuthenticated: true,
-        });
-      },
-
-      // 🔹 update username (used by Settings)
-      updateUsername: (username) => {
+      isRateLimited: false,
+      login: (token, userData, userEmail) => {
         set((state) => ({
-          ...state,
-          username,
+          token,
+          email: userEmail ?? state.email,
+          user: userData ? userData : state.user,
+          isAuthLoading: false,
+          isAuthenticated: true,
         }));
       },
-
-      // 🔹 logout
-      logout: () => {
+      setRateLimited: (value) =>
         set({
-          token: null,
-          userId: null,
-          username: null,
-          isAuthenticated: false,
+          isRateLimited: value,
+        }),
+      updateUserName: (newUserName) => {
+        set((state) => {
+          if (!state.user) return state;
+
+          return {
+            user: {
+              ...state.user,
+              username: newUserName,
+            },
+          };
         });
-        localStorage.removeItem("auth-data");
+      },
+
+      logout: async () => {
+        try {
+          await apiLogout();
+        } catch (error) {
+          console.log(error);
+        } finally {
+          set({
+            token: null,
+            user: null,
+            email: null,
+            isAuthenticated: false,
+            isRateLimited: false,
+          });
+
+          localStorage.removeItem("userData-storage");
+        }
       },
     }),
+
     {
-      name: "auth-data",
-    },
-  ),
+      name: "userData-storage",
+      storage: createJSONStorage(() => localStorage),
+
+      partialize: (state) => ({
+        user: state.user,
+        email: state.email,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+        isRateLimited: state.isRateLimited,
+      }),
+    }
+  )
 );
 
 export default useAuthStore;

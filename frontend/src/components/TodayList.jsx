@@ -29,11 +29,7 @@ const TodayList = () => {
 
     try{
       await toggleHabit(habit._id);
-      toast.success(habit.completed ? t("habit_incomplete") : t("habit_completed"));
-
-
     }catch(error){
-       toast.error(t("habit_update_failed"));
        console.log(error);
     }
   }
@@ -44,7 +40,7 @@ const TodayList = () => {
         text-slate-600 dark:text-gray-400
         transition-colors"
       >
-        No habits for current date!
+        {t("No habits for current date!")}
       </div>
     )
   }
@@ -55,7 +51,7 @@ const TodayList = () => {
         text-slate-600 dark:text-gray-400
         transition-colors"
       >
-        Loading habits...
+        {t("Loading habits...")}
       </div>
     );
 

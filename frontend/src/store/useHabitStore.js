@@ -11,6 +11,7 @@ import {
 } from "../../services/habitService";
 import { formatDate } from "../utils/dateFormatter";
 import { formatStatstics } from "../utils/formatStatistics";
+import i18next from "i18next";
 const useHabitStore = create((set, get) => ({
   searchTerm: "",
   isSearching: false,
@@ -110,12 +111,6 @@ const useHabitStore = create((set, get) => ({
     }
   },
   toggleHabit: async (id) => {
-    const formatDate = (date) =>
-      date.toISOString().split("T")[0];
-    if (get().selectedDate.toDateString() !== new Date().toDateString()) {
-      return toast.error("You can only mark today's habit as completed or uncompleted")
-    }
-
     const habitToToggle = get().habits.find(h => h._id === id)
     if (!habitToToggle) return
 
@@ -128,21 +123,75 @@ const useHabitStore = create((set, get) => ({
       ),
       habitCompletions: state.habitCompletions + (prevState ? -1 : 1)
     }))
-
     try {
       if (prevState) {
         await unCompleteHabit(id, { date })
+        toast.dismiss();
+        toast.success(i18next.t("habit_incomplete"));
       } else {
         await completeHabit(id, { date })
+        toast.dismiss();
+        toast.success(i18next.t("habit_completed"));
       }
     } catch (err) {
-      console.log(err)
+      let errorMessage = err.response?.data?.message;
+      toast.dismiss();
+      toast.error(i18next.t(errorMessage)|| i18next.t("habit_update_failed"))
       set(state => ({
         habits: state.habits.map(h =>
           h._id === id ? { ...h, completed: prevState } : h
         ),
         habitCompletions: state.habitCompletions + (prevState ? 1 : -1)
       }))
+    }
+  },
+
+  fetchCategories: async () => {
+    set({ loading: true });
+    try {
+      const response = await api.get("/categories");
+      const formatted = response.data.data.map((cat) => ({
+        id: cat._id,
+        name: cat.name,
+        value: cat._id,
+        color: cat.backgroundColor || "#dbd6f9",
+      }));
+      set({ categories: formatted });
+    } catch (error) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.dismiss();
+      toast.error(message);
+      console.error("Failed to fetch categories", error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  addUserCategory: async (newCategory, t) => {
+    try {
+      const res = await api.post("/categories", newCategory);
+
+      const categoryCreated = res.data.data;
+
+      const category = {
+        id: categoryCreated._id,
+        name: categoryCreated.name,
+        value: categoryCreated._id,
+        color: categoryCreated.backgroundColor || "#dbd6f9",
+      };
+
+      set((state) => ({
+        categories: [...state.categories, category],
+      }));
+
+      toast.dismiss();
+      toast.success(t("Successfully Added the Category"));
+
+      return category;
+    } catch (error) {
+      const message = error.response?.data?.error || "Something went wrong";
+      toast.dismiss();
+      toast.error(message);
+      console.log("Failed to add user category", error);
     }
   },
   isModalOpen: false,
@@ -160,65 +209,34 @@ const useHabitStore = create((set, get) => ({
   setModalOpen: () => {
     set((state) => ({ isModalOpen: !state.isModalOpen }));
   },
-  fetchCategories: async () => {
-    set({ loading: true });
-    try {
-      const response = await api.get("/categories");
-      const formatted = response.data.data.map((cat) => ({
-        id: cat._id,
-        name: cat.name,
-        value: cat._id,
-        color: cat.backgroundColor || "#dbd6f9",
-      }));
-      set({ categories: formatted });
-    } catch (error) {
-      const message = error.response?.data?.error || "Something went wrong";
-      toast.error(message);
-      console.error("Failed to fetch categories", error);
-    } finally {
-      set({ loading: false });
-    }
-  },
   submitHabit: async (data, isEditingMode, currentHabitID) => {
     set({ loading: true });
     try {
       if (isEditingMode) {
         await api.put(`/habits/${currentHabitID}`, data);
-        toast.success("Successfuly Updated the Habit!");
+        toast.dismiss();
+        toast.success(i18next.t("Habit Updated Successfully!"));
       } else {
         await api.post("/habits", data);
-        toast.success("Habit Added Successfully!");
+        toast.dismiss();
+        toast.success(i18next.t("Habit Added Successfully!"));
       }
       set({
         isModalOpen: false,
         habitData: {
           title: "",
           description: "",
-          frequency: null,
-          categoryId: null,
+          frequency: "",
+          categoryId: "",
         },
       });
     } catch (error) {
-      const message = error.response?.data?.error || "Something went wrong";
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.dismiss();
       toast.error(message);
       console.log("Failed to add habit", error);
     } finally {
       set({ loading: false });
-    }
-  },
-  addUserCategory: async (category, color) => {
-    const newCategoryData = {
-      name: category,
-      icon: "",
-      backgroundColor: color,
-    };
-    try {
-      await api.post("/categories", newCategoryData);
-      toast.success("Successfully Added the Category");
-    } catch (error) {
-      const message = error.response?.data?.error || "Something went wrong";
-      toast.error(message);
-      console.log("Failed to add user category", error);
     }
   },
   allhabits: [],
@@ -235,6 +253,7 @@ const useHabitStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+
   openAddHabitModal: () => {
     set({
       isModalOpen: true,
@@ -270,139 +289,52 @@ const useHabitStore = create((set, get) => ({
       },
     }));
   },
-  chartData: [],
-  weeklyStatistics: [],
-  monthlyStatistics: [],
-  yearlyStatistics: [],
+    chartData: [],
+    weeklyStatistics: [],
+    monthlyStatistics: [],
+    yearlyStatistics: [],
+    chartLoading: false,
+    chartError: null,
+    getChartData: async () => {
+        const data = await getChartData();
+        set({ chartData: data });
+    },
 
-  getChartData: async () => {
-    try {
-      const data = await getChartData();
-      set({ chartData: data || [] });
-    } catch (err) {
-      set({ error: "Failed to load chart data" });
-    }
-  },
+    getStatistics: async (mode) => {
+        set({chartLoading: true})
+        const { chartData } = get();
+        const isYearly = mode === 'yearly';
 
-  getWeeklyStatistics: async () => {
-    set({ loading: true, error: null });
+        const source = isYearly ? chartData?.monthly : chartData?.daily;
+        if (!source || source.length === 0) return;
 
-    try {
-      const start = new Date();
-      start.setDate(start.getDate() - 6);
+        const start = new Date();
+        if (mode === 'weekly') start.setDate(start.getDate() - 6);
+        else if (mode === 'monthly') start.setDate(start.getDate() - 30);
+        else if (mode === 'yearly') start.setMonth(start.getMonth() - 12);
+        try{
+        const response = await getHabitsChartData(formatDate(start), formatDate(new Date()));
+        const rawData = isYearly ? (response.data.monthly || []) : (response.data.daily || []);
+        const formatted = formatStatstics(rawData, mode);
+        set({ [`${mode}Statistics`]: formatted });
+        }catch(error){
+        const message = error.response?.data?.message || "Failed to fetch data";
+        set({chartError:message})
+        }finally{
+            set({chartLoading:false})
+        }
 
-      const response = await getHabitsChartData(
-        formatDate(start),
-        formatDate(new Date()),
-      );
+    },
 
-      const rawData =
-        response?.data?.daily || response?.daily || response || [];
+    getWeeklyStatistics: () => get().getStatistics('weekly'),
+    getMonthlyStatistics: () => get().getStatistics('monthly'),
+    getYearlyStatistics: () => get().getStatistics('yearly'),
 
-      const grouped = rawData.reduce((acc, day) => {
-        const weekday = new Date(day.date + "T00:00:00").toLocaleDateString(
-          "en-US",
-          { weekday: "short" },
-        );
-        acc[weekday] = (acc[weekday] || 0) + (day.completed || 0);
-        return acc;
-      }, {});
-
-      const formatted = Object.keys(grouped).map((key) => ({
-        name: key,
-        completed: grouped[key],
-      }));
-
-      set({ weeklyStatistics: formatted });
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Failed to fetch weekly statistics";
-      set({ error: message });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  getMonthlyStatistics: async () => {
-    set({ loading: true, error: null });
-
-    try {
-      const start = new Date();
-      start.setMonth(start.getMonth() - 5);
-
-      const response = await getHabitsChartData(
-        formatDate(start),
-        formatDate(new Date()),
-      );
-
-      const rawData =
-        response?.data?.daily || response?.daily || response || [];
-
-      const grouped = rawData.reduce((acc, day) => {
-        const month = new Date(day.date + "T00:00:00").toLocaleDateString(
-          "en-US",
-          { month: "short" },
-        );
-        acc[month] = (acc[month] || 0) + (day.completed || 0);
-        return acc;
-      }, {});
-
-      const formatted = Object.keys(grouped).map((key) => ({
-        name: key,
-        completed: grouped[key],
-      }));
-
-      set({ monthlyStatistics: formatted });
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Failed to fetch monthly statistics";
-      set({ error: message });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  getYearlyStatistics: async () => {
-    set({ loading: true, error: null });
-
-    try {
-      const start = new Date();
-      start.setFullYear(start.getFullYear() - 3);
-
-      const response = await getHabitsChartData(
-        formatDate(start),
-        formatDate(new Date()),
-      );
-
-      const rawData =
-        response?.data?.daily || response?.daily || response || [];
-
-      const grouped = rawData.reduce((acc, day) => {
-        const year = day.date.split("-")[0];
-        acc[year] = (acc[year] || 0) + (day.completed || 0);
-        return acc;
-      }, {});
-
-      const formatted = Object.keys(grouped).map((key) => ({
-        name: key,
-        completed: grouped[key],
-      }));
-
-      set({ yearlyStatistics: formatted });
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Failed to fetch yearly statistics";
-      set({ error: message });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  getConsistencyData: async (startDate, endDate) => {
+    getConsistencyData: async (startDate, endDate) => {
     set({ loading: true, error: null });
     try {
       const result = await getHabitsChartData(startDate, endDate);
-      console.log(result);
+
       if (result.success) {
         set({ consistencyData: result.data.daily, loading: false });
       } else {
@@ -419,11 +351,11 @@ const useHabitStore = create((set, get) => ({
 
     set((state) => ({
       habits: state.habits.filter((h) => h._id !== id),
-      allhabits: state.allhabits.filter((h) => h._id !== id),
     }));
-
+    toast.dismiss();
     toast.success(t("habit deleted successfully!"));
   } catch (error) {
+    toast.dismiss();
     toast.error(t("Failed to delete habit!"));
     console.error(
       "Delete habit failed:",
