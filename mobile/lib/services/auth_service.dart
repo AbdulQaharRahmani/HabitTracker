@@ -6,7 +6,6 @@ import 'package:habit_tracker/services/token_storage.dart';
 import 'package:http/http.dart' as http;
 
 import 'http_client.dart';
-import '../screens/habitScreen/add_habit.dart';
 import '../utils/category/category_model.dart';
 import '../utils/profile/profile_model.dart';
 import '../utils/today_progressBar/task_item.dart';
@@ -75,7 +74,10 @@ class AuthService {
         }
 
         // 🔑 Refresh Token
-        final refreshToken = userData['refreshToken'];
+        final refreshToken =
+            userData['refreshToken'] ??
+            data['refreshToken'] ??
+            _extractRefreshTokenFromSetCookie(res.headers['set-cookie']);
         if (refreshToken != null && refreshToken.toString().isNotEmpty) {
           await AuthManager.saveRefreshToken(refreshToken);
         }
@@ -395,6 +397,23 @@ class AuthService {
     );
   }
 
+  String? _extractRefreshTokenFromSetCookie(String? setCookieHeader) {
+    if (setCookieHeader == null || setCookieHeader.isEmpty) {
+      return null;
+    }
+
+    final parts = setCookieHeader.split(';');
+    for (final part in parts) {
+      final trimmed = part.trim();
+      if (trimmed.startsWith('refreshToken=')) {
+        final value = trimmed.substring('refreshToken='.length);
+        return value.isEmpty ? null : value;
+      }
+    }
+
+    return null;
+  }
+
   bool _isDoneForDate(Map<String, dynamic> json, DateTime date) {
     if (!json.containsKey('frequency')) {
       return json['status'] == 'done';
@@ -468,3 +487,4 @@ Future<String> getDisplayName() async {
     return 'Habit Tracker User';
   }
 }
+

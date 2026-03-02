@@ -20,13 +20,10 @@ class HabitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final Color color = habit.category.backgroundColor;
-    final IconData icon = habit.category.icon;
     Provider.of<ThemeProvider>(context);
 
-    final Color categoryColor = habit.getColor();
-    final IconData icon = habit.getIcon();
+    final Color categoryColor = habit.category.backgroundColor;
+    final IconData icon = habit.category.icon;
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),

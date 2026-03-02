@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:habit_tracker/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
+
 import '../../app/app_theme.dart';
 import '../../features/routes.dart';
 import '../../providers/theme_provider.dart';
-import '../../services/token_storage.dart'; // ← AuthManager
 import '../../services/app_state.dart';
+import '../../services/token_storage.dart';
 import '../../utils/profile/profile_model.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -20,10 +21,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService _api = AuthService();
   final AppState _appState = AppState();
+  final List<int> _streakMilestones = <int>[7, 14, 25, 50, 70, 100, 150, 200, 365];
 
   HabitsData? habitsData;
   UserData? userData;
-
   String displayName = 'Habit Tracker User';
   bool loading = true;
 
@@ -34,9 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadProfileData({bool forceRefresh = false}) async {
-    // Check if data is already preloaded (skip if force refresh)
     if (!forceRefresh && _appState.isProfileLoaded) {
-      debugPrint('✅ Using preloaded profile data');
       setState(() {
         habitsData = _appState.habitsData;
         userData = _appState.userData;
@@ -48,31 +47,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       final savedName = await AuthManager.getUserName();
-
       final welcome = await _api.fetchHabitsDashboard();
       final profileRes = await _api.getUserProfile();
 
+      if (!mounted) return;
       setState(() {
         habitsData = welcome.habitsData;
-
-        userData = profileRes['data'] != null
-            ? UserData.fromJson(profileRes['data'])
-            : null;
-
+        userData = profileRes['data'] != null ? UserData.fromJson(profileRes['data']) : null;
         displayName = (savedName?.trim().isNotEmpty == true)
             ? savedName!
             : (userData?.userId.trim().isNotEmpty == true)
-            ? userData!.userId
-            : 'Habit Tracker User';
-
+                ? userData!.userId
+                : 'Habit Tracker User';
         loading = false;
       });
-
-      debugPrint('Profile loaded → name: $displayName, habits: ${habitsData?.toJson()}');
-    } catch (e) {
-      debugPrint('Profile load error: $e');
-
+    } catch (_) {
       final fallbackName = await AuthManager.getUserName();
+      if (!mounted) return;
       setState(() {
         displayName = fallbackName ?? 'Habit Tracker User';
         loading = false;
@@ -81,168 +72,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _refreshProfile() async {
-    debugPrint('🔄 Refreshing profile data...');
     await _loadProfileData(forceRefresh: true);
+  }
+
+  int get _streak => habitsData?.currentStreak ?? 0;
+  int get _totalHabits => habitsData?.totalHabits ?? 0;
+  int get _completionRate => habitsData?.completionRate ?? 0;
+
+  int? get _nextMilestone {
+    for (final milestone in _streakMilestones) {
+      if (_streak < milestone) return milestone;
+    }
+    return null;
+  }
+
+  int get _unlockedMilestonesCount {
+    return _streakMilestones.where((m) => _streak >= m).length;
   }
 
   Widget _buildShimmer() {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
         child: Column(
           children: [
-            SizedBox(height: 40.h),
-
-            // Profile Avatar Shimmer
+            SizedBox(height: 28.h),
             Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: CircleAvatar(
-                radius: 60.r,
-                backgroundColor: Colors.grey[300],
+              baseColor: AppTheme.border.withOpacity(0.5),
+              highlightColor: AppTheme.surface,
+              child: Container(
+                height: 210.h,
+                decoration: BoxDecoration(
+                  color: AppTheme.surface,
+                  borderRadius: BorderRadius.circular(22.r),
+                ),
               ),
             ),
-
             SizedBox(height: 16.h),
-
-            // Name Shimmer
             Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: AppTheme.border.withOpacity(0.5),
+              highlightColor: AppTheme.surface,
               child: Container(
-                width: 150.w,
-                height: 24.h,
+                height: 130.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-              ),
-            ),
-
-            SizedBox(height: 8.h),
-
-            // Streak Badge Shimmer
-            Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                width: 120.w,
-                height: 36.h,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(30.r),
-                ),
-              ),
-            ),
-
-            SizedBox(height: 32.h),
-
-            // Stats Card Shimmer
-            Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(16.r),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: List.generate(
-                    3,
-                    (index) => Column(
-                      children: [
-                        Container(
-                          width: 56.w,
-                          height: 56.w,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                        Container(
-                          width: 40.w,
-                          height: 20.h,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                            borderRadius: BorderRadius.circular(4.r),
-                          ),
-                        ),
-                        SizedBox(height: 6.h),
-                        Container(
-                          width: 60.w,
-                          height: 14.h,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                            borderRadius: BorderRadius.circular(4.r),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ),
             ),
-
-            SizedBox(height: 24.h),
-
-            // Preferences Shimmer
+            SizedBox(height: 16.h),
             Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: AppTheme.border.withOpacity(0.5),
+              highlightColor: AppTheme.surface,
               child: Container(
-                padding: EdgeInsets.all(20.w),
+                height: 220.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: AppTheme.surface,
                   borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Column(
-                  children: List.generate(
-                    3,
-                    (index) => Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.h),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 20.w,
-                            height: 20.w,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[400],
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          SizedBox(width: 16.w),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 100.w,
-                                  height: 14.h,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[400],
-                                    borderRadius: BorderRadius.circular(4.r),
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                Container(
-                                  width: 80.w,
-                                  height: 16.h,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[400],
-                                    borderRadius: BorderRadius.circular(4.r),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -255,11 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     Provider.of<ThemeProvider>(context);
-    if (loading) {
-      return _buildShimmer();
-    }
-
-    final String streakText = '${habitsData?.currentStreak ?? 0} Day Streak';
+    if (loading) return _buildShimmer();
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -268,199 +151,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: AppTheme.primary,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 40.h),
-
-              // Profile Avatar
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 60.r,
-                    backgroundColor: AppTheme.primary.withOpacity(0.1),
-                    backgroundImage: userData?.profileImage != null
-                        ? NetworkImage(userData!.profileImage!)
-                        : null,
-                    child: userData?.profileImage == null
-                        ? Icon(Icons.person, size: 60.r, color: AppTheme.primary)
-                        : null,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      padding: EdgeInsets.all(6.w),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppTheme.background,
-                          width: 3.w,
-                        ),
-                      ),
-                      child: Icon(Icons.camera_alt, size: 18.r, color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-
+              SizedBox(height: 18.h),
+              _buildProfileHeader(),
               SizedBox(height: 16.h),
-
-              // Name ── حالا از SharedPreferences اولویت دارد
-              Text(
-                displayName,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24.sp,
-                ),
-              ),
-
-              SizedBox(height: 8.h),
-
-              // Streak Badge
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(30.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.local_fire_department,
-                        color: AppTheme.primary, size: 20.r),
-                    SizedBox(width: 8.w),
-                    Text(
-                      streakText,
-                      style: TextStyle(
-                        color: AppTheme.primary,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 32.h),
-
-              // Stats Card
-              Container(
-                padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 12.r,
-                      offset: Offset(0, 6.h),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStat(
-                      label: 'Total Habits',
-                      value: '${habitsData?.totalHabits ?? 0}',
-                      icon: Icons.list_alt,
-                      color: AppTheme.primary,
-                    ),
-                    _buildStat(
-                      label: 'Current Streak',
-                      value: '${habitsData?.currentStreak ?? 0}d',
-                      icon: Icons.local_fire_department,
-                      color: Colors.orange,
-                    ),
-                    _buildStat(
-                      label: 'Completion Rate',
-                      value: '${habitsData?.completionRate ?? 0}%',
-                      icon: Icons.check_circle_outline,
-                      color: Colors.green,
-                    ),
-                  ],
-                ),
-              ),
-
+              _buildStatsGrid(),
+              SizedBox(height: 16.h),
+              _buildAchievementSection(),
+              SizedBox(height: 16.h),
+              if (userData != null) _buildPreferencesCard(),
+              if (userData != null) SizedBox(height: 16.h),
+              _buildLogoutButton(),
               SizedBox(height: 24.h),
-
-              // Preferences
-              if (userData != null) ...[
-                Container(
-                  padding: EdgeInsets.all(20.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        blurRadius: 12.r,
-                        offset: Offset(0, 6.h),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Preferences',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.sp,
-                        ),
-                      ),
-                      SizedBox(height: 16.h),
-                      _buildPreferenceRow(
-                        icon: Icons.calendar_today,
-                        label: 'Week Starts On',
-                        value: (userData!.weekStartDay ?? 'monday').capitalize(),
-                      ),
-                      _buildPreferenceRow(
-                        icon: Icons.access_time,
-                        label: 'Daily Reminder',
-                        value: userData!.dailyReminderEnabled == true
-                            ? userData!.dailyReminderTime ?? 'Not set'
-                            : 'Disabled',
-                      ),
-                      _buildPreferenceRow(
-                        icon: Icons.public,
-                        label: 'Timezone',
-                        value: userData!.timezone ?? 'UTC',
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 32.h),
-              ],
-
-              // Logout
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    await AuthManager.logout();
-                    if (!mounted) return;
-                    Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-                      AppRoutes.login,
-                          (route) => false,
-                    );
-                  },
-                  icon: Icon(Icons.logout, size: 20.sp),
-                  label: Text('Logout', style: TextStyle(fontSize: 16.sp)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    side: BorderSide(color: Colors.red.withOpacity(0.3)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 32.h),
             ],
           ),
         ),
@@ -468,38 +173,327 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStat({
-    required String label,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
+  Widget _buildProfileHeader() {
+    final String streakText = '$_streak day streak';
+    final String? imageUrl = userData?.profileImage;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22.r),
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primary,
+            AppTheme.primary.withOpacity(0.78),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withOpacity(0.28),
+            blurRadius: 18.r,
+            offset: Offset(0, 10.h),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(2.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.18),
+                  shape: BoxShape.circle,
+                ),
+                child: CircleAvatar(
+                  radius: 36.r,
+                  backgroundColor: Colors.white.withOpacity(0.2),
+                  backgroundImage: (imageUrl != null && imageUrl.isNotEmpty) ? NetworkImage(imageUrl) : null,
+                  child: (imageUrl == null || imageUrl.isEmpty)
+                      ? Text(
+                          displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 28.sp,
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      displayName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22.sp,
+                      ),
+                    ),
+                    SizedBox(height: 5.h),
+                    Text(
+                      _nextMilestone == null
+                          ? 'All milestone tiers unlocked'
+                          : 'Next achievement at $_nextMilestone days',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 13.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 14.h),
+          Row(
+            children: [
+              _buildHeaderPill(Icons.local_fire_department, streakText),
+              SizedBox(width: 8.w),
+              _buildHeaderPill(Icons.emoji_events, '$_unlockedMilestonesCount badges'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderPill(IconData icon, String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(999.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 16.r),
+          SizedBox(width: 6.w),
+          Text(
+            text,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsGrid() {
+    final int remaining = _nextMilestone == null ? 0 : (_nextMilestone! - _streak);
+
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.shadow,
+            blurRadius: 10.r,
+            offset: Offset(0, 5.h),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(child: _buildMiniStat('Habits', '$_totalHabits', Icons.track_changes, AppTheme.primary)),
+          Expanded(child: _buildMiniStat('Completion', '$_completionRate%', Icons.check_circle_outline, AppTheme.success)),
+          Expanded(child: _buildMiniStat('Streak', '$_streak', Icons.local_fire_department, Colors.orange)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniStat(String label, String value, IconData icon, Color color) {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(14.w),
+          width: 38.w,
+          height: 38.w,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withOpacity(0.12),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, size: 28.r, color: color),
+          child: Icon(icon, size: 18.r, color: color),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 8.h),
         Text(
           value,
           style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
             color: AppTheme.textPrimary,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 6.h),
+        SizedBox(height: 2.h),
         Text(
           label,
-          style: TextStyle(fontSize: 13.sp, color: AppTheme.textMuted),
+          style: TextStyle(color: AppTheme.textMuted, fontSize: 11.sp),
           textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+
+  Widget _buildAchievementSection() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.shadow,
+            blurRadius: 10.r,
+            offset: Offset(0, 5.h),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.emoji_events, color: AppTheme.warning, size: 20.r),
+              SizedBox(width: 8.w),
+              Text(
+                'Streak Achievements',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.sp,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            'Unlock at 25, 70, 100 and higher streaks.',
+            style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.sp),
+          ),
+          SizedBox(height: 14.h),
+          GridView.builder(
+            itemCount: _streakMilestones.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8.w,
+              mainAxisSpacing: 8.h,
+              childAspectRatio: 1.06,
+            ),
+            itemBuilder: (context, index) {
+              final int milestone = _streakMilestones[index];
+              final bool unlocked = _streak >= milestone;
+              return _buildAchievementCard(milestone, unlocked);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAchievementCard(int milestone, bool unlocked) {
+    return Container(
+      padding: EdgeInsets.all(10.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.r),
+        color: unlocked ? AppTheme.warningBackground : AppTheme.inputBackground,
+        border: Border.all(
+          color: unlocked ? AppTheme.warning.withOpacity(0.4) : AppTheme.border,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            unlocked ? Icons.workspace_premium : Icons.lock_outline,
+            color: unlocked ? AppTheme.warning : AppTheme.textMuted,
+            size: 18.r,
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            '$milestone Days',
+            style: TextStyle(
+              color: unlocked ? AppTheme.warning : AppTheme.textSecondary,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            unlocked ? 'Unlocked' : 'Locked',
+            style: TextStyle(
+              color: unlocked ? AppTheme.warning : AppTheme.textMuted,
+              fontSize: 10.sp,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreferencesCard() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.shadow,
+            blurRadius: 10.r,
+            offset: Offset(0, 5.h),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Preferences',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16.sp,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          SizedBox(height: 12.h),
+          _buildPreferenceRow(
+            icon: Icons.calendar_today_outlined,
+            label: 'Week Starts',
+            value: (userData?.weekStartDay ?? 'monday').capitalize(),
+          ),
+          _buildPreferenceRow(
+            icon: Icons.schedule_outlined,
+            label: 'Daily Reminder',
+            value: (userData?.dailyReminderEnabled ?? false)
+                ? (userData?.dailyReminderTime ?? 'Not set')
+                : 'Disabled',
+          ),
+          _buildPreferenceRow(
+            icon: Icons.public,
+            label: 'Timezone',
+            value: userData?.timezone ?? 'UTC',
+          ),
+        ],
+      ),
     );
   }
 
@@ -512,23 +506,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Row(
         children: [
-          Icon(icon, size: 20.r, color: AppTheme.primary),
-          SizedBox(width: 16.w),
+          Container(
+            width: 34.w,
+            height: 34.w,
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Icon(icon, size: 16.r, color: AppTheme.primary),
+          ),
+          SizedBox(width: 10.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
-                  style: TextStyle(fontSize: 14.sp, color: AppTheme.textMuted),
-                ),
+                Text(label, style: TextStyle(color: AppTheme.textMuted, fontSize: 12.sp)),
                 SizedBox(height: 2.h),
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
                     color: AppTheme.textPrimary,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -538,9 +537,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  Widget _buildLogoutButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () async {
+          await AuthManager.logout();
+          if (!mounted) return;
+          Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+            AppRoutes.login,
+            (route) => false,
+          );
+        },
+        icon: Icon(Icons.logout, size: 18.r),
+        label: Text('Logout', style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600)),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppTheme.error,
+          side: BorderSide(color: AppTheme.error.withOpacity(0.28)),
+          padding: EdgeInsets.symmetric(vertical: 14.h),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        ),
+      ),
+    );
+  }
 }
 
-// Helper
 extension StringExtension on String {
   String capitalize() => isEmpty ? this : this[0].toUpperCase() + substring(1);
 }

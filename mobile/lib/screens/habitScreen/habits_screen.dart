@@ -66,6 +66,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
       _isLoading = true;
       _page = 1;
       _hasNextPage = true;
+      _errorMessage = null;
     });
 
     try {
@@ -86,6 +87,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
         setState(() {
           _habits = reversedList;
           _isLoading = false;
+          _errorMessage = null;
           if (habitsJson.length < _limit) _hasNextPage = false;
         });
       } else {
@@ -124,7 +126,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
           if (habitsJson.isNotEmpty) {
             final reversedNewPage = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
             setState(() {
-              _habits.insertAll(0, reversedNewPage);
+              _habits.addAll(reversedNewPage);
             });
           } else {
             setState(() => _hasNextPage = false);
@@ -141,7 +143,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
     }
   }
 
-  Future<void> _deleteHabit(String habitId, int index) async {
+  Future<void> _deleteHabit(String habitId) async {
     try {
       final token = await _getToken();
       final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits/$habitId');
@@ -156,8 +158,9 @@ class _HabitsScreenState extends State<HabitsScreen> {
 
       if (response.statusCode == 200) {
         setState(() {
-          _habits.removeAt(index);
+          _habits.removeWhere((habit) => habit.id == habitId);
         });
+        if (!mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(
            SnackBar(
@@ -166,6 +169,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
           ),
         );
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
            SnackBar(
             content: Text('Failed to delete habit'),
@@ -174,6 +178,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $e'),
@@ -270,7 +275,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
 
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
+            child: Row(
                 children: [
                   Expanded(
                     child: Container(
@@ -289,8 +294,28 @@ class _HabitsScreenState extends State<HabitsScreen> {
                               controller: _searchController,
                               decoration: InputDecoration(
                                 hintText: 'Search habits...',
+                                isDense: true,
+                                filled: false,
+                                fillColor: Colors.transparent,
+                                contentPadding: EdgeInsets.zero,
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                focusedErrorBorder: InputBorder.none,
                                 hintStyle: TextStyle(color: AppTheme.textMuted),
+                                suffixIcon: _searchQuery.isNotEmpty
+                                    ? IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _searchQuery = '';
+                                            _searchController.clear();
+                                          });
+                                        },
+                                        icon: Icon(Icons.close, color: AppTheme.textMuted),
+                                      )
+                                    : null,
                               ),
                               onChanged: (value) {
                                 setState(() {
@@ -446,7 +471,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
         return HabitCard(
           habit: habit,
           onEdit: () => _editHabit(habit),
-          onDelete: () => _deleteHabit(habit.id, index),
+          onDelete: () => _deleteHabit(habit.id),
         );
       },
     );
