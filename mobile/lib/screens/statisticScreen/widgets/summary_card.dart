@@ -7,29 +7,46 @@ class SummaryCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return   Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        SummaryCard(
-          title: 'Habits',
-          value: '12',
-          icon: Icons.checklist_outlined,
-          iconColor: AppTheme.primary, // اصلاح شده
+        Expanded(
+          child: SummaryCard(
+            title: 'Habits',
+            value: '12',
+            icon: Icons.checklist_outlined,
+            iconColor: AppTheme.primary,
+          ),
         ),
-        SummaryCard(
-          title: 'Streak',
-          value: '5',
-          icon: Icons.local_fire_department,
-          iconColor: AppTheme.warning, // اصلاح شده
+        const _Gap(),
+        Expanded(
+          child: SummaryCard(
+            title: 'Streak',
+            value: '5',
+            icon: Icons.local_fire_department,
+            iconColor: AppTheme.warning,
+          ),
         ),
-        SummaryCard(
-          title: 'Rate',
-          value: '87%',
-          icon: Icons.percent,
-          iconColor: AppTheme.success, // اصلاح شده
+        const _Gap(),
+        Expanded(
+          child: SummaryCard(
+            title: 'Rate',
+            value: '87%',
+            icon: Icons.percent,
+            iconColor: AppTheme.success,
+          ),
         ),
       ],
     );
+  }
+}
+
+class _Gap extends StatelessWidget {
+  const _Gap();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(width: 8.w);
   }
 }
 
@@ -50,7 +67,6 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100.w,
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: AppTheme.surface,

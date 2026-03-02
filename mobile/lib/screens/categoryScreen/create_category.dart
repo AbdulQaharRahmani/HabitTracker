@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/app/app_theme.dart';
+import 'package:habit_tracker/core/responsive/responsive_helper.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/category/category_model.dart';
@@ -437,6 +438,12 @@ class _CreateCategoryState extends State<CreateCategory> {
 
   Widget _buildIconPicker() {
     final filteredIcons = appIcons.where((icon) => icon.category == selectedIconCategory).toList();
+    final crossAxisCount = ResponsiveHelper.adaptiveGridCount(
+      context,
+      mobile: 4,
+      tablet: 6,
+      desktop: 8,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -455,8 +462,8 @@ class _CreateCategoryState extends State<CreateCategory> {
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(15),
         itemCount: filteredIcons.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 6,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
           childAspectRatio: 1,
