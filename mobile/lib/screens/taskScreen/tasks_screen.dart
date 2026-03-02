@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/responsive/responsive_helper.dart';
+import 'package:habit_tracker/core/widgets/app_empty_state.dart';
+import 'package:habit_tracker/core/widgets/app_error_state.dart';
 import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
 import 'package:provider/provider.dart';
 import '../../app/app_theme.dart';
+import '../../features/tasks/data/repositories/tasks_repository_impl.dart';
+import '../../features/tasks/domain/usecases/fetch_task_categories_usecase.dart';
+import '../../features/tasks/domain/usecases/fetch_tasks_usecase.dart';
+import '../../features/tasks/domain/usecases/toggle_task_status_usecase.dart';
 import '../../providers/theme_provider.dart';
-import '../../services/taskpage_api/category_api.dart';
-import '../../services/taskpage_api/tasks_api.dart';
 import '../../utils/category/category_model.dart';
 import '../../utils/taskpage_components/task_shimer.dart';
 import '../../utils/taskpage_components/tasks_model.dart';
@@ -21,7 +26,11 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  final TaskApiService _apiService = TaskApiService();
+  final _tasksRepository = TasksRepositoryImpl();
+  late final FetchTasksUseCase _fetchTasksUseCase;
+  late final FetchTaskCategoriesUseCase _fetchTaskCategoriesUseCase;
+  late final ToggleTaskStatusUseCase _toggleTaskStatusUseCase;
+
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
@@ -37,13 +46,14 @@ class _TasksScreenState extends State<TasksScreen> {
   final int _limit = 20;
   String? _token;
   Timer? _searchTimer;
-
-  final CategoryApiService _categoryApi = CategoryApiService();
   List<CategoryModel> _categories = [];
 
   @override
   void initState() {
     super.initState();
+    _fetchTasksUseCase = FetchTasksUseCase(_tasksRepository);
+    _fetchTaskCategoriesUseCase = FetchTaskCategoriesUseCase(_tasksRepository);
+    _toggleTaskStatusUseCase = ToggleTaskStatusUseCase(_tasksRepository);
     _init();
     _scrollController.addListener(_onScroll);
     _searchController.addListener(_onSearchChanged);
@@ -76,8 +86,13 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   Future<void> _loadCategories() async {
-    final categories = await _categoryApi.fetchCategories(token: _token!);
-    setState(() => _categories = categories);
+    final result = await _fetchTaskCategoriesUseCase();
+    if (!mounted) return;
+    if (result.success) {
+      setState(() => _categories = result.data ?? <CategoryModel>[]);
+    } else {
+      setState(() => _categories = <CategoryModel>[]);
+    }
   }
 
   Future<void> _fetchTasks({bool reset = false}) async {
@@ -93,13 +108,13 @@ class _TasksScreenState extends State<TasksScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final data = await _apiService.fetchTasks(
-        token: _token!,
+      final result = await _fetchTasksUseCase(
         page: _page,
         limit: _limit,
         searchTerm: _searchTerm.isNotEmpty ? _searchTerm : null,
         categoryId: selectedCategoryId,
       );
+      final data = result.data ?? <Task>[];
 
       final newTasks = data.where((t) => !_tasks.any((old) => old.id == t.id)).toList();
 
@@ -133,11 +148,13 @@ class _TasksScreenState extends State<TasksScreen> {
     });
 
     try {
-      await _apiService.toggleTaskStatus(
+      final result = await _toggleTaskStatusUseCase(
         taskId: task.id,
         currentStatus: oldStatus,
-        token: _token!,
       );
+      if (!result.success) {
+        throw Exception(result.message);
+      }
     } catch (_) {
       setState(() {
         _tasks[index] = _tasks[index].copyWith(status: oldStatus);
@@ -177,13 +194,13 @@ class _TasksScreenState extends State<TasksScreen> {
     if (showLoading) setState(() => _isLoading = true);
 
     try {
-      final data = await _apiService.fetchTasks(
-        token: _token!,
+      final result = await _fetchTasksUseCase(
         page: reset ? 1 : _page,
         limit: _limit,
         searchTerm: _searchTerm.isNotEmpty ? _searchTerm : null,
         categoryId: selectedCategoryId,
       );
+      final data = result.data ?? <Task>[];
 
       setState(() {
         if (reset) {
@@ -293,7 +310,8 @@ class _TasksScreenState extends State<TasksScreen> {
                                   );
                                   if (newTask != null) {
                                     await _refreshTasks();
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(this.context).showSnackBar(
                                        SnackBar(
                                         content: Text('Task created successfully!'),
                                         backgroundColor: AppTheme.success,
@@ -326,7 +344,7 @@ class _TasksScreenState extends State<TasksScreen> {
               if (_isLoading && _tasks.isEmpty)
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                        (_, __) => const TasksCardShimmer(),
+                        (context, index) => const TasksCardShimmer(),
                     childCount: 3,
                   ),
                 ),
@@ -335,11 +353,21 @@ class _TasksScreenState extends State<TasksScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 60),
-                    child: Center(
-                      child: Text(
-                        selectedCategoryId == null ? 'No tasks found' : 'No tasks found for this category',
-                        style: TextStyle(color: AppTheme.textMuted),
-                      ),
+                    child: AppEmptyState(
+                      title: selectedCategoryId == null
+                          ? 'No tasks found'
+                          : 'No tasks found for this category',
+                    ),
+                  ),
+                ),
+
+              if (_errorMessage != null && _tasks.isEmpty)
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 300,
+                    child: AppErrorState(
+                      message: _errorMessage!,
+                      onRetry: () => _fetchTasks(reset: true),
                     ),
                   ),
                 ),
@@ -351,7 +379,7 @@ class _TasksScreenState extends State<TasksScreen> {
               if (_isLoading && _tasks.isNotEmpty)
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                        (_, __) => const TasksCardShimmer(),
+                        (context, index) => const TasksCardShimmer(),
                     childCount: 1,
                   ),
                 ),
@@ -388,8 +416,9 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   Widget _buildCategoryFilters() {
+    final chipHeight = ResponsiveHelper.isTablet(context) ? 56.0 : 50.0;
     return SizedBox(
-      height: 50,
+      height: chipHeight,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 15),
