@@ -32,6 +32,6 @@ export const fetchLogsStats  = async ()=>{
 }
 export const fetchLogsDetails = async(id)=>{
     let response = await api.get(`/logs/${id}`)
-    console.log(response.data.data)
+    console.log(response)
     return response.data.data
 }
