@@ -9,7 +9,14 @@ export default function LogTable({ filteredList }) {
 const tableError = useLogsStore((state)=> state.tableError)
 const tableLoading = useLogsStore((state)=> state.tableLoading)
 const [isModalOpen, setModalOpen] = useState(false)
-
+const getLogsDetails = useLogsStore((state)=> state.getLogsDetails)
+const [logsDetails, setLogsDetails] = useState(null)
+const handleRouteClick = async(logId)=>{
+    console.log("Clicked logId:", logId)
+   let response =  await getLogsDetails(logId)
+   setLogsDetails(response)
+      setModalOpen(true)
+}
   if (tableError) {
     return (
       <div className="w-full py-16 flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
@@ -47,7 +54,6 @@ const [isModalOpen, setModalOpen] = useState(false)
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Timestamp")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Level")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Method")}</th>
-            <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Message")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Route")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Status")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t('User ID')}</th>
@@ -57,8 +63,8 @@ const [isModalOpen, setModalOpen] = useState(false)
         </thead>
 
         <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-          {filteredList.map((log, index) => (
-            <tr key={index} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+          {filteredList.map((log) => (
+            <tr key={log.logId} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-5 py-3.5 font-mono text-[13px] text-gray-400 whitespace-nowrap">
                 {formatDate(new Date(log.timestamp))}
               </td>
@@ -76,7 +82,7 @@ const [isModalOpen, setModalOpen] = useState(false)
                 {log.method}
               </td>
               <td className="px-5 py-3.5 text-[14px] cursor-pointer font-medium text-indigo-600 dark:text-indigo-400"
-              onClick={()=> setModalOpen(true)}
+              onClick={()=> handleRouteClick(log.logId)}
               >
                 {log.path}
               </td>
@@ -100,7 +106,7 @@ const [isModalOpen, setModalOpen] = useState(false)
           ))}
         </tbody>
       </table>
-      <LogsDetailsModal isOpen={isModalOpen} onClose={()=> setModalOpen(false)}></LogsDetailsModal>
+      <LogsDetailsModal isOpen={isModalOpen} logsDetails={logsDetails} onClose={()=> setModalOpen(false)}></LogsDetailsModal>
     </div>
   );
 }

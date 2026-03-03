@@ -30,3 +30,8 @@ export const fetchLogsStats  = async ()=>{
     let response = await api.get("/logs/log-stats")
     return response.data.data
 }
+export const fetchLogsDetails = async(id)=>{
+    let response = await api.get(`/logs/${id}`)
+    console.log(response.data.data)
+    return response.data.data
+}
