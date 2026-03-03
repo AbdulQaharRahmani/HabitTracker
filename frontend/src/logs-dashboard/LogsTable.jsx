@@ -12,7 +12,6 @@ const [isModalOpen, setModalOpen] = useState(false)
 const getLogsDetails = useLogsStore((state)=> state.getLogsDetails)
 const [logsDetails, setLogsDetails] = useState(null)
 const handleRouteClick = async(logId)=>{
-    console.log("Clicked logId:", logId)
    let response =  await getLogsDetails(logId)
    setLogsDetails(response)
       setModalOpen(true)

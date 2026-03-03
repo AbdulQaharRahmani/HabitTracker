@@ -70,13 +70,20 @@ const useLogsStore = create((set, get) => ({
             set({ sidebarLoading: false })
         }
     },
+    logsDetailLoading: false,
+    logsDetailError: null,
     getLogsDetails : async(logId)=>{
+        set({logsDetailLoading: true})
         try{
             let data = await fetchLogsDetails(logId)
             return data
         }catch(error){
            console.log(error)
            const message = error.response?.data?.message || "Failed to load logs details"
+           set({logsDetailError: message})
+
+        }finally{
+        set({logsDetailLoading: false})
         }
     }
 
