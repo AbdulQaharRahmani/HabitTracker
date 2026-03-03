@@ -9,6 +9,9 @@ import toast from "react-hot-toast";
 import "../App.css";
 import { useHotkeys } from "react-hotkeys-hook";
 import { MdTask } from "react-icons/md";
+import HabitCardIcon from "../components/HabitCardIcon";
+import { iconCategories } from "../utils/icons";
+import { FaCheckCircle } from "react-icons/fa";
 
 const InlineInput = ({ catId, value, onChange, onSubmit, onCancel }) => {
   const inputRef = useRef(null);
@@ -306,8 +309,6 @@ function Tasks() {
     }
   }, { dependencies: [activeCategoryId], enableOnFormTags: true });
 
-
-
   useEffect(() => {
     if (!loading && groupedArray.length > 0 && !activeCategoryId) {
       setTimeout(() => {
@@ -321,7 +322,17 @@ function Tasks() {
     }
   }, [loading, groupedArray.length]);
 
-  console.log(groupedArray);
+
+  const getIconComponent = (iconValue) => {
+    if (!iconValue) return null;
+    for (const category in iconCategories) {
+      const found = iconCategories[category].find(
+        (item) => item.value === iconValue
+      );
+      if (found) return found.icon;
+    }
+    return null;
+  };
 
 return (
     <div
@@ -339,7 +350,9 @@ return (
 
       {!loading && (
         <div className="columns-1 md:columns-2 lg:columns-3 gap-4 mt-4">
-          {groupedArray.map((group, index) => (
+        {groupedArray.map((group, index) => {
+          const Icon = getIconComponent(group.icon) || FaCheckCircle;
+          return (
             <div
               key={group.id}
               ref={(el) => (categoryRef.current[index] = el)}
@@ -355,9 +368,9 @@ return (
               className={`break-inside-avoid-column mb-4 bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-200/80 dark:border-gray-800 transition-all outline-none
                 ${activeCategoryId === group.id ? "ring-2 ring-indigo-500 shadow-lg ring-offset-2" : ""}`}
             >
-              <div className="p-6 pb-2 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+              <div className="px-4 pt-2 pb-1 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-1">
-                  <span className="text-xl">{group.icon || <MdTask/>}</span>
+                  <HabitCardIcon Icon={Icon} color={group.color}/>
                   <h5 className="font-bold text-lg text-gray-800 dark:text-gray-100">{group.name}</h5>
                 </div>
                 <button
@@ -387,7 +400,8 @@ return (
                 )}
               </div>
             </div>
-          ))}
+          );
+        })}
         </div>
       )}
     </div>
