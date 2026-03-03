@@ -8,6 +8,8 @@ const TodayList = () => {
   const { habits, loading, error, fetchHabitsByDate, toggleHabit } =
     useHabitStore();
 
+  console.log("habit data:", habits)
+
     const {t} = useTranslation();
 
   useEffect(() => {
