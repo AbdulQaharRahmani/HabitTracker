@@ -24,13 +24,14 @@ import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
 import { useTranslation } from "react-i18next";
 import AdminRoute from "./components/AdminRoute";
 
-
 function App() {
   const {t} = useTranslation()
-    const { i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const[initialLoading, setInitialLoading] = useState(true)
   const login = useAuthStore((state) => state.login)
   const logout = useAuthStore((state) => state.logout)
+  const isRateLimited = useAuthStore((state) => state.isRateLimited);
+
   useEffect(() => {
     const getAccessToken = async () => {
       try {
@@ -55,6 +56,26 @@ function App() {
     document.documentElement.lang = savedLanguage
     localStorage.setItem("language", currentLang)
   }, [i18n.language])
+
+  useEffect(() => {
+  if (isRateLimited) {
+    const timer = setTimeout(() => {
+      useAuthStore.getState().setRateLimited(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }
+  }, [isRateLimited]);
+
+    if (isRateLimited) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
+        <p className="text-red-500 font-semibold text-lg">
+          Too many requests. Please wait some seconds...
+        </p>
+      </div>
+    );
+  }
   if(initialLoading){
     return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
@@ -65,6 +86,7 @@ function App() {
     </div>
   );
   }
+
   return (
     <>
       <Toaster

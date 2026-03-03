@@ -25,7 +25,7 @@ export default function Habits() {
   const ITEMS_PER_PAGE = 10;
   useEffect(() => {
     fetchHabitsPage(currentPage, ITEMS_PER_PAGE);
-  }, [currentPage, fetchHabitsPage]);
+  }, []);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;

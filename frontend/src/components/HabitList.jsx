@@ -3,21 +3,20 @@ import Pagination from "./Pagination";
 import useHabitStore from "../store/useHabitStore";
 import { useTranslation } from "react-i18next";
 
-
 export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
-  const habits = useHabitStore((state)=> state.habits)
-  const loading = useHabitStore((state)=> state.loading)
-  const error = useHabitStore((state)=> state.error)
-  const totalCount = useHabitStore((state)=> state.totalCount)
+  const habits = useHabitStore((state) => state.habits);
+  const loading = useHabitStore((state) => state.loading);
+  const error = useHabitStore((state) => state.error);
+  const totalCount = useHabitStore((state) => state.totalCount);
   const ITEMS_PER_PAGE = 10;
-  const {t} = useTranslation()
+  const { t } = useTranslation();
   if (loading && habits.length === 0) {
     return (
       <div className="animate-pulse space-y-4 mt-6">
-          <div className="h-24 bg-gray-200 rounded-lg"></div>
-          <div className="h-24 bg-gray-200 rounded-lg"></div>
-          <div className="h-24 bg-gray-200 rounded-lg"></div>
-       </div>
+        <div className="h-24 bg-gray-200 rounded-lg"></div>
+        <div className="h-24 bg-gray-200 rounded-lg"></div>
+        <div className="h-24 bg-gray-200 rounded-lg"></div>
+      </div>
     );
   }
 
@@ -40,7 +39,7 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
       >
         {habits.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400 text-lg">
-            No habits found.
+            {t("No habits found.")}
           </p>
         ) : (
           habits.map((habit) => (
@@ -50,7 +49,7 @@ export default function HabitList({ viewMode, currentPage, setCurrentPage }) {
               viewMode={viewMode}
               title={habit.title}
               description={habit.description}
-              categoryId={habit.categoryId }
+              categoryId={habit.categoryId}
               frequency={habit.frequency}
             />
           ))
