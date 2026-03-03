@@ -135,6 +135,7 @@
   "Activity by Month": "فعالیت ماهانه",
   "terms_of_service": "شرایط خدمات ",
   "and": "و",
+  "Add": "جدید",
   "privacy_policy": "سیاست حفظ حریم خصوصی موافقم",
   "Sign Up": "ثبت‌ نام",
   "Remember for 30 days": "30 مرا به یاد داشته باش",
@@ -154,6 +155,7 @@
   "Welcome back": "خوش آمدید",
   "Have an account": "قبلاً حساب دارید؟",
   "Don't have an account": "قبلاً حساب ندارید؟",
+  "manage your tasks and do them.": "کار های خود را مدریت و انجام دهید",
   "Enter your Credentials to access your account": "برای دسترسی به حساب تان، اعتبارنامه های خود را وارد کنید",
   "Log in": "ورود",
   "Log Management & Analytics Dashboard": "داشبورد مدیریت و تحلیل لاگ‌ها",
@@ -270,7 +272,7 @@
   "Password updated. please log in again": "رمز عبور به روزرسانی شده. لطفا دوباره وارد شوید",
   "Password update failed": "بروزرسانی رمز عبور ناموفق بود",
   "Message": "پیام",
-  
+
   "displaying": "نمایش",
   "outOf": "از",
   "daily": "روزانه",

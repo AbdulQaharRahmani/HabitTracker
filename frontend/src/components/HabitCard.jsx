@@ -41,20 +41,17 @@ export default function HabitCard({
 
   const getIconComponent = (iconValue) => {
     if (!iconValue) return null;
-
     for (const category in iconCategories) {
       const found = iconCategories[category].find(
         (item) => item.value === iconValue
       );
-
       if (found) return found.icon;
     }
-
     return null;
   };
 
   const Icon =  getIconComponent(categoryId?.icon) || FaCheckCircle;
-  
+
   return (
     <>
     <div
