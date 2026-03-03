@@ -8,6 +8,7 @@ import AddCategory from "../components/tasks/AddCategory";
 import toast from "react-hot-toast";
 import "../App.css";
 import { useHotkeys } from "react-hotkeys-hook";
+import { MdTask } from "react-icons/md";
 
 const InlineInput = ({ catId, value, onChange, onSubmit, onCancel }) => {
   const inputRef = useRef(null);
@@ -356,7 +357,7 @@ return (
             >
               <div className="p-6 pb-2 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-1">
-                  <span className="text-xl">{group.icon || "📋"}</span>
+                  <span className="text-xl">{group.icon || <MdTask/>}</span>
                   <h5 className="font-bold text-lg text-gray-800 dark:text-gray-100">{group.name}</h5>
                 </div>
                 <button
