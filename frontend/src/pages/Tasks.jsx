@@ -1,74 +1,61 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import Header from "../components/Header";
-import AddTask from "../components/tasks/AddTask";
 import TaskCard from "../components/tasks/TaskCard";
 import { useTaskCardStore } from "../store/useTaskCardStore";
 import { useTranslation } from "react-i18next";
 import i18n from "../utils/i18n";
-import EditTask from "../components/tasks/EditTask";
-import { useHotkeys } from "react-hotkeys-hook";
 import AddCategory from "../components/tasks/AddCategory";
+import toast from "react-hot-toast";
 import "../App.css";
+import { useHotkeys } from "react-hotkeys-hook";
 
-const CircularProgress = ({ percentage, color }) => {
-  const radius = 32;
-  const stroke = 5;
-  const normalizedRadius = radius - stroke * 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+const InlineInput = ({ catId, value, onChange, onSubmit, onCancel }) => {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="relative flex items-center justify-center w-20 h-20">
-      <svg height={radius * 2} width={radius * 2} className="transform -rotate-90">
-        <circle
-          stroke="#e5e7eb"
-          fill="transparent"
-          strokeWidth={stroke}
-          r={normalizedRadius}
-          cx={radius}
-          cy={radius}
-        />
-        <circle
-          stroke={color || "#6366f1"}
-          fill="transparent"
-          strokeWidth={stroke}
-          strokeDasharray={circumference + " " + circumference}
-          style={{ strokeDashoffset }}
-          strokeLinecap="round"
-          r={normalizedRadius}
-          cx={radius}
-          cy={radius}
-        />
-      </svg>
-      <span className="absolute text-sm font-bold text-gray-800 dark:text-gray-100">{percentage}%</span>
+    <div className="mb-2 px-1">
+      <input
+        ref={inputRef}
+        type="text"
+        data-inline-input="true"
+        className="w-full p-2 text-sm border-2 border-indigo-500 rounded-lg outline-none dark:bg-gray-800 dark:text-white"
+        placeholder="Task title..."
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+          if (e.key === "Enter") { e.preventDefault(); onSubmit(catId); }
+          if (e.key === "Escape") { e.preventDefault(); onCancel(); }
+        }}
+        onBlur={() => {
+          setTimeout(() => { if (!value?.trim()) onCancel(); }, 150);
+        }}
+      />
     </div>
   );
 };
 
 function Tasks() {
-  const {
-    tasks,
-    fetchTasks,
-    loading,
-    isModalOpen,
-    isEditModalOpen,
-    fetchCategories,
-    setModalOpen,
-    setTaskData,
-    categories
-  } = useTaskCardStore((state) => state);
+  const { tasks, fetchTasks, loading, fetchCategories, addTask, categories } =
+    useTaskCardStore((state) => state);
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
   const [activeCategoryId, setActiveCategoryId] = useState(null);
+  const [inlineTaskTitle, setInlineTaskTitle] = useState("");
+  const [isAddingToId, setIsAddingToId] = useState(null);
 
-  useEffect(() => {
-    fetchTasks(ITEMS_PER_PAGE, page);
-  }, [page, isModalOpen, isEditModalOpen, fetchTasks]);
+  const categoryRef = useRef([]);
+  const isAddingRef = useRef(false);
+  const containerRef = useRef(null);
 
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  useEffect(() => { fetchTasks(ITEMS_PER_PAGE, page); }, [page, fetchTasks]);
+  useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
   const { t } = useTranslation();
   const isRTL = i18n.language === "fa";
@@ -88,311 +75,322 @@ function Tasks() {
 
     tasks.forEach((task) => {
       const catId = typeof task.categoryId === "object" ? task.categoryId?._id : task.categoryId;
-      if (catId && groups[catId]) {
-        groups[catId].items.push(task);
-      }
+      if (catId && groups[catId]) groups[catId].items.push(task);
     });
 
-    return Object.values(groups).map(group => {
-      const completedCount = group.items.filter(i => i.status === "done").length;
+    return Object.values(groups).map((group) => {
+      const completedCount = group.items.filter((i) => i.status === "done").length;
       const totalCount = group.items.length;
       const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
       return { ...group, completedCount, totalCount, percentage };
     });
   }, [tasks, categories]);
 
-  const handleAddNewTaskToCategory = (e, catId) => {
-    e.stopPropagation();
-    setTaskData("title", "");
-    setTaskData("category", catId);
-    setModalOpen(true);
-  };
+  const handleQuickAdd = useCallback(async (catId) => {
+    if (!inlineTaskTitle.trim()) {
+      setIsAddingToId(null);
+      setInlineTaskTitle("");
+      return;
+    }
+    try {
+      isAddingRef.current = true;
+      await addTask({ title: inlineTaskTitle, categoryId: catId, priority: "medium", dueDate: new Date().toISOString() });
+      setInlineTaskTitle("");
+      setIsAddingToId(null);
+      toast.success(t("Task added"));
+      setTimeout(() => document.querySelector(`[data-category-id="${catId}"]`)?.focus(), 100);
+    } catch (err) {
+      toast.error(t("Error adding task"));
+    } finally {
+      isAddingRef.current = false;
+    }
+  }, [inlineTaskTitle, addTask, t]);
 
-  const categoryRef = useRef([]);
+  const cancelAdding = useCallback(() => {
+    const catId = isAddingToId;
+    setIsAddingToId(null);
+    setInlineTaskTitle("");
+    if (catId) setTimeout(() => document.querySelector(`[data-category-id="${catId}"]`)?.focus(), 50);
+  }, [isAddingToId]);
 
-  useHotkeys("up, down, left, right", (e) => {
-      const active = document.activeElement;
-      if (!active || !active.hasAttribute("data-task-card")) return;
+  const startAdding = useCallback((catId) => {
+    setIsAddingToId(catId);
+    setActiveCategoryId(catId);
+    setInlineTaskTitle("");
+  }, []);
+
+  const getClosestCategoryCard = useCallback((element) => {
+    let el = element;
+    while (el) {
+      if (el.getAttribute?.("data-category-card") === "true") return el;
+      el = el.parentElement;
+    }
+    return null;
+  }, []);
+
+  const handleContainerKeyDown = useCallback((e) => {
+    const active = document.activeElement;
+    const isInlineInput = active?.getAttribute("data-inline-input") === "true";
+    const isEditInput = active?.getAttribute("data-edit-input") === "true";
+    const isTaskCard = active?.hasAttribute("data-task-card");
+    const isCategoryCard = active?.getAttribute("data-category-card") === "true";
+
+    if (isInlineInput) return;
+
+    if (isEditInput) return;
+
+
+    if (e.key === "Escape") {
+      if (isAddingToId) { e.preventDefault(); cancelAdding(); }
+      return;
+    }
+
+    if (e.key === "Tab") {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const allCards = Array.from(
+        document.querySelectorAll('[data-category-card="true"]')
+      );
+      const visibleCards = allCards.filter(
+        (el) => el.offsetWidth > 0 && el.offsetHeight > 0
+      );
+
+      if (visibleCards.length === 0) return;
+
+      let currentIndex = -1;
+
+      if (isCategoryCard) {
+        currentIndex = visibleCards.indexOf(active);
+      } else {
+        const parentCard = getClosestCategoryCard(active);
+        if (parentCard) {
+          currentIndex = visibleCards.indexOf(parentCard);
+        }
+      }
+
+      let nextIndex;
+      if (currentIndex === -1) {
+        nextIndex = 0;
+      } else if (e.shiftKey) {
+        nextIndex = (currentIndex - 1 + visibleCards.length) % visibleCards.length;
+      } else {
+        nextIndex = (currentIndex + 1) % visibleCards.length;
+      }
+
+      const nextCard = visibleCards[nextIndex];
+      if (nextCard) {
+        const catId = nextCard.getAttribute("data-category-id");
+        if (catId) setActiveCategoryId(catId);
+        nextCard.focus();
+      }
+      return;
+    }
+
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+      if (isCategoryCard && !isTaskCard) {
+        const catId = active.getAttribute("data-category-id");
+        if (catId && (e.key === "ArrowDown" || e.key === "Enter")) {
+          e.preventDefault();
+          const firstTask = active.querySelector("[data-task-card]");
+          if (firstTask) firstTask.focus();
+        }
+        return;
+      }
+
+      if (!isTaskCard) return;
+
       e.preventDefault();
       const currentId = active.getAttribute("data-id");
+      let colIndex = -1;
+      let rowIndex = -1;
 
-      const visibleCards = Array.from(document.querySelectorAll('[data-task-card]'));
-      const currentIndex = visibleCards.findIndex(card => card.getAttribute('data-id') === currentId);
+      groupedArray.forEach((group, cIdx) => {
+        const rIdx = group.items.findIndex((item) => item._id === currentId);
+        if (rIdx !== -1) { colIndex = cIdx; rowIndex = rIdx; }
+      });
 
-      if (currentIndex === -1) return;
+      if (colIndex === -1) return;
 
-      const columns = window.innerWidth >= 1024 ? 1 : window.innerWidth >= 768 ? 1 : 1;
+      let nextCol = colIndex;
+      let nextRow = rowIndex;
 
-      let nextIndex = currentIndex;
+      if (e.key === "ArrowUp") nextRow--;
+      if (e.key === "ArrowDown") nextRow++;
+      if (e.key === "ArrowLeft") isRTL ? nextCol++ : nextCol--;
+      if (e.key === "ArrowRight") isRTL ? nextCol-- : nextCol++;
 
-      if (e.key === "ArrowUp") nextIndex = Math.max(0, currentIndex - columns);
-      if (e.key === "ArrowDown") nextIndex = Math.min(visibleCards.length - 1, currentIndex + columns);
-      if (e.key === "ArrowLeft") nextIndex = isRTL ? Math.min(visibleCards.length - 1, currentIndex + 1) : Math.max(0, currentIndex - 1);
-      if (e.key === "ArrowRight") nextIndex = isRTL ? Math.max(0, currentIndex - 1) : Math.min(visibleCards.length - 1, currentIndex + 1);
+      nextCol = Math.max(0, Math.min(nextCol, groupedArray.length - 1));
+      const targetGroup = groupedArray[nextCol];
+      if (!targetGroup || targetGroup.items.length === 0) return;
 
-      const nextTask = visibleCards[nextIndex];
-      if (nextTask) nextTask.focus();
-    }, { enableOnFormTags: false, dependencies: [groupedArray, isRTL] }
-  );
+      nextRow = Math.max(0, Math.min(nextRow, targetGroup.items.length - 1));
+      const nextTask = targetGroup.items[nextRow];
+      if (nextTask) document.querySelector(`[data-id="${nextTask._id}"]`)?.focus();
+      return;
+    }
+  }, [activeCategoryId, isAddingToId, groupedArray, isRTL, startAdding, cancelAdding, getClosestCategoryCard, t]);
 
-  useHotkeys("ctrl+k, meta+k", (e) => {
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleCapture = (e) => {
+      if (e.key !== "Tab") return;
+
+      const active = document.activeElement;
+      const isInlineInput = active?.getAttribute("data-inline-input") === "true";
+      const isEditInput = active?.getAttribute("data-edit-input") === "true";
+
+      if (isInlineInput || isEditInput) return;
+
+      if (!container.contains(active)) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const allCards = Array.from(
+        document.querySelectorAll('[data-category-card="true"]')
+      );
+      const visibleCards = allCards.filter(
+        (el) => el.offsetWidth > 0 && el.offsetHeight > 0
+      );
+
+      if (visibleCards.length === 0) return;
+
+      let currentIndex = -1;
+      const isCategoryCard = active?.getAttribute("data-category-card") === "true";
+
+      if (isCategoryCard) {
+        currentIndex = visibleCards.indexOf(active);
+      } else {
+        let el = active;
+        while (el) {
+          if (el.getAttribute?.("data-category-card") === "true") {
+            currentIndex = visibleCards.indexOf(el);
+            break;
+          }
+          el = el.parentElement;
+        }
+      }
+
+      let nextIndex;
+      if (currentIndex === -1) {
+        nextIndex = 0;
+      } else if (e.shiftKey) {
+        nextIndex = (currentIndex - 1 + visibleCards.length) % visibleCards.length;
+      } else {
+        nextIndex = (currentIndex + 1) % visibleCards.length;
+      }
+
+      const nextCard = visibleCards[nextIndex];
+      if (nextCard) {
+        const catId = nextCard.getAttribute("data-category-id");
+        if (catId) setActiveCategoryId(catId);
+        nextCard.focus();
+      }
+    };
+
+    container.addEventListener("keydown", handleCapture, true);
+
+    return () => {
+      container.removeEventListener("keydown", handleCapture, true);
+    };
+  }, []);
+
+    useHotkeys("ctrl+k, meta+k", (e) => {
     e.preventDefault();
     if (activeCategoryId) {
-      setTaskData("category", activeCategoryId);
-      setModalOpen(true);
+      startAdding(activeCategoryId);
     }
-  }, { enabled: !isModalOpen, dependencies: [activeCategoryId] });
+  }, { dependencies: [activeCategoryId], enableOnFormTags: true });
 
-useHotkeys("tab", (e) => {
-    const allCards = Array.from(document.querySelectorAll('[data-category-card]'));
 
-    const visibleCards = allCards.filter(el => el.offsetParent !== null);
 
-    if (visibleCards.length === 0) return;
-
-    e.preventDefault();
-
-    const active = document.activeElement;
-    const currentIndex = visibleCards.findIndex(el => el.contains(active));
-
-    const nextIndex = (currentIndex + 1) % visibleCards.length;
-    const nextCategory = visibleCards[nextIndex];
-
-    if (nextCategory) {
-      const catId = nextCategory.getAttribute('data-category-id');
-      setActiveCategoryId(catId);
-
-      const firstTask = nextCategory.querySelector("[data-task-card]");
-      if (firstTask) {
-        firstTask.focus();
-      } else {
-        nextCategory.focus();
-      }
+  useEffect(() => {
+    if (!loading && groupedArray.length > 0 && !activeCategoryId) {
+      setTimeout(() => {
+        const firstCard = document.querySelector('[data-category-card="true"]');
+        if (firstCard) {
+          const catId = firstCard.getAttribute("data-category-id");
+          if (catId) setActiveCategoryId(catId);
+          firstCard.focus();
+        }
+      }, 200);
     }
-  }, { enableOnFormTags: false, dependencies: [groupedArray] });
+  }, [loading, groupedArray.length]);
 
-  return (
-    <div className={`pb-10 px-4 md:px-6 bg-[#faf9f8] dark:bg-gray-950 min-h-screen ${isRTL ? "rtl" : "ltr"}`}>
-      <EditTask />
-      <AddTask />
+  console.log(groupedArray);
 
+return (
+    <div
+      ref={containerRef}
+      onKeyDown={handleContainerKeyDown}
+      tabIndex={-1}
+      className={`pb-10 px-4 md:px-6 bg-[#faf9f8] dark:bg-gray-950 min-h-screen outline-none ${isRTL ? "rtl" : "ltr"}`}
+    >
       <div className="flex sticky z-10 justify-between items-center py-6">
-        <Header title={t("Tasks")} subtitle={t("manage your habits and do them.")} />
-        <button
-          onClick={() => setModalOpen(true)}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-md transition-transform active:scale-95"
-        >
-          <span className="text-xl font-bold">+</span> Add New Task
-        </button>
+        <Header title={t("Tasks")} subtitle={t("manage your tasks and do them.")} />
+        <div className="flex items-center gap-3">
+          <AddCategory variant="header" />
+        </div>
       </div>
 
       {!loading && (
-        <>
-          {/* Masonry layout for desktop */}
-          <div className="hidden lg:block">
-            <div className="columns-3 gap-4 mt-4">
-              {groupedArray.map((group, index) => (
-                <div
-                  key={group.id}
-                  ref={(el) => (categoryRef.current[index] = el)}
-                  data-category-card="true"
-                  data-category-id={group.id}
-                  tabIndex="0"
-                  onClick={() => setActiveCategoryId(group.id)}
-                  onFocus={() => setActiveCategoryId(group.id)}
-                  className={`break-inside-avoid-column mb-3 bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-200/80 dark:border-gray-800 transition-all focus:outline-none
-                    ${activeCategoryId === group.id ? 'ring-2 ring-indigo-500 shadow-lg ring-offset-2' : ''}`}
-                >
-                  {/* Card Header */}
-                  <div className="p-6 pb-2 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xl">{group.icon || '📋'}</span>
-                      <h5 className="font-bold text-lg text-gray-800 dark:text-gray-100">
-                        {group.name}
-                      </h5>
-                    </div>
-                    <button
-                      onClick={(e) => handleAddNewTaskToCategory(e, group.id)}
-                      className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-sm"
-                    >
-                      <span className="text-sm font-semibold">+</span> add new
-                    </button>
-                  </div>
-
-                  {/* Task List Section */}
-                  <div className="px-6 py-3">
-                    {group.items.length > 0 ? (
-                      <div>
-                        {group.items.map((task) => (
-                          <TaskCard key={task._id} {...task} />
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-400 text-sm text-center py-1">{t("No tasks here")}</p>
-                    )}
-                  </div>
-
-                  {/* Card Footer with Progress */}
-                  <div className="px-6 py-1 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center rounded-b-3xl">
-                    <div>
-                      <p className="text-indigo-600 dark:text-indigo-400 text-xs font-semibold mb-1">
-                        {group.completedCount} of {group.totalCount} habits completed today!
-                      </p>
-                      <button className="text-red-500 text-xs font-semibold hover:underline">
-                        Read more ...
-                      </button>
-                    </div>
-                    <CircularProgress percentage={group.percentage} color={group.color} />
-                  </div>
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-4 mt-4">
+          {groupedArray.map((group, index) => (
+            <div
+              key={group.id}
+              ref={(el) => (categoryRef.current[index] = el)}
+              data-category-card="true"
+              data-category-id={group.id}
+              tabIndex={0}
+              onClick={() => setActiveCategoryId(group.id)}
+              onFocus={(e) => {
+                if (e.target.getAttribute("data-category-card") === "true") {
+                  setActiveCategoryId(group.id);
+                }
+              }}
+              className={`break-inside-avoid-column mb-4 bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-200/80 dark:border-gray-800 transition-all outline-none
+                ${activeCategoryId === group.id ? "ring-2 ring-indigo-500 shadow-lg ring-offset-2" : ""}`}
+            >
+              <div className="p-6 pb-2 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+                <div className="flex items-center gap-1">
+                  <span className="text-xl">{group.icon || "📋"}</span>
+                  <h5 className="font-bold text-lg text-gray-800 dark:text-gray-100">{group.name}</h5>
                 </div>
-              ))}
-
-              <div
-                ref={(el) => (categoryRef.current[groupedArray.length] = el)}
-                data-category-card="true"
-                tabIndex="0"
-                className="break-inside-avoid-column mb-7 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700 p-4 flex items-center justify-center h-[200px] bg-white/50 dark:bg-gray-900/50"
-              >
-                <AddCategory />
+                <button
+                  tabIndex={-1}
+                  onClick={(e) => { e.stopPropagation(); startAdding(group.id); }}
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-sm"
+                >
+                  <span className="text-sm font-semibold">+</span> {t("Add")}
+                </button>
+              </div>
+              <div className="px-6 py-3">
+                {isAddingToId === group.id && (
+                  <InlineInput
+                    catId={group.id}
+                    value={inlineTaskTitle}
+                    onChange={setInlineTaskTitle}
+                    onSubmit={handleQuickAdd}
+                    onCancel={cancelAdding}
+                  />
+                )}
+                {group.items.length > 0 ? (
+                  <div>{group.items.map((task) => <TaskCard key={task._id} {...task} />)}</div>
+                ) : (
+                  isAddingToId !== group.id && (
+                    <p className="text-gray-400 text-sm text-center py-1">{t("No tasks here")}</p>
+                  )
+                )}
               </div>
             </div>
-          </div>
-            {/* tablet layout  */}
-          <div className="hidden md:block lg:hidden">
-            <div className="columns-2 gap-4 mt-2">
-              {groupedArray.map((group, index) => (
-                <div
-                  key={group.id}
-                  ref={(el) => (categoryRef.current[index] = el)}
-                  data-category-card="true"
-                  data-category-id={group.id}
-                  tabIndex="0"
-                  onClick={() => setActiveCategoryId(group.id)}
-                  onFocus={() => setActiveCategoryId(group.id)}
-                  className={`break-inside-avoid-column mb-7 bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-200/80 dark:border-gray-800 transition-all focus:outline-none
-                    ${activeCategoryId === group.id ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}`}
-                >
-                  <div className="p-6 pb-2 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{group.icon || '📋'}</span>
-                      <h3 className="font-bold text-xl text-gray-800 dark:text-gray-100">
-                        {group.name}
-                      </h3>
-                    </div>
-                    <button
-                      onClick={(e) => handleAddNewTaskToCategory(e, group.id)}
-                      className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-1.5 rounded-lg flex items-center gap-1 shadow-sm"
-                    >
-                      <span className="text-sm font-bold">+</span> Add new
-                    </button>
-                  </div>
-
-                  <div className="px-6 py-4">
-                    {group.items.length > 0 ? (
-                      <div className="space-y-1">
-                        {group.items.map((task) => (
-                          <TaskCard key={task._id} {...task} />
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-400 text-sm text-center py-1">{t("No tasks here")}</p>
-                    )}
-                  </div>
-
-                  <div className="px-6 py-5 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center rounded-b-3xl">
-                    <div>
-                      <p className="text-indigo-600 dark:text-indigo-400 text-xs font-semibold mb-2">
-                        {group.completedCount} of {group.totalCount} habits completed today!
-                      </p>
-                      <button className="text-red-500 text-xs font-semibold hover:underline">
-                        Read more ...
-                      </button>
-                    </div>
-                    <CircularProgress percentage={group.percentage} color={group.color} />
-                  </div>
-                </div>
-              ))}
-
-              <div
-                ref={(el) => (categoryRef.current[groupedArray.length] = el)}
-                data-category-card="true"
-                tabIndex="0"
-                className="break-inside-avoid-column mb-7 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700 p-4 flex items-center justify-center h-[200px] bg-white/50 dark:bg-gray-900/50"
-              >
-                <AddCategory />
-              </div>
-            </div>
-          </div>
-
-
-          <div className="block md:hidden">
-            <div className="columns-1 gap-4 mt-4">
-              {groupedArray.map((group, index) => (
-                <div
-                  key={group.id}
-                  ref={(el) => (categoryRef.current[index] = el)}
-                  data-category-card="true"
-                  data-category-id={group.id}
-                  tabIndex="0"
-                  onClick={() => setActiveCategoryId(group.id)}
-                  onFocus={() => setActiveCategoryId(group.id)}
-                  className={`break-inside-avoid-column mb-7 bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-200/80 dark:border-gray-800 transition-all focus:outline-none
-                    ${activeCategoryId === group.id ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}`}
-                >
-                  <div className="p-6 pb-2 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{group.icon || '📋'}</span>
-                      <h3 className="font-bold text-xl text-gray-800 dark:text-gray-100">
-                        {group.name}
-                      </h3>
-                    </div>
-                    <button
-                      onClick={(e) => handleAddNewTaskToCategory(e, group.id)}
-                      className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-1.5 rounded-lg flex items-center gap-1 shadow-sm"
-                    >
-                      <span className="text-sm font-bold">+</span> Add new
-                    </button>
-                  </div>
-
-                  <div className="px-6 py-4">
-                    {group.items.length > 0 ? (
-                      <div>
-                        {group.items.map((task) => (
-                          <TaskCard key={task._id} {...task} />
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-400 text-sm text-center py-1">{t("No tasks here")}</p>
-                    )}
-                  </div>
-
-                  <div className="px-6 py-5 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center rounded-b-3xl">
-                    <div>
-                      <p className="text-indigo-600 dark:text-indigo-400 text-xs font-semibold mb-2">
-                        {group.completedCount} of {group.totalCount} habits completed today!
-                      </p>
-                      <button className="text-red-500 text-xs font-semibold hover:underline">
-                        Read more ...
-                      </button>
-                    </div>
-                    <CircularProgress percentage={group.percentage} color={group.color} />
-                  </div>
-                </div>
-              ))}
-
-              <div
-                ref={(el) => (categoryRef.current[groupedArray.length] = el)}
-                data-category-card="true"
-                tabIndex="0"
-                className="break-inside-avoid-column mb-7 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700 p-4 flex items-center justify-center h-[200px] bg-white/50 dark:bg-gray-900/50"
-              >
-                <AddCategory />
-              </div>
-            </div>
-          </div>
-        </>
+          ))}
+        </div>
       )}
     </div>
   );
 }
+
 export default Tasks;
