@@ -5,6 +5,7 @@ import HabitCardIcon from "./HabitCardIcon";
 import { MdDeleteOutline } from "react-icons/md";
 import useHabitStore from "../store/useHabitStore";
 import ConfirmationModal from './modals/ConfirmationModal';
+import { iconCategories } from '../utils/icons';
 
 import { useTranslation } from "react-i18next";
 
@@ -13,20 +14,17 @@ export default function HabitCard({
   description,
   categoryId,
   frequency,
-  duration,
   viewMode,
   _id,
 }) {
   const color = categoryId?.backgroundColor || "#6366F1";
   const bgColor = `${color}15`;
-  const Icon = FaCheckCircle;
   const { openEditHabitModal } = useHabitStore();
   const deleteHabit = useHabitStore((state) => state.deleteHabit);
   const { t } = useTranslation();
 
   const [isModalOpen,setIsModalOpen]=useState(false);
   const [isDeleting,setIsDeleting]=useState(false);
-
 
   const handleDelete=async()=>{
     try{
@@ -41,6 +39,18 @@ export default function HabitCard({
     }
   }
 
+  const getIconComponent = (iconValue) => {
+    if (!iconValue) return null;
+    for (const category in iconCategories) {
+      const found = iconCategories[category].find(
+        (item) => item.value === iconValue
+      );
+      if (found) return found.icon;
+    }
+    return null;
+  };
+
+  const Icon =  getIconComponent(categoryId?.icon) || FaCheckCircle;
 
   return (
     <>
@@ -74,9 +84,7 @@ export default function HabitCard({
             </span>
 
             <span className="flex items-center text-[12px] text-gray-500 dark:text-gray-400">
-              {frequency || "No frequency"}
-              <FaCircle className="mx-2 text-[5px]" />
-              {duration || "No Duration"}
+              {t(frequency) || "No frequency"}
             </span>
           </div>
         </div>

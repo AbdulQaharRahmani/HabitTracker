@@ -18,7 +18,7 @@ export default function LogStats() {
     indigo: "bg-indigo-50/50 border-indigo-100 text-indigo-600 dark:bg-indigo-500/10 dark:border-indigo-400/20",
     rose: "bg-rose-50/50 border-rose-100 text-rose-600 dark:bg-rose-500/10 dark:border-rose-400/20",
     amber: "bg-amber-50/50 border-amber-100 text-amber-600 dark:bg-amber-500/10 dark:border-amber-400/20",
-    emerald: "bg-emerald-50/50 border-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-400/20",
+    emerald: "bg-blue-50/50 border-blue-100 text-blue-600 dark:bg-blue-500/10 dark:border-blue-400/20",
   };
 
   const statsArray = Object.entries(logsStats || {}).map(([key, value]) => ({

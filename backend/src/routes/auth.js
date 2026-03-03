@@ -6,12 +6,17 @@ import {
   googleLogin,
   refreshAccessToken,
   logOutUser,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/authController.js';
 import {
+  forgotPasswordValidator,
   loginValidator,
   registerValidator,
+  resetPasswordValidator,
 } from '../validators/validateUser.js';
 import { validate } from '../middleware/validate.js';
+import { forgotPasswordLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -22,6 +27,19 @@ router.post(
   asyncHandler(registerUser)
 );
 router.post('/login', loginValidator, validate, asyncHandler(loginUser));
+router.post(
+  '/forgotPassword',
+  forgotPasswordLimiter,
+  forgotPasswordValidator,
+  validate,
+  asyncHandler(forgotPassword)
+);
+router.put(
+  '/resetPassword/:resetToken',
+  resetPasswordValidator,
+  validate,
+  asyncHandler(resetPassword)
+);
 
 //Google routes
 router.post('/google', asyncHandler(googleLogin));

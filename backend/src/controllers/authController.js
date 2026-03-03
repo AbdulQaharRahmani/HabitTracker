@@ -10,9 +10,10 @@ import { getDefaultCategories } from '../utils/defaultCategories.js';
 import {
   generateAccessToken,
   generateRefreshToken,
-  hashRefreshToken,
+  hashToken,
 } from '../utils/jwt.js';
 import { refreshTokenModel } from '../models/RefreshToken.js';
+import { agenda } from '../config/agenda.js';
 
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -81,22 +82,16 @@ export const loginUser = async (req, res) => {
 
   const token = generateAccessToken(user);
   const refreshToken = generateRefreshToken();
-  const hashedToken = hashRefreshToken(refreshToken);
+  const hashedToken = hashToken(refreshToken);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
-  const existingToken = await refreshTokenModel.findOne({ userId: user._id });
-
-  if (existingToken) {
-    await existingToken.set({ token: hashedToken, expiresAt }).save()
-  } else {
-    await refreshTokenModel.create({
-      userId: user._id,
-      token: hashedToken,
-      expiresAt: expiresAt,
-    });
-  }
+  await refreshTokenModel.findOneAndUpdate(
+    { userId: user._id },
+    { token: hashedToken, expiresAt: expiresAt },
+    { upsert: true, new: true }
+  );
 
   const isProduction = process.env.NODE_ENV === 'production';
   // send token in cookie
@@ -115,6 +110,7 @@ export const loginUser = async (req, res) => {
       id: user._id,
       email: user.email,
       username: user.username,
+      role: user.role,
     },
   });
 };
@@ -174,22 +170,16 @@ export const googleLogin = async (req, res) => {
 
   const token = generateAccessToken(user);
   const refreshToken = generateRefreshToken();
-  const hashedToken = hashRefreshToken(refreshToken);
+  const hashedToken = hashToken(refreshToken);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
-  const existingToken = await refreshTokenModel.findOne({ userId: user._id });
-
-  if (existingToken) {
-    await existingToken.set({ token: hashedToken, expiresAt }).save()
-  } else {
-    await refreshTokenModel.create({
-      userId: user._id,
-      token: hashedToken,
-      expiresAt: expiresAt,
-    });
-  }
+  await refreshTokenModel.findOneAndUpdate(
+    { userId: user._id },
+    { token: hashedToken, expiresAt: expiresAt },
+    { upsert: true, new: true }
+  );
 
   const isProduction = process.env.NODE_ENV === 'production';
   // send token in cookie
@@ -206,6 +196,7 @@ export const googleLogin = async (req, res) => {
       token,
       id: user._id,
       email: user.email,
+      role: user.role,
     },
   });
 };
@@ -214,7 +205,7 @@ export const refreshAccessToken = async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token) throw unauthorized();
 
-  const hashedToken = hashRefreshToken(token);
+  const hashedToken = hashToken(token);
   const storeToken = await refreshTokenModel.findOne({ token: hashedToken });
 
   if (!storeToken) throw notFound('Token');
@@ -222,10 +213,8 @@ export const refreshAccessToken = async (req, res) => {
   if (storeToken.expiresAt <= new Date())
     throw new AppError('Refresh token expired', 403, ERROR_CODES.FORBIDDEN);
 
-  await refreshTokenModel.deleteOne({ token: hashedToken }); //delete previous hashed token
-
-  const user = await UserModel.findById({ _id: storeToken.userId })
-  if (!user) throw unauthorized()
+  const user = await UserModel.findById(storeToken.userId);
+  if (!user) throw unauthorized();
 
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken();
@@ -233,11 +222,14 @@ export const refreshAccessToken = async (req, res) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // expire at 7 days
 
-  await refreshTokenModel.create({
-    userId: storeToken.userId,
-    token: hashRefreshToken(refreshToken),
-    expiresAt: expiresAt,
-  });
+  await refreshTokenModel.findOneAndUpdate(
+    { userId: user._id },
+    { token: hashToken(refreshToken), expiresAt: expiresAt },
+    {
+      upsert: true,
+      new: true,
+    }
+  );
 
   const isProduction = process.env.NODE_ENV === 'production';
   // send token in cookie
@@ -255,9 +247,73 @@ export const logOutUser = async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token) throw notFound('Token');
 
-  const hashed = hashRefreshToken(token);
+  const hashed = hashToken(token);
   await refreshTokenModel.deleteOne({ token: hashed });
 
   res.clearCookie('refreshToken');
   res.status(200).json({ success: true, message: 'Logout successfully' });
+};
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await UserModel.findOne({ email });
+  if (!user) throw notFound('User');
+
+  const resetToken = user.createPasswordResetToken();
+
+  await user.save({ validateBeforeSave: false });
+  const resetUrl = `${process.env.FRONTEND_URL}resetPassword/${resetToken}`;
+
+  await agenda.now('send-reset-password-email', {
+    username: user.username,
+    email: user.email,
+    resetUrl: resetUrl,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Email sent successfully',
+  });
+};
+
+export const resetPassword = async (req, res) => {
+  const { resetToken } = req.params;
+  const { newPassword, confirmPassword } = req.body;
+
+  const hashedToken = hashToken(resetToken);
+
+  const now = new Date();
+  const user = await UserModel.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: now },
+  });
+
+  if (!user)
+    throw new AppError(
+      'Invalid or expired token',
+      400,
+      ERROR_CODES.INVALID_TOKEN
+    );
+
+  if (newPassword !== confirmPassword)
+    throw new AppError(
+      'Password has to match',
+      400,
+      ERROR_CODES.PASSWORDS_NOT_MATCHING
+    );
+
+  const newPass = await bcrypt.hash(newPassword, 12);
+  await user
+    .set({
+      password: newPass,
+      passwordResetToken: null,
+      passwordResetExpires: null,
+    })
+    .save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Password updated successfully',
+  });
 };

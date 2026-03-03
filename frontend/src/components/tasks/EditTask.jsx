@@ -22,21 +22,25 @@ export default function EditTask () {
     if (!editingTaskId) return;
 
     if (!taskData.title) {
+      toast.dismiss();
       toast.error(t("Title is required!"));
       return;
     }
 
     if (!taskData.dueDate) {
+      toast.dismiss();
       toast.error(t("Deadline is required!"));
       return;
     }
 
     if (!taskData.category) {
+      toast.dismiss();
       toast.error(t("Category is required!"));
       return;
     }
 
     if (!taskData.priority) {
+      toast.dismiss();
       toast.error(t("Priority is required!"));
       return;
     }
@@ -49,17 +53,17 @@ export default function EditTask () {
       title: taskData.title,
       description: taskData.description,
       dueDate: normalizedDate,
-      categoryId: taskData.category,  
+      categoryId: taskData.category,
       priority: taskData.priority,
     };
-
-    console.log("final takpayload sent", taskData.dueDate);
 
     try {
       await updateTask(editingTaskId, taskPayload);
       closeModal();
+      toast.dismiss();
       toast.success(t("Task edited successfully!"));
     } catch (error) {
+      toast.dismiss();
       toast.error(t("Sorry! could not edit task"));
     }
   };
@@ -72,7 +76,7 @@ export default function EditTask () {
     },
     { enabled: isEditModalOpen }
   );
-  
+
   useHotkeys(
     "esc",
     () => {

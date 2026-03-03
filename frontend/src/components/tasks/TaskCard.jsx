@@ -1,156 +1,204 @@
-import {useState} from 'react';
-import { FaRegCircle, FaCircle, FaCheckCircle } from "react-icons/fa";
-import { MdDeleteOutline } from "react-icons/md";
+import { FaRegSquare, FaCheckSquare } from "react-icons/fa";
 import { useTaskCardStore } from "../../store/useTaskCardStore";
-import ConfirmationModal from '../modals/ConfirmationModal';
 import { useTranslation } from "react-i18next";
-import { formatDate } from "../../utils/formatDate";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { MdDeleteOutline } from "react-icons/md";
+import toast from "react-hot-toast";
 import { CiEdit } from "react-icons/ci";
 
-
-export default function TaskCard({
-  title,
-  categoryId,
-  dueDate,
-  description,
-  status,
-  _id,
-  priority,
-}) {
+export default function TaskCard({ title, status, _id }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
+  const updateTask = useTaskCardStore((state) => state.updateTask);
   const deleteTask = useTaskCardStore((state) => state.deleteTask);
-  const openEditModal = useTaskCardStore((s) => s.openEditModal);
-
-  const [isModalOpen,setIsModalOpen]=useState(false);
-  const [isDeleting,setIsDeleting]=useState(false);
-
-  const { label, type } = formatDate(dueDate);
   const { t } = useTranslation();
 
-  const dueStyles = {
-    today: "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400",
-    yesterday: "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400",
-    tomorrow: "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400",
-    none: "bg-gray-100 text-gray-600 dark:bg-gray-700/30 dark:text-gray-400",
-  };
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(title);
 
-  const priorityBorder = {
-    high: "border-l-2 border-indigo-500",
-    medium: "border-l-2 border-amber-500",
-    low: "border-l-2 border-gray-300 dark:border-gray-600",
-  };
+  const editInputRef = useRef(null);
+  const cardRef = useRef(null);
 
-  const handleDelete=async()=>{
-    try{
-      setIsDeleting(true);
-      await deleteTask(_id,t);
-      setIsModalOpen(false);
-
-    }catch(err){
-      console.error("Failed to delete task:", err);
-    }finally{
-      setIsDeleting(false);
+  useEffect(() => {
+    if (isEditing && editInputRef.current) {
+      setTimeout(() => {
+        editInputRef.current?.focus();
+        editInputRef.current?.select();
+      }, 50);
     }
-  }
+  }, [isEditing]);
 
- return (
-  <>
+  useEffect(() => {
+    if (!isEditing) {
+      setEditValue(title);
+    }
+  }, [title, isEditing]);
+
+  const handleSaveEdit = useCallback(async () => {
+    const trimmed = editValue.trim();
+    if (!trimmed || trimmed === title) {
+      setIsEditing(false);
+      setEditValue(title);
+      setTimeout(() => cardRef.current?.focus(), 50);
+      return;
+    }
+
+    try {
+      await updateTask(_id, { title: trimmed });
+      setIsEditing(false);
+      toast.success(t("Task updated"));
+      setTimeout(() => cardRef.current?.focus(), 50);
+    } catch (err) {
+      toast.error(t("Failed to update"));
+      setEditValue(title);
+      setIsEditing(false);
+      setTimeout(() => cardRef.current?.focus(), 50);
+    }
+  }, [editValue, title, _id, updateTask, t]);
+
+  const handleDelete = useCallback(async () => {
+    try {
+      await deleteTask(_id, t);
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+      toast.error(t("Failed to delete"));
+    }
+  }, [_id, deleteTask, t]);
+
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (isEditing) return;
+
+      switch (e.key) {
+        case "F2":
+          e.preventDefault();
+          e.stopPropagation();
+          setIsEditing(true);
+          break;
+        case "Enter":
+          e.preventDefault();
+          e.stopPropagation();
+          setIsEditing(true);
+          break;
+        case " ":
+          e.preventDefault();
+          e.stopPropagation();
+          completeTask(_id);
+          break;
+        case "Delete":
+        case "Backspace":
+          e.preventDefault();
+          e.stopPropagation();
+          handleDelete();
+          break;
+        default:
+          break;
+      }
+    },
+    [isEditing, completeTask, _id, handleDelete]
+  );
+
+  const handleEditKeyDown = useCallback(
+    (e) => {
+      e.stopPropagation();
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSaveEdit();
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setIsEditing(false);
+        setEditValue(title);
+        setTimeout(() => cardRef.current?.focus(), 50);
+      }
+    },
+    [handleSaveEdit, title]
+  );
+
+  return (
     <div
+      ref={cardRef}
+      tabIndex={0}
+      data-task-card="true"
+      data-id={_id}
+      onKeyDown={handleKeyDown}
       className={`
-        group bg-white dark:bg-gray-800 rounded-md p-2.5
-        transition-all duration-150 shadow-md dark:border-gray-700
-        hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm
-        ${priorityBorder[priority] ?? "-l-4  border-l-2 border-gray-400"}
-        ${status === "done" ? "opacity-75" : ""}
+        group flex items-center justify-between gap-2 py-1.5 px-2 rounded-md outline-none
+        transition-all duration-150 focus:bg-gray-200 dark:focus:bg-gray-800
+        cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900/50
+        ${isEditing ? "bg-indigo-50 dark:bg-indigo-900/20 ring-1 ring-indigo-500" : ""}
       `}
+      onClick={() => !isEditing && completeTask(_id)}
     >
-      <div className="flex items-start gap-2">
-        <button
-          onClick={() => completeTask(_id)}
-          className="mt-0.5 flex-shrink-0"
-          aria-label={status === "done" ? t("Mark as incomplete") : t("Mark as complete")}
-        >
+      <div className="flex items-center gap-2 overflow-hidden w-full">
+        <div className="flex-shrink-0">
           {status === "done" ? (
-            <FaCheckCircle size={14} className="text-green-500" />
+            <FaCheckSquare size={16} className="text-indigo-500" />
           ) : (
-            <FaRegCircle size={14} className="text-gray-400 hover:text-green-500 transition-colors" />
+            <FaRegSquare
+              size={16}
+              className="text-gray-400 group-hover:text-indigo-400"
+            />
           )}
-        </button>
-
-        <div className="flex-grow min-w-0">
-          <div className="flex justify-between items-start gap-2">
-            <h4
-              className={`text-sm font-bold leading-snug ${
-                status === "done"
-                  ? "line-through text-gray-400"
-                  : "text-gray-800 dark:text-gray-200"
-              }`}
-            >
-              {t(title)}
-            </h4>
-
-            {/* Action buttons - now with edit and delete */}
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  openEditModal(_id);
-                }}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-                aria-label={t("Edit task")}
-              >
-                <CiEdit size={16} className="text-gray-400 hover:text-indigo-500 transition-colors" />
-              </button>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-                aria-label={t("Delete task")}
-              >
-                <MdDeleteOutline size={16} className="text-gray-400 hover:text-red-500 transition-colors" />
-              </button>
-            </div>
-          </div>
-
-          {/* {description && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
-              {t(description)}
-            </p>
-          )} */}
-
-          <div className=" flex items-center gap-2">
-            <div className={`rounded-md py-0.5 px-1.5 text-[0.5rem] font-medium ${dueStyles[type]}`}>
-              {t(label)}
-            </div>
-
-            {/* {categoryId?.name && (
-              <div className="flex items-center gap-1.5">
-                <div
-                  className="w-1 h-1 rounded-full"
-                  style={{ backgroundColor: categoryId?.backgroundColor ?? "#999" }}
-                />
-                <span
-                   style={{ color: categoryId?.backgroundColor ?? "#999" }}
-                  className="text-[0.65rem] font-medium text-gray-500 dark:text-gray-400">
-                  {t(categoryId.name)}
-                </span>
-              </div>
-            )} */}
-          </div>
         </div>
+
+        {isEditing ? (
+          <input
+            ref={editInputRef}
+            data-edit-input="true"
+            className="text-sm w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-200"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleSaveEdit}
+            onKeyDown={handleEditKeyDown}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <h4
+            className={`text-sm truncate transition-all ${
+              status === "done"
+                ? "text-gray-400 line-through"
+                : "text-gray-800 dark:text-gray-200"
+            }`}
+          >
+            {title}
+          </h4>
+        )}
       </div>
+
+      {!isEditing && (
+        <button
+          tabIndex={-1}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
+          className="p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+          aria-label={t("Delete task")}
+        >
+          <MdDeleteOutline
+            size={16}
+            className="text-gray-400 hover:text-red-500 transition-colors"
+          />
+        </button>
+      )}
+
+      {!isEditing && (
+        <button
+          tabIndex={-1}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsEditing(true);
+          }}
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          aria-label={t("Edit task")}
+        >
+          <CiEdit
+            size={16}
+            className="text-gray-400 hover:text-indigo-500 transition-colors"
+          />
+        </button>
+      )}
     </div>
-
-
-    <ConfirmationModal
-      isOpen={isModalOpen}
-      onClose={() => setIsModalOpen(false)}
-      onConfirm={handleDelete}
-      title={t("delete_task")}
-      description={t("delete_task_description")}
-      confirmText={t("delete_confirmText")}
-      type="danger"
-      isLoading={isDeleting}
-    />
-  </>
-)};
-
+  );
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +10,7 @@ import '../../providers/theme_provider.dart';
 import '../../utils/habits/habit.dart';
 import '../../utils/habits/habit_card.dart';
 import 'add_habit.dart';
+import 'edit_habit_screen.dart';
 
 class HabitsScreen extends StatefulWidget {
   const HabitsScreen({super.key});
@@ -20,8 +22,14 @@ class HabitsScreen extends StatefulWidget {
 class _HabitsScreenState extends State<HabitsScreen> {
   List<Habit> _habits = [];
   bool _isLoading = true;
+  bool _isLoadMoreRunning = false;
+  bool _hasNextPage = true;
+  int _page = 1;
+  final int _limit = 8;
+  late ScrollController _scrollController;
   String? _errorMessage;
   String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   final TextStyle _linkStyle = TextStyle(
     color: AppTheme.primary,
@@ -37,6 +45,15 @@ class _HabitsScreenState extends State<HabitsScreen> {
   void initState() {
     super.initState();
     _fetchHabits();
+    _scrollController = ScrollController()..addListener(_loadMoreHabits);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _scrollController.removeListener(_loadMoreHabits);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<String?> _getToken() async {
@@ -45,59 +62,82 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   Future<void> _fetchHabits() async {
-    final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits');
-
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
+      _page = 1;
+      _hasNextPage = true;
     });
 
     try {
       final token = await _getToken();
+      final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits?page=$_page&limit=$_limit');
 
-      if (token == null) {
-        setState(() {
-          _errorMessage = "Please login again (token not found)";
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 30));
+      final response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedData = jsonDecode(response.body);
+        final List<dynamic> habitsJson = decodedData['data'];
 
-        if (decodedData['success'] == true) {
-          final List<dynamic> habitsJson = decodedData['data'];
+        final reversedList = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
 
-          setState(() {
-            _habits = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
-            _isLoading = false;
-          });
-        } else {
-          setState(() {
-            _errorMessage = "Failed to load habits";
-            _isLoading = false;
-          });
-        }
+        setState(() {
+          _habits = reversedList;
+          _isLoading = false;
+          if (habitsJson.length < _limit) _hasNextPage = false;
+        });
       } else {
         setState(() {
-          _errorMessage = "Server error: ${response.statusCode}";
+          _errorMessage = "Failed to load habits (${response.statusCode})";
           _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = "Network error: $e";
+        _errorMessage = "Network error: Make sure you are connected.";
         _isLoading = false;
       });
+    }
+  }
+
+  void _loadMoreHabits() async {
+    if (_hasNextPage && !_isLoading && !_isLoadMoreRunning &&
+        _scrollController.position.extentAfter < 300) {
+
+      setState(() => _isLoadMoreRunning = true);
+      _page++;
+
+      try {
+        final token = await _getToken();
+        final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits?page=$_page&limit=$_limit');
+
+        final response = await http.get(url, headers: {
+          'Authorization': 'Bearer $token',
+        }).timeout(const Duration(seconds: 30));
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> decodedData = jsonDecode(response.body);
+          final List<dynamic> habitsJson = decodedData['data'];
+
+          if (habitsJson.isNotEmpty) {
+            final reversedNewPage = habitsJson.map((item) => Habit.fromJson(item)).toList().reversed.toList();
+            setState(() {
+              _habits.insertAll(0, reversedNewPage);
+            });
+          } else {
+            setState(() => _hasNextPage = false);
+          }
+        } else {
+          setState(() => _hasNextPage = false);
+        }
+      } catch (e) {
+        debugPrint("Error loading more: $e");
+        setState(() => _hasNextPage = false);
+      }
+
+      setState(() => _isLoadMoreRunning = false);
     }
   }
 
@@ -112,7 +152,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-      );
+      ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -120,15 +160,15 @@ class _HabitsScreenState extends State<HabitsScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Habit deleted successfully'),
+           SnackBar(
+            content: Text('Habit deleted successfully'),
             backgroundColor: AppTheme.success,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Failed to delete habit'),
+           SnackBar(
+            content: Text('Failed to delete habit'),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -144,20 +184,21 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   Future<void> _editHabit(Habit habit) async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Edit Habit', style: TextStyle(color: AppTheme.textPrimary)),
-        content: Text('Edit feature will be implemented soon', style: TextStyle(color: AppTheme.textSecondary)),
-        backgroundColor: AppTheme.surface,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK', style: _linkStyle),
-          ),
-        ],
-      ),
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => EditHabitPage(habit: habit)),
     );
+
+    if (result != null && result is Habit) {
+      setState(() {
+        final index = _habits.indexWhere((h) => h.id == result.id);
+        if (index != -1) {
+          _habits[index] = result;
+        }
+      });
+    } else if (result == true) {
+      await _refreshHabits();
+    }
   }
 
   Future<void> _refreshHabits() async {
@@ -200,159 +241,214 @@ class _HabitsScreenState extends State<HabitsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              // ======= Header =======
-              Text(
-                "My Habits",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Manage and track your daily routines effectively.',
-                style: _descriptionStyle,
-              ),
-              const SizedBox(height: 20),
-
-              // ======= Search + New Habit Button =======
-              Row(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    flex: 5,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        hintText: 'Search....',
-                        hintStyle: TextStyle(color: AppTheme.textMuted),
-                        prefixIcon: Icon(Icons.search, color: AppTheme.textMuted),
-                        fillColor: AppTheme.inputBackground,
-                        filled: true,
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: AppTheme.primary, width: 1),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value;
-                        });
-                      },
+                   Text(
+                    "My Habits",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Manage and track your daily routines effectively.',
+                    style: _descriptionStyle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Row(
+                children: [
                   Expanded(
-                    flex: 3,
-                    child: SizedBox(
-                      height: 48,
-                      child: FloatingActionButton.extended(
+                    child: Container(
+                      height: 48.h,
+                      decoration: BoxDecoration(
+                        color: AppTheme.inputBackground,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 12.w),
+                           Icon(Icons.search, color: AppTheme.textMuted),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Search habits...',
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(color: AppTheme.textMuted),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _searchQuery = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  SizedBox(
+                    height: 48.h,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        AddHabitDialog.show(
+                          context,
+                          onSubmit: (newHabit) {
+                            if (newHabit != null) {
+                              setState(() {
+                                 _habits.insert(0, newHabit);
+                              });
+                            } else {
+                              _refreshHabits();
+                            }
+                          },
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        onPressed: () {
-                          AddHabitDialog.show(
-                            context,
-                            onSubmit: (data) {
-                              _refreshHabits();
-                            },
-                          );
-                        },
-                        icon: Icon(Icons.add, color: AppTheme.textWhite),
-                        label: Text(
-                          'New Habit',
-                          style: TextStyle(color: AppTheme.textWhite, fontWeight: FontWeight.w600),
-                        ),
-                        elevation: 0,
-                        backgroundColor: AppTheme.primary,
+                      ),
+                      icon: const Icon(Icons.add, size: 20, color: Colors.white),
+                      label: const Text(
+                        'New',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
                 ],
               ),
+            ),
 
-              const SizedBox(height: 16),
+            SizedBox(height: 16.h),
 
-              // ======= Habit List (with Shimmer or Content) =======
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppTheme.primary,
-                  onRefresh: _refreshHabits,
-                  child: _isLoading
-                      ? _buildShimmerLoading()
-                      : _errorMessage != null
-                      ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(_errorMessage!, style: TextStyle(color: AppTheme.textSecondary)),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _refreshHabits,
-                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
-                      : _filteredHabits.isEmpty
-                      ? Center(
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.inbox_outlined, size: 60, color: AppTheme.textMuted),
-                          const SizedBox(height: 16),
-                          Text(
-                            _searchQuery.isNotEmpty
-                                ? 'No habits found for "$_searchQuery"'
-                                : 'No habits found',
-                            style: _descriptionStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          if (_searchQuery.isNotEmpty)
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  _searchQuery = '';
-                                });
-                              },
-                              child: Text('Clear search', style: _linkStyle),
-                            ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    itemCount: _filteredHabits.length,
-                    itemBuilder: (context, index) {
-                      final habit = _filteredHabits[index];
-                      return HabitCard(
-                        habit: habit,
-                        onEdit: () => _editHabit(habit),
-                        onDelete: () => _deleteHabit(habit.id, index),
-                      );
-                    },
-                  ),
-                ),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppTheme.primary,
+                onRefresh: _refreshHabits,
+                child: _buildHabitsList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHabitsList() {
+    if (_isLoading) {
+      return _buildShimmerLoading();
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                _errorMessage!,
+                style:  TextStyle(color: AppTheme.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20.h),
+              ElevatedButton(
+                onPressed: _refreshHabits,
+                child: const Text('Try Again'),
               ),
             ],
           ),
         ),
+      );
+    }
+
+    if (_filteredHabits.isEmpty) {
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.all(40.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.inbox_outlined,
+                size: 80.w,
+                color: AppTheme.textMuted,
+              ),
+              SizedBox(height: 20.h),
+              Text(
+                _searchQuery.isNotEmpty
+                    ? 'No habits found for "$_searchQuery"'
+                    : 'No habits found',
+                style: _descriptionStyle,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 12.h),
+              if (_searchQuery.isNotEmpty)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _searchQuery = '';
+                      _searchController.clear();
+                    });
+                  },
+                  child: Text(
+                    'Clear search',
+                    style: _linkStyle,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.only(
+        bottom: 20.h,
+        top: 10.h,
+        left: 20.w,
+        right: 20.w,
       ),
+      itemCount: _filteredHabits.length + (_isLoadMoreRunning ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index == _filteredHabits.length) {
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final habit = _filteredHabits[index];
+        return HabitCard(
+          habit: habit,
+          onEdit: () => _editHabit(habit),
+          onDelete: () => _deleteHabit(habit.id, index),
+        );
+      },
     );
   }
 }

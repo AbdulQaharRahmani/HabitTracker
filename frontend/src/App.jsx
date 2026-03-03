@@ -17,11 +17,76 @@ import { Toaster } from "react-hot-toast";
 import "./styles/toast.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Logs from "./pages/Logs";
-
+import { useEffect, useState } from "react";
+import useAuthStore from "./store/useAuthStore";
+import { refreshToken } from "../services/authServices";
 import AuthRedirectRoute from './components/auth/AuthRedirectRoute';
-
+import { useTranslation } from "react-i18next";
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
+  const {t} = useTranslation()
+  const { i18n } = useTranslation();
+  const[initialLoading, setInitialLoading] = useState(true)
+  const login = useAuthStore((state) => state.login)
+  const logout = useAuthStore((state) => state.logout)
+  const isRateLimited = useAuthStore((state) => state.isRateLimited);
+
+  useEffect(() => {
+    const getAccessToken = async () => {
+      try {
+        useAuthStore.setState({ isAuthLoading: true })
+        let token = await refreshToken()
+        login(token, null)
+      } catch (error) {
+        console.log(error)
+        logout()
+      } finally {
+        useAuthStore.setState({ isAuthLoading: false })
+        setInitialLoading(false)
+      }
+    }
+    getAccessToken()
+  }, [])
+  useEffect(()=>{
+    const currentLang = i18n.language
+    const savedLanguage = localStorage.getItem("language")
+    const direction = currentLang === "fa" ? "rtl": "ltr"
+    document.documentElement.dir = direction
+    document.documentElement.lang = savedLanguage
+    localStorage.setItem("language", currentLang)
+  }, [i18n.language])
+
+  useEffect(() => {
+  if (isRateLimited) {
+    const timer = setTimeout(() => {
+      useAuthStore.getState().setRateLimited(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }
+  }, [isRateLimited]);
+
+    if (isRateLimited) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
+        <p className="text-red-500 font-semibold text-lg">
+          Too many requests. Please wait some seconds...
+        </p>
+      </div>
+    );
+  }
+  if(initialLoading){
+    return (
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
+      <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+      <p className="mt-4 text-sm font-medium text-gray-500 dark:text-gray-400 animate-pulse">
+        {t("Please Wait a Moment...")}
+      </p>
+    </div>
+  );
+  }
+
   return (
     <>
       <Toaster
@@ -48,7 +113,8 @@ function App() {
         <Route element={<AuthRedirectRoute/>}>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-        </Route>
+          </Route>
+
         <Route element={<ProtectedRoute />}>
         <Route
           element={
@@ -62,9 +128,13 @@ function App() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/logs" element={<Logs />} />
+
+          <Route element={<AdminRoute />}>
+            <Route path="/logs" element={<Logs />} />
+          </Route>
+
         </Route>
-        </Route>
+      </Route>
         <Route path="*" element={<>not found</>} />
       </Routes>
     </Router>

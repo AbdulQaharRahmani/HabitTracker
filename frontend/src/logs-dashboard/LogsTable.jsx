@@ -47,6 +47,7 @@ const [isModalOpen, setModalOpen] = useState(false)
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Timestamp")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Level")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Method")}</th>
+            <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Message")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Route")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t("Status")}</th>
             <th className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">{t('User ID')}</th>
