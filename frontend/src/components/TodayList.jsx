@@ -4,16 +4,6 @@ import useHabitStore from "../store/useHabitStore";
 import toast from 'react-hot-toast';
 import {useTranslation} from 'react-i18next';
 
-const iconMap = {
-  Health: "🏋️‍♂️",
-  reading: "📚",
-  meditation: "🧘‍♀️",
-  Study: "📖",
-  coding: "💻",
-  cooking: "👩‍🍳",
-  default: "✨",
-};
-
 const TodayList = () => {
   const { habits, loading, error, fetchHabitsByDate, toggleHabit } =
     useHabitStore();
@@ -26,6 +16,7 @@ const TodayList = () => {
 
   const handleToggleComplete = async(habit)=>{
     toast.dismiss();
+
 
     try{
       await toggleHabit(habit._id);
@@ -72,20 +63,15 @@ const TodayList = () => {
         transition-colors"
     >
       {habits.map((habit) => (
-        <TodayCard
-          key={habit._id}
-          title={habit.title}
-          description={habit.description}
-          categoryIcon={
-            habit.categoryId?.icon ||
-            iconMap[habit.category?.name] ||
-            iconMap.default
-          }
-          color={habit.categoryId?.backgroundColor || "blue"}
-          completed={habit.completed}
-          onToggleComplete={()=>handleToggleComplete(habit)}
-          progress={habit.completed ? 100 : 0}
-        />
+      <TodayCard
+      key={habit._id}
+      title={habit.title}
+      description={habit.description}
+      categoryId={habit.category}
+      completed={habit.completed}
+      onToggleComplete={() => handleToggleComplete(habit)}
+      progress={habit.completed ? 100 : 0}
+      />
       ))}
     </div>
   );
