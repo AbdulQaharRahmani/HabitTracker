@@ -57,8 +57,6 @@ export default function EditTask () {
       priority: taskData.priority,
     };
 
-    console.log("final takpayload sent", taskData.dueDate);
-
     try {
       await updateTask(editingTaskId, taskPayload);
       closeModal();
