@@ -1,12 +1,14 @@
 import React from "react";
+import { FaCheckCircle } from "react-icons/fa";
+import { iconCategories } from '../utils/icons';
+import HabitCardIcon from "./HabitCardIcon";
 
 const CardComponent = ({
-  categoryIcon,
+  categoryId,
   title,
   description,
   completed = false,
   progress = 0,
-  color = "blue",
   onToggleComplete,
 }) => {
   const colorMaps = {
@@ -28,7 +30,7 @@ const CardComponent = ({
       bar: "bg-red-500",
       btn: "bg-indigo-500",
     },
-    purple: {
+      purple: {
       bg: "bg-purple-50 dark:bg-purple-900/30",
       text: "text-purple-500",
       bar: "bg-purple-600",
@@ -36,7 +38,23 @@ const CardComponent = ({
     },
   };
 
-  const theme = colorMaps[color] || colorMaps.blue;
+  const theme = colorMaps[categoryId?.backgroundColor] || colorMaps.blue;
+
+    const getIconComponent = (iconValue) => {
+      if (!iconValue) return null;
+      for (const category in iconCategories) {
+        const found = iconCategories[category].find(
+          (item) => item.value === iconValue
+        );
+        if (found) return found.icon;
+      }
+      return null;
+    };
+
+  const color = categoryId?.backgroundColor || "#6366F1";
+  const bgColor = `${color}15`;
+
+  const Icon = getIconComponent(categoryId?.icon) || FaCheckCircle;
 
   return (
     <div
@@ -51,9 +69,9 @@ const CardComponent = ({
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div
-          className={`w-10 h-10 rounded-full flex items-center justify-center ${theme.bg}`}
+          className={`w-10 h-10 rounded-full flex items-center justify-center ${bgColor}`}
         >
-          <span className="text-2xl">{categoryIcon}</span>
+          <HabitCardIcon Icon={Icon} color={categoryId?.backgroundColor} bgColor={bgColor}/>
         </div>
 
         <button
