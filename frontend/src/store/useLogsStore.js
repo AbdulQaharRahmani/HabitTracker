@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { fetchLogs, fetchLogsStats } from "../../services/logsService";
+import { fetchLogs, fetchLogsStats, fetchLogsDetails } from "../../services/logsService";
 
 const useLogsStore = create((set, get) => ({
     logsData: [],
@@ -69,7 +69,24 @@ const useLogsStore = create((set, get) => ({
         finally {
             set({ sidebarLoading: false })
         }
+    },
+    logsDetailLoading: false,
+    logsDetailError: null,
+    getLogsDetails : async(logId)=>{
+        set({logsDetailLoading: true})
+        try{
+            let data = await fetchLogsDetails(logId)
+            return data
+        }catch(error){
+           console.log(error)
+           const message = error.response?.data?.message || "Failed to load logs details"
+           set({logsDetailError: message})
+
+        }finally{
+        set({logsDetailLoading: false})
+        }
     }
+
 }));
 
 export default useLogsStore;

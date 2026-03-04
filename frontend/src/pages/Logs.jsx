@@ -59,7 +59,6 @@ export default function Logs() {
       sortOrder: selectedDate,
     });
   };
-
   const levels = useMemo(
     () => [
       { id: 1, name: t("All levels"), value: "all levels" },
