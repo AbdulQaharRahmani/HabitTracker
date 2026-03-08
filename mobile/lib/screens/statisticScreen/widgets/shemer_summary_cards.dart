@@ -12,19 +12,32 @@ class ShimmerSummaryCards extends StatelessWidget {
     final themeProv = Provider.of<ThemeProvider>(context);
     final isDark = themeProv.currentTheme.brightness == Brightness.dark;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(3, (index) => _buildShimmerCard(isDark)),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const cardCount = 3;
+        const gap = 8.0;
+        final totalGap = gap * (cardCount - 1);
+        final cardWidth = (constraints.maxWidth - totalGap) / cardCount;
+
+        return Row(
+          children: List.generate(cardCount, (index) {
+            return Padding(
+              padding: EdgeInsets.only(right: index == cardCount - 1 ? 0 : gap),
+              child: _buildShimmerCard(isDark, cardWidth),
+            );
+          }),
+        );
+      },
     );
   }
 
-  Widget _buildShimmerCard(bool isDark) {
+  Widget _buildShimmerCard(bool isDark, double width) {
     return Shimmer.fromColors(
       // تعیین رنگ بر اساس حالت دارک یا لایت
       baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
       highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
       child: Container(
-        width: 100,
+        width: width,
         height: 100,
         decoration: BoxDecoration(
           color: isDark ? Colors.black26 : Colors.white,

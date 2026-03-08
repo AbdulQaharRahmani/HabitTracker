@@ -22,7 +22,7 @@ class AuthManager {
   // -----------------------------
   static Future<void> saveRefreshToken(String refreshToken) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_refreshKey, refreshToken);
+    await prefs.setString(_refreshKey, refreshToken.trim());
   }
 
   // -----------------------------

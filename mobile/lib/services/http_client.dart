@@ -154,7 +154,7 @@ class AuthenticatedHttpClient {
 
   static Future<bool> _performRefresh() async {
     try {
-      final refreshToken = await AuthManager.getRefreshToken();
+      final refreshToken = (await AuthManager.getRefreshToken())?.trim();
       if (refreshToken == null || refreshToken.isEmpty) {
         debugPrint('No refresh token available');
         await _handleRefreshFailure();
@@ -167,7 +167,11 @@ class AuthenticatedHttpClient {
           'Content-Type': 'application/json',
           'Cookie': 'refreshToken=$refreshToken',
         },
-        body: jsonEncode({'refreshToken': refreshToken}),
+        body: jsonEncode({
+          'refreshToken': refreshToken,
+          // Backend variants may expect `token` as request field.
+          'token': refreshToken,
+        }),
       );
 
       if (response.statusCode != 200) {
