@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/app/app_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -14,41 +15,59 @@ class SettingProfileCard extends StatelessWidget {
 
   final String name;
   final String email;
-  final String imageUrl;
+  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
     Provider.of<ThemeProvider>(context);
+    final avatarText = name.isNotEmpty ? name.trim()[0].toUpperCase() : '?';
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       decoration: _boxDecoration(),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 34,
-            backgroundImage: NetworkImage(imageUrl),
+            radius: 26.r,
+            backgroundColor: AppTheme.primary.withValues(alpha: 0.14),
+            backgroundImage: (imageUrl != null && imageUrl!.isNotEmpty)
+                ? NetworkImage(imageUrl!)
+                : null,
+            child: (imageUrl == null || imageUrl!.isEmpty)
+                ? Text(
+                    avatarText,
+                    style: TextStyle(
+                      color: AppTheme.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18.sp,
+                    ),
+                  )
+                : null,
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 3.h),
                 Text(
                   email,
-                  style:  TextStyle(color: AppTheme.textMuted),
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 11.sp,
+                  ),
                 ),
               ],
             ),
           ),
-         Icon(Icons.chevron_right, color: AppTheme.textMuted),
+          Icon(Icons.chevron_right, color: AppTheme.textMuted),
         ],
       ),
     );
@@ -57,13 +76,8 @@ class SettingProfileCard extends StatelessWidget {
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
       color: AppTheme.surface,
-      borderRadius: BorderRadius.circular(24),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.05),
-          blurRadius: 10,
-        ),
-      ],
+      borderRadius: BorderRadius.circular(14.r),
+      border: Border.all(color: AppTheme.border),
     );
   }
 }

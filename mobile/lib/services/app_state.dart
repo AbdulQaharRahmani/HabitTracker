@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/profile/profile_model.dart';
 import 'auth_service.dart';
+import 'token_storage.dart';
 
 /// Global app state manager for preloading and caching data
 class AppState extends ChangeNotifier {
@@ -70,6 +71,46 @@ class AppState extends ChangeNotifier {
   Future<void> refreshProfileData() async {
     _profileLoaded = false;
     await preloadProfileData();
+  }
+
+  /// Resolve display name with local cache + API/storage fallbacks
+  Future<String> getDisplayName() async {
+    if (_displayName != null && _displayName!.trim().isNotEmpty) {
+      return _displayName!;
+    }
+
+    if (_userData != null && _userData!.userId.trim().isNotEmpty) {
+      return _userData!.userId;
+    }
+
+    final storedUser = await AuthManager.getUserData();
+    if (storedUser != null) {
+      final name = storedUser['name']?.toString();
+      if (name != null && name.trim().isNotEmpty) {
+        return name;
+      }
+
+      final email = storedUser['email']?.toString();
+      if (email != null && email.contains('@')) {
+        return email.split('@').first;
+      }
+    }
+
+    final profileRes = await _api.getUserProfile();
+    if (profileRes['success'] == true && profileRes['data'] is Map<String, dynamic>) {
+      final data = profileRes['data'] as Map<String, dynamic>;
+      final username = data['username']?.toString();
+      if (username != null && username.trim().isNotEmpty) {
+        return username;
+      }
+
+      final email = data['email']?.toString();
+      if (email != null && email.contains('@')) {
+        return email.split('@').first;
+      }
+    }
+
+    return 'Habit Tracker User';
   }
 
   /// Clear cached profile data (on logout)

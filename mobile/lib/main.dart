@@ -3,14 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:habit_tracker/core/error/global_error_handler.dart';
 import 'package:habit_tracker/core/theme/app_theme.dart' as core_theme;
 import 'package:habit_tracker/providers/theme_provider.dart';
-import 'package:habit_tracker/screens/statisticScreen/data/providers/consistency_provider.dart';
-import 'package:habit_tracker/screens/statisticScreen/data/providers/statistic_provider.dart';
+import 'package:habit_tracker/services/habit_reminder_service.dart';
 import 'package:provider/provider.dart';
 import 'features/routes.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GlobalErrorHandler.initialize();
+  await HabitReminderService.instance.initialize();
+  await HabitReminderService.instance.reschedulePersistedReminders();
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),

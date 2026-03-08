@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/services.dart';
 import 'package:habit_tracker/services/auth_service.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -21,12 +25,16 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService _api = AuthService();
   final AppState _appState = AppState();
+  final ImagePicker _picker = ImagePicker();
   final List<int> _streakMilestones = <int>[7, 14, 25, 50, 70, 100, 150, 200, 365];
 
   HabitsData? habitsData;
   UserData? userData;
   String displayName = 'Habit Tracker User';
+  String emailAddress = '';
+  String profileImageUrl = '';
   bool loading = true;
+  bool imageBusy = false;
 
   @override
   void initState() {
@@ -36,43 +44,230 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadProfileData({bool forceRefresh = false}) async {
     if (!forceRefresh && _appState.isProfileLoaded) {
+      final localUser = await AuthManager.getUserData();
+      if (!mounted) return;
       setState(() {
         habitsData = _appState.habitsData;
         userData = _appState.userData;
-        displayName = _appState.displayName ?? 'Habit Tracker User';
+        displayName = _resolveDisplayName(localUser?['name'], localUser?['email'], _appState.userData);
+        emailAddress = localUser?['email'] ?? '';
         loading = false;
       });
+      await _syncProfileImage();
       return;
     }
 
     try {
-      final savedName = await AuthManager.getUserName();
+      final localUser = await AuthManager.getUserData();
       final welcome = await _api.fetchHabitsDashboard();
       final profileRes = await _api.getUserProfile();
+      final fetchedUser = profileRes['data'] != null ? UserData.fromJson(profileRes['data']) : null;
 
       if (!mounted) return;
       setState(() {
         habitsData = welcome.habitsData;
-        userData = profileRes['data'] != null ? UserData.fromJson(profileRes['data']) : null;
-        displayName = (savedName?.trim().isNotEmpty == true)
-            ? savedName!
-            : (userData?.userId.trim().isNotEmpty == true)
-                ? userData!.userId
-                : 'Habit Tracker User';
+        userData = fetchedUser;
+        displayName = _resolveDisplayName(localUser?['name'], localUser?['email'], fetchedUser);
+        emailAddress = localUser?['email'] ?? '';
         loading = false;
       });
+      await _syncProfileImage();
     } catch (_) {
-      final fallbackName = await AuthManager.getUserName();
+      final localUser = await AuthManager.getUserData();
       if (!mounted) return;
       setState(() {
-        displayName = fallbackName ?? 'Habit Tracker User';
+        displayName = _resolveDisplayName(localUser?['name'], localUser?['email'], userData);
+        emailAddress = localUser?['email'] ?? '';
         loading = false;
       });
     }
   }
 
+  String _resolveDisplayName(String? name, String? email, UserData? profile) {
+    if (name != null && name.trim().isNotEmpty) return name.trim();
+    if (email != null && email.contains('@')) return email.split('@').first.capitalize();
+    if (profile?.userId.trim().isNotEmpty == true) return profile!.userId;
+    return 'Habit Tracker User';
+  }
+
+  Future<void> _syncProfileImage() async {
+    final res = await _api.getProfileImage(userId: userData?.userId);
+    if (!mounted) return;
+    final bool ok = res['success'] == true && res['data'] is String;
+    setState(() {
+      profileImageUrl = ok ? (res['data'] as String) : '';
+    });
+  }
+
   Future<void> _refreshProfile() async {
     await _loadProfileData(forceRefresh: true);
+  }
+
+  Future<void> _showAvatarActions() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.camera_alt_outlined, color: AppTheme.primary),
+                  title: const Text('Take photo'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickAndUpload(ImageSource.camera);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo_library_outlined, color: AppTheme.primary),
+                  title: const Text('Choose from gallery'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickAndUpload(ImageSource.gallery);
+                  },
+                ),
+                if (profileImageUrl.isNotEmpty)
+                  ListTile(
+                    leading: Icon(Icons.visibility_outlined, color: AppTheme.textPrimary),
+                    title: const Text('View photo'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showImagePreview();
+                    },
+                  ),
+                if (profileImageUrl.isNotEmpty)
+                  ListTile(
+                    leading: Icon(Icons.delete_outline, color: AppTheme.error),
+                    title: Text('Remove photo', style: TextStyle(color: AppTheme.error)),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _removeProfileImage();
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickAndUpload(ImageSource source) async {
+    try {
+      final picked = await _picker.pickImage(source: source, imageQuality: 85, maxWidth: 1200);
+      if (picked == null) return;
+      final imageFile = File(picked.path);
+      final bytes = await imageFile.length();
+      const maxAllowedBytes = 2 * 1024 * 1024;
+      if (bytes > maxAllowedBytes) {
+        if (!mounted) return;
+        _showMessage('Image is too large (max 2MB). Please choose a smaller image.', isError: true);
+        return;
+      }
+
+      if (!mounted) return;
+      setState(() => imageBusy = true);
+
+      final res = await _api.uploadProfileImage(imageFile);
+      final ok = res['success'] == true;
+      if (!mounted) return;
+
+      if (ok) {
+        await _syncProfileImage();
+        _showMessage('Profile image updated');
+      } else {
+        final msg = (res['message'] ?? 'Could not upload image').toString();
+        _showMessage(msg, isError: true);
+      }
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+      final code = e.code.toLowerCase();
+      if (code.contains('denied')) {
+        _showMessage('Permission denied for camera/photos. Please allow it in app settings.', isError: true);
+      } else if (code.contains('plugin')) {
+        _showMessage('Image picker is not initialized. Please fully restart the app.', isError: true);
+      } else {
+        _showMessage('Image picker error: ${e.message ?? e.code}', isError: true);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Could not pick/upload image: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => imageBusy = false);
+    }
+  }
+
+  Future<void> _removeProfileImage() async {
+    final shouldRemove = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Remove profile image?'),
+            content: const Text('This will remove your current profile photo.'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('Remove', style: TextStyle(color: AppTheme.error)),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!shouldRemove) return;
+
+    setState(() => imageBusy = true);
+    final res = await _api.removeProfileImage();
+    if (!mounted) return;
+
+    if (res['success'] == true) {
+      setState(() => profileImageUrl = '');
+      _showMessage('Profile image removed');
+    } else {
+      _showMessage((res['message'] ?? 'Could not remove image').toString(), isError: true);
+    }
+
+    setState(() => imageBusy = false);
+  }
+
+  void _showImagePreview() {
+    if (profileImageUrl.isEmpty) return;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18.r),
+          child: InteractiveViewer(
+            child: Image.network(
+              profileImageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, error, stackTrace) => Container(
+                color: AppTheme.surface,
+                padding: EdgeInsets.all(20.w),
+                child: Text('Unable to load image', style: TextStyle(color: AppTheme.textPrimary)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showMessage(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? AppTheme.error : AppTheme.success,
+      ),
+    );
   }
 
   int get _streak => habitsData?.currentStreak ?? 0;
@@ -146,36 +341,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: RefreshIndicator(
-        onRefresh: _refreshProfile,
-        color: AppTheme.primary,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 18.h),
-              _buildProfileHeader(),
-              SizedBox(height: 16.h),
-              _buildStatsGrid(),
-              SizedBox(height: 16.h),
-              _buildAchievementSection(),
-              SizedBox(height: 16.h),
-              if (userData != null) _buildPreferencesCard(),
-              if (userData != null) SizedBox(height: 16.h),
-              _buildLogoutButton(),
-              SizedBox(height: 24.h),
-            ],
+      body: Stack(
+        children: [
+          RefreshIndicator(
+            onRefresh: _refreshProfile,
+            color: AppTheme.primary,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 18.h),
+                  _buildProfileHeader(),
+                  SizedBox(height: 16.h),
+                  _buildStatsGrid(),
+                  SizedBox(height: 16.h),
+                  _buildAchievementSection(),
+                  SizedBox(height: 16.h),
+                  if (userData != null) _buildPreferencesCard(),
+                  if (userData != null) SizedBox(height: 16.h),
+                  _buildLogoutButton(),
+                  SizedBox(height: 24.h),
+                ],
+              ),
+            ),
           ),
-        ),
+          if (imageBusy)
+            Container(
+              color: Colors.black.withOpacity(0.2),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+        ],
       ),
     );
   }
 
   Widget _buildProfileHeader() {
     final String streakText = '$_streak day streak';
-    final String? imageUrl = userData?.profileImage;
+    final String secondaryText = emailAddress.isNotEmpty
+        ? emailAddress
+        : (_nextMilestone == null ? 'All milestone tiers unlocked' : 'Next achievement at $_nextMilestone days');
 
     return Container(
       width: double.infinity,
@@ -202,26 +408,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Row(
             children: [
-              Container(
-                padding: EdgeInsets.all(2.w),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
-                  shape: BoxShape.circle,
-                ),
-                child: CircleAvatar(
-                  radius: 36.r,
-                  backgroundColor: Colors.white.withOpacity(0.2),
-                  backgroundImage: (imageUrl != null && imageUrl.isNotEmpty) ? NetworkImage(imageUrl) : null,
-                  child: (imageUrl == null || imageUrl.isEmpty)
-                      ? Text(
-                          displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 28.sp,
-                          ),
-                        )
-                      : null,
+              GestureDetector(
+                onTap: _showAvatarActions,
+                child: Stack(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(2.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        shape: BoxShape.circle,
+                      ),
+                      child: CircleAvatar(
+                        radius: 36.r,
+                        backgroundColor: Colors.white.withOpacity(0.2),
+                        child: ClipOval(child: _buildAvatarContent()),
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 24.w,
+                        height: 24.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppTheme.primary, width: 2),
+                        ),
+                        child: Icon(Icons.edit, size: 12.r, color: AppTheme.primary),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(width: 14.w),
@@ -241,9 +458,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 5.h),
                     Text(
-                      _nextMilestone == null
-                          ? 'All milestone tiers unlocked'
-                          : 'Next achievement at $_nextMilestone days',
+                      secondaryText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 13.sp,
@@ -262,7 +479,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildHeaderPill(Icons.emoji_events, '$_unlockedMilestonesCount badges'),
             ],
           ),
+          SizedBox(height: 10.h),
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: _showAvatarActions,
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.white.withOpacity(0.15),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                ),
+                icon: Icon(Icons.photo_camera_back_outlined, size: 16.r),
+                label: Text('Change photo', style: TextStyle(fontSize: 12.sp)),
+              ),
+              if (profileImageUrl.isNotEmpty) SizedBox(width: 8.w),
+              if (profileImageUrl.isNotEmpty)
+                TextButton.icon(
+                  onPressed: _removeProfileImage,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.red.withOpacity(0.2),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                  ),
+                  icon: Icon(Icons.delete_outline, size: 16.r),
+                  label: Text('Remove', style: TextStyle(fontSize: 12.sp)),
+                ),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAvatarContent() {
+    if (profileImageUrl.isNotEmpty) {
+      return Image.network(
+        profileImageUrl,
+        width: 72.r,
+        height: 72.r,
+        fit: BoxFit.cover,
+        errorBuilder: (_, error, stackTrace) => _buildAvatarFallback(),
+      );
+    }
+    return _buildAvatarFallback();
+  }
+
+  Widget _buildAvatarFallback() {
+    return Container(
+      width: 72.r,
+      height: 72.r,
+      alignment: Alignment.center,
+      color: Colors.transparent,
+      child: Text(
+        displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 28.sp,
+        ),
       ),
     );
   }
@@ -293,8 +567,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStatsGrid() {
-    final int remaining = _nextMilestone == null ? 0 : (_nextMilestone! - _streak);
-
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(

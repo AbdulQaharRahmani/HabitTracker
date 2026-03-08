@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/screens/settingScreen/setting_screen.dart';
 import 'package:habit_tracker/screens/statisticScreen/statistics_screen.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/providers/consistency_provider.dart';
+import 'package:habit_tracker/screens/statisticScreen/data/providers/statistic_provider.dart';
 import 'package:habit_tracker/screens/taskScreen/tasks_screen.dart';
 import 'package:habit_tracker/screens/todayScreen/today_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -27,12 +29,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Widget> _buildScreens() {
-    return const [
-      TodayScreen(),
-      HabitsScreen(),
-      TasksScreen(),
-      StatisticScreen(),
-      SettingScreen()
+    return [
+      const TodayScreen(),
+      const HabitsScreen(),
+      const TasksScreen(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<StatisticProvider>(
+            create: (_) => StatisticProvider(),
+          ),
+          ChangeNotifierProvider<ConsistencyProvider>(
+            create: (_) => ConsistencyProvider(),
+          ),
+        ],
+        child: const StatisticScreen(),
+      ),
+      const SettingScreen()
     ];
   }
 

@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'http_client.dart';
 import '../utils/category/category_model.dart';
 
-import '../screens/habitScreen/add_habit.dart';
 import '../screens/statisticScreen/data/models/daily_consistency.dart';
 import '../utils/profile/profile_model.dart';
 import '../utils/today_progressBar/task_item.dart';
@@ -171,16 +170,108 @@ class AuthService {
   Future<Map<String, dynamic>> uploadProfileImage(File image) async {
     try {
       final token = await AuthManager.getToken();
+      if (token == null || token.isEmpty) {
+        return {'success': false, 'message': 'Session expired, please login again'};
+      }
 
-      final request =
-      http.MultipartRequest("POST", Uri.parse("$_api/users/profile-picture"));
-      request.headers["Authorization"] = "Bearer $token";
-      request.files.add(await http.MultipartFile.fromPath("image", image.path));
+      // Keep compatibility with older backend variants that may still expect "image".
+      final byProfilePicture = await _uploadProfileImageWithField(
+        image: image,
+        token: token,
+        fieldName: 'profilePicture',
+      );
+      if (byProfilePicture['success'] == true) return byProfilePicture;
+      final status = byProfilePicture['statusCode'] as int? ?? 0;
+      if (status != 400 && status != 500) return byProfilePicture;
 
-      final response = await http.Response.fromStream(await request.send());
-      return jsonDecode(response.body);
+      final byImage = await _uploadProfileImageWithField(
+        image: image,
+        token: token,
+        fieldName: 'image',
+      );
+      return byImage;
     } catch (e) {
       return {'success': false, 'message': 'Failed to upload profile image: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> _uploadProfileImageWithField({
+    required File image,
+    required String token,
+    required String fieldName,
+  }) async {
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse("$_api/users/profile-picture"),
+    );
+    request.headers["Authorization"] = "Bearer $token";
+    request.files.add(await http.MultipartFile.fromPath(fieldName, image.path));
+
+    final response = await http.Response.fromStream(await request.send());
+    Map<String, dynamic> body;
+    try {
+      body = jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (_) {
+      body = {
+        'success': response.statusCode >= 200 && response.statusCode < 300,
+        'message': response.body,
+      };
+    }
+    body['success'] = body['success'] == true;
+    body['message'] = body['message']?.toString() ??
+        body['error']?.toString() ??
+        body['code']?.toString() ??
+        'Request failed (${response.statusCode})';
+    body['statusCode'] = response.statusCode;
+    return body;
+  }
+
+  Future<Map<String, dynamic>> getProfileImage({String? userId}) async {
+    try {
+      // New backend variant
+      final res = await AuthenticatedHttpClient.get('/users/profile-picture');
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body);
+      }
+      // Old backend variant
+      if (userId != null && userId.isNotEmpty) {
+        final legacy = await AuthenticatedHttpClient.get('/users/$userId/profile-picture');
+        return jsonDecode(legacy.body);
+      }
+      return {'success': false, 'message': 'Profile image endpoint unavailable'};
+    } catch (e) {
+      // Old backend variant fallback
+      if (userId != null && userId.isNotEmpty) {
+        try {
+          final legacy = await AuthenticatedHttpClient.get('/users/$userId/profile-picture');
+          return jsonDecode(legacy.body);
+        } catch (_) {}
+      }
+      return {'success': false, 'message': 'Failed to fetch profile image: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> removeProfileImage() async {
+    try {
+      final res = await AuthenticatedHttpClient.delete('/users/profile-picture');
+      Map<String, dynamic> body;
+      try {
+        body = jsonDecode(res.body) as Map<String, dynamic>;
+      } catch (_) {
+        body = {
+          'success': res.statusCode >= 200 && res.statusCode < 300,
+          'message': res.body,
+        };
+      }
+      body['success'] = body['success'] == true;
+      body['message'] = body['message']?.toString() ??
+          body['error']?.toString() ??
+          body['code']?.toString() ??
+          'Request failed (${res.statusCode})';
+      body['statusCode'] = res.statusCode;
+      return body;
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to remove profile image: $e'};
     }
   }
 
@@ -338,32 +429,8 @@ class AuthService {
     required TaskItem item,
     required DateTime forDate,
   }) async {
-    final headers = await _headers();
-
     if (item.sourceType == 'habit') {
-      final date = _formatDate(forDate);
-      final url = Uri.parse("$_api/habits/${item.id}/complete");
-
-      try {
-        final res = item.done
-            ? await AuthenticatedHttpClient.post(
-                '/habits/${item.id}/complete',
-                body: jsonEncode({"date": date}),
-              )
-            : await AuthenticatedHttpClient.delete(
-                '/habits/${item.id}/complete',
-                body: jsonEncode({"date": date}),
-              );
-
-        if (res.statusCode == 200 || res.statusCode == 201) {
-          final body = jsonDecode(res.body);
-          return body['success'] == true;
-        }
-        return false;
-      } catch (e) {
-        debugPrint("Error toggling habit: $e");
-        return false;
-      }
+      return _setHabitCompletion(item: item, forDate: forDate);
     }
 
     try {
@@ -373,17 +440,64 @@ class AuthService {
       );
 
       if (res.statusCode == 200) {
-        final body = jsonDecode(res.body);
-        if (body.containsKey('success')) {
-          return body['success'] == true;
-        } else if (body.containsKey('data')) {
-          return body['data']?['done'] == item.done;
-        }
-        return true;
+        return _responseIndicatesSuccess(res.body, expectedDone: item.done);
       }
       return false;
     } catch (e) {
       debugPrint("Error toggling task: $e");
+      return false;
+    }
+  }
+
+  Future<bool> _setHabitCompletion({
+    required TaskItem item,
+    required DateTime forDate,
+  }) async {
+    final date = _formatDate(forDate);
+
+    try {
+      final List<Future<http.Response> Function()> requests = item.done
+          ? [
+              () => AuthenticatedHttpClient.post(
+                    '/habits/${item.id}/complete',
+                    body: jsonEncode({"date": date}),
+                  ),
+              () => AuthenticatedHttpClient.post(
+                    '/habits/${item.id}/complete?date=$date',
+                  ),
+              () => AuthenticatedHttpClient.patch(
+                    '/habits/${item.id}/status',
+                    body: jsonEncode({"done": true, "date": date}),
+                  ),
+            ]
+          : [
+              () => AuthenticatedHttpClient.delete(
+                    '/habits/${item.id}/complete',
+                    body: jsonEncode({"date": date}),
+                  ),
+              () => AuthenticatedHttpClient.delete(
+                    '/habits/${item.id}/complete?date=$date',
+                  ),
+              () => AuthenticatedHttpClient.post(
+                    '/habits/${item.id}/uncomplete',
+                    body: jsonEncode({"date": date}),
+                  ),
+              () => AuthenticatedHttpClient.patch(
+                    '/habits/${item.id}/status',
+                    body: jsonEncode({"done": false, "date": date}),
+                  ),
+            ];
+
+      for (final send in requests) {
+        final res = await send();
+        if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 204) {
+          return _responseIndicatesSuccess(res.body, expectedDone: item.done);
+        }
+      }
+
+      return false;
+    } catch (e) {
+      debugPrint("Error toggling habit: $e");
       return false;
     }
   }
@@ -394,13 +508,23 @@ class AuthService {
 
   TaskItem _mapHabitToTaskItem(
       Map<String, dynamic> json, DateTime forDate) {
-    final category = json['category'] ?? json['categoryId'] ?? {};
+    final rawHabit = json['habit'];
+    final Map<String, dynamic> habit =
+        rawHabit is Map<String, dynamic> ? rawHabit : json;
+    final category =
+        habit['category'] ?? habit['categoryId'] ?? json['category'] ?? json['categoryId'] ?? {};
     final name = (category['name'] ?? 'other').toString();
+    final id =
+        json['habitId']?.toString() ??
+        habit['_id']?.toString() ??
+        json['_id']?.toString() ??
+        '';
 
     return TaskItem(
-      id: json['_id'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
+      id: id,
+      title: habit['title'] ?? json['title'] ?? '',
+      description: habit['description'] ?? json['description'] ?? '',
+      frequency: habit['frequency'] ?? json['frequency'] ?? 'daily',
       category: name,
       icon: TaskItem.resolveIcon(
         apiIconName: category['icon']?.toString(),
@@ -410,11 +534,30 @@ class AuthService {
         apiHexColor: category['backgroundColor']?.toString(),
         categoryName: name,
       ),
-      sourceType: json.containsKey('frequency') ? 'habit' : 'task',
+      sourceType: 'habit',
       createdAt:
-      DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      DateTime.tryParse(habit['createdAt'] ?? json['createdAt'] ?? '') ?? DateTime.now(),
       done: _isDoneForDate(json, forDate),
     );
+  }
+
+  bool _responseIndicatesSuccess(String bodyRaw, {required bool expectedDone}) {
+    if (bodyRaw.trim().isEmpty) return true;
+    try {
+      final dynamic decoded = jsonDecode(bodyRaw);
+      if (decoded is Map<String, dynamic>) {
+        if (decoded['success'] != null) return decoded['success'] == true;
+        final dynamic data = decoded['data'];
+        if (data is Map<String, dynamic>) {
+          if (data['done'] != null) return data['done'] == expectedDone;
+          if (data['isCompleted'] != null) return data['isCompleted'] == expectedDone;
+          if (data['completed'] != null) return data['completed'] == expectedDone;
+        }
+      }
+    } catch (_) {
+      // Treat non-JSON success responses as success when status code is successful.
+    }
+    return true;
   }
 
   String? _extractRefreshTokenFromSetCookie(String? setCookieHeader) {
@@ -444,7 +587,9 @@ class AuthService {
     if (json['completed'] == true ||
         json['isCompleted'] == true ||
         json['done'] == true ||
-        json['completedToday'] == true) return true;
+        json['completedToday'] == true) {
+      return true;
+    }
 
     if (json['completedDates'] is List) {
       return (json['completedDates'] as List).any((d) {
