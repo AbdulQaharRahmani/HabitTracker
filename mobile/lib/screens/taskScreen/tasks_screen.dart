@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/core/widgets/app_empty_state.dart';
-import 'package:habit_tracker/core/widgets/app_error_state.dart';
 import 'package:habit_tracker/screens/taskScreen/add_task_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -51,11 +49,6 @@ class _TasksScreenState extends State<TasksScreen> {
 
   Timer? _searchTimer;
   String? _token;
-
-  final TextStyle _descriptionStyle = TextStyle(
-    color: AppTheme.textSecondary,
-    fontSize: 14,
-  );
 
   @override
   void initState() {
@@ -240,6 +233,116 @@ class _TasksScreenState extends State<TasksScreen> {
     });
   }
 
+  Widget _buildSearchAndCreate() {
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 44.h,
+              decoration: BoxDecoration(
+                color: AppTheme.background,
+                borderRadius: BorderRadius.circular(9.r),
+              ),
+              padding: EdgeInsets.only(left: 10.w, right: 4.w),
+              child: Row(
+                children: [
+                  Icon(Icons.search, size: 18.sp, color: AppTheme.textMuted),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search tasks...',
+                        isDense: true,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        hintStyle: TextStyle(
+                          color: AppTheme.textMuted,
+                          fontSize: 13.sp,
+                        ),
+                      ),
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: AppTheme.textPrimary,
+                      ),
+                      textInputAction: TextInputAction.search,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ),
+                  if (_searchController.text.isNotEmpty)
+                    IconButton(
+                      onPressed: () {
+                        _searchTimer?.cancel();
+                        _searchController.clear();
+                        _searchTerm = '';
+                        _fetchTasks(reset: true);
+                      },
+                      icon: Icon(Icons.close, size: 18.sp, color: AppTheme.textMuted),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 6.w),
+          InkWell(
+            onTap: () async {
+              final newTask = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => NewTaskPage(defaultCategoryId: _selectedCategoryId),
+                ),
+              );
+              if (newTask != null) {
+                await _fetchTasks(reset: true);
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Task created successfully!'),
+                    backgroundColor: AppTheme.success,
+                  ),
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(9.r),
+            child: Container(
+              height: 44.h,
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(9.r),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.add, size: 16.sp, color: AppTheme.primary),
+                  SizedBox(width: 5.w),
+                  Text(
+                    'New',
+                    style: TextStyle(
+                      color: AppTheme.primary,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Provider.of<ThemeProvider>(context);
@@ -251,131 +354,41 @@ class _TasksScreenState extends State<TasksScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'My Tasks',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30.sp,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'Stay focused with prioritized tasks and clear progress.',
-                    style: _descriptionStyle,
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'My Tasks',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 28.sp,
+                  color: AppTheme.textPrimary,
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 48.h,
-                      decoration: BoxDecoration(
-                        color: AppTheme.inputBackground,
-                        borderRadius: BorderRadius.circular(15.r),
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                      padding: EdgeInsets.only(left: 12.w, right: 6.w),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search, color: AppTheme.textMuted),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              decoration: InputDecoration(
-                                hintText: 'Search tasks...',
-                                isDense: true,
-                                filled: false,
-                                fillColor: Colors.transparent,
-                                contentPadding: EdgeInsets.zero,
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                errorBorder: InputBorder.none,
-                                focusedErrorBorder: InputBorder.none,
-                                hintStyle: TextStyle(color: AppTheme.textMuted),
-                                suffixIcon: _searchController.text.isNotEmpty
-                                    ? IconButton(
-                                        onPressed: () {
-                                          _searchTimer?.cancel();
-                                          _searchController.clear();
-                                          _searchTerm = '';
-                                          _fetchTasks(reset: true);
-                                        },
-                                        icon: Icon(Icons.close, color: AppTheme.textMuted),
-                                      )
-                                    : null,
-                              ),
-                              textInputAction: TextInputAction.search,
-                              onChanged: (_) => setState(() {}),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  SizedBox(
-                    height: 48.h,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        final newTask = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => NewTaskPage(defaultCategoryId: _selectedCategoryId),
-                          ),
-                        );
-                        if (newTask != null) {
-                          await _fetchTasks(reset: true);
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(this.context).showSnackBar(
-                            SnackBar(
-                              content: const Text('Task created successfully!'),
-                              backgroundColor: AppTheme.success,
-                            ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                      ),
-                      icon: const Icon(Icons.add, size: 20, color: Colors.white),
-                      label: const Text(
-                        'New',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ),
-                ],
+              SizedBox(height: 4.h),
+              Text(
+                'Stay focused with prioritized tasks and clear progress.',
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 12.sp,
+                ),
               ),
-            ),
-            SizedBox(height: 10.h),
-            _buildCategoryFilters(),
-            SizedBox(height: 8.h),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: _refreshTasks,
-                color: AppTheme.primary,
-                child: _buildTasksContent(todoTasks, completedTasks),
+              SizedBox(height: 10.h),
+              _buildSearchAndCreate(),
+              SizedBox(height: 10.h),
+              _buildCategoryFilters(),
+              SizedBox(height: 8.h),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _refreshTasks,
+                  color: AppTheme.primary,
+                  child: _buildTasksContent(todoTasks, completedTasks),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -393,11 +406,31 @@ class _TasksScreenState extends State<TasksScreen> {
     if (_errorMessage != null && _tasks.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.only(top: 80.h),
         children: [
-          SizedBox(height: 220.h),
-          AppErrorState(
-            message: _errorMessage!,
-            onRetry: () => _fetchTasks(reset: true),
+          Container(
+            padding: EdgeInsets.all(14.w),
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: AppTheme.border),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.wifi_off_rounded, color: AppTheme.textMuted, size: 28.sp),
+                SizedBox(height: 10.h),
+                Text(
+                  _errorMessage!,
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 13.sp),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12.h),
+                ElevatedButton(
+                  onPressed: () => _fetchTasks(reset: true),
+                  child: const Text('Try Again'),
+                ),
+              ],
+            ),
           ),
         ],
       );
@@ -406,12 +439,31 @@ class _TasksScreenState extends State<TasksScreen> {
     if (todoTasks.isEmpty && completedTasks.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.only(top: 80.h),
         children: [
-          SizedBox(height: 120.h),
-          AppEmptyState(
-            title: _selectedCategoryId == null && _searchTerm.isEmpty
-                ? 'No tasks found'
-                : 'No tasks match this filter',
+          Container(
+            padding: EdgeInsets.all(14.w),
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: AppTheme.border),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.inbox_outlined, size: 34.sp, color: AppTheme.textMuted),
+                SizedBox(height: 10.h),
+                Text(
+                  _selectedCategoryId == null && _searchTerm.isEmpty
+                      ? 'No tasks found'
+                      : 'No tasks match this filter',
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 12.sp,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ],
       );
@@ -438,7 +490,7 @@ class _TasksScreenState extends State<TasksScreen> {
             ),
           ),
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 20)),
+        const SliverToBoxAdapter(child: SizedBox(height: 70)),
       ],
     );
   }
@@ -453,9 +505,9 @@ class _TasksScreenState extends State<TasksScreen> {
               child: Text(
                 '$title (${tasks.length})',
                 style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: title == 'TO DO' ? AppTheme.primary : AppTheme.success,
                 ),
               ),
             );
@@ -474,11 +526,17 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   Widget _buildCategoryFilters() {
-    return SizedBox(
-      height: 44.h,
+    return Container(
+      height: 52.h,
+      padding: EdgeInsets.symmetric(vertical: 4.h),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppTheme.border),
+      ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         itemCount: _categories.length + 1,
         itemBuilder: (context, index) {
           final bool isAll = index == 0;
@@ -488,23 +546,28 @@ class _TasksScreenState extends State<TasksScreen> {
           final bool selected = isSelected || showSelectedForAll;
 
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5.w),
+            padding: EdgeInsets.symmetric(horizontal: 4.w),
             child: FilterChip(
               showCheckmark: false,
               label: Text(
                 isAll ? 'All' : category!.name,
-                style: TextStyle(color: selected ? AppTheme.textWhite : AppTheme.textPrimary),
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: selected ? AppTheme.primary : AppTheme.textPrimary,
+                ),
               ),
               selected: selected,
               onSelected: (_) {
                 setState(() => _selectedCategoryId = category?.id);
                 _fetchTasks(reset: true);
               },
-              selectedColor: AppTheme.primary,
-              backgroundColor: selected ? AppTheme.primary : AppTheme.surface,
+              selectedColor: AppTheme.primary.withValues(alpha: 0.12),
+              backgroundColor: AppTheme.background,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.r),
-                side: BorderSide(color: selected ? AppTheme.primary : AppTheme.border),
+                side: BorderSide(
+                  color: selected ? AppTheme.primary : AppTheme.border,
+                ),
               ),
             ),
           );

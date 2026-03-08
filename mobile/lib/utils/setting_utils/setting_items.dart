@@ -23,9 +23,24 @@ class SettingNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: SettingIcon(icon: icon, color: color),
-      title: Text(title, style: const TextStyle(fontSize: 17)),
-      subtitle: subtitle != null ? Text(subtitle!) : null,
-      trailing: const Icon(Icons.chevron_right),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.textPrimary,
+        ),
+      ),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle!,
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 11,
+              ),
+            )
+          : null,
+      trailing: Icon(Icons.chevron_right, color: AppTheme.textMuted),
     );
   }
 }
@@ -41,20 +56,30 @@ class SettingTimeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading:  SettingIcon(
+      leading: SettingIcon(
         icon: Icons.schedule,
         color: AppTheme.learningText,
       ),
-      title: const Text("Daily Reminder"),
+      title: Text(
+        "Daily Reminder",
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.textPrimary,
+        ),
+      ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: AppTheme.inputBackground,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           time,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textSecondary,
+          ),
         ),
       ),
     );
@@ -81,11 +106,19 @@ class SettingSwitchItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: SettingIcon(icon: icon, color: color),
-      title: Text(title),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.textPrimary,
+        ),
+      ),
       trailing: Switch(
         value: value,
         onChanged: onChanged,
         activeThumbColor: AppTheme.primary,
+        activeTrackColor: AppTheme.primary.withValues(alpha: 0.35),
       ),
     );
   }
@@ -104,9 +137,12 @@ class SettingDangerItem extends StatelessWidget {
     Provider.of<ThemeProvider>(context);
     return ListTile(
       leading: SettingIcon(icon: Icons.delete, color: AppTheme.error),
-      title:  Text(
+      title: Text(
         "Delete Account",
-        style: TextStyle(color: AppTheme.error),
+        style: TextStyle(
+          color: AppTheme.error,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       onTap: onTap,
     );
