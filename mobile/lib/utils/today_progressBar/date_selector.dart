@@ -19,24 +19,38 @@ class DateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80.h,
+    return Container(
+      height: 84.h,
+      padding: EdgeInsets.symmetric(vertical: 6.h),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppTheme.border),
+      ),
       child: ListView.separated(
         controller: controller,
         scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         itemCount: dates.length,
-        separatorBuilder: (_, __) => SizedBox(width: 8.w),
+        separatorBuilder: (_, _) => SizedBox(width: 8.w),
         itemBuilder: (context, index) {
           final date = dates[index];
           final isSelected = DateUtils.isSameDay(date, selectedDate);
 
-          return GestureDetector(
+          return InkWell(
+            borderRadius: BorderRadius.circular(14.r),
             onTap: () => onDateSelected(date),
-            child: Container(
-              width: 64.w,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 58.w,
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primary : AppTheme.surface,
-                borderRadius: BorderRadius.circular(16.r),
+                color: isSelected
+                    ? AppTheme.primary.withValues(alpha: 0.14)
+                    : AppTheme.background,
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(
+                  color: isSelected ? AppTheme.primary : AppTheme.border,
+                ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -44,8 +58,9 @@ class DateSelector extends StatelessWidget {
                   Text(
                     DateFormat.E().format(date),
                     style: TextStyle(
-                      color:
-                      isSelected ? AppTheme.surface : AppTheme.textMuted,
+                      fontSize: 11.sp,
+                      color: isSelected ? AppTheme.primary : AppTheme.textMuted,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -53,9 +68,9 @@ class DateSelector extends StatelessWidget {
                     '${date.day}',
                     style: TextStyle(
                       fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       color: isSelected
-                          ? AppTheme.textWhite
+                          ? AppTheme.primary
                           : AppTheme.textPrimary,
                     ),
                   ),

@@ -1,56 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../app/app_theme.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../app/app_theme.dart';
+
+import '../app/app_theme.dart' as legacy_theme;
+import '../core/theme/app_theme.dart' as core_theme;
 
 class ThemeProvider extends ChangeNotifier {
   static const String _themeKey = 'isDarkMode';
   bool _isDarkMode = false;
 
   bool get isDarkMode => _isDarkMode;
+  ThemeMode get themeMode => _isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
-  // ──────────────────────────────────────────────────────────────
-  // این خط خیلی مهم است — از currentTheme دینامیک AppTheme استفاده می‌کنه
-  // ──────────────────────────────────────────────────────────────
-  ThemeData get currentTheme => AppTheme.currentTheme;
+  ThemeData get currentTheme =>
+      _isDarkMode ? core_theme.AppTheme.dark() : core_theme.AppTheme.light();
 
   ThemeProvider() {
     _loadTheme();
   }
 
-  // ──────────────────────────────────────────────────────────────
-  // لود تم از حافظه
-  // ──────────────────────────────────────────────────────────────
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     _isDarkMode = prefs.getBool(_themeKey) ?? false;
 
-    AppTheme.setTheme(_isDarkMode);   // رنگ‌های AppTheme رو بروز می‌کنه
+    // Keep legacy static palette in sync while old UI is being migrated.
+    legacy_theme.AppTheme.setTheme(_isDarkMode);
     notifyListeners();
   }
 
-  // ──────────────────────────────────────────────────────────────
-  // سوئیچ تم (دکمه Dark Mode)
-  // ──────────────────────────────────────────────────────────────
   Future<void> toggleTheme() async {
     _isDarkMode = !_isDarkMode;
 
-    AppTheme.setTheme(_isDarkMode);   // رنگ‌ها رو عوض می‌کنه
+    legacy_theme.AppTheme.setTheme(_isDarkMode);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_themeKey, _isDarkMode);
 
     notifyListeners();
   }
 
-  // ──────────────────────────────────────────────────────────────
-  // تنظیم مستقیم تم (در صورت نیاز)
-  // ──────────────────────────────────────────────────────────────
   Future<void> setTheme(bool isDark) async {
     _isDarkMode = isDark;
 
-    AppTheme.setTheme(_isDarkMode);
+    legacy_theme.AppTheme.setTheme(_isDarkMode);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_themeKey, _isDarkMode);
 

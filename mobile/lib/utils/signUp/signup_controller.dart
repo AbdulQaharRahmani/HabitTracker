@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/auth_service.dart';
+import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/auth/domain/usecases/register_usecase.dart';
 
 class SignUpController extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
@@ -12,7 +13,7 @@ class SignUpController extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  final AuthService _authService = AuthService();
+  final RegisterUseCase _registerUseCase = RegisterUseCase(AuthRepositoryImpl());
 
   // ===== Validators =====
   String? nameValidator(String? value) {
@@ -43,18 +44,14 @@ class SignUpController extends ChangeNotifier {
   }
 
   // ===== Sign Up Logic =====
-  Future<bool> signUp(BuildContext context) async {
-    print("SignUp started");
-
+  Future<bool> signUp() async {
     if (formKey.currentState?.validate() != true) {
-      print("Form validation failed");
       return false;
     }
 
 
     if (!isAgreeTerms) {
       errorMessage = 'Please agree to the terms and conditions';
-      _showErrorMessage(context, errorMessage!);
       return false;
     }
 
@@ -63,50 +60,26 @@ class SignUpController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _authService.register(
+      final result = await _registerUseCase(
         name: usernameController.text.trim(),
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      print("Server response: $result");
-
-      if (result["success"] == true) {
-            _showSuccessMessage(context);
+      if (result.success) {
+        errorMessage = null;
         return true;
       } else {
-        errorMessage = result["message"] ?? 'Registration failed';
-        _showErrorMessage(context, errorMessage!);
+        errorMessage = result.message ?? 'Registration failed';
         return false;
       }
     } catch (e) {
       errorMessage = 'Connection error: $e';
-      _showErrorMessage(context, errorMessage!);
       return false;
     } finally {
       isLoading = false;
       notifyListeners();
     }
-  }
-
-  void _showSuccessMessage(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Sign up successful!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _showErrorMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      ),
-    );
   }
 
   void clear() {
@@ -118,6 +91,7 @@ class SignUpController extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
   void dispose() {
     usernameController.dispose();
     emailController.dispose();

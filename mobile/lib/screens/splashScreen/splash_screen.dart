@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/features/routes.dart';
-import 'package:habit_tracker/services/token_storage.dart';
+import 'package:habit_tracker/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:habit_tracker/features/auth/domain/usecases/is_logged_in_usecase.dart';
 
 
 
@@ -12,6 +13,9 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final IsLoggedInUseCase _isLoggedInUseCase =
+      IsLoggedInUseCase(AuthRepositoryImpl());
+
   @override
   void initState() {
     super.initState();
@@ -21,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkLoginStatus() async {
     await Future.delayed(const Duration(milliseconds: 1500));
 
-    final isLoggedIn = await AuthManager.isUserLoggedIn();
+    final isLoggedIn = await _isLoggedInUseCase();
 
     if (!mounted) return;
 
