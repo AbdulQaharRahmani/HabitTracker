@@ -288,6 +288,8 @@ export const useTaskCardStore = create((set, get) => ({
     }
   },
 
+  setTasks: (tasks) => set({ tasks }),
+
 }));
 
 const normalizePriorityToEnglish = (value) => {

@@ -13,6 +13,20 @@ import HabitCardIcon from "../components/HabitCardIcon";
 import { iconCategories } from "../utils/icons";
 import { FaCheckCircle } from "react-icons/fa";
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
+
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove
+} from "@dnd-kit/sortable";
+
 const InlineInput = ({ catId, value, onChange, onSubmit, onCancel }) => {
   const inputRef = useRef(null);
 
@@ -45,8 +59,19 @@ const InlineInput = ({ catId, value, onChange, onSubmit, onCancel }) => {
 };
 
 function Tasks() {
-  const { tasks, fetchTasks, loading, fetchCategories, addTask, categories } =
-    useTaskCardStore((state) => state);
+  const sensors = useSensors(
+    useSensor(PointerSensor)
+  );
+
+  const {
+    tasks,
+    setTasks,
+    fetchTasks,
+    loading,
+    fetchCategories,
+    addTask,
+    categories
+  } = useTaskCardStore((state) => state);
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
@@ -334,6 +359,34 @@ function Tasks() {
     return null;
   };
 
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    const category = groupedArray.find(group =>
+      group.items.some(task => task._id === activeId)
+    );
+
+    if (!category) return;
+
+    const oldIndex = category.items.findIndex(t => t._id === activeId);
+    const newIndex = category.items.findIndex(t => t._id === overId);
+
+    const reordered = arrayMove(category.items, oldIndex, newIndex);
+
+    const otherTasks = tasks.filter(
+      t => !category.items.some(ci => ci._id === t._id)
+    );
+
+    const updatedTasks = [...otherTasks, ...reordered];
+
+    setTasks(updatedTasks);
+  };
+
 return (
     <div
       ref={containerRef}
@@ -349,60 +402,75 @@ return (
       </div>
 
       {!loading && (
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-4 mt-4">
-        {groupedArray.map((group, index) => {
-          const Icon = getIconComponent(group.icon) || FaCheckCircle;
-          return (
-            <div
-              key={group.id}
-              ref={(el) => (categoryRef.current[index] = el)}
-              data-category-card="true"
-              data-category-id={group.id}
-              tabIndex={0}
-              onClick={() => setActiveCategoryId(group.id)}
-              onFocus={(e) => {
-                if (e.target.getAttribute("data-category-card") === "true") {
-                  setActiveCategoryId(group.id);
-                }
-              }}
-              className={`break-inside-avoid-column mb-4 bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-200/80 dark:border-gray-800 transition-all outline-none
-                ${activeCategoryId === group.id ? "ring-2 ring-indigo-500 shadow-lg ring-offset-2" : ""}`}
-            >
-              <div className="px-4 pt-2 pb-1 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
-                <div className="flex items-center gap-1">
-                  <HabitCardIcon Icon={Icon} color={group.color}/>
-                  <h5 className="font-bold text-lg text-gray-800 dark:text-gray-100">{group.name}</h5>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          {groupedArray.map((group, index) => {
+            const Icon = getIconComponent(group.icon) || FaCheckCircle;
+            return (
+              <div
+                key={group.id}
+                ref={(el) => (categoryRef.current[index] = el)}
+                data-category-card="true"
+                data-category-id={group.id}
+                tabIndex={0}
+                onClick={() => setActiveCategoryId(group.id)}
+                onFocus={(e) => {
+                  if (e.target.getAttribute("data-category-card") === "true") {
+                    setActiveCategoryId(group.id);
+                  }
+                }}
+                className={`break-inside-avoid-column mb-4 bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-200/80 dark:border-gray-800 transition-all outline-none
+                  ${activeCategoryId === group.id ? "ring-2 ring-indigo-500 shadow-lg ring-offset-2" : ""}`}
+              >
+                <div className="px-4 pt-2 pb-1 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+                  <div className="flex items-center gap-1">
+                    <HabitCardIcon Icon={Icon} color={group.color}/>
+                    <h5 className="font-bold text-lg text-gray-800 dark:text-gray-100">{group.name}</h5>
+                  </div>
+                  <button
+                    tabIndex={-1}
+                    onClick={(e) => { e.stopPropagation(); startAdding(group.id); }}
+                    className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-sm"
+                  >
+                    <span className="text-sm font-semibold">+</span> {t("Add")}
+                  </button>
                 </div>
-                <button
-                  tabIndex={-1}
-                  onClick={(e) => { e.stopPropagation(); startAdding(group.id); }}
-                  className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-sm"
-                >
-                  <span className="text-sm font-semibold">+</span> {t("Add")}
-                </button>
+                <div className="px-6 py-3">
+                  {isAddingToId === group.id && (
+                    <InlineInput
+                      catId={group.id}
+                      value={inlineTaskTitle}
+                      onChange={setInlineTaskTitle}
+                      onSubmit={handleQuickAdd}
+                      onCancel={cancelAdding}
+                    />
+                  )}
+                  {group.items.length > 0 ? (
+                    <SortableContext
+                      items={group.items.map(task => task._id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div>
+                        {group.items.map((task) => (
+                          <TaskCard key={task._id} {...task} />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  ) : (
+                    isAddingToId !== group.id && (
+                      <p className="text-gray-400 text-sm text-center py-1">{t("No tasks here")}</p>
+                    )
+                  )}
+                </div>
               </div>
-              <div className="px-6 py-3">
-                {isAddingToId === group.id && (
-                  <InlineInput
-                    catId={group.id}
-                    value={inlineTaskTitle}
-                    onChange={setInlineTaskTitle}
-                    onSubmit={handleQuickAdd}
-                    onCancel={cancelAdding}
-                  />
-                )}
-                {group.items.length > 0 ? (
-                  <div>{group.items.map((task) => <TaskCard key={task._id} {...task} />)}</div>
-                ) : (
-                  isAddingToId !== group.id && (
-                    <p className="text-gray-400 text-sm text-center py-1">{t("No tasks here")}</p>
-                  )
-                )}
-              </div>
-            </div>
-          );
-        })}
-        </div>
+            );
+          })}
+          </div>
+        </DndContext>
       )}
     </div>
   );
