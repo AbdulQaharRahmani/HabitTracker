@@ -6,18 +6,24 @@ const CategoryHeader = ({ group, Icon}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(group.name);
   const updateTaskCategoryName = useTaskCardStore((state)=> state.updateTaskCategoryName)
-  const fetchCategories = useTaskCardStore((state)=> state.fetchCategories)
-  const updatedData = {
-     name: value,
-     icon: group.icon,
-     backgroundColor:group.backgroundColor,
-     isHabit: false
-  }
-  const handleSave = () => {
-     updateTaskCategoryName(group.id, updatedData)
-     fetchCategories()
+  const handleSave = async () => {
+  if (value.trim() === group.name) {
     setIsEditing(false);
+    return;
+  }
+  const updatedData = {
+    ...group,
+    name: value.trim(),
   };
+
+  try {
+    await updateTaskCategoryName(group.id,updatedData);
+    setIsEditing(false);
+  } catch (error) {
+    setValue(group.name);
+    setIsEditing(false);
+  }
+};
 
   return (
     <div className="flex items-center gap-1">

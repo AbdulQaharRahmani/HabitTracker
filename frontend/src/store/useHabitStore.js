@@ -150,12 +150,15 @@ const useHabitStore = create((set, get) => ({
     set({ loading: true });
     try {
       const response = await api.get("/categories");
-      const formatted = response.data.data.map((cat) => ({
+      const formatted = response.data.data.filter((cat)=> cat.isHabit === true)
+      .map((cat)=> ({
         id: cat._id,
         name: cat.name,
         value: cat._id,
         color: cat.backgroundColor || "#dbd6f9",
-      }));
+      }))
+
+
       set({ categories: formatted });
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong";
