@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { deleteTask, getTasks, updateTaskStatus } from "../../services/tasksService";
+import { deleteTask, getTasks, updateCategoryName, updateTaskStatus } from "../../services/tasksService";
 import api from "../../services/api";
 import toast from "react-hot-toast";
 
@@ -265,6 +265,7 @@ export const useTaskCardStore = create((set, get) => ({
         name: newCategory.name,
         backgroundColor: newCategory.backgroundColor,
         icon: newCategory.icon,
+        isHabit: false
       });
 
       const category = res.data.data;
@@ -287,6 +288,14 @@ export const useTaskCardStore = create((set, get) => ({
       toast.error(t("Failed to create category"));
     }
   },
+  updateTaskCategoryName: async(categoryId, updatedData)=>{
+      try{
+        await updateCategoryName(categoryId, updatedData)
+      }catch(error){
+        console.log(error)
+      }
+   }
+
 
 }));
 
@@ -305,4 +314,6 @@ const normalizePriorityToEnglish = (value) => {
     default:
       return "medium";
   }
+
 };
+
