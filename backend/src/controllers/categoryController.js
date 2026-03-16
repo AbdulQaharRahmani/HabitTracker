@@ -15,8 +15,6 @@ export const createCategory = async (req, res) => {
 
   const { name, icon, backgroundColor, isHabit } = req.body;
 
-  console.log(typeof isHabit);
-
   const category = await CategoryModel.create({
     userId: req.user._id,
     name,
