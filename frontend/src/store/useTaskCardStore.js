@@ -41,12 +41,13 @@ export const useTaskCardStore = create((set, get) => ({
     set({ categoriesLoading: true });
     try {
       const response = await api.get("/categories");
-      const formatted = response.data.data.filter((cat)=> cat.isHabit === false)
+      const formatted = response.data.data.filter((cat)=> !cat.isHabit)
       .map((cat)=>({
         id: cat._id,
         name: cat.name,
         value: cat._id,
         color: cat.backgroundColor || "#dbd6f9",
+        isHabit:cat.isHabit
       }))
       set({ categories: formatted });
     } catch (error) {
@@ -280,6 +281,7 @@ export const useTaskCardStore = create((set, get) => ({
             value: category._id,
             color: category.backgroundColor,
             icon: category.icon,
+            isHabit:false
           },
         ],
       }));

@@ -156,6 +156,7 @@ const useHabitStore = create((set, get) => ({
         name: cat.name,
         value: cat._id,
         color: cat.backgroundColor || "#dbd6f9",
+        isHabit: true
       }))
 
 
@@ -180,11 +181,13 @@ const useHabitStore = create((set, get) => ({
         name: categoryCreated.name,
         value: categoryCreated._id,
         color: categoryCreated.backgroundColor || "#dbd6f9",
+        isHabit: true,
+        icon: categoryCreated.icon
       };
-
       set((state) => ({
         categories: [...state.categories, category],
       }));
+      console.log(get().categories)
 
       toast.dismiss();
       toast.success(t("Successfully Added the Category"));

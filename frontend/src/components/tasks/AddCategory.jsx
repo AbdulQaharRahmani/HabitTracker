@@ -46,6 +46,7 @@ export default function AddCategory({ variant = "card" }) {
         name: categoryName,
         backgroundColor: selectedColor,
         icon: selectedIcon,
+        isHabit: false
       };
 
       await createCategory(newCategoryPayload, t);
