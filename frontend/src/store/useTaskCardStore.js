@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { deleteTask, getTasks, updateTaskStatus } from "../../services/tasksService";
+import { deleteTask, getTasks, updateCategoryName, updateTaskStatus } from "../../services/tasksService";
 import api from "../../services/api";
 import toast from "react-hot-toast";
 
@@ -41,12 +41,14 @@ export const useTaskCardStore = create((set, get) => ({
     set({ categoriesLoading: true });
     try {
       const response = await api.get("/categories");
-      const formatted = response.data.data.map((cat) => ({
+      const formatted = response.data.data.filter((cat)=> !cat.isHabit)
+      .map((cat)=>({
         id: cat._id,
         name: cat.name,
         value: cat._id,
         color: cat.backgroundColor || "#dbd6f9",
-      }));
+        isHabit:cat.isHabit
+      }))
       set({ categories: formatted });
     } catch (error) {
       const message = error.response?.data?.error || "Something went wrong";
@@ -265,6 +267,7 @@ export const useTaskCardStore = create((set, get) => ({
         name: newCategory.name,
         backgroundColor: newCategory.backgroundColor,
         icon: newCategory.icon,
+        isHabit: false
       });
 
       const category = res.data.data;
@@ -278,6 +281,7 @@ export const useTaskCardStore = create((set, get) => ({
             value: category._id,
             color: category.backgroundColor,
             icon: category.icon,
+            isHabit:false
           },
         ],
       }));
@@ -287,6 +291,27 @@ export const useTaskCardStore = create((set, get) => ({
       toast.error(t("Failed to create category"));
     }
   },
+ updateTaskCategoryName: async (id, updatedData) => {
+  try {
+    const response = await api.put(`/categories/${id}`, updatedData);
+    const newCategory = response.data.data;
+    set((state) => ({
+      categories: state.categories.map((cat) =>
+        (cat.id === id || cat._id === id)
+          ? {
+              ...cat,
+              name: newCategory.name,
+              id: newCategory._id
+            }
+          : cat
+      ),
+    }));
+  } catch (error) {
+    console.error("Store update failed:", error);
+    throw error;
+  }
+},
+
 
 }));
 
@@ -305,4 +330,6 @@ const normalizePriorityToEnglish = (value) => {
     default:
       return "medium";
   }
+
 };
+
