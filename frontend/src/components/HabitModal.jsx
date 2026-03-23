@@ -154,7 +154,7 @@ export default function HabitModal() {
                   </label>
                   <SearchableDropdown
                     items={categories}
-                    value={t(habitData.categoryId)}
+                    value={habitData.categoryId}
                     badgeColor={
                       categories.find((c) => c.id === habitData.categoryId)
                         ?.color || "#dbd6f9"

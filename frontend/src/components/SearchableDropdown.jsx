@@ -67,6 +67,7 @@ export default function SearchableDropdown({
         name: searchTerm,
         backgroundColor: selectedColor,
         icon: selectedIcon,
+        isHabit: true
       };
 
       await addUserCategory(newCategoryPayload, t);
