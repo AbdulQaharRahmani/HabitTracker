@@ -8,10 +8,11 @@ import AddCategory from "../components/tasks/AddCategory";
 import toast from "react-hot-toast";
 import "../App.css";
 import { useHotkeys } from "react-hotkeys-hook";
-import { MdTask } from "react-icons/md";
-import HabitCardIcon from "../components/HabitCardIcon";
+import { MdPendingActions, MdTask } from "react-icons/md";
 import { iconCategories } from "../utils/icons";
 import { FaCheckCircle } from "react-icons/fa";
+import { CiEdit } from "react-icons/ci";
+import CategoryHeader from "../components/tasks/CategoryHeader";
 
 import {
   DndContext,
@@ -352,7 +353,7 @@ function Tasks() {
     };
   }, []);
 
-    useHotkeys("ctrl+k, meta+k", (e) => {
+  useHotkeys("ctrl+k, meta+k", (e) => {
     e.preventDefault();
     if (activeCategoryId) {
       startAdding(activeCategoryId);

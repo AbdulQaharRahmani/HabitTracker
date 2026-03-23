@@ -20,11 +20,12 @@ const CategorySchema = new mongoose.Schema(
     },
     icon: { type: String, default: '', trim: true },
     backgroundColor: { type: String, default: '', trim: true },
+    isHabit: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
 
-CategorySchema.index({ userId: 1, name: 1 }, { unique: true });
+CategorySchema.index({ userId: 1, name: 1, isHabit: 1 }, { unique: true });
 
 CategorySchema.statics.doesCategoryExist = function (categoryId, userId) {
   return this.exists({ _id: categoryId, userId });
