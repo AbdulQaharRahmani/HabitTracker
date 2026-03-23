@@ -103,15 +103,40 @@ function Tasks() {
     });
 
     tasks.forEach((task) => {
-      const catId = typeof task.categoryId === "object" ? task.categoryId?._id : task.categoryId;
-      if (catId && groups[catId]) groups[catId].items.push(task);
+      const catId =
+        typeof task.categoryId === "object"
+          ? task.categoryId?._id
+          : task.categoryId;
+
+      if (catId && groups[catId]) {
+        groups[catId].items.push(task);
+      }
     });
 
-    return Object.values(groups).map((group) => {
-      const completedCount = group.items.filter((i) => i.status === "done").length;
+    Object.values(groups).forEach((group) => {
+      group.items.sort((a, b) => {
+        return (a.order ?? 0) - (b.order ?? 0);
+      });
+    });
+
+  return Object.values(groups).map((group) => {
+      const completedCount = group.items.filter(
+        (i) => i.status === "done"
+      ).length;
+
       const totalCount = group.items.length;
-      const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-      return { ...group, completedCount, totalCount, percentage };
+
+      const percentage =
+        totalCount > 0
+          ? Math.round((completedCount / totalCount) * 100)
+          : 0;
+
+      return {
+        ...group,
+        completedCount,
+        totalCount,
+        percentage,
+      };
     });
   }, [tasks, categories]);
 
@@ -361,7 +386,6 @@ function Tasks() {
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
-
     if (!over || active.id === over.id) return;
 
     const activeId = active.id;
@@ -378,15 +402,32 @@ function Tasks() {
 
     const reordered = arrayMove(category.items, oldIndex, newIndex);
 
-    const otherTasks = tasks.filter(
-      t => !category.items.some(ci => ci._id === t._id)
-    );
+    reordered.forEach((task, index) => {
+      task.order = index;
+    });
 
-    const updatedTasks = [...otherTasks, ...reordered];
+    const updatedTasks = tasks.map(task => {
+      const updated = reordered.find(t => t._id === task._id);
+      return updated ? updated : task;
+    });
 
     setTasks(updatedTasks);
+
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
+  useEffect(() => {
+    const savedTasks = JSON.parse(localStorage.getItem("tasks"));
+    if (savedTasks) {
+      setTasks(savedTasks);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tasks.length > 0) {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+  }, [tasks]);
 return (
     <div
       ref={containerRef}
