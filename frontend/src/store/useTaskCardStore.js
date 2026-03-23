@@ -59,23 +59,25 @@ export const useTaskCardStore = create((set, get) => ({
       set({ categoriesLoading: false });
     }
   },
-
+  
   addTask: async (taskPayload) => {
-    try {
-      const payload = {
-        title: taskPayload.title,
-        description: taskPayload.description,
-        dueDate: taskPayload.dueDate,
-        categoryId: taskPayload.categoryId,
-        priority: normalizePriorityToEnglish(taskPayload.priority),
-      };
+  try {
+    const payload = {
+      title: taskPayload.title,
+      description: taskPayload.description,
+      dueDate: taskPayload.dueDate,
+      categoryId: taskPayload.categoryId,
+      priority: normalizePriorityToEnglish(taskPayload.priority),
+    };
 
-      const res = await api.post("/tasks", payload);
+    const res = await api.post("/tasks", payload);
 
-      set((state) => {
-        const categoryName =
-          state.categories.find((c) => c.id === taskPayload.category)?.name ||
-          "—";
+    set((state) => {
+      const categoryTasks = state.tasks.filter(
+        (t) => t.categoryId === taskPayload.categoryId
+      );
+
+      const newOrder = categoryTasks.length;
 
         return {
           tasks: [
@@ -85,14 +87,15 @@ export const useTaskCardStore = create((set, get) => ({
               title: taskPayload.title,
               description: taskPayload.description,
               dueDate: taskPayload.dueDate,
-              category: categoryName, //for UI
               categoryId: taskPayload.categoryId,
-              done: false,
+              status: "todo",
               priority: normalizePriorityToEnglish(taskPayload.priority),
+              order: newOrder,
             },
           ],
         };
       });
+
       return res.data;
     } catch (error) {
       console.error("Add task failed:", error.response?.data || error.message);
@@ -101,15 +104,28 @@ export const useTaskCardStore = create((set, get) => ({
   },
 
   fetchTasks: async (limit, page) => {
-    set({ tasksLoading: true, error: null });
+    set({ loading: true });
+
     try {
+      const savedTasks = JSON.parse(localStorage.getItem("tasks"));
+
+      if (savedTasks) {
+        set({ tasks: savedTasks, loading: false });
+        return;
+      }
+
       const response = await getTasks(limit, page);
-      set({ tasks: response.data, loading: false });
+
+      const tasksWithOrder = response.data.map((task, index) => ({
+        ...task,
+        order: index,
+      }));
+
+      set({ tasks: tasksWithOrder, loading: false });
+
+      localStorage.setItem("tasks", JSON.stringify(tasksWithOrder));
     } catch (err) {
-      set({
-        error: err?.message || "An error occurred",
-        tasksLoading: false,
-      });
+      set({ loading: false });
     }
   },
 
@@ -312,6 +328,8 @@ export const useTaskCardStore = create((set, get) => ({
   }
 },
 
+
+  setTasks: (tasks) => set({ tasks }),
 
 }));
 

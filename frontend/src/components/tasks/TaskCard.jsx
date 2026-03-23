@@ -5,6 +5,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { MdDeleteOutline } from "react-icons/md";
 import toast from "react-hot-toast";
 import { CiEdit } from "react-icons/ci";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function TaskCard({ title, status, _id }) {
   const completeTask = useTaskCardStore((state) => state.completeTask);
@@ -115,9 +117,22 @@ export default function TaskCard({ title, status, _id }) {
     [handleSaveEdit, title]
   );
 
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: _id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  };
+
   return (
     <div
-      ref={cardRef}
+      ref={(node) => {
+        setNodeRef(node);
+        cardRef.current = node;
+      }}
+      style={style}
+      {...attributes}
+      {...listeners}
       tabIndex={0}
       data-task-card="true"
       data-id={_id}

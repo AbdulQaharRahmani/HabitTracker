@@ -14,6 +14,20 @@ import { FaCheckCircle } from "react-icons/fa";
 import { CiEdit } from "react-icons/ci";
 import CategoryHeader from "../components/tasks/CategoryHeader";
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
+
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove
+} from "@dnd-kit/sortable";
+
 const InlineInput = ({ catId, value, onChange, onSubmit, onCancel }) => {
   const inputRef = useRef(null);
 
@@ -46,8 +60,19 @@ const InlineInput = ({ catId, value, onChange, onSubmit, onCancel }) => {
 };
 
 function Tasks() {
-  const { tasks, fetchTasks, loading, fetchCategories, addTask, categories } =
-    useTaskCardStore((state) => state);
+  const sensors = useSensors(
+    useSensor(PointerSensor)
+  );
+
+  const {
+    tasks,
+    setTasks,
+    fetchTasks,
+    loading,
+    fetchCategories,
+    addTask,
+    categories
+  } = useTaskCardStore((state) => state);
 
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
@@ -79,15 +104,40 @@ function Tasks() {
     });
 
     tasks.forEach((task) => {
-      const catId = typeof task.categoryId === "object" ? task.categoryId?._id : task.categoryId;
-      if (catId && groups[catId]) groups[catId].items.push(task);
+      const catId =
+        typeof task.categoryId === "object"
+          ? task.categoryId?._id
+          : task.categoryId;
+
+      if (catId && groups[catId]) {
+        groups[catId].items.push(task);
+      }
     });
 
-    return Object.values(groups).map((group) => {
-      const completedCount = group.items.filter((i) => i.status === "done").length;
+    Object.values(groups).forEach((group) => {
+      group.items.sort((a, b) => {
+        return (a.order ?? 0) - (b.order ?? 0);
+      });
+    });
+
+  return Object.values(groups).map((group) => {
+      const completedCount = group.items.filter(
+        (i) => i.status === "done"
+      ).length;
+
       const totalCount = group.items.length;
-      const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-      return { ...group, completedCount, totalCount, percentage };
+
+      const percentage =
+        totalCount > 0
+          ? Math.round((completedCount / totalCount) * 100)
+          : 0;
+
+      return {
+        ...group,
+        completedCount,
+        totalCount,
+        percentage,
+      };
     });
   }, [tasks, categories]);
 
@@ -335,7 +385,51 @@ function Tasks() {
     return null;
   };
 
-  return (
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    const category = groupedArray.find(group =>
+      group.items.some(task => task._id === activeId)
+    );
+
+    if (!category) return;
+
+    const oldIndex = category.items.findIndex(t => t._id === activeId);
+    const newIndex = category.items.findIndex(t => t._id === overId);
+
+    const reordered = arrayMove(category.items, oldIndex, newIndex);
+
+    reordered.forEach((task, index) => {
+      task.order = index;
+    });
+
+    const updatedTasks = tasks.map(task => {
+      const updated = reordered.find(t => t._id === task._id);
+      return updated ? updated : task;
+    });
+
+    setTasks(updatedTasks);
+
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
+
+  useEffect(() => {
+    const savedTasks = JSON.parse(localStorage.getItem("tasks"));
+    if (savedTasks) {
+      setTasks(savedTasks);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tasks.length > 0) {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+  }, [tasks]);
+return (
     <div
       ref={containerRef}
       onKeyDown={handleContainerKeyDown}
@@ -350,7 +444,12 @@ function Tasks() {
       </div>
 
       {!loading && (
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-4 mt-4">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
           {groupedArray.map((group, index) => {
             const Icon = getIconComponent(group.icon) || FaCheckCircle;
             return (
@@ -367,11 +466,12 @@ function Tasks() {
                   }
                 }}
                 className={`break-inside-avoid-column mb-4 bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-200/80 dark:border-gray-800 transition-all outline-none
-                ${activeCategoryId === group.id ? "ring-2 ring-indigo-500 shadow-lg ring-offset-2" : ""}`}
+                  ${activeCategoryId === group.id ? "ring-2 ring-indigo-500 shadow-lg ring-offset-2" : ""}`}
               >
                 <div className="px-4 pt-2 pb-1 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
                   <div className="flex items-center gap-1">
-                    <CategoryHeader group={group} Icon={Icon}/>
+                    <HabitCardIcon Icon={Icon} color={group.color}/>
+                    <h5 className="font-bold text-lg text-gray-800 dark:text-gray-100">{group.name}</h5>
                   </div>
                   <button
                     tabIndex={-1}
@@ -392,7 +492,16 @@ function Tasks() {
                     />
                   )}
                   {group.items.length > 0 ? (
-                    <div>{group.items.map((task) => <TaskCard key={task._id} {...task} />)}</div>
+                    <SortableContext
+                      items={group.items.map(task => task._id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div>
+                        {group.items.map((task) => (
+                          <TaskCard key={task._id} {...task} />
+                        ))}
+                      </div>
+                    </SortableContext>
                   ) : (
                     isAddingToId !== group.id && (
                       <p className="text-gray-400 text-sm text-center py-1">{t("No tasks here")}</p>
@@ -402,7 +511,8 @@ function Tasks() {
               </div>
             );
           })}
-        </div>
+          </div>
+        </DndContext>
       )}
     </div>
   );
