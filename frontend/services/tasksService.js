@@ -38,3 +38,7 @@ export const deleteTask = async (taskId) => {
      throw error;
    }
 }
+export const updateCategoryName = async(categoryId, updatedData)=>{
+    const response = await api.put(`/categories/${categoryId}`,updatedData )
+    return response.data.data
+}

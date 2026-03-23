@@ -150,12 +150,16 @@ const useHabitStore = create((set, get) => ({
     set({ loading: true });
     try {
       const response = await api.get("/categories");
-      const formatted = response.data.data.map((cat) => ({
+      const formatted = response.data.data.filter((cat)=> cat.isHabit === true)
+      .map((cat)=> ({
         id: cat._id,
         name: cat.name,
         value: cat._id,
         color: cat.backgroundColor || "#dbd6f9",
-      }));
+        isHabit: true
+      }))
+
+
       set({ categories: formatted });
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong";
@@ -177,11 +181,13 @@ const useHabitStore = create((set, get) => ({
         name: categoryCreated.name,
         value: categoryCreated._id,
         color: categoryCreated.backgroundColor || "#dbd6f9",
+        isHabit: true,
+        icon: categoryCreated.icon
       };
-
       set((state) => ({
         categories: [...state.categories, category],
       }));
+      console.log(get().categories)
 
       toast.dismiss();
       toast.success(t("Successfully Added the Category"));
