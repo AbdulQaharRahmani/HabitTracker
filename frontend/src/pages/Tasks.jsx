@@ -8,10 +8,11 @@ import AddCategory from "../components/tasks/AddCategory";
 import toast from "react-hot-toast";
 import "../App.css";
 import { useHotkeys } from "react-hotkeys-hook";
-import { MdPendingActions, MdTask } from "react-icons/md";
+
+import { HiPlus } from "react-icons/hi";
+import { LuPlus } from "react-icons/lu";
 import { iconCategories } from "../utils/icons";
 import { FaCheckCircle } from "react-icons/fa";
-import { CiEdit } from "react-icons/ci";
 import CategoryHeader from "../components/tasks/CategoryHeader";
 
 const InlineInput = ({ catId, value, onChange, onSubmit, onCancel }) => {
@@ -376,9 +377,12 @@ function Tasks() {
                   <button
                     tabIndex={-1}
                     onClick={(e) => { e.stopPropagation(); startAdding(group.id); }}
-                    className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-sm"
+
                   >
-                    <span className="text-sm font-semibold">+</span> {t("Add")}
+                   <HiPlus
+                    size={32}
+                    className="text-orange-500 hover:bg-orange-600 hover:text-white rounded-xl p-1 cursor-pointer transition-colors duration-200"
+                  />
                   </button>
                 </div>
                 <div className="px-6 py-3">
