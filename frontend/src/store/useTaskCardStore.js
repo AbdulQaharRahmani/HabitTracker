@@ -312,7 +312,58 @@ export const useTaskCardStore = create((set, get) => ({
   }
 },
 
+// Delete Task Category
+deleteTaskCategory: async (id,t) => {
+  try {
+    const category = get().categories.find(
+      (cat) => cat.id === id || cat._id === id
+    );
 
+    if (!category) {
+      toast.dismiss();
+      toast.error(t("category_not_found"));
+      return;
+    }
+
+    const relatedTasks = get().tasks.filter((task) => {
+      const taskCategoryId =
+        typeof task.categoryId === "string"
+          ? task.categoryId
+          : task.categoryId?._id;
+
+      return taskCategoryId?.toString() === category.id?.toString();
+    });
+
+    if (category.isHabit) {
+      toast.dismiss();
+      toast.error(t("habit_category_cannot_be_deleted"));
+      return;
+    }
+
+    if (relatedTasks.length > 0) {
+      toast.dismiss();
+      toast.error(t("category_with_tasks_cannot_be_deleted"));
+      return;
+    }
+
+   const realId = category.id || category._id;
+
+    await api.delete(`/categories/${realId}`);
+
+   set((state) => ({
+    categories: state.categories.filter(
+      (cat) => (cat.id || cat._id)?.toString() !== id.toString()
+    ),
+  }));
+
+    toast.dismiss();
+    toast.success(t("category_deleted_successfully"));
+  } catch (error) {
+    toast.dismiss();
+    console.error("Category delete failed:", error.response?.data || error.message);
+    toast.error(error.response?.data?.message || t("category_delete_failed"));
+  }
+},
 }));
 
 const normalizePriorityToEnglish = (value) => {

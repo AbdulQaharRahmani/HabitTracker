@@ -209,9 +209,15 @@
     "education": "Education"
   },
   "No tasks here": "No tasks here",
-  
+
   "displaying": "Displaying",
   "to": "to",
   "outOf": "out of",
-  "results": "results"
+  "results": "results",
+
+"category_not_found": "Category not found",
+"habit_category_cannot_be_deleted": "Habit categories cannot be deleted",
+"category_with_tasks_cannot_be_deleted": "category with tasks cannot be deleted",
+"category_deleted_successfully": "Category deleted successfully!",
+"category_delete_failed": "Failed to delete category"
 }

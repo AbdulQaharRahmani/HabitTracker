@@ -2,10 +2,18 @@ import { useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import HabitCardIcon from "../HabitCardIcon"
 import { useTaskCardStore } from "../../store/useTaskCardStore";
+import {useTranslation} from 'react-i18next';
+import {MdDeleteOutline} from 'react-icons/md';
 const CategoryHeader = ({ group, Icon}) => {
+
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(group.name);
   const updateTaskCategoryName = useTaskCardStore((state)=> state.updateTaskCategoryName)
+
+  const deleteTaskCategory = useTaskCardStore((state) => state.deleteTaskCategory);
+
+  const {t}=useTranslation();
+
   const handleSave = async () => {
   if (value.trim() === group.name) {
     setIsEditing(false);
@@ -25,8 +33,17 @@ const CategoryHeader = ({ group, Icon}) => {
   }
 };
 
+const handleDelete = async () => {
+  try {
+    const categoryId = group._id || group.id;
+    await deleteTaskCategory(categoryId,t);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 group rounded-md px-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900/50">
       <HabitCardIcon Icon={Icon} color={group.color}/>
 
       {isEditing ? (
@@ -49,6 +66,22 @@ const CategoryHeader = ({ group, Icon}) => {
           />
         </div>
       )}
+      {!isEditing && (
+              <button
+                tabIndex={-1}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete();
+                }}
+                className="p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+                aria-label={t("Delete task")}
+              >
+                <MdDeleteOutline
+                  size={16}
+                  className="text-gray-400 hover:text-red-500 transition-colors"
+                />
+              </button>
+        )}
     </div>
   );
 };
