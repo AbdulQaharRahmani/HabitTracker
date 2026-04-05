@@ -296,5 +296,11 @@
   "Save Task": "ذخیره وظیفه",
   "Please fill all fields!": "لطفا همه فیلدها را پر کنید!",
   "Welcome again!": "دوباره خوش آمدید!",
-  "Processing...": "درحال پردازش..."
+  "Processing...": "درحال پردازش...",
+
+  "category_not_found": "کتگوری پیدا نشد",
+  "habit_category_cannot_be_deleted": "کتگوری‌های عادت قابل حذف نیستند",
+  "category_with_tasks_cannot_be_deleted": "کتگوری دارای تسک قابل حذف نیست",
+  "category_deleted_successfully": "کتگوری با موفقیت حذف شد!",
+  "category_delete_failed": "حذف کتگوری ناموفق بود"
 }
