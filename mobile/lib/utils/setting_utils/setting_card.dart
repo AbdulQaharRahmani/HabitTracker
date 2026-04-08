@@ -21,13 +21,8 @@ class SettingCard extends StatelessWidget {
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
       color: AppTheme.surface,
-      borderRadius: BorderRadius.circular(24),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.05),
-          blurRadius: 10,
-        ),
-      ],
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: AppTheme.border),
     );
   }
 }
