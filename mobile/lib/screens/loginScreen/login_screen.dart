@@ -22,7 +22,11 @@ class LoginScreen extends StatelessWidget {
             children: [
               const HeaderCard(),
               const SizedBox(height: 20),
-              LoginCard(controller: LoginController() ),
+              Builder(
+                builder: (context) {
+                  return LoginCard(controller: context.read<LoginController>());
+                },
+              ),
             ],
           ),
         ),

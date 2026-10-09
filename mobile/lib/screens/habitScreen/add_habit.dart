@@ -1,85 +1,262 @@
+import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../app/app_theme.dart';
 import '../../services/category_cache.dart';
+import '../../services/habit_reminder_service.dart';
+import '../../services/token_storage.dart';
 import '../../utils/category/category_model.dart';
 import '../../utils/habits/habit.dart';
-import '../../features/add_habit_model.dart';
-import '../../providers/theme_provider.dart';
-
+import 'habit_form.dart';
 
 class AddHabitDialog {
   static Future<void> show(
-      BuildContext context, {
-        required void Function(Habit? newHabit) onSubmit,
-        bool barrierDismissible = true,
-      }) async {
-    final maxWidth = MediaQuery.of(context).size.width * 0.92;
-    final dialogWidth = maxWidth > 420 ? 420.0 : maxWidth;
-
-    await showDialog(
-      context: context,
-      barrierDismissible: barrierDismissible,
-      builder: (_) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        backgroundColor: Colors.transparent,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: dialogWidth,
-              maxHeight: MediaQuery.of(context).size.height * 0.86,
+    BuildContext context, {
+    required FutureOr<void> Function(Habit? newHabit) onSubmit,
+    bool barrierDismissible = true,
+  }) async {
+    final result = await Navigator.of(context).push<Habit?>(
+      PageRouteBuilder<Habit?>(
+        opaque: false,
+        barrierDismissible: barrierDismissible,
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const AddHabitPage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          return FadeTransition(
+            opacity: curved,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.08),
+                end: Offset.zero,
+              ).animate(curved),
+              child: child,
             ),
-            child: Material(
-              borderRadius: BorderRadius.circular(14.r),
-              elevation: 14,
-              color: AppTheme.surface,
-              shadowColor: AppTheme.shadow,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                    decoration: BoxDecoration(
-                      color: AppTheme.inputBackground,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
-                      border: Border(
-                        bottom: BorderSide(color: AppTheme.border, width: 0.5),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Add New Habit',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+          );
+        },
+      ),
+    );
+    await onSubmit(result);
+  }
+}
 
-                  // Body
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
-                      child: _AddHabitForm(
-                        onSubmit: (newHabit) {
-                          onSubmit(newHabit);
-                        },
-                      ),
-                    ),
+class AddHabitPage extends StatefulWidget {
+  const AddHabitPage({super.key});
+
+  @override
+  State<AddHabitPage> createState() => _AddHabitPageState();
+}
+
+class _AddHabitPageState extends State<AddHabitPage> {
+  static const _endpoint = 'https://habit-tracker-17sr.onrender.com/api/habits';
+
+  bool _loadingCategories = true;
+  bool _isSubmitting = false;
+  String? _error;
+  List<CategoryModel> _categories = <CategoryModel>[];
+
+  HabitFormValue? _formValue;
+  bool _isFormValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    setState(() {
+      _loadingCategories = true;
+      _error = null;
+    });
+
+    try {
+      final cached = CategoryCache().getCachedCategoriesSync();
+      if (cached != null && cached.isNotEmpty) {
+        _categories = List<CategoryModel>.from(cached);
+      } else {
+        _categories = List<CategoryModel>.from(
+          await CategoryCache().getCategories(),
+        );
+      }
+
+      if (!mounted) return;
+      setState(() => _loadingCategories = false);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loadingCategories = false;
+        _error = 'Unable to load categories. Check your connection and retry.';
+      });
+    }
+  }
+
+  Future<void> _submit() async {
+    if (!_isFormValid || _formValue == null || _isSubmitting) {
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final token = await AuthManager.getToken();
+      if (token == null || token.isEmpty) {
+        _showMessage('Please login again.');
+        return;
+      }
+
+      final response = await http
+          .post(
+            Uri.parse(_endpoint),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'title': _formValue!.title,
+              'description': _formValue!.description,
+              'frequency': _formValue!.apiFrequency,
+              'categoryId': _formValue!.category!.id,
+              'reminderEnabled': _formValue!.reminderEnabled,
+              'reminderTime': _formValue!.reminderTime,
+            }),
+          )
+          .timeout(const Duration(seconds: 45));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        HapticFeedback.lightImpact();
+        Habit? created;
+        try {
+          final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+          created = Habit.fromJson(decoded['data'] as Map<String, dynamic>);
+        } catch (_) {
+          created = null;
+        }
+
+        if (!mounted) return;
+        if (created != null) {
+          await HabitReminderService.instance.applyReminderForHabit(
+            habit: created,
+            enabled: _formValue!.reminderEnabled,
+            reminderTime: _formValue!.reminderTime,
+          );
+          created = created.copyWith(
+            reminderEnabled: _formValue!.reminderEnabled,
+            reminderTime: _formValue!.reminderTime,
+          );
+        }
+        if (!mounted) return;
+        _showMessage('Habit created successfully.', success: true);
+        Navigator.of(context).pop(created);
+        return;
+      }
+
+      _showMessage('Could not create habit (${response.statusCode}).');
+    } catch (_) {
+      _showMessage('Network issue while creating habit.');
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  void _showMessage(String message, {bool success = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: success ? AppTheme.success : AppTheme.error,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        backgroundColor: AppTheme.background,
+        elevation: 0,
+        title: Text(
+          'Add Habit',
+          style: TextStyle(
+            color: AppTheme.textPrimary,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: _loadingCategories
+            ? const _CenteredLoader()
+            : _error != null
+            ? _InlineErrorState(message: _error!, onRetry: _fetchCategories)
+            : AnimatedPadding(
+                duration: const Duration(milliseconds: 160),
+                curve: Curves.easeOut,
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.viewInsetsOf(context).bottom,
+                ),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
+                  child: HabitForm(
+                    categories: _categories,
+                    enabled: !_isSubmitting,
+                    onChanged: (value, isValid) {
+                      _formValue = value;
+                      if (_isFormValid != isValid) {
+                        setState(() => _isFormValid = isValid);
+                      }
+                    },
                   ),
-                  SizedBox(height: 8.h),
-                ],
+                ),
+              ),
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 12.h),
+          child: SizedBox(
+            height: 48.h,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              child: ElevatedButton(
+                key: ValueKey<bool>(_isSubmitting),
+                onPressed: _isSubmitting || !_isFormValid || _loadingCategories
+                    ? null
+                    : _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: AppTheme.textWhite,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  elevation: 0,
+                ),
+                child: _isSubmitting
+                    ? SizedBox(
+                        width: 16.w,
+                        height: 16.w,
+                        child: const CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        'Save habit',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -89,289 +266,59 @@ class AddHabitDialog {
   }
 }
 
-class _AddHabitForm extends StatefulWidget {
-  final void Function(Habit? newHabit) onSubmit;
+class _InlineErrorState extends StatelessWidget {
+  const _InlineErrorState({required this.message, required this.onRetry});
 
-  const _AddHabitForm({required this.onSubmit});
-
-  @override
-  State<_AddHabitForm> createState() => _AddHabitFormState();
-}
-
-class _AddHabitFormState extends State<_AddHabitForm> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleCtl = TextEditingController();
-  final _descCtl = TextEditingController();
-
-  final _frequencies = ['Daily', 'Weekly', 'Monthly'];
-
-  List<CategoryModel> _categories = [];
-  bool _isLoadingCategories = true;
-  String? _errorMessage;
-
-  String _frequency = 'Daily';
-  CategoryModel? _selectedCategory;
-  bool _isSubmitting = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchCategories();
-  }
-
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('jwt_token');
-  }
-
-  Future<void> _fetchCategories() async {
-    // First try to get cached categories synchronously
-    final cached = CategoryCache().getCachedCategoriesSync();
-    if (cached != null && cached.isNotEmpty) {
-      setState(() {
-        _categories = List.from(cached);
-        _selectedCategory = _categories.first;
-        _isLoadingCategories = false;
-      });
-      return;
-    }
-
-    // Otherwise fetch from network
-    setState(() {
-      _isLoadingCategories = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final fetchedCategories = await CategoryCache().getCategories();
-      setState(() {
-        _categories = List.from(fetchedCategories);
-        if (_categories.isNotEmpty) {
-          _selectedCategory = _categories.first;
-        }
-        _isLoadingCategories = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = "Network connection error";
-        _isLoadingCategories = false;
-      });
-    }
-  }
-
-  void _submit() async {
-    if (!_formKey.currentState!.validate() || _selectedCategory == null) return;
-
-    setState(() => _isSubmitting = true);
-
-    final url = Uri.parse('https://habit-tracker-17sr.onrender.com/api/habits');
-
-    try {
-      final token = await _getToken();
-
-      if (token == null) {
-        _showSnackBar("Please login again");
-        setState(() => _isSubmitting = false);
-        return;
-      }
-
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          "title": _titleCtl.text.trim(),
-          "description": _descCtl.text.trim(),
-          "frequency": _frequency.toLowerCase(),
-          "categoryId": _selectedCategory!.id,
-        }),
-      ).timeout(const Duration(seconds: 60));
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        _showSnackBar("Habit added successfully!", isSuccess: true);
-
-        try {
-          final Map<String, dynamic> decodedData = jsonDecode(response.body);
-          final newHabit = Habit.fromJson(decodedData['data']);
-          widget.onSubmit(newHabit);
-        } catch (_) {
-          widget.onSubmit(null);
-        }
-
-        if (mounted) Navigator.pop(context);
-      } else {
-        print("❌ Submit Error Body: ${response.body}");
-        _showSnackBar("Error: ${response.statusCode}");
-        _showSnackBar("Not registered: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("❌ Submit Exception: $e");
-      _showSnackBar("Connection error: $e");
-    } finally {
-      if (mounted) setState(() => _isSubmitting = false);
-    }
-  }
-
-  void _showSnackBar(String message, {bool isSuccess = false}) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isSuccess ? AppTheme.success : AppTheme.error,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _titleCtl.dispose();
-    _descCtl.dispose();
-    super.dispose();
-  }
-
-  InputDecoration _fieldDecoration({String? hint}) {
-    return InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: AppTheme.inputBackground,
-      contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.r),
-        borderSide: BorderSide(color: AppTheme.border),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.r),
-        borderSide: BorderSide(color: AppTheme.border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.r),
-        borderSide: BorderSide(color: AppTheme.primary, width: 1.5.w),
-      ),
-    );
-  }
-
-  TextStyle _labelStyle() {
-    return TextStyle(
-      color: AppTheme.textSecondary,
-      fontWeight: FontWeight.w600,
-      fontSize: 14.sp,
-    );
-  }
+  final String message;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<ThemeProvider>(context);
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Title
-          Text('Title', style: _labelStyle()),
-          SizedBox(height: 8.h),
-          TextFormField(
-            controller: _titleCtl,
-            decoration: _fieldDecoration(hint: 'Enter habit title...'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Please enter a title' : null,
-            textInputAction: TextInputAction.next,
-          ),
-          SizedBox(height: 14.h),
-
-          // Description
-          Text('Description', style: _labelStyle()),
-          SizedBox(height: 8.h),
-          TextFormField(
-            controller: _descCtl,
-            minLines: 3,
-            maxLines: 6,
-            decoration: _fieldDecoration(hint: 'Enter habit description...'),
-            keyboardType: TextInputType.multiline,
-          ),
-          SizedBox(height: 14.h),
-
-          // Frequency
-          Text('Frequency', style: _labelStyle()),
-          SizedBox(height: 8.h),
-          DropdownButtonFormField<String>(
-            value: _frequency,
-            decoration: _fieldDecoration(),
-            items: _frequencies.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
-            onChanged: (v) {
-              if (v == null) return;
-              setState(() => _frequency = v);
-            },
-          ),
-          SizedBox(height: 14.h),
-
-          // Category (Dynamic Loading)
-          Text('Category', style: _labelStyle()),
-          SizedBox(height: 8.h),
-          _isLoadingCategories
-              ? Center(child: Padding(
-            padding: EdgeInsets.all(10.h),
-            child: SizedBox(
-              height: 20.h, width: 20.w,
-              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary),
+    return Padding(
+      padding: EdgeInsets.all(16.w),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: AppTheme.border),
+        ),
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.wifi_off_rounded,
+              size: 26.sp,
+              color: AppTheme.textMuted,
             ),
-          ))
-              : _errorMessage != null
-              ? Text(_errorMessage!, style: TextStyle(color: AppTheme.error, fontSize: 12.sp))
-              : DropdownButtonFormField<CategoryModel>(
-            value: _selectedCategory,
-            decoration: _fieldDecoration(),
-            items: _categories.map((c) => DropdownMenuItem(
-                value: c,
-                child: Text(c.name, style: TextStyle(color: AppTheme.textPrimary))
-            )).toList(),
-            onChanged: (v) {
-              if (v == null) return;
-              setState(() => _selectedCategory = v);
-            },
-            validator: (v) => v == null ? 'Select a category' : null,
-          ),
-          SizedBox(height: 20.h),
-
-          // Save button
-          SizedBox(
-            height: 50.h,
-            child: ElevatedButton(
-              onPressed: _isSubmitting || _isLoadingCategories ? null : _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                foregroundColor: AppTheme.textWhite,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                elevation: 0,
-              ),
-              child: _isSubmitting
-                  ? SizedBox(
-                width: 14.w,
-                height: 14.h,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.w,
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-                  : Text('Save', style: TextStyle(fontSize: 14.sp)),
+            SizedBox(height: 10.h),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12.sp, color: AppTheme.textSecondary),
             ),
-          ),
+            SizedBox(height: 12.h),
+            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-          SizedBox(height: 8.h),
+class _CenteredLoader extends StatelessWidget {
+  const _CenteredLoader();
 
-          // Cancel
-          TextButton(
-            onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: AppTheme.textSecondary,
-              padding: EdgeInsets.zero,
-            ),
-            child: Text('Cancel', style: TextStyle(fontSize: 14.sp)),
-          ),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: 24.w,
+        height: 24.w,
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: AppTheme.primary,
+        ),
       ),
     );
   }

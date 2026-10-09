@@ -107,6 +107,7 @@ export const loginUser = async (req, res) => {
     message: 'Login Successfully',
     data: {
       token,
+      refreshToken,
       id: user._id,
       email: user.email,
       username: user.username,
@@ -194,6 +195,7 @@ export const googleLogin = async (req, res) => {
     message: 'Login Successfully',
     data: {
       token,
+      refreshToken,
       id: user._id,
       email: user.email,
       role: user.role,
@@ -202,7 +204,7 @@ export const googleLogin = async (req, res) => {
 };
 
 export const refreshAccessToken = async (req, res) => {
-  const token = req.cookies.refreshToken;
+  const token = req.cookies.refreshToken || req.body?.refreshToken;
   if (!token) throw unauthorized();
 
   const hashedToken = hashToken(token);
@@ -240,7 +242,17 @@ export const refreshAccessToken = async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  res.status(200).json({ token: accessToken });
+  res.status(200).json({
+    success: true,
+    message: 'Token refreshed successfully',
+    token: accessToken,
+    refreshToken,
+    data: {
+      token: accessToken,
+      refreshToken,
+      accessToken,
+    },
+  });
 };
 
 export const logOutUser = async (req, res) => {

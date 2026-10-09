@@ -1,64 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:habit_tracker/app/app_theme.dart';
+import '../../../providers/theme_provider.dart'; // مسیر ایمپورت را چک کنید
+import '../data/providers/statistic_provider.dart';
+import 'filter_enum.dart';
 
-class FilterTabs extends StatefulWidget {
+class FilterTabs extends StatelessWidget {
   const FilterTabs({super.key});
 
   @override
-  State<FilterTabs> createState() => _FilterTabsState();
-}
-
-class _FilterTabsState extends State<FilterTabs> {
-  final List<String> tabs = ['This Month', 'Last Month', 'All Time'];
-  final Set<String> selectedTabs = {'This Month'};
-
-  void toggleTab(String tab) {
-    setState(() {
-      if (selectedTabs.contains(tab)) {
-        selectedTabs.remove(tab);
-      } else {
-        selectedTabs.add(tab);
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // listen filter changes
+    final statisticProv = Provider.of<StatisticProvider>(context);
+    //Theme changes
+    final themeProv = Provider.of<ThemeProvider>(context);
+    final theme = themeProv.currentTheme;
+
+    final selectedFilter = statisticProv.filter;
+
     return Row(
-      children: tabs.map((tab) {
-        final isActive = selectedTabs.contains(tab);
+      children: ChartFilter.values.map((filter) {
+        final isActive = selectedFilter == filter;
+
         return GestureDetector(
-          onTap: () => toggleTab(tab),
+          onTap: () => statisticProv.setFilter(filter),
           child: Padding(
             padding: EdgeInsets.only(right: 8.w),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
               decoration: BoxDecoration(
-                color: isActive ? AppTheme.filterActiveBackground : AppTheme.filterInactiveBackground,
+                color: isActive
+                    ? const Color(0xFF6C63FF)
+                    : theme.cardColor,
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(
                   color: isActive
-                      ? AppTheme.filterActiveBackground
-                      : AppTheme.border,
+                      ? const Color(0xFF6C63FF)
+                      : theme.dividerColor.withOpacity(0.1),
                 ),
-                boxShadow: isActive
-                    ? [
-                  BoxShadow(
-                    color: AppTheme.shadow,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ]
-                    : [],
               ),
               child: Text(
-                tab,
+                _getTitle(filter),
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
-                  color: isActive ? AppTheme.filterActiveText : AppTheme.filterInactiveText,
+                  color: isActive
+                      ? Colors.white
+                      : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
                 ),
               ),
             ),
@@ -66,5 +55,14 @@ class _FilterTabsState extends State<FilterTabs> {
         );
       }).toList(),
     );
+  }
+
+  String _getTitle(ChartFilter filter) {
+    switch (filter) {
+      case ChartFilter.week: return "Week";
+      case ChartFilter.month: return "This Month";
+      case ChartFilter.year: return "Year";
+      case ChartFilter.lastMonth: return "Last Month";
+    }
   }
 }

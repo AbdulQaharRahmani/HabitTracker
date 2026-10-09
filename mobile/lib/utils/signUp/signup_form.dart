@@ -86,10 +86,7 @@ class _SignupFormState extends State<SignupForm> {
                   ),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
-
-                        print('Terms and conditions tapped');
-                      },
+                      onTap: () {},
                       child: RichText(
                         text: TextSpan(
                           style: TextStyle(
@@ -134,10 +131,30 @@ class _SignupFormState extends State<SignupForm> {
                       onPressed: controller.isLoading
                           ? null
                           : () async {
-                              final ok = await controller.signUp(context);
-                              if (ok && mounted) {
+                              final ok = await controller.signUp();
+                              if (!mounted) return;
+
+                              if (!ok && controller.errorMessage != null) {
+                                ScaffoldMessenger.of(this.context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(controller.errorMessage!),
+                                    backgroundColor: Colors.red,
+                                    duration: const Duration(seconds: 3),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (ok) {
+                                ScaffoldMessenger.of(this.context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Sign up successful!'),
+                                    backgroundColor: Colors.green,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
                                 Navigator.pushReplacementNamed(
-                                  context,
+                                  this.context,
                                   AppRoutes.home,
                                 );
                               }

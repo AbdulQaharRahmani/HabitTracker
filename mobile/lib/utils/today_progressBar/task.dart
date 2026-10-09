@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:habit_tracker/utils/auto_scroll_text.dart';
 import '../../app/app_theme.dart';
 import '../../utils/today_progressBar/task_item.dart';
 
@@ -77,18 +78,13 @@ class TaskCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.access_time,
+                        item.icon,
                         size: 14.sp,
                         color: AppTheme.textMuted,
                       ),
                       SizedBox(width: 4.w),
-                      Text(
-                        item.frequency ?? '',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: AppTheme.textMuted,
-                        ),
-                      ),
+                     SizedBox(width: 90.w,
+                         child: AutoScrollText(text: item.description, textStyle: TextStyle(fontSize: 12.sp))),
                       SizedBox(width: 10.w),
                       Container(
                         padding: EdgeInsets.symmetric(
@@ -99,8 +95,13 @@ class TaskCard extends StatelessWidget {
                           color: AppTheme.inputBackground,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
+
                         child: Text(
-                         item.category,
+                          item.sourceType == 'task'
+                              ? (item.priority ?? '')
+                              : (item.sourceType == 'habit'
+                              ? (item.frequency ?? '')
+                              : ''),
                           style: TextStyle(
                             fontSize: 11.sp,
                             color: AppTheme.textMuted,

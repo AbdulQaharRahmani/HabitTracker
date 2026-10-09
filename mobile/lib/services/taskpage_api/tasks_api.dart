@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../../utils/taskpage_components/tasks_model.dart';
 import '../token_storage.dart';
+import '../http_client.dart';
 
 class TaskApiService {
   static const String baseUrl =
@@ -13,7 +14,7 @@ class TaskApiService {
   static const Duration _timeoutDuration = Duration(seconds: 10);
 
   /// ===============================
-  /// Fetch tasks with pagination (UX optimized)
+  /// Fetch tasks with pagination (UX optimized) - with auto-refresh
   /// ===============================
   Future<List<Task>> fetchTasks({
     required String token,
@@ -24,18 +25,18 @@ class TaskApiService {
     String? categoryId,
   }) async {
     try {
-      final uri = Uri.parse(
-        '$baseUrl/tasks?limit=$limit&page=$page${searchTerm != null ? '&search=$searchTerm' : ''}',
-      );
+      final queryParams = <String, String>{
+        'limit': limit.toString(),
+        'page': page.toString(),
+        if (searchTerm != null && searchTerm.isNotEmpty) 'search': searchTerm,
+        if (categoryId != null) 'categoryId': categoryId,
+      };
 
-      final response = await http
-          .get(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      )
+      final queryString = queryParams.entries
+          .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+
+      final response = await AuthenticatedHttpClient.get('/tasks?$queryString')
           .timeout(_timeoutDuration);
 
       if (response.statusCode == 200) {
@@ -62,7 +63,7 @@ class TaskApiService {
   }
 
   /// ===============================
-  /// Add new task
+  /// Add new task - with auto-refresh
   /// ===============================
   Future<Map<String, dynamic>> addTask({
     required String title,
@@ -73,11 +74,6 @@ class TaskApiService {
     String? token,
     DateTime? dueDate,
   }) async {
-    final authToken = token ?? await AuthManager.getToken();
-    if (authToken == null) {
-      throw Exception('Token not found');
-    }
-
     final payload = {
       'title': title,
       'description': description,
@@ -90,18 +86,10 @@ class TaskApiService {
 
     debugPrint('📤 Create Task Payload: ${jsonEncode(payload)}');
 
-
-
-    final response = await http
-        .post(
-      Uri.parse('$baseUrl/tasks'),
-      headers: {
-        'Authorization': 'Bearer $authToken',
-        'Content-Type': 'application/json',
-      },
+    final response = await AuthenticatedHttpClient.post(
+      '/tasks',
       body: jsonEncode(payload),
-    )
-        .timeout(_timeoutDuration);
+    ).timeout(_timeoutDuration);
 
     final body = jsonDecode(response.body);
     debugPrint('📤 body of response from backend : ${body}');
@@ -122,23 +110,17 @@ class TaskApiService {
   }
 
   /// ===============================
-  /// Update task (robust parsing)
+  /// Update task (robust parsing) - with auto-refresh
   /// ===============================
   Future<Task> updateTask(
       String taskId,
       Map<String, dynamic> updatedFields,
       String token,
       ) async {
-    final response = await http
-        .put(
-      Uri.parse('$baseUrl/tasks/$taskId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+    final response = await AuthenticatedHttpClient.put(
+      '/tasks/$taskId',
       body: jsonEncode(updatedFields),
-    )
-        .timeout(_timeoutDuration);
+    ).timeout(_timeoutDuration);
 
     final Map<String, dynamic> body = jsonDecode(response.body);
 
@@ -158,34 +140,24 @@ class TaskApiService {
   }
 
   /// ===============================
-  /// Toggle task status (optimistic friendly)
-
+  /// Toggle task status (optimistic friendly) - with auto-refresh
+  /// ===============================
   Future<void> toggleTaskStatus({
     required String taskId,
     required String currentStatus,
     required String token,
   }) async {
     final newStatus = currentStatus == 'done' ? 'todo' : 'done';
-
-    final url = Uri.parse('$baseUrl/tasks/$taskId/status');
     final body = jsonEncode({'status': newStatus});
 
-    // ===== DEBUG: Show exactly what we are sending to backend =====
     debugPrint('🔹 Toggle Task Status Request');
-    debugPrint('URL: $url');
-    debugPrint('Headers: {Authorization: Bearer $token, Content-Type: application/json}');
     debugPrint('Body: $body');
 
-    final response = await http.patch(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+    final response = await AuthenticatedHttpClient.patch(
+      '/tasks/$taskId/status',
       body: body,
     );
 
-    // ===== DEBUG: Show response from backend =====
     debugPrint('🔹 Response Status: ${response.statusCode}');
     debugPrint('🔹 Response Body: ${response.body}');
 
@@ -196,17 +168,10 @@ class TaskApiService {
 
 
   /// ===============================
-  /// Delete task
+  /// Delete task - with auto-refresh
   /// ===============================
   Future<void> deleteTask(String taskId, String token) async {
-    final response = await http
-        .delete(
-      Uri.parse('$baseUrl/tasks/$taskId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    )
+    final response = await AuthenticatedHttpClient.delete('/tasks/$taskId')
         .timeout(_timeoutDuration);
 
     if (response.statusCode != 200 &&
@@ -214,7 +179,7 @@ class TaskApiService {
       throw Exception('Failed to delete task');
     }
   }
-  // filter tasks and fetch filter tasks
+  // filter tasks and fetch filter tasks - with auto-refresh
   Future<List<Task>> fetchFilteredTasks({
     required String token,
     String? searchTerm,
@@ -231,15 +196,12 @@ class TaskApiService {
     if (categoryId != null) query['categoryId'] = categoryId;
     if (dueDate != null) query['dueDate'] = dueDate;
 
-    final uri = Uri.parse('$baseUrl/tasks/filter')
-        .replace(queryParameters: query);
+    final queryString = query.entries
+        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+        .join('&');
 
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+    final response = await AuthenticatedHttpClient.get(
+      '/tasks/filter${queryString.isNotEmpty ? '?$queryString' : ''}',
     );
 
     if (response.statusCode == 200) {

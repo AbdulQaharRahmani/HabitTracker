@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+
 import '../../app/app_theme.dart';
 import '../../providers/theme_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/token_storage.dart';
 import '../../utils/setting_utils/setting_card.dart';
 import '../../utils/setting_utils/setting_header.dart';
 import '../../utils/setting_utils/setting_items.dart';
@@ -16,8 +20,55 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  final AuthService _api = AuthService();
+
   bool streakAlerts = true;
   bool weeklySummary = false;
+  bool _loadingProfile = true;
+  String _displayName = 'Habit Tracker User';
+  String _emailAddress = '';
+  String _profileImageUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadIdentity();
+  }
+
+  String _resolveDisplayName(String? name, String? email, Map<String, dynamic>? profile) {
+    if (name != null && name.trim().isNotEmpty) return name.trim();
+    final username = profile?['username']?.toString();
+    if (username != null && username.trim().isNotEmpty) return username;
+    if (email != null && email.contains('@')) return email.split('@').first;
+    return 'Habit Tracker User';
+  }
+
+  Future<void> _loadIdentity() async {
+    final localUser = await AuthManager.getUserData();
+    final profileRes = await _api.getUserProfile();
+    final profileData = profileRes['data'] is Map<String, dynamic>
+        ? profileRes['data'] as Map<String, dynamic>
+        : null;
+    final imageRes = await _api.getProfileImage(
+      userId: profileData?['_id']?.toString(),
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _displayName = _resolveDisplayName(
+        localUser?['name'],
+        localUser?['email'],
+        profileData,
+      );
+      _emailAddress = localUser?['email']?.toString() ??
+          profileData?['email']?.toString() ??
+          '';
+      _profileImageUrl = (imageRes['success'] == true && imageRes['data'] is String)
+          ? imageRes['data'] as String
+          : '';
+      _loadingProfile = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +79,24 @@ class _SettingScreenState extends State<SettingScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SettingHeader(title: "Settings"),
+              const SettingHeader(
+                title: "Settings",
+                subtitle: "Manage appearance, reminders, and account preferences.",
+              ),
               Expanded(
                 child: ListView(
                   children: [
-                    const SizedBox(height: 16),
-                    const SettingProfileCard(
-                      name: "Alex Doe",
-                      email: "alex.doe@example.com",
-                      imageUrl:
-                      "https://lh3.googleusercontent.com/aida-public/AB6AXuCsHroUVx7WfTW3EqTo3FDmeV0mF9BJlGzPy4kuwgthgEHiyndN0G8c92r6fJlRjsKm5ukqvEG9U0_i_m-NeA4JkKFrkp9Wekm8jc96DSBkoEBe2ifwENLUuvgN9Dotxc5-jKdhjO_1k23P4A4tMGH1JmxQ9qClSMnFOoXGtaCaPNfXlXSO1QgAo-ZbEF7cmwdnHwEjDXVdpuaDpXjLGrf2smvQSzG6QcWICqyV-DhcQS46zA9-xvHQw7_8wHwDk8xIERYA-TfRWco",
+                    SizedBox(height: 14.h),
+                    SettingProfileCard(
+                      name: _loadingProfile ? 'Loading...' : _displayName,
+                      email: _loadingProfile
+                          ? 'Fetching account...'
+                          : (_emailAddress.isEmpty ? 'No email available' : _emailAddress),
+                      imageUrl: _profileImageUrl,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 20.h),
                     const SettingSection(title: "General"),
                     SettingCard(
                       children: [
@@ -61,7 +117,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 20.h),
                     const SettingSection(title: "Notifications"),
                     SettingCard(
                       children: [
@@ -86,7 +142,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 20.h),
                     const SettingSection(title: "Data & Account"),
                     SettingCard(
                       children: [
@@ -107,7 +163,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                   ],
                 ),
               ),

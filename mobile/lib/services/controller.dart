@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'auth_service.dart';
+import '../features/auth/data/repositories/auth_repository_impl.dart';
+import '../features/auth/domain/usecases/login_usecase.dart';
 
 
 class LoginController extends ChangeNotifier {
@@ -8,7 +9,7 @@ class LoginController extends ChangeNotifier {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  final AuthService _authService = AuthService();
+  final LoginUseCase _loginUseCase = LoginUseCase(AuthRepositoryImpl());
   bool isLoading = false;
   String? errorMessage;
 
@@ -41,15 +42,15 @@ class LoginController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _authService.login(
+      final result = await _loginUseCase(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      if (result['success'] == true) {
+      if (result.success) {
         return true;
       } else {
-        errorMessage = result['message'] ?? 'Login failed';
+        errorMessage = result.message ?? 'Login failed';
         return false;
       }
     } catch (e) {

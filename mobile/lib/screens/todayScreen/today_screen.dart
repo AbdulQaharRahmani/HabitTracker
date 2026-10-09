@@ -5,17 +5,17 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../app/app_theme.dart';
 import '../../providers/theme_provider.dart';
+import '../../services/app_state.dart';
 import '../../services/auth_service.dart';
-import '../../utils/profile/profile_model.dart'; // contains Welcome, HabitsData, UserData, TaskItem
-import '../../features/routes.dart'; // if needed for named routes (optional)
-import '../profileScreen/profile_screen.dart'; // ProfileScreen import
-
-import '../../utils/today_progressBar/daily_grid.dart';
+import '../../utils/date_validator.dart';
+import '../../utils/profile/profile_model.dart';
 import '../../utils/today_progressBar/date_selector.dart';
-import '../../utils/today_progressBar/header_section.dart';
-import '../../utils/today_progressBar/task.dart';
-import '../../utils/today_progressBar/top_bar.dart';
+import '../../utils/today_progressBar/habit_card.dart';
+import '../../utils/today_progressBar/task_card.dart';
 import '../../utils/today_progressBar/task_item.dart';
+import '../../utils/today_progressBar/top_bar.dart';
+
+enum _TodayTab { habits, tasks }
 
 class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key});
@@ -26,21 +26,17 @@ class TodayScreen extends StatefulWidget {
 
 class _TodayScreenState extends State<TodayScreen> {
   final AuthService _api = AuthService();
-
-  bool get _isToday => DateUtils.isSameDay(selectedDate, DateTime.now());
+  final AppState _appState = AppState();
 
   DateTime selectedDate = DateTime.now();
   late DateTime loginDate;
   late List<DateTime> dateRange;
 
   final ScrollController _dateScrollController = ScrollController();
+  _TodayTab _activeTab = _TodayTab.habits;
 
   Map<String, List<TaskItem>> _habitSections = {};
   Map<String, List<TaskItem>> _taskSections = {};
-
-  // Dashboard summary data
-  HabitsData? _habitsSummary;
-  UserData? _userData;
 
   bool _loading = false;
   String? _error;
@@ -48,7 +44,6 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   void initState() {
     super.initState();
-
     loginDate = DateTime.now().subtract(const Duration(days: 5));
     selectedDate = DateTime.now();
     dateRange = _buildDateRange(loginDate);
@@ -58,25 +53,24 @@ class _TodayScreenState extends State<TodayScreen> {
     });
 
     _loadAllData(selectedDate);
+    _appState.preloadProfileData();
   }
 
   List<DateTime> _buildDateRange(DateTime start) {
     return List.generate(
       31,
-          (i) => DateTime(start.year, start.month, start.day + i),
+      (i) => DateTime(start.year, start.month, start.day + i),
     );
   }
 
   void _scrollToToday() {
     final todayIndex = dateRange.indexWhere(
-          (d) => DateUtils.isSameDay(d, selectedDate),
+      (d) => DateUtils.isSameDay(d, selectedDate),
     );
-
     if (todayIndex == -1 || !_dateScrollController.hasClients) return;
 
     final itemWidth = 72.w;
     final screenWidth = MediaQuery.of(context).size.width;
-
     double offset =
         (todayIndex * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
     offset = offset.clamp(0.0, _dateScrollController.position.maxScrollExtent);
@@ -109,14 +103,19 @@ class _TodayScreenState extends State<TodayScreen> {
     });
 
     try {
-      // Load daily content
-      final tasks = await _api.fetchTasks(forDate: date);
-      final habits = await _api.fetchHabits(forDate: date);
+      final results = await Future.wait([
+        _api.fetchAllTasks(forDate: date),
+        _api.fetchAllHabits(forDate: date),
+        _api.fetchHabitsDashboard(),
+      ]);
+
+      final tasks = results[0] as List<TaskItem>;
+      final habits = results[1] as List<TaskItem>;
+      final _ = results[2] as Welcome;
 
       final itemsTasks = tasks.where((t) => t.appliesToDate(date)).toList();
-      final itemsHabits = habits; // adjust filtering if needed
+      final itemsHabits = habits;
 
-      // Group by category
       final Map<String, List<TaskItem>> taskSections = {};
       for (final t in itemsTasks) {
         final key = t.category.toUpperCase();
@@ -129,14 +128,9 @@ class _TodayScreenState extends State<TodayScreen> {
         (habitSections[key] ??= []).add(h);
       }
 
-      // Load global dashboard stats (independent of selected date)
-      final welcome = await _api.fetchHabitsDashboard();
-
       setState(() {
         _taskSections = taskSections;
         _habitSections = habitSections;
-        _habitsSummary = welcome.habitsData;
-        _userData = welcome.userData;
       });
     } catch (e) {
       setState(() {
@@ -148,14 +142,8 @@ class _TodayScreenState extends State<TodayScreen> {
   }
 
   Future<void> _toggleDone(TaskItem item) async {
-    if (!_isToday) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You can only complete habits for today'),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
-        ),
-      );
+    if (!DateValidator.isDateInAllowedRange(selectedDate)) {
+      DateValidator.showDateError(context, selectedDate);
       return;
     }
 
@@ -178,88 +166,270 @@ class _TodayScreenState extends State<TodayScreen> {
     }
   }
 
-  Widget _miniStat(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          label,
-          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
-        ),
-      ],
-    );
+  List<TaskItem> _flattenSections(Map<String, List<TaskItem>> sections) {
+    final List<TaskItem> items = [];
+    for (final list in sections.values) {
+      items.addAll(list);
+    }
+    return items;
   }
 
-  Widget _buildSectionList(String title, Map<String, List<TaskItem>> sections) {
-    if (sections.isEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SectionHeader(title: title, icon: const Icon(Icons.list)),
-          const SizedBox(height: 8),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text('No item is here'),
-          ),
-          const SizedBox(height: 16),
-        ],
+  Widget _buildSectionList({
+    required String title,
+    required String subtitle,
+    required List<TaskItem> items,
+    required bool isHabitSection,
+  }) {
+    if (items.isEmpty) {
+      return _buildEmptySection(
+        title: title,
+        subtitle: subtitle,
+        isHabitSection: isHabitSection,
       );
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: title, icon: const Icon(Icons.list)),
-        const SizedBox(height: 8),
-        ...sections.entries.map((entry) {
-          Icon sectionIcon;
-          switch (entry.key) {
-            case 'HEALTH':
-              sectionIcon =  Icon(Icons.favorite, color: AppTheme.error);
-              break;
-            case 'STUDY':
-              sectionIcon =  Icon(Icons.school, color: AppTheme.primary);
-              break;
-            case 'WORK':
-              sectionIcon = Icon(Icons.work, color: AppTheme.primary);
-              break;
-            default:
-              sectionIcon =  Icon(Icons.task, color: AppTheme.success);
-          }
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        _buildSectionHeader(title: title, subtitle: subtitle),
+        SizedBox(height: 8.h),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(14.r),
+            border: Border.all(color: AppTheme.border),
+          ),
+          child: Column(
             children: [
-              Row(
-                children: [
-                  sectionIcon,
-                  const SizedBox(width: 8),
-                  Text(
-                    entry.key,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+              ...items.asMap().entries.map((indexedItem) {
+                final item = indexedItem.value;
+                return TweenAnimationBuilder<double>(
+                  duration: Duration(milliseconds: 180 + indexedItem.key * 45),
+                  tween: Tween<double>(begin: 0, end: 1),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value.clamp(0.0, 1.0).toDouble(),
+                      child: Transform.translate(
+                        offset: Offset(0, (1 - value) * 6),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      isHabitSection
+                          ? HabitCard(
+                              item: item,
+                              onToggleDone: (_) => _toggleDone(item),
+                            )
+                          : TaskCard(
+                              item: item,
+                              onToggleDone: (_) => _toggleDone(item),
+                            ),
+                      if (indexedItem.key != items.length - 1)
+                        Divider(
+                          height: 10.h,
+                          color: AppTheme.border.withValues(alpha: 0.55),
+                        ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              ...entry.value.map((item) {
-                return TaskCard(
-                  item: item,
-                  onToggleDone: (_) => _toggleDone(item),
                 );
-              }).toList(),
-              const SizedBox(height: 12),
+              }),
             ],
-          );
-        }).toList(),
-        const SizedBox(height: 16),
+          ),
+        ),
+        SizedBox(height: 12.h),
       ],
     );
   }
 
-  // ──── Shimmer components ────
+  Widget _buildSectionHeader({
+    required String title,
+    required String subtitle,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              title == 'Habits'
+                  ? Icons.local_fire_department
+                  : Icons.event_note,
+              size: 16.sp,
+              color: title == 'Habits' ? AppTheme.warning : AppTheme.primary,
+            ),
+            SizedBox(width: 6.w),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 2.h),
+        Padding(
+          padding: EdgeInsets.only(left: 22.w),
+          child: Text(
+            subtitle,
+            style: TextStyle(fontSize: 11.sp, color: AppTheme.textSecondary),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSegmentBar({required int habitsCount, required int tasksCount}) {
+    final bool habitsSelected = _activeTab == _TodayTab.habits;
+
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _SegmentTab(
+              selected: habitsSelected,
+              icon: Icons.event_repeat,
+              title: 'Habits',
+              count: habitsCount,
+              onTap: () => setState(() => _activeTab = _TodayTab.habits),
+            ),
+          ),
+          SizedBox(width: 6.w),
+          Expanded(
+            child: _SegmentTab(
+              selected: !habitsSelected,
+              icon: Icons.task_alt_outlined,
+              title: 'Tasks',
+              count: tasksCount,
+              onTap: () => setState(() => _activeTab = _TodayTab.tasks),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressHero({
+    required String title,
+    required int completed,
+    required int total,
+  }) {
+    final progress = total == 0 ? 0.0 : completed / total;
+    final remaining = (total - completed).clamp(0, 9999);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      width: double.infinity,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.primary.withValues(alpha: 0.84),
+            const Color(0xFF95B8FF),
+          ],
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${(progress * 100).round()}%',
+            style: TextStyle(
+              fontSize: 40.sp,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textWhite,
+              height: 1,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            '$title: $completed of $total completed',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: AppTheme.textWhite.withValues(alpha: 0.92),
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+            decoration: BoxDecoration(
+              color: AppTheme.textWhite.withValues(alpha: 0.22),
+              borderRadius: BorderRadius.circular(999.r),
+            ),
+            child: Text(
+              '$remaining left for this tab',
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: AppTheme.textWhite,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildEmptySection({
+    required String title,
+    required String subtitle,
+    required bool isHabitSection,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(title: title, subtitle: subtitle),
+          SizedBox(height: 10.h),
+          Row(
+            children: [
+              Icon(
+                isHabitSection
+                    ? Icons.emoji_events_outlined
+                    : Icons.inbox_outlined,
+                color: AppTheme.textMuted,
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: Text(
+                  isHabitSection
+                      ? 'No habits planned. Add one to maintain your routine.'
+                      : 'No tasks for this day. Plan one focused action.',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _shimmerBox({
     double height = 16,
     double width = double.infinity,
@@ -291,7 +461,7 @@ class _TodayScreenState extends State<TodayScreen> {
             child: Container(
               width: 42.w,
               height: 42.w,
-              decoration:  BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppTheme.textPrimary,
                 shape: BoxShape.circle,
               ),
@@ -302,13 +472,25 @@ class _TodayScreenState extends State<TodayScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _shimmerBox(height: 14.h, width: 0.5.sw, borderRadius: BorderRadius.circular(6.r)),
+                _shimmerBox(
+                  height: 14.h,
+                  width: 0.5.sw,
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
                 SizedBox(height: 8.h),
                 Row(
                   children: [
-                    _shimmerBox(height: 12.h, width: 60.w, borderRadius: BorderRadius.circular(6.r)),
+                    _shimmerBox(
+                      height: 12.h,
+                      width: 60.w,
+                      borderRadius: BorderRadius.circular(6.r),
+                    ),
                     SizedBox(width: 10.w),
-                    _shimmerBox(height: 12.h, width: 80.w, borderRadius: BorderRadius.circular(12.r)),
+                    _shimmerBox(
+                      height: 12.h,
+                      width: 80.w,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
                   ],
                 ),
               ],
@@ -332,14 +514,14 @@ class _TodayScreenState extends State<TodayScreen> {
     );
   }
 
-  Widget _shimmerSection(String title) {
+  Widget _shimmerSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            _shimmerBox(height: 16.h, width: 120.w, borderRadius: BorderRadius.circular(6.r)),
-          ],
+        _shimmerBox(
+          height: 16.h,
+          width: 120.w,
+          borderRadius: BorderRadius.circular(6.r),
         ),
         SizedBox(height: 8.h),
         ...List.generate(3, (_) => _shimmerTaskItem()),
@@ -352,57 +534,21 @@ class _TodayScreenState extends State<TodayScreen> {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        Padding(
-          padding: EdgeInsets.only(bottom: 12.h),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _shimmerBox(height: 20.h, width: 0.4.sw, borderRadius: BorderRadius.circular(6.r)),
-                    SizedBox(height: 6.h),
-                    _shimmerBox(height: 12.h, width: 0.6.sw, borderRadius: BorderRadius.circular(6.r)),
-                  ],
-                ),
-              ),
-              SizedBox(width: 12.w),
-              _shimmerBox(height: 40.h, width: 40.h, borderRadius: BorderRadius.circular(40.r)),
-              SizedBox(width: 8.w),
-              _shimmerBox(height: 40.h, width: 40.h, borderRadius: BorderRadius.circular(40.r)),
-            ],
-          ),
+        _shimmerBox(
+          height: 120.h,
+          width: double.infinity,
+          borderRadius: BorderRadius.circular(16.r),
         ),
-        SizedBox(
-          height: 80.h,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(vertical: 4.h),
-            itemCount: 7,
-            separatorBuilder: (_, __) => SizedBox(width: 8.w),
-            itemBuilder: (context, index) {
-              return _shimmerBox(
-                height: 64.h,
-                width: 64.w,
-                borderRadius: BorderRadius.circular(12.r),
-              );
-            },
-          ),
+        SizedBox(height: 12.h),
+        _shimmerBox(
+          height: 44.h,
+          width: double.infinity,
+          borderRadius: BorderRadius.circular(12.r),
         ),
-        SizedBox(height: 16.h),
-        _shimmerBox(height: 96.h, width: double.infinity, borderRadius: BorderRadius.circular(12.r)),
-        SizedBox(height: 16.h),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _shimmerSection('Habits'),
-              _shimmerSection('Tasks'),
-              SizedBox(height: 40.h),
-            ],
-          ),
-        ),
+        SizedBox(height: 14.h),
+        _shimmerSection(),
+        _shimmerSection(),
+        SizedBox(height: 50.h),
       ],
     );
   }
@@ -410,17 +556,26 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   Widget build(BuildContext context) {
     Provider.of<ThemeProvider>(context);
-    int total = 0;
-    int completed = 0;
 
-    _taskSections.values.forEach((list) {
-      total += list.length;
-      completed += list.where((t) => t.done).length;
-    });
-    _habitSections.values.forEach((list) {
-      total += list.length;
-      completed += list.where((t) => t.done).length;
-    });
+    final habitItems = _flattenSections(_habitSections);
+    final taskItems = _flattenSections(_taskSections);
+
+    final int habitTotal = habitItems.length;
+    final int habitCompleted = habitItems.where((e) => e.done).length;
+    final int taskTotal = taskItems.length;
+    final int taskCompleted = taskItems.where((e) => e.done).length;
+
+    final bool habitsTab = _activeTab == _TodayTab.habits;
+    final int activeTotal = habitsTab ? habitTotal : taskTotal;
+    final int activeCompleted = habitsTab ? habitCompleted : taskCompleted;
+    final int remaining = (activeTotal - activeCompleted).clamp(0, 9999);
+
+    final List<TaskItem> activeItems = habitsTab ? habitItems : taskItems;
+    final bool isHabitSection = habitsTab;
+    final String sectionTitle = habitsTab ? 'Habits' : 'Today';
+    final String sectionSubtitle = habitsTab
+        ? '$habitTotal active habits'
+        : '$taskTotal tasks to execute';
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -441,35 +596,93 @@ class _TodayScreenState extends State<TodayScreen> {
                   _loadAllData(date);
                 },
               ),
-              const SizedBox(height: 16),
-
-              dailyGoalCard(
-                completed: completed,
-                total: total,
-                progress: total == 0 ? 0 : completed / total,
-                streakDays: _habitsSummary?.currentStreak ?? 0,
+              const SizedBox(height: 14),
+              _buildProgressHero(
+                title: habitsTab ? 'Habits progress' : 'Tasks progress',
+                completed: activeCompleted,
+                total: activeTotal,
               ),
-
-              const SizedBox(height: 16),
+              SizedBox(height: 10.h),
+              _buildSegmentBar(habitsCount: habitTotal, tasksCount: taskTotal),
+              SizedBox(height: 10.h),
               Expanded(
                 child: _loading
                     ? _buildLoadingShimmer()
                     : _error != null
                     ? Center(child: Text(_error!))
                     : RefreshIndicator(
-                  onRefresh: () => _loadAllData(selectedDate),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      _buildSectionList('Habits', _habitSections),
-                      _buildSectionList('Tasks', _taskSections),
-                      const SizedBox(height: 40),
-                    ],
-                  ),
-                ),
+                        onRefresh: () => _loadAllData(selectedDate),
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: [
+                            _buildSectionList(
+                              title: sectionTitle,
+                              subtitle: sectionSubtitle,
+                              items: activeItems,
+                              isHabitSection: isHabitSection,
+                            ),
+                            SizedBox(height: 70.h),
+                          ],
+                        ),
+                      ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SegmentTab extends StatelessWidget {
+  final bool selected;
+  final IconData icon;
+  final String title;
+  final int count;
+  final VoidCallback onTap;
+
+  const _SegmentTab({
+    required this.selected,
+    required this.icon,
+    required this.title,
+    required this.count,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Color fg = selected ? AppTheme.primary : AppTheme.textSecondary;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(9.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.symmetric(vertical: 8.h),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppTheme.primary.withValues(alpha: 0.08)
+              : AppTheme.background,
+          borderRadius: BorderRadius.circular(9.r),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 14.sp, color: fg),
+            SizedBox(width: 6.w),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                color: fg,
+              ),
+            ),
+            SizedBox(width: 6.w),
+            Text(
+              '$count',
+              style: TextStyle(fontSize: 11.sp, color: fg),
+            ),
+          ],
         ),
       ),
     );
