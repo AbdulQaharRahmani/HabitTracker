@@ -25,8 +25,7 @@ class HabitCard extends StatelessWidget {
     final IconData icon = habit.category.icon;
     Provider.of<ThemeProvider>(context);
 
-    final Color categoryColor = habit.getColor();
-    final IconData icon = habit.getIcon();
+
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
@@ -50,12 +49,12 @@ class HabitCard extends StatelessWidget {
             width: 48.r,
             height: 48.r,
             decoration: BoxDecoration(
-              color: categoryColor.withOpacity(0.12),
+              color: color.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              color: categoryColor,
+              color: color,
               size: 26.sp,
             ),
           ),
@@ -108,7 +107,7 @@ class HabitCard extends StatelessWidget {
                         vertical: 4.h,
                       ),
                       decoration: BoxDecoration(
-                        color: categoryColor.withOpacity(0.15),
+                        color: color.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(6.r),
                       ),
                       child: Text(
@@ -116,7 +115,7 @@ class HabitCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10.sp,
                           fontWeight: FontWeight.bold,
-                          color: categoryColor,
+                          color: color,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
